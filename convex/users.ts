@@ -1,0 +1,352 @@
+import { v } from "convex/values"
+import { internalMutation, query, mutation } from "./_generated/server"
+
+/**
+ * Internal mutation to create a user from Clerk webhook
+ * Called when user.created event is received
+ * Validates: Requirements 1.5, 2.1
+ */
+export const createUserFromWebhook = internalMutation({
+  args: {
+    clerkId: v.string(),
+    email: v.string(),
+    name: v.string(),
+    profilePicture: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Check if user already exists
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", args.clerkId))
+      .first()
+
+    if (existingUser) {
+      console.log(`User with clerkId ${args.clerkId} already exists`)
+      return existingUser._id
+    }
+
+    // Create new user with default values
+    const userId = await ctx.db.insert("users", {
+      clerkId: args.clerkId,
+      email: args.email,
+      name: args.name,
+      profilePicture: args.profilePicture,
+      bio: "",
+      university: "",
+      role: "Student", // Default role
+      experienceLevel: "Beginner", // Default experience level
+      skills: [],
+      socialLinks: {
+        github: undefined,
+        linkedin: undefined,
+        twitter: undefined,
+        website: undefined,
+      },
+      followerCount: 0,
+      followingCount: 0,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    })
+
+    console.log(`Created user ${userId} for clerkId ${args.clerkId}`)
+    return userId
+  },
+})
+
+/**
+ * Internal mutation to update a user from Clerk webhook
+ * Called when user.updated event is received
+ * Validates: Requirements 1.5
+ */
+export const updateUserFromWebhook = internalMutation({
+  args: {
+    clerkId: v.string(),
+    email: v.string(),
+    name: v.string(),
+    profilePicture: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Find the user by clerkId
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", args.clerkId))
+      .first()
+
+    if (!user) {
+      console.error(`User with clerkId ${args.clerkId} not found`)
+      throw new Error("User not found")
+    }
+
+    // Update user with new data from Clerk
+    await ctx.db.patch(user._id, {
+      email: args.email,
+      name: args.name,
+      profilePicture: args.profilePicture,
+      updatedAt: Date.now(),
+    })
+
+    console.log(`Updated user ${user._id} for clerkId ${args.clerkId}`)
+    return user._id
+  },
+})
+
+/**
+ * Get the current authenticated user
+ * Validates: Requirements 2.9, 12.4
+ */
+export const getCurrentUser = query({
+  args: {},
+  handler: async (ctx) => {
+    // Get the authenticated user identity
+    const identity = await ctx.auth.getUserIdentity()
+    
+    if (!identity) {
+      return null
+    }
+
+    // Find user by Clerk ID
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .first()
+
+    return user
+  },
+})
+
+/**
+ * Get a user by their ID
+ * Validates: Requirements 2.9, 12.4
+ */
+export const getUserById = query({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    // Require authentication
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    // Fetch user by ID
+    const user = await ctx.db.get(args.userId)
+    
+    return user
+  },
+})
+
+/**
+ * Search users with filters
+ * Validates: Requirements 8.2, 8.3, 8.4, 12.4
+ */
+export const searchUsers = query({
+  args: {
+    query: v.optional(v.string()),
+    role: v.optional(
+      v.union(
+        v.literal("Student"),
+        v.literal("Research Scholar"),
+        v.literal("Faculty")
+      )
+    ),
+    skills: v.optional(v.array(v.string())),
+  },
+  handler: async (ctx, args) => {
+    // Require authentication
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    // Get all users
+    let users = await ctx.db.query("users").collect()
+
+    // Filter by name (case-insensitive substring match)
+    if (args.query) {
+      const queryLower = args.query.toLowerCase()
+      users = users.filter((user) =>
+        user.name.toLowerCase().includes(queryLower)
+      )
+    }
+
+    // Filter by role
+    if (args.role) {
+      users = users.filter((user) => user.role === args.role)
+    }
+
+    // Filter by skills (user must have at least one of the specified skills)
+    if (args.skills && args.skills.length > 0) {
+      users = users.filter((user) =>
+        args.skills!.some((skill) => user.skills.includes(skill))
+      )
+    }
+
+    return users
+  },
+})
+
+/**
+ * Update user profile
+ * Validates: Requirements 2.3, 12.5
+ */
+export const updateProfile = mutation({
+  args: {
+    bio: v.optional(v.string()),
+    university: v.optional(v.string()),
+    role: v.optional(
+      v.union(
+        v.literal("Student"),
+        v.literal("Research Scholar"),
+        v.literal("Faculty")
+      )
+    ),
+    experienceLevel: v.optional(
+      v.union(
+        v.literal("Beginner"),
+        v.literal("Intermediate"),
+        v.literal("Advanced"),
+        v.literal("Expert")
+      )
+    ),
+    socialLinks: v.optional(
+      v.object({
+        github: v.optional(v.string()),
+        linkedin: v.optional(v.string()),
+        twitter: v.optional(v.string()),
+        website: v.optional(v.string()),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    // Get the authenticated user identity
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    // Find the current user
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .first()
+
+    if (!user) {
+      throw new Error("User not found")
+    }
+
+    // Validate bio length
+    if (args.bio !== undefined && args.bio.length > 500) {
+      throw new Error("Bio must not exceed 500 characters")
+    }
+
+    // Validate university length
+    if (args.university !== undefined && args.university.length > 200) {
+      throw new Error("University name must not exceed 200 characters")
+    }
+
+    // Update user profile
+    const updates: any = {
+      updatedAt: Date.now(),
+    }
+
+    if (args.bio !== undefined) updates.bio = args.bio
+    if (args.university !== undefined) updates.university = args.university
+    if (args.role !== undefined) updates.role = args.role
+    if (args.experienceLevel !== undefined)
+      updates.experienceLevel = args.experienceLevel
+    if (args.socialLinks !== undefined) updates.socialLinks = args.socialLinks
+
+    await ctx.db.patch(user._id, updates)
+
+    return user._id
+  },
+})
+
+/**
+ * Add a skill to user profile
+ * Validates: Requirements 3.1, 3.2, 12.5
+ */
+export const addSkill = mutation({
+  args: {
+    skill: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Get the authenticated user identity
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    // Find the current user
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .first()
+
+    if (!user) {
+      throw new Error("User not found")
+    }
+
+    // Validate skill name
+    if (!args.skill || args.skill.trim().length === 0) {
+      throw new Error("Skill name cannot be empty")
+    }
+
+    if (args.skill.length > 50) {
+      throw new Error("Skill name must not exceed 50 characters")
+    }
+
+    // Check for duplicate
+    if (user.skills.includes(args.skill)) {
+      throw new Error("Skill already exists")
+    }
+
+    // Add skill to user's skills array
+    const updatedSkills = [...user.skills, args.skill]
+
+    await ctx.db.patch(user._id, {
+      skills: updatedSkills,
+      updatedAt: Date.now(),
+    })
+
+    return updatedSkills
+  },
+})
+
+/**
+ * Remove a skill from user profile
+ * Validates: Requirements 3.2, 12.5
+ */
+export const removeSkill = mutation({
+  args: {
+    skill: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Get the authenticated user identity
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    // Find the current user
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .first()
+
+    if (!user) {
+      throw new Error("User not found")
+    }
+
+    // Remove skill from user's skills array
+    const updatedSkills = user.skills.filter((s) => s !== args.skill)
+
+    await ctx.db.patch(user._id, {
+      skills: updatedSkills,
+      updatedAt: Date.now(),
+    })
+
+    return updatedSkills
+  },
+})
