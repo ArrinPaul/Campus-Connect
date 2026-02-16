@@ -1,0 +1,353 @@
+import { v } from "convex/values"
+import { query, mutation } from "./_generated/server"
+import { Id } from "./_generated/dataModel"
+
+/**
+ * Get feed posts with pagination
+ * Returns posts in reverse chronological order (newest first)
+ * Includes author data in responses
+ * Validates: Requirements 6.1, 6.2, 6.3, 12.4
+ */
+export const getFeedPosts = query({
+  args: {
+    limit: v.optional(v.number()),
+    cursor: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Require authentication
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const limit = args.limit ?? 20 // Default to 20 posts per page
+
+    // Get all posts ordered by createdAt descending (newest first)
+    let postsQuery = ctx.db
+      .query("posts")
+      .withIndex("by_createdAt")
+      .order("desc")
+
+    // Apply cursor-based pagination if cursor is provided
+    if (args.cursor) {
+      const cursorPost = await ctx.db.get(args.cursor as Id<"posts">)
+      if (cursorPost) {
+        postsQuery = postsQuery.filter((q) =>
+          q.lt(q.field("createdAt"), cursorPost.createdAt)
+        )
+      }
+    }
+
+    // Fetch posts with limit + 1 to determine if there are more
+    const posts = await postsQuery.take(limit + 1)
+
+    // Determine if there are more posts
+    const hasMore = posts.length > limit
+    const postsToReturn = hasMore ? posts.slice(0, limit) : posts
+
+    // Fetch author data for each post
+    const postsWithAuthors = await Promise.all(
+      postsToReturn.map(async (post) => {
+        const author = await ctx.db.get(post.authorId)
+        return {
+          ...post,
+          author: author || null,
+        }
+      })
+    )
+
+    // Return posts with pagination info
+    return {
+      posts: postsWithAuthors,
+      nextCursor: hasMore ? postsToReturn[postsToReturn.length - 1]._id : null,
+      hasMore,
+    }
+  },
+})
+
+/**
+ * Get a single post by ID
+ * Includes author data in response
+ * Validates: Requirements 6.6, 12.4
+ */
+export const getPostById = query({
+  args: {
+    postId: v.id("posts"),
+  },
+  handler: async (ctx, args) => {
+    // Require authentication
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    // Fetch the post
+    const post = await ctx.db.get(args.postId)
+
+    if (!post) {
+      return null
+    }
+
+    // Fetch author data
+    const author = await ctx.db.get(post.authorId)
+
+    return {
+      ...post,
+      author: author || null,
+    }
+  },
+})
+
+/**
+ * Create a new post
+ * Validates content (non-empty, max 5000 chars)
+ * Initializes likeCount and commentCount to 0
+ * Validates: Requirements 4.1, 4.2, 4.3, 4.5, 12.4, 12.5
+ */
+export const createPost = mutation({
+  args: {
+    content: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Require authentication
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    // Get current user
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .unique()
+
+    if (!user) {
+      throw new Error("User not found")
+    }
+
+    // Validate content - non-empty
+    if (!args.content || args.content.trim().length === 0) {
+      throw new Error("Post content cannot be empty")
+    }
+
+    // Validate content - max 5000 characters
+    if (args.content.length > 5000) {
+      throw new Error("Post content must not exceed 5000 characters")
+    }
+
+    // Create post with initialized counts
+    const now = Date.now()
+    const postId = await ctx.db.insert("posts", {
+      authorId: user._id,
+      content: args.content,
+      likeCount: 0,
+      commentCount: 0,
+      createdAt: now,
+      updatedAt: now,
+    })
+
+    // Return the created post
+    const post = await ctx.db.get(postId)
+    return post
+  },
+})
+
+/**
+ * Delete a post
+ * Validates user is the post author (authorization)
+ * Validates: Requirements 4.6, 4.7, 12.4, 12.5
+ */
+export const deletePost = mutation({
+  args: {
+    postId: v.id("posts"),
+  },
+  handler: async (ctx, args) => {
+    // Require authentication
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    // Get current user
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .unique()
+
+    if (!user) {
+      throw new Error("User not found")
+    }
+
+    // Get the post
+    const post = await ctx.db.get(args.postId)
+
+    if (!post) {
+      throw new Error("Post not found")
+    }
+
+    // Verify user is the post author (authorization)
+    if (post.authorId !== user._id) {
+      throw new Error("Forbidden: You can only delete your own posts")
+    }
+
+    // Delete the post
+    await ctx.db.delete(args.postId)
+
+    return { success: true }
+  },
+})
+
+/**
+ * Check if current user has liked a post
+ * Validates: Requirements 5.4, 12.4
+ */
+export const hasUserLikedPost = query({
+  args: {
+    postId: v.id("posts"),
+  },
+  handler: async (ctx, args) => {
+    // Require authentication
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      return false
+    }
+
+    // Get current user
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .unique()
+
+    if (!user) {
+      return false
+    }
+
+    // Check if like exists
+    const like = await ctx.db
+      .query("likes")
+      .withIndex("by_user_and_post", (q) =>
+        q.eq("userId", user._id).eq("postId", args.postId)
+      )
+      .unique()
+
+    return like !== null
+  },
+})
+
+/**
+ * Like a post
+ * Validates user hasn't already liked the post
+ * Increments post likeCount
+ * Validates: Requirements 5.1, 5.2, 5.4, 12.4
+ */
+export const likePost = mutation({
+  args: {
+    postId: v.id("posts"),
+  },
+  handler: async (ctx, args) => {
+    // Require authentication
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    // Get current user
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .unique()
+
+    if (!user) {
+      throw new Error("User not found")
+    }
+
+    // Check if post exists
+    const post = await ctx.db.get(args.postId)
+    if (!post) {
+      throw new Error("Post not found")
+    }
+
+    // Check if user has already liked the post
+    const existingLike = await ctx.db
+      .query("likes")
+      .withIndex("by_user_and_post", (q) =>
+        q.eq("userId", user._id).eq("postId", args.postId)
+      )
+      .unique()
+
+    if (existingLike) {
+      throw new Error("You have already liked this post")
+    }
+
+    // Create like record
+    await ctx.db.insert("likes", {
+      userId: user._id,
+      postId: args.postId,
+      createdAt: Date.now(),
+    })
+
+    // Increment post likeCount
+    await ctx.db.patch(args.postId, {
+      likeCount: post.likeCount + 1,
+    })
+
+    return { success: true }
+  },
+})
+
+/**
+ * Unlike a post
+ * Validates user has previously liked the post
+ * Decrements post likeCount
+ * Validates: Requirements 5.3, 12.4
+ */
+export const unlikePost = mutation({
+  args: {
+    postId: v.id("posts"),
+  },
+  handler: async (ctx, args) => {
+    // Require authentication
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    // Get current user
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .unique()
+
+    if (!user) {
+      throw new Error("User not found")
+    }
+
+    // Check if post exists
+    const post = await ctx.db.get(args.postId)
+    if (!post) {
+      throw new Error("Post not found")
+    }
+
+    // Check if user has liked the post
+    const existingLike = await ctx.db
+      .query("likes")
+      .withIndex("by_user_and_post", (q) =>
+        q.eq("userId", user._id).eq("postId", args.postId)
+      )
+      .unique()
+
+    if (!existingLike) {
+      throw new Error("You have not liked this post")
+    }
+
+    // Delete like record
+    await ctx.db.delete(existingLike._id)
+
+    // Decrement post likeCount
+    await ctx.db.patch(args.postId, {
+      likeCount: Math.max(0, post.likeCount - 1), // Ensure count doesn't go negative
+    })
+
+    return { success: true }
+  },
+})

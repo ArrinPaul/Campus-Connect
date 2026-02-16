@@ -350,3 +350,61 @@ export const removeSkill = mutation({
     return updatedSkills
   },
 })
+/**
+ * Generate an upload URL for profile picture
+ * Validates: Requirements 2.4, 12.4
+ */
+export const generateUploadUrl = mutation({
+  args: {},
+  handler: async (ctx) => {
+    // Require authentication
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    return await ctx.storage.generateUploadUrl()
+  },
+})
+
+/**
+ * Update user profile picture
+ * Validates: Requirements 2.4, 12.5
+ */
+export const updateProfilePicture = mutation({
+  args: {
+    storageId: v.id("_storage"),
+  },
+  handler: async (ctx, args) => {
+    // Get the authenticated user identity
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    // Find the current user
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .first()
+
+    if (!user) {
+      throw new Error("User not found")
+    }
+
+    // Get the URL for the uploaded file
+    const url = await ctx.storage.getUrl(args.storageId)
+
+    if (!url) {
+      throw new Error("Failed to get file URL")
+    }
+
+    // Update user profile picture
+    await ctx.db.patch(user._id, {
+      profilePicture: url,
+      updatedAt: Date.now(),
+    })
+
+    return url
+  },
+})

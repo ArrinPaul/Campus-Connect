@@ -173,4 +173,49 @@ describe("ProfileForm", () => {
     expect(submitButton).toBeDisabled()
     expect(screen.getByText("Saving...")).toBeInTheDocument()
   })
+
+  it("should display profile picture preview when image is selected", async () => {
+    render(<ProfileForm />)
+
+    const file = new File(["test"], "test.png", { type: "image/png" })
+    const input = screen.getByLabelText(/profile picture/i) as HTMLInputElement
+
+    fireEvent.change(input, { target: { files: [file] } })
+
+    await waitFor(() => {
+      const preview = screen.getByAltText("Profile preview")
+      expect(preview).toBeInTheDocument()
+    })
+  })
+
+  it("should validate image file type", async () => {
+    render(<ProfileForm />)
+
+    const file = new File(["test"], "test.txt", { type: "text/plain" })
+    const input = screen.getByLabelText(/profile picture/i) as HTMLInputElement
+
+    fireEvent.change(input, { target: { files: [file] } })
+
+    await waitFor(() => {
+      expect(screen.getByText("Please select an image file")).toBeInTheDocument()
+    })
+  })
+
+  it("should validate image file size", async () => {
+    render(<ProfileForm />)
+
+    // Create a file larger than 5MB
+    const largeFile = new File(["x".repeat(6 * 1024 * 1024)], "large.png", {
+      type: "image/png",
+    })
+    const input = screen.getByLabelText(/profile picture/i) as HTMLInputElement
+
+    fireEvent.change(input, { target: { files: [largeFile] } })
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Image size must be less than 5MB")
+      ).toBeInTheDocument()
+    })
+  })
 })

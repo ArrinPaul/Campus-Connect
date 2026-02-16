@@ -10,4 +10,13 @@ export const api = {
     createUserFromWebhook: 'users:createUserFromWebhook',
     updateUserFromWebhook: 'users:updateUserFromWebhook',
   },
+  posts: {
+    getFeedPosts: 'posts:getFeedPosts',
+    getPostById: 'posts:getPostById',
+    createPost: 'posts:createPost',
+    deletePost: 'posts:deletePost',
+    likePost: 'posts:likePost',
+    unlikePost: 'posts:unlikePost',
+    hasUserLikedPost: 'posts:hasUserLikedPost',
+  },
 }

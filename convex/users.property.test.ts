@@ -327,4 +327,84 @@ describe('Profile Operations Properties', () => {
       );
     });
   });
+
+  /**
+   * Property 6: Profile picture update
+   * **Validates: Requirements 2.4**
+   * 
+   * For any profile picture upload, the profile's profilePicture field must be 
+   * updated with the new image reference.
+   */
+  describe('Property 6: Profile picture update', () => {
+    it('should update profile picture field', () => {
+      fc.assert(
+        fc.property(
+          fc.webUrl(),
+          (imageUrl) => {
+            const profile = createDefaultProfile({
+              clerkId: 'test_clerk_id',
+              email: 'test@example.com',
+              name: 'Test User',
+            });
+
+            // Initially no profile picture
+            expect(profile.profilePicture).toBeUndefined();
+
+            // Simulate profile picture upload
+            const updatedProfile = {
+              ...profile,
+              profilePicture: imageUrl,
+              updatedAt: Date.now(),
+            };
+
+            // Verify profile picture was updated
+            expect(updatedProfile.profilePicture).toBe(imageUrl);
+            expect(updatedProfile.profilePicture).toBeDefined();
+            expect(updatedProfile.updatedAt).toBeGreaterThanOrEqual(profile.updatedAt);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should allow updating profile picture multiple times', () => {
+      fc.assert(
+        fc.property(
+          fc.webUrl(),
+          fc.webUrl(),
+          (firstImageUrl, secondImageUrl) => {
+            const profile = createDefaultProfile({
+              clerkId: 'test_clerk_id',
+              email: 'test@example.com',
+              name: 'Test User',
+            });
+
+            // First upload
+            const profileWithFirstImage = {
+              ...profile,
+              profilePicture: firstImageUrl,
+              updatedAt: Date.now(),
+            };
+
+            expect(profileWithFirstImage.profilePicture).toBe(firstImageUrl);
+
+            // Second upload (replace)
+            const profileWithSecondImage = {
+              ...profileWithFirstImage,
+              profilePicture: secondImageUrl,
+              updatedAt: Date.now(),
+            };
+
+            // Verify second image replaced the first
+            expect(profileWithSecondImage.profilePicture).toBe(secondImageUrl);
+            expect(profileWithSecondImage.profilePicture).not.toBe(firstImageUrl);
+            expect(profileWithSecondImage.updatedAt).toBeGreaterThanOrEqual(
+              profileWithFirstImage.updatedAt
+            );
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
 });

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import {
@@ -16,6 +16,7 @@ interface ProfileFormProps {
     university?: string
     role?: "Student" | "Research Scholar" | "Faculty"
     experienceLevel?: "Beginner" | "Intermediate" | "Advanced" | "Expert"
+    profilePicture?: string
     socialLinks?: {
       github?: string
       linkedin?: string
@@ -28,6 +29,14 @@ interface ProfileFormProps {
 
 export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
   const updateProfile = useMutation(api.users.updateProfile)
+  const generateUploadUrl = useMutation(api.users.generateUploadUrl)
+  const updateProfilePicture = useMutation(api.users.updateProfilePicture)
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    initialData?.profilePicture || null
+  )
 
   const [bio, setBio] = useState(initialData?.bio || "")
   const [university, setUniversity] = useState(initialData?.university || "")
@@ -47,6 +56,33 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [successMessage, setSuccessMessage] = useState("")
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        setErrors({ ...errors, image: "Please select an image file" })
+        return
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors({ ...errors, image: "Image size must be less than 5MB" })
+        return
+      }
+
+      setSelectedImage(file)
+      setErrors({ ...errors, image: "" })
+
+      // Create preview
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -84,6 +120,37 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
     setIsSubmitting(true)
 
     try {
+      // Upload profile picture if a new image is selected
+      if (selectedImage) {
+        try {
+          // Get upload URL from Convex
+          const uploadUrl = await generateUploadUrl()
+
+          // Upload the file
+          const result = await fetch(uploadUrl, {
+            method: "POST",
+            headers: { "Content-Type": selectedImage.type },
+            body: selectedImage,
+          })
+
+          if (!result.ok) {
+            throw new Error("Failed to upload image")
+          }
+
+          const { storageId } = await result.json()
+
+          // Update profile picture in database
+          await updateProfilePicture({ storageId })
+        } catch (uploadError) {
+          throw new Error(
+            uploadError instanceof Error
+              ? uploadError.message
+              : "Failed to upload profile picture"
+          )
+        }
+      }
+
+      // Update profile data
       await updateProfile({
         bio,
         university,
@@ -98,6 +165,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
       })
 
       setSuccessMessage("Profile updated successfully!")
+      setSelectedImage(null)
       if (onSave) {
         onSave()
       }
@@ -112,6 +180,54 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Profile Picture Upload */}
+      <div>
+        <label htmlFor="profilePicture" className="block text-sm font-medium text-gray-700">
+          Profile Picture
+        </label>
+        <div className="mt-2 flex items-center gap-4">
+          {/* Image Preview */}
+          <div className="relative h-20 w-20 flex-shrink-0">
+            {imagePreview ? (
+              <img
+                src={imagePreview}
+                alt="Profile preview"
+                className="h-20 w-20 rounded-full object-cover"
+              />
+            ) : (
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-200 text-2xl font-bold text-gray-600">
+                ?
+              </div>
+            )}
+          </div>
+
+          {/* Upload Button */}
+          <div className="flex-1">
+            <input
+              id="profilePicture"
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Choose Image
+            </button>
+            <p className="mt-1 text-xs text-gray-500">
+              Max 5MB. Supported formats: JPG, PNG, GIF
+            </p>
+          </div>
+        </div>
+        {errors.image && (
+          <p className="mt-1 text-sm text-red-600">{errors.image}</p>
+        )}
+      </div>
+
       {/* Bio */}
       <div>
         <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
