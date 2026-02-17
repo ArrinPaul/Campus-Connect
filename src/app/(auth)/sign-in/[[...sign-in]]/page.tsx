@@ -17,6 +17,11 @@ export default function SignInPage() {
               card: "shadow-xl",
             },
           }}
+          signInMethods={[
+            { type: "email_code" },
+            { type: "oauth_google" },
+            { type: "oauth_github" },
+          ]}
         />
       </div>
     </div>

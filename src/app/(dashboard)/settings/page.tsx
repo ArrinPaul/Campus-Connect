@@ -1,5 +1,6 @@
 "use client"
 
+import { useUser } from "@clerk/nextjs"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { ProfileForm } from "@/components/profile/ProfileForm"
@@ -7,7 +8,32 @@ import { ThemeToggle } from "@/components/theme/theme-toggle"
 import { LoadingSpinner } from "@/components/ui/loading-skeleton"
 
 export default function SettingsPage() {
-  const currentUser = useQuery(api.users.getCurrentUser)
+  const { isLoaded, isSignedIn } = useUser()
+  const currentUser = useQuery(
+    api.users.getCurrentUser,
+    isLoaded && isSignedIn ? {} : "skip"
+  )
+
+  // Show loading state while auth is being checked
+  if (!isLoaded) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+      </div>
+    )
+  }
+
+  // Handle not authenticated
+  if (!isSignedIn) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Not Authenticated</h2>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">Please sign in to access settings.</p>
+        </div>
+      </div>
+    )
+  }
 
   if (currentUser === undefined) {
     return (

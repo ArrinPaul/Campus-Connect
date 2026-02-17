@@ -55,7 +55,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
     <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
       <div>
         <label htmlFor="postContent" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          What's on your mind?
+          What&apos;s on your mind?
         </label>
         <textarea
           id="postContent"

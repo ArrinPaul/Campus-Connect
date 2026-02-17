@@ -1,5 +1,6 @@
 "use client"
 
+import { useUser } from "@clerk/nextjs"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
@@ -10,7 +11,11 @@ interface FollowingListProps {
 }
 
 export function FollowingList({ userId }: FollowingListProps) {
-  const following = useQuery(api.follows.getFollowing, { userId })
+  const { isLoaded, isSignedIn } = useUser()
+  const following = useQuery(
+    api.follows.getFollowing,
+    isLoaded && isSignedIn ? { userId } : "skip"
+  )
 
   if (following === undefined) {
     return (

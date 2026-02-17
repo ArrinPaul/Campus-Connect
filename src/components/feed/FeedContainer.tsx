@@ -1,33 +1,40 @@
 "use client"
 
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback, useEffect, useRef } from "react"
+import { useUser } from "@clerk/nextjs"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { PostCard } from "@/components/posts/PostCard"
 import { InfiniteScrollTrigger } from "./InfiniteScrollTrigger"
 
 export function FeedContainer() {
+  const { isLoaded, isSignedIn } = useUser()
   const [allPosts, setAllPosts] = useState<any[]>([])
   const [cursor, setCursor] = useState<string | null>(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
-  const [hasInitialized, setHasInitialized] = useState(false)
+  const hasInitializedRef = useRef(false)
 
-  // Initial query
-  const feedData = useQuery(api.posts.getFeedPosts, { limit: 20 })
+  // Initial query - only run when authenticated
+  const feedData = useQuery(
+    api.posts.getFeedPosts,
+    isLoaded && isSignedIn ? { limit: 20 } : "skip"
+  )
 
   // Query for loading more posts
   const moreFeedData = useQuery(
     api.posts.getFeedPosts,
-    cursor && isLoadingMore ? { limit: 20, cursor } : "skip"
+    isLoaded && isSignedIn && cursor && isLoadingMore ? { limit: 20, cursor } : "skip"
   )
 
   // Update allPosts when initial data loads or updates (real-time)
   useEffect(() => {
-    if (feedData && !hasInitialized) {
+    if (!feedData) return
+    
+    if (!hasInitializedRef.current) {
       setAllPosts(feedData.posts)
       setCursor(feedData.nextCursor)
-      setHasInitialized(true)
-    } else if (feedData && hasInitialized && !isLoadingMore) {
+      hasInitializedRef.current = true
+    } else if (!isLoadingMore) {
       // Handle real-time updates for the initial batch
       // Only update if we're not currently loading more posts
       setAllPosts((prev) => {
@@ -38,7 +45,7 @@ export function FeedContainer() {
       })
       setCursor(feedData.nextCursor)
     }
-  }, [feedData, hasInitialized, isLoadingMore])
+  }, [feedData, isLoadingMore])
 
   // Update allPosts when more data loads
   useEffect(() => {
@@ -55,6 +62,38 @@ export function FeedContainer() {
       setIsLoadingMore(true)
     }
   }, [isLoadingMore, cursor])
+
+  // Show loading state while auth is being checked
+  if (!isLoaded) {
+    return (
+      <div className="space-y-3 sm:space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="animate-pulse rounded-lg bg-white dark:bg-gray-800 p-4 shadow dark:shadow-gray-900/50 sm:p-6">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 sm:h-10 sm:w-10" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 w-24 rounded bg-gray-200 dark:bg-gray-700 sm:h-4 sm:w-32" />
+                <div className="h-2 w-16 rounded bg-gray-200 dark:bg-gray-700 sm:h-3 sm:w-24" />
+              </div>
+            </div>
+            <div className="mt-3 space-y-2 sm:mt-4">
+              <div className="h-3 w-full rounded bg-gray-200 dark:bg-gray-700 sm:h-4" />
+              <div className="h-3 w-3/4 rounded bg-gray-200 dark:bg-gray-700 sm:h-4" />
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  // Handle not authenticated
+  if (!isSignedIn) {
+    return (
+      <div className="rounded-lg bg-white dark:bg-gray-800 p-8 text-center shadow dark:shadow-gray-900/50">
+        <p className="text-gray-600 dark:text-gray-400">Please sign in to view the feed.</p>
+      </div>
+    )
+  }
 
   // Initial loading state
   if (feedData === undefined) {
@@ -80,7 +119,7 @@ export function FeedContainer() {
   }
 
   // Empty state
-  if (allPosts.length === 0 && hasInitialized) {
+  if (allPosts.length === 0 && hasInitializedRef.current) {
     return (
       <div className="rounded-lg bg-white dark:bg-gray-800 p-8 text-center shadow dark:shadow-gray-900/50 sm:p-12">
         <svg

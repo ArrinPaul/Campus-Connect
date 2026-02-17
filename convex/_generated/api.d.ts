@@ -8,8 +8,11 @@
  * @module
  */
 
+import type * as comments from "../comments.js";
+import type * as follows from "../follows.js";
 import type * as http from "../http.js";
 import type * as posts from "../posts.js";
+import type * as sanitize from "../sanitize.js";
 import type * as users from "../users.js";
 
 import type {
@@ -19,8 +22,11 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  comments: typeof comments;
+  follows: typeof follows;
   http: typeof http;
   posts: typeof posts;
+  sanitize: typeof sanitize;
   users: typeof users;
 }>;
 

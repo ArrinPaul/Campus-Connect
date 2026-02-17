@@ -16,8 +16,10 @@ describe('Follow Mutations', () => {
     });
 
     it('should allow following different users', () => {
-      const currentUserId = 'user123';
-      const targetUserId = 'user456';
+      // Simulate dynamic user IDs that could be equal or different at runtime
+      const getUserId = (id: string): string => id;
+      const currentUserId = getUserId('user123');
+      const targetUserId = getUserId('user456');
       
       const isSelfFollow = currentUserId === targetUserId;
       expect(isSelfFollow).toBe(false);

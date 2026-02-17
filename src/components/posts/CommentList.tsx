@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import { useUser } from "@clerk/nextjs"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
@@ -30,8 +31,12 @@ interface CommentListProps {
 }
 
 export function CommentList({ postId, comments, isLoading = false }: CommentListProps) {
+  const { isLoaded, isSignedIn } = useUser()
   const deleteComment = useMutation(api.comments.deleteComment)
-  const currentUser = useQuery(api.users.getCurrentUser)
+  const currentUser = useQuery(
+    api.users.getCurrentUser,
+    isLoaded && isSignedIn ? {} : "skip"
+  )
   const [deletingId, setDeletingId] = useState<Id<"comments"> | null>(null)
 
   const handleDeleteComment = async (commentId: Id<"comments">) => {

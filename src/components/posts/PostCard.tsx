@@ -2,6 +2,7 @@
 
 import { useState, memo } from "react"
 import Image from "next/image"
+import { useUser } from "@clerk/nextjs"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
@@ -31,12 +32,19 @@ interface PostCardProps {
 }
 
 export const PostCard = memo(function PostCard({ post, author }: PostCardProps) {
+  const { isLoaded, isSignedIn } = useUser()
   const deletePost = useMutation(api.posts.deletePost)
   const likePost = useMutation(api.posts.likePost)
   const unlikePost = useMutation(api.posts.unlikePost)
   
-  const currentUser = useQuery(api.users.getCurrentUser)
-  const hasLiked = useQuery(api.posts.hasUserLikedPost, { postId: post._id })
+  const currentUser = useQuery(
+    api.users.getCurrentUser,
+    isLoaded && isSignedIn ? {} : "skip"
+  )
+  const hasLiked = useQuery(
+    api.posts.hasUserLikedPost,
+    isLoaded && isSignedIn ? { postId: post._id } : "skip"
+  )
 
   const [isDeleting, setIsDeleting] = useState(false)
   const [isLiking, setIsLiking] = useState(false)

@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import { useState } from "react"
+import { useUser } from "@clerk/nextjs"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
@@ -31,9 +32,13 @@ interface ProfileHeaderProps {
 }
 
 export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
+  const { isLoaded, isSignedIn } = useUser()
   const followUser = useMutation(api.follows.followUser)
   const unfollowUser = useMutation(api.follows.unfollowUser)
-  const isFollowingQuery = useQuery(api.follows.isFollowing, { userId: user._id })
+  const isFollowingQuery = useQuery(
+    api.follows.isFollowing,
+    isLoaded && isSignedIn && !isOwnProfile ? { userId: user._id } : "skip"
+  )
   
   const [optimisticFollowing, setOptimisticFollowing] = useState<boolean | null>(null)
   const [isLoading, setIsLoading] = useState(false)

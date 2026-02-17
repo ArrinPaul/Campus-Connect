@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useUser } from "@clerk/nextjs"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { UserSearchBar } from "@/components/profile/UserSearchBar"
@@ -14,17 +15,23 @@ interface FilterCriteria {
 }
 
 export default function DiscoverPage() {
+  const { isLoaded, isSignedIn } = useUser()
   const [searchQuery, setSearchQuery] = useState("")
   const [filters, setFilters] = useState<FilterCriteria>({
     skills: [],
   })
 
-  // Query users with search and filters
-  const users = useQuery(api.users.searchUsers, {
-    query: searchQuery || undefined,
-    role: filters.role,
-    skills: filters.skills.length > 0 ? filters.skills : undefined,
-  })
+  // Query users with search and filters (skip if not authenticated)
+  const users = useQuery(
+    api.users.searchUsers,
+    isLoaded && isSignedIn
+      ? {
+          query: searchQuery || undefined,
+          role: filters.role,
+          skills: filters.skills.length > 0 ? filters.skills : undefined,
+        }
+      : "skip"
+  )
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)

@@ -32,7 +32,9 @@ jest.mock("next/navigation", () => ({
 }))
 
 jest.mock("next/link", () => {
-  return ({ children, ...props }: any) => <a {...props}>{children}</a>
+  const MockLink = ({ children, ...props }: any) => <a {...props}>{children}</a>
+  MockLink.displayName = "MockLink"
+  return MockLink
 })
 
 describe("User Flow Integration Tests", () => {

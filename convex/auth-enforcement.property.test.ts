@@ -61,9 +61,9 @@ describe('Authentication Enforcement Property Tests', () => {
    * Property 43: All queries must check authentication
    * This test validates the pattern used in all queries
    */
-  it('Property 43: should handle unauthenticated requests appropriately in queries', () => {
-    fc.assert(
-      fc.property(
+  it('Property 43: should handle unauthenticated requests appropriately in queries', async () => {
+    await fc.assert(
+      fc.asyncProperty(
         fc.constantFrom(
           'getFeedPosts',
           'getPostById',
@@ -75,7 +75,7 @@ describe('Authentication Enforcement Property Tests', () => {
           'getFollowers',
           'getFollowing'
         ),
-        (queryName) => {
+        async (queryName) => {
           // Simulate the authentication check pattern used in queries
           const mockContext = {
             auth: {
@@ -90,8 +90,6 @@ describe('Authentication Enforcement Property Tests', () => {
               // Some queries throw, others return null/false
               if (queryName === 'hasUserLikedPost' || queryName === 'isFollowing') {
                 return false;
-              } else if (queryName === 'getCurrentUser') {
-                return null;
               } else {
                 throw new Error('Unauthorized');
               }
@@ -101,11 +99,9 @@ describe('Authentication Enforcement Property Tests', () => {
 
           // Verify that unauthenticated requests are handled appropriately
           if (queryName === 'hasUserLikedPost' || queryName === 'isFollowing') {
-            expect(checkAuth(mockContext)).resolves.toBe(false);
-          } else if (queryName === 'getCurrentUser') {
-            expect(checkAuth(mockContext)).resolves.toBeNull();
+            await expect(checkAuth(mockContext)).resolves.toBe(false);
           } else {
-            expect(checkAuth(mockContext)).rejects.toThrow('Unauthorized');
+            await expect(checkAuth(mockContext)).rejects.toThrow('Unauthorized');
           }
         }
       ),

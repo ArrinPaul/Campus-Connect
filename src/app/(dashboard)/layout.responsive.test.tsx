@@ -18,9 +18,11 @@ jest.mock("@/components/navigation/mobile-nav", () => ({
 
 // Mock Next.js Link
 jest.mock("next/link", () => {
-  return ({ children, ...props }: any) => (
+  const MockLink = ({ children, ...props }: any) => (
     <a {...props}>{children}</a>
   )
+  MockLink.displayName = "MockLink"
+  return MockLink
 })
 
 describe("DashboardLayout - Responsive Design", () => {
