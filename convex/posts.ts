@@ -2,6 +2,7 @@ import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
 import { Id } from "./_generated/dataModel"
 import { sanitizeText } from "./sanitize"
+import { linkHashtagsToPost } from "./hashtags"
 
 /**
  * Get feed posts with pagination
@@ -179,6 +180,9 @@ export const createPost = mutation({
       createdAt: now,
       updatedAt: now,
     })
+
+    // Link hashtags to post
+    await linkHashtagsToPost(ctx, postId, sanitizedContent)
 
     // Return the created post
     const post = await ctx.db.get(postId)

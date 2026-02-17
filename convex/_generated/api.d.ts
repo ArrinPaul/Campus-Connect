@@ -11,6 +11,7 @@
 import type * as bookmarks from "../bookmarks.js";
 import type * as comments from "../comments.js";
 import type * as follows from "../follows.js";
+import type * as hashtags from "../hashtags.js";
 import type * as http from "../http.js";
 import type * as posts from "../posts.js";
 import type * as reactions from "../reactions.js";
@@ -27,6 +28,7 @@ declare const fullApi: ApiFromModules<{
   bookmarks: typeof bookmarks;
   comments: typeof comments;
   follows: typeof follows;
+  hashtags: typeof hashtags;
   http: typeof http;
   posts: typeof posts;
   reactions: typeof reactions;

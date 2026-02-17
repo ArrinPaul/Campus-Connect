@@ -11,6 +11,7 @@ import { CommentComposer } from "@/components/posts/CommentComposer"
 import { ReactionPicker, ReactionSummary } from "@/components/posts/ReactionPicker"
 import { ReactionModal } from "@/components/posts/ReactionModal"
 import { BookmarkButton } from "@/components/posts/BookmarkButton"
+import { PostContent } from "@/components/posts/PostContent"
 
 interface User {
   _id: Id<"users">
@@ -137,7 +138,10 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
 
       {/* Post Content */}
       <div className="mt-3 sm:mt-4">
-        <p className="whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200 sm:text-base">{post.content}</p>
+        <PostContent
+          content={post.content}
+          className="text-sm text-gray-800 dark:text-gray-200 sm:text-base"
+        />
       </div>
 
       {/* Engagement Stats and Actions */}

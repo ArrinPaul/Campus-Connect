@@ -139,4 +139,23 @@ export default defineSchema({
     .index("by_post", ["postId"])
     .index("by_hashtag", ["hashtagId"])
     .index("by_hashtag_created", ["hashtagId", "createdAt"]),
+
+  notifications: defineTable({
+    recipientId: v.id("users"), // user receiving the notification
+    actorId: v.id("users"), // user who triggered the notification
+    type: v.union(
+      v.literal("reaction"), // someone reacted to your post/comment
+      v.literal("comment"), // someone commented on your post
+      v.literal("mention"), // someone mentioned you
+      v.literal("follow"), // someone followed you
+      v.literal("reply") // someone replied to your comment
+    ),
+    referenceId: v.optional(v.string()), // postId, commentId, etc.
+    message: v.string(), // e.g., "John Doe liked your post"
+    isRead: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_recipient", ["recipientId"])
+    .index("by_recipient_unread", ["recipientId", "isRead"])
+    .index("by_recipient_created", ["recipientId", "createdAt"]),
 })

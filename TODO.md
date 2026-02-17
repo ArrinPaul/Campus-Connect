@@ -97,46 +97,65 @@
 **Dependencies:**
 - [x] Install `@radix-ui/react-dropdown-menu`
 
+**Tests:**
+- [x] `convex/bookmarks.test.ts` — comprehensive backend tests
+- [x] `src/app/(dashboard)/bookmarks/page.test.tsx` — page component tests
+
 ---
 
-### 1.3 Hashtags & Trending 🔴 ⏱️ L
+### 1.3 Hashtags & Trending 🔴 ⏱️ L ✅ COMPLETED
 
 **Schema:**
-- [ ] Create `hashtags` table
-  - [ ] Fields: tag (lowercase, normalized), postCount, lastUsedAt
-  - [ ] Indexes: by_tag, by_post_count
-- [ ] Create `postHashtags` table (many-to-many)
-  - [ ] Fields: postId, hashtagId
-  - [ ] Indexes: by_post, by_hashtag
+- [x] Create `hashtags` table
+  - [x] Fields: tag (lowercase, normalized), postCount, lastUsedAt, trendingScore
+  - [x] Indexes: by_tag, by_post_count, by_trending_score
+- [x] Create `postHashtags` table (many-to-many)
+  - [x] Fields: postId, hashtagId, createdAt
+  - [x] Indexes: by_post, by_hashtag, by_hashtag_created
 
 **Backend:**
-- [ ] Create `convex/hashtags.ts`
-  - [ ] `extractHashtags(content: string)` utility — regex to find #tags
-  - [ ] Update `posts.ts` → `createPost` mutation to extract & create hashtags
-  - [ ] `getTrending` query — top 10 hashtags by engagement in last 24h
-  - [ ] `getPostsByHashtag` query — paginated posts with a specific tag
-  - [ ] `searchHashtags` query — autocomplete for hashtag input
-  - [ ] Convex cron job (every 6h) to update trending cache
+- [x] Create `convex/hashtags.ts`
+  - [x] `extractHashtags(content: string)` utility — regex to find #tags
+  - [x] `linkHashtagsToPost()` internal function — create/update hashtags
+  - [x] Update `posts.ts` → `createPost` mutation to extract & create hashtags
+  - [x] `getTrending` query — top hashtags by post count in last 24h
+  - [x] `getPostsByHashtag` query — paginated posts with a specific tag
+  - [x] `searchHashtags` query — autocomplete for hashtag input
+  - [x] `updateTrendingScores` mutation — for cron job (future)
+  - [x] `getHashtagStats` query — hashtag details
 
 **Frontend:**
-- [ ] Update `PostComposer.tsx`
-  - [ ] Syntax highlight hashtags as user types (blue color)
-  - [ ] Autocomplete dropdown for existing hashtags
-- [ ] Create `src/app/(dashboard)/hashtag/[tag]/page.tsx` — hashtag feed page
-- [ ] Create `src/components/trending/TrendingHashtags.tsx` widget
-  - [ ] Show top 10 trending hashtags
-  - [ ] Click → navigate to hashtag page
-- [ ] Add trending sidebar to feed page
-- [ ] Update `PostCard.tsx` — make hashtags in content clickable links
+- [x] Create `src/app/(dashboard)/hashtag/[tag]/page.tsx` — hashtag feed page
+  - [x] Display hashtag name and post count
+  - [x] Show posts using this hashtag
+  - [x] Empty state
+- [x] Create `src/components/trending/TrendingHashtags.tsx` widget
+  - [x] Show top 10 trending hashtags with post counts
+  - [x] Rank indicator for top 3
+  - [x] Click → navigate to hashtag page
+- [x] Add trending sidebar to feed page (desktop only)
+- [x] Update `PostCard.tsx` — make hashtags in content clickable links
+  - [x] Create `PostContent.tsx` component
 
 **Utilities:**
-- [ ] `lib/hashtag-utils.ts`
-  - [ ] `normalizeHashtag(tag: string)` — lowercase, trim
-  - [ ] `renderHashtagsAsLinks(content: string)` — React component
+- [x] `lib/hashtag-utils.ts`
+  - [x] `normalizeHashtag(tag: string)` — lowercase, trim
+  - [x] `extractHashtags(content: string)` — find all hashtags
+  - [x] `parseHashtags(content: string)` — split into segments for rendering
+  - [x] `getHashtagDisplay(tag: string)` — format with #
+  - [x] `isValidHashtag(tag: string)` — validation
+
+**PostComposer Enhancements:**
+- [x] Update `PostComposer.tsx` with hashtag features
+  - [x] Real-time syntax highlighting — hashtags shown in blue as user types
+  - [x] Autocomplete dropdown — suggestions based on existing hashtags
+  - [x] Keyboard navigation — ↑↓ to navigate suggestions, Enter to select
+  - [x] Automatic hashtag insertion with proper cursor positioning
+  - [x] Popularity display — show post count for each suggestion
 
 **Tests:**
-- [ ] `convex/hashtags.test.ts`
-- [ ] `lib/hashtag-utils.test.ts`
+- [x] `convex/hashtags.test.ts` — comprehensive backend API tests
+- [x] `lib/hashtag-utils.test.ts` — utility function tests with edge cases
 
 ---
 
