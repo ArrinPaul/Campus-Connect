@@ -40,6 +40,12 @@ export default function DashboardLayout({
               >
                 Discover
               </Link>
+              <Link
+                href="/bookmarks"
+                className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
+              >
+                Bookmarks
+              </Link>
               {currentUser && (
                 <Link
                   href={`/profile/${currentUser._id}`}

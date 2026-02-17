@@ -10,6 +10,7 @@ import { CommentList } from "@/components/posts/CommentList"
 import { CommentComposer } from "@/components/posts/CommentComposer"
 import { ReactionPicker, ReactionSummary } from "@/components/posts/ReactionPicker"
 import { ReactionModal } from "@/components/posts/ReactionModal"
+import { BookmarkButton } from "@/components/posts/BookmarkButton"
 
 interface User {
   _id: Id<"users">
@@ -179,6 +180,11 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
           </svg>
           <span className="text-xs font-medium sm:text-sm">{post.commentCount}</span>
         </button>
+
+        {/* Bookmark Button */}
+        {currentUser && (
+          <BookmarkButton postId={post._id} />
+        )}
       </div>
 
       {/* Reaction Modal */}

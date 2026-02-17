@@ -120,4 +120,23 @@ export default defineSchema({
     .index("by_follower", ["followerId"])
     .index("by_following", ["followingId"])
     .index("by_follower_and_following", ["followerId", "followingId"]),
+
+  hashtags: defineTable({
+    tag: v.string(), // lowercase, normalized (e.g., "machinelearning")
+    postCount: v.number(), // number of posts using this hashtag
+    lastUsedAt: v.number(), // timestamp of last use
+    trendingScore: v.optional(v.number()), // computed score for trending
+  })
+    .index("by_tag", ["tag"])
+    .index("by_post_count", ["postCount"])
+    .index("by_trending_score", ["trendingScore"]),
+
+  postHashtags: defineTable({
+    postId: v.id("posts"),
+    hashtagId: v.id("hashtags"),
+    createdAt: v.number(),
+  })
+    .index("by_post", ["postId"])
+    .index("by_hashtag", ["hashtagId"])
+    .index("by_hashtag_created", ["hashtagId", "createdAt"]),
 })

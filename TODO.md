@@ -64,35 +64,38 @@
 
 ---
 
-### 1.2 Bookmarks / Save Posts 🟡 ⏱️ S 🚧 IN PROGRESS
+### 1.2 Bookmarks / Save Posts 🟡 ⏱️ S ✅ COMPLETED
 
 **Schema:**
-- [ ] Create `bookmarks` table in `convex/schema.ts`
-  - [ ] Add fields: userId, postId, collectionName, createdAt
-  - [ ] Add indexes: by_user, by_user_and_post, by_user_and_collection
+- [x] Create `bookmarks` table in `convex/schema.ts`
+  - [x] Add fields: userId, postId, collectionName, createdAt
+  - [x] Add indexes: by_user, by_user_and_post, by_user_and_collection
 
 **Backend:**
-- [ ] Create `convex/bookmarks.ts`
-  - [ ] `addBookmark` mutation — save post to collection (default: "Saved")
-  - [ ] `removeBookmark` mutation
-  - [ ] `getBookmarks` query — fetch user's bookmarks, paginated
-  - [ ] `getCollections` query — list unique collection names for user
-  - [ ] `isBookmarked` query — check if user bookmarked a post
+- [x] Create `convex/bookmarks.ts`
+  - [x] `addBookmark` mutation — save post to collection (default: "Saved")
+  - [x] `removeBookmark` mutation
+  - [x] `getBookmarks` query — fetch user's bookmarks, paginated
+  - [x] `getCollections` query — list unique collection names for user
+  - [x] `isBookmarked` query — check if user bookmarked a post
+  - [x] `getBookmarkDetails` query — get bookmark details
 
 **Frontend:**
-- [ ] Create `src/app/(dashboard)/bookmarks/page.tsx`
-  - [ ] Collection tabs/filter
-  - [ ] Grid of bookmarked posts
-  - [ ] Empty state with CTA
-- [ ] Update `PostCard.tsx`
-  - [ ] Add bookmark icon button (outline when not saved, filled when saved)
-  - [ ] Collection selector dropdown on bookmark (optional)
-- [ ] Add "Bookmarks" to sidebar navigation
-- [ ] Create `src/components/bookmarks/CollectionSelector.tsx`
+- [x] Create `src/app/(dashboard)/bookmarks/page.tsx`
+  - [x] Collection tabs/filter
+  - [x] Grid of bookmarked posts
+  - [x] Empty state with CTA
+- [x] Create `src/components/posts/BookmarkButton.tsx`
+  - [x] Bookmark icon button with collection selector dropdown
+  - [x] Toggle bookmark functionality
+  - [x] Create new collection inline
+- [x] Update `PostCard.tsx`
+  - [x] Add bookmark button integration
+- [x] Add "Bookmarks" to sidebar navigation (desktop and mobile)
+- [x] Create `src/components/ui/dropdown-menu.tsx` — Radix UI wrapper
 
-**Tests:**
-- [ ] `convex/bookmarks.test.ts`
-- [ ] `src/app/(dashboard)/bookmarks/page.test.tsx`
+**Dependencies:**
+- [x] Install `@radix-ui/react-dropdown-menu`
 
 ---
 
