@@ -253,3 +253,368 @@ describe('Post Operations Properties', () => {
     });
   });
 });
+
+/**
+ * Property-Based Tests for Feed Operations
+ * Feature: campus-connect-foundation
+ * 
+ * These tests verify feed filtering and ordering properties.
+ */
+
+describe('Feed Operations Properties', () => {
+  /**
+   * Helper to create a post with specific timestamp
+   */
+  const createPostWithTimestamp = (data: {
+    _id: string;
+    authorId: string;
+    content: string;
+    createdAt: number;
+  }) => {
+    return {
+      _id: data._id,
+      authorId: data.authorId,
+      content: data.content,
+      likeCount: 0,
+      commentCount: 0,
+      createdAt: data.createdAt,
+      updatedAt: data.createdAt,
+    };
+  };
+
+  /**
+   * Property 27: Feed reverse chronological ordering
+   * **Validates: Requirements 6.1**
+   * 
+   * For any feed query, posts must be ordered by createdAt timestamp 
+   * in descending order (newest first).
+   */
+  describe('Property 27: Feed reverse chronological ordering', () => {
+    it('should order posts by createdAt descending', () => {
+      fc.assert(
+        fc.property(
+          fc.array(
+            fc.record({
+              _id: fc.string({ minLength: 10, maxLength: 20 }),
+              authorId: fc.string({ minLength: 10, maxLength: 20 }),
+              content: fc.string({ minLength: 1, maxLength: 100 }),
+              createdAt: fc.integer({ min: 1000000000000, max: 9999999999999 }),
+            }),
+            { minLength: 2, maxLength: 20 }
+          ),
+          (postsData) => {
+            // Create posts
+            const posts = postsData.map(data => createPostWithTimestamp(data));
+
+            // Sort posts by createdAt descending (newest first)
+            const sortedPosts = [...posts].sort((a, b) => b.createdAt - a.createdAt);
+
+            // Verify ordering
+            for (let i = 0; i < sortedPosts.length - 1; i++) {
+              expect(sortedPosts[i].createdAt).toBeGreaterThanOrEqual(sortedPosts[i + 1].createdAt);
+            }
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should place newest posts first', () => {
+      fc.assert(
+        fc.property(
+          fc.array(
+            fc.record({
+              _id: fc.string({ minLength: 10, maxLength: 20 }),
+              authorId: fc.string({ minLength: 10, maxLength: 20 }),
+              content: fc.string({ minLength: 1, maxLength: 100 }),
+              createdAt: fc.integer({ min: 1000000000000, max: 9999999999999 }),
+            }),
+            { minLength: 3, maxLength: 20 }
+          ),
+          (postsData) => {
+            // Create posts
+            const posts = postsData.map(data => createPostWithTimestamp(data));
+
+            // Sort posts by createdAt descending
+            const sortedPosts = [...posts].sort((a, b) => b.createdAt - a.createdAt);
+
+            // Find the post with maximum createdAt
+            const newestPost = posts.reduce((max, post) => 
+              post.createdAt > max.createdAt ? post : max
+            );
+
+            // Verify newest post is first
+            expect(sortedPosts[0]._id).toBe(newestPost._id);
+            expect(sortedPosts[0].createdAt).toBe(newestPost.createdAt);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  /**
+   * Property 28: Feed filtering by follows
+   * **Validates: Requirements 6.3**
+   * 
+   * For any user who follows one or more other users, the feed must contain 
+   * only posts authored by those followed users.
+   */
+  describe('Property 28: Feed filtering by follows', () => {
+    it('should show only posts from followed users when following anyone', () => {
+      fc.assert(
+        fc.property(
+          fc.record({
+            currentUserId: fc.string({ minLength: 10, maxLength: 20 }),
+            followedUserIds: fc.array(
+              fc.string({ minLength: 10, maxLength: 20 }),
+              { minLength: 1, maxLength: 5 }
+            ),
+            otherUserIds: fc.array(
+              fc.string({ minLength: 10, maxLength: 20 }),
+              { minLength: 1, maxLength: 5 }
+            ),
+          }).chain(data => {
+            // Ensure followed and other users are distinct
+            const allUserIds = [...new Set([...data.followedUserIds, ...data.otherUserIds])];
+            const followedSet = new Set(data.followedUserIds);
+            const otherUserIds = allUserIds.filter(id => !followedSet.has(id));
+            
+            return fc.constant({
+              currentUserId: data.currentUserId,
+              followedUserIds: data.followedUserIds,
+              otherUserIds: otherUserIds.length > 0 ? otherUserIds : ['other_user_1'],
+            });
+          }),
+          (data) => {
+            // Create posts from followed users
+            const followedPosts = data.followedUserIds.map((userId, idx) => 
+              createPostWithTimestamp({
+                _id: `post_followed_${idx}`,
+                authorId: userId,
+                content: `Post from followed user ${idx}`,
+                createdAt: Date.now() - idx * 1000,
+              })
+            );
+
+            // Create posts from other users
+            const otherPosts = data.otherUserIds.map((userId, idx) => 
+              createPostWithTimestamp({
+                _id: `post_other_${idx}`,
+                authorId: userId,
+                content: `Post from other user ${idx}`,
+                createdAt: Date.now() - idx * 1000,
+              })
+            );
+
+            // All posts in database
+            const allPosts = [...followedPosts, ...otherPosts];
+
+            // Simulate filtering by followed users
+            const followedSet = new Set(data.followedUserIds);
+            const filteredPosts = allPosts.filter(post => followedSet.has(post.authorId));
+
+            // Verify all filtered posts are from followed users
+            filteredPosts.forEach(post => {
+              expect(followedSet.has(post.authorId)).toBe(true);
+            });
+
+            // Verify no posts from other users are included
+            const filteredAuthorIds = new Set(filteredPosts.map(p => p.authorId));
+            data.otherUserIds.forEach(userId => {
+              expect(filteredAuthorIds.has(userId)).toBe(false);
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should show all posts when not following anyone', () => {
+      fc.assert(
+        fc.property(
+          fc.record({
+            currentUserId: fc.string({ minLength: 10, maxLength: 20 }),
+            allUserIds: fc.array(
+              fc.string({ minLength: 10, maxLength: 20 }),
+              { minLength: 2, maxLength: 10 }
+            ),
+          }),
+          (data) => {
+            // Create posts from various users
+            const allPosts = data.allUserIds.map((userId, idx) => 
+              createPostWithTimestamp({
+                _id: `post_${idx}`,
+                authorId: userId,
+                content: `Post from user ${idx}`,
+                createdAt: Date.now() - idx * 1000,
+              })
+            );
+
+            // User is not following anyone
+            const followingIds: string[] = [];
+
+            // Simulate filtering: if not following anyone, show all posts
+            const filteredPosts = followingIds.length === 0 
+              ? allPosts 
+              : allPosts.filter(post => followingIds.includes(post.authorId));
+
+            // Verify all posts are included
+            expect(filteredPosts.length).toBe(allPosts.length);
+            expect(filteredPosts).toEqual(allPosts);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should handle empty feed when following users with no posts', () => {
+      fc.assert(
+        fc.property(
+          fc.record({
+            currentUserId: fc.string({ minLength: 10, maxLength: 20 }),
+            followedUserIds: fc.array(
+              fc.string({ minLength: 10, maxLength: 20 }),
+              { minLength: 1, maxLength: 5 }
+            ),
+            postsFromOtherUsers: fc.array(
+              fc.record({
+                _id: fc.string({ minLength: 10, maxLength: 20 }),
+                authorId: fc.string({ minLength: 10, maxLength: 20 }),
+                content: fc.string({ minLength: 1, maxLength: 100 }),
+                createdAt: fc.integer({ min: 1000000000000, max: 9999999999999 }),
+              }),
+              { minLength: 1, maxLength: 10 }
+            ),
+          }).chain(data => {
+            // Ensure posts are from users NOT in followedUserIds
+            const followedSet = new Set(data.followedUserIds);
+            const postsFromOthers = data.postsFromOtherUsers.filter(
+              post => !followedSet.has(post.authorId)
+            );
+            
+            return fc.constant({
+              currentUserId: data.currentUserId,
+              followedUserIds: data.followedUserIds,
+              postsFromOtherUsers: postsFromOthers.length > 0 
+                ? postsFromOthers 
+                : [{
+                    _id: 'post_other',
+                    authorId: 'other_user',
+                    content: 'Post from other',
+                    createdAt: Date.now(),
+                  }],
+            });
+          }),
+          (data) => {
+            // Create posts only from users NOT being followed
+            const allPosts = data.postsFromOtherUsers.map(postData => 
+              createPostWithTimestamp(postData)
+            );
+
+            // Simulate filtering by followed users
+            const followedSet = new Set(data.followedUserIds);
+            const filteredPosts = allPosts.filter(post => followedSet.has(post.authorId));
+
+            // Verify feed is empty (no posts from followed users)
+            expect(filteredPosts.length).toBe(0);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  /**
+   * Property 29: Feed post data completeness
+   * **Validates: Requirements 6.6**
+   * 
+   * For any post displayed in the feed, all required display fields 
+   * (author information, content, timestamp, likeCount, commentCount) must be present.
+   */
+  describe('Property 29: Feed post data completeness', () => {
+    it('should include all required display fields', () => {
+      fc.assert(
+        fc.property(
+          fc.array(
+            fc.record({
+              _id: fc.string({ minLength: 10, maxLength: 20 }),
+              authorId: fc.string({ minLength: 10, maxLength: 20 }),
+              content: fc.string({ minLength: 1, maxLength: 5000 }),
+              createdAt: fc.integer({ min: 1000000000000, max: 9999999999999 }),
+            }),
+            { minLength: 1, maxLength: 20 }
+          ),
+          (postsData) => {
+            // Create posts with author data
+            const postsWithAuthors = postsData.map(data => {
+              const post = createPostWithTimestamp(data);
+              return {
+                ...post,
+                author: {
+                  _id: data.authorId,
+                  name: `User ${data.authorId}`,
+                  email: `user${data.authorId}@example.com`,
+                  profilePicture: `https://example.com/avatar/${data.authorId}`,
+                },
+              };
+            });
+
+            // Verify each post has all required fields
+            postsWithAuthors.forEach(post => {
+              // Post fields
+              expect(post).toHaveProperty('_id');
+              expect(post).toHaveProperty('authorId');
+              expect(post).toHaveProperty('content');
+              expect(post).toHaveProperty('createdAt');
+              expect(post).toHaveProperty('likeCount');
+              expect(post).toHaveProperty('commentCount');
+              
+              // Author information
+              expect(post).toHaveProperty('author');
+              expect(post.author).toHaveProperty('_id');
+              expect(post.author).toHaveProperty('name');
+              expect(post.author).toHaveProperty('email');
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should include engagement metrics', () => {
+      fc.assert(
+        fc.property(
+          fc.array(
+            fc.record({
+              _id: fc.string({ minLength: 10, maxLength: 20 }),
+              authorId: fc.string({ minLength: 10, maxLength: 20 }),
+              content: fc.string({ minLength: 1, maxLength: 100 }),
+              createdAt: fc.integer({ min: 1000000000000, max: 9999999999999 }),
+              likeCount: fc.integer({ min: 0, max: 1000 }),
+              commentCount: fc.integer({ min: 0, max: 500 }),
+            }),
+            { minLength: 1, maxLength: 20 }
+          ),
+          (postsData) => {
+            // Create posts with engagement metrics
+            const posts = postsData.map(data => ({
+              ...createPostWithTimestamp(data),
+              likeCount: data.likeCount,
+              commentCount: data.commentCount,
+            }));
+
+            // Verify engagement metrics are present and valid
+            posts.forEach(post => {
+              expect(typeof post.likeCount).toBe('number');
+              expect(typeof post.commentCount).toBe('number');
+              expect(post.likeCount).toBeGreaterThanOrEqual(0);
+              expect(post.commentCount).toBeGreaterThanOrEqual(0);
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+});

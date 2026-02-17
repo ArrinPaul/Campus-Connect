@@ -5,6 +5,8 @@ import { Id } from "./_generated/dataModel"
 /**
  * Get feed posts with pagination
  * Returns posts in reverse chronological order (newest first)
+ * Filters by followed users if user is following anyone
+ * Returns all posts if user is not following anyone
  * Includes author data in responses
  * Validates: Requirements 6.1, 6.2, 6.3, 12.4
  */
@@ -20,7 +22,26 @@ export const getFeedPosts = query({
       throw new Error("Unauthorized")
     }
 
+    // Get current user
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .unique()
+
+    if (!user) {
+      throw new Error("User not found")
+    }
+
     const limit = args.limit ?? 20 // Default to 20 posts per page
+
+    // Get current user's following list
+    const followingList = await ctx.db
+      .query("follows")
+      .withIndex("by_follower", (q) => q.eq("followerId", user._id))
+      .collect()
+
+    // Extract the IDs of users being followed
+    const followingIds = followingList.map((follow) => follow.followingId)
 
     // Get all posts ordered by createdAt descending (newest first)
     let postsQuery = ctx.db
@@ -36,6 +57,15 @@ export const getFeedPosts = query({
           q.lt(q.field("createdAt"), cursorPost.createdAt)
         )
       }
+    }
+
+    // Filter by followed users if following anyone
+    if (followingIds.length > 0) {
+      postsQuery = postsQuery.filter((q) =>
+        q.or(
+          ...followingIds.map((id) => q.eq(q.field("authorId"), id))
+        )
+      )
     }
 
     // Fetch posts with limit + 1 to determine if there are more

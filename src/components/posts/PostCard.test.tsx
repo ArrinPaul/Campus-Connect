@@ -185,8 +185,17 @@ describe("PostCard", () => {
     render(<PostCard post={mockPost} author={mockAuthor} />)
 
     const likeButton = screen.getByLabelText("Like post")
+    
+    // Verify initial like count
+    expect(screen.getByText("5")).toBeInTheDocument()
+    
     fireEvent.click(likeButton)
 
+    // Verify optimistic update - like count should increase immediately
+    await waitFor(() => {
+      expect(screen.getByText("6")).toBeInTheDocument()
+    })
+    
     await waitFor(() => {
       expect(mockLikePost).toHaveBeenCalledWith({ postId: "post123" })
     })
@@ -200,8 +209,17 @@ describe("PostCard", () => {
     render(<PostCard post={mockPost} author={mockAuthor} />)
 
     const likeButton = screen.getByLabelText("Unlike post")
+    
+    // Verify initial like count
+    expect(screen.getByText("5")).toBeInTheDocument()
+    
     fireEvent.click(likeButton)
 
+    // Verify optimistic update - like count should decrease immediately
+    await waitFor(() => {
+      expect(screen.getByText("4")).toBeInTheDocument()
+    })
+    
     await waitFor(() => {
       expect(mockUnlikePost).toHaveBeenCalledWith({ postId: "post123" })
     })
@@ -259,5 +277,53 @@ describe("PostCard", () => {
 
     const likeButton = screen.getByLabelText("Like post")
     expect(likeButton).toBeDisabled()
+  })
+
+  it("should revert optimistic update on like error", async () => {
+    mockGetCurrentUser.mockReturnValue({ _id: "currentUser" as Id<"users"> })
+    mockHasUserLikedPost.mockReturnValue(false)
+    mockLikePost.mockRejectedValue(new Error("Network error"))
+
+    render(<PostCard post={mockPost} author={mockAuthor} />)
+
+    const likeButton = screen.getByLabelText("Like post")
+    
+    // Verify initial like count
+    expect(screen.getByText("5")).toBeInTheDocument()
+    
+    fireEvent.click(likeButton)
+
+    // Verify optimistic update happens
+    await waitFor(() => {
+      expect(screen.getByText("6")).toBeInTheDocument()
+    })
+    
+    // Wait for error and revert
+    await waitFor(() => {
+      expect(screen.getByText("5")).toBeInTheDocument()
+    })
+  })
+
+  it("should show optimistic heart fill when liking", async () => {
+    mockGetCurrentUser.mockReturnValue({ _id: "currentUser" as Id<"users"> })
+    mockHasUserLikedPost.mockReturnValue(false)
+    mockLikePost.mockResolvedValue({ success: true })
+
+    render(<PostCard post={mockPost} author={mockAuthor} />)
+
+    const likeButton = screen.getByLabelText("Like post")
+    const heartIcon = likeButton.querySelector("svg")
+    
+    // Initially empty heart
+    expect(heartIcon).toHaveClass("fill-none")
+    
+    fireEvent.click(likeButton)
+
+    // Optimistically filled heart
+    await waitFor(() => {
+      const updatedButton = screen.getByLabelText("Unlike post")
+      const updatedHeartIcon = updatedButton.querySelector("svg")
+      expect(updatedHeartIcon).toHaveClass("fill-red-600")
+    })
   })
 })
