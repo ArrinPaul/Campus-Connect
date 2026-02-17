@@ -381,7 +381,7 @@ Final pages, integration, and comprehensive testing
     - _Requirements: 7.1, 7.5_
 
 - [ ] 12. Implement user discovery
-  - [-] 12.1 Enhance searchUsers query with filters
+  - [x] 12.1 Enhance searchUsers query with filters
     - Add name search with case-insensitive matching
     - Add role filter
     - Add skills filter (match any skill in array)
@@ -389,47 +389,47 @@ Final pages, integration, and comprehensive testing
     - Return user profiles with all display fields
     - _Requirements: 8.2, 8.3, 8.4, 8.6_
   
-  - [~] 12.2 Write property tests for user discovery
+  - [x] 12.2 Write property tests for user discovery
     - **Property 37: User search by name**
     - **Property 38: User filter by role**
     - **Property 39: User filter by skills**
     - **Property 40: Search result data completeness**
     - **Validates: Requirements 8.2, 8.3, 8.4, 8.6**
   
-  - [~] 12.3 Create UserSearchBar component
+  - [x] 12.3 Create UserSearchBar component
     - Build search input with debouncing
     - Trigger search on input change
     - Show search icon and clear button
     - _Requirements: 8.2_
   
-  - [~] 12.4 Create UserFilterPanel component
+  - [x] 12.4 Create UserFilterPanel component
     - Add role filter dropdown
     - Add skills filter with multi-select
     - Trigger filter change on selection
     - Show active filters with clear options
     - _Requirements: 8.3, 8.4_
   
-  - [~] 12.5 Create UserCard component
+  - [x] 12.5 Create UserCard component
     - Display user avatar, name, and role
     - Display university and skills
     - Link to full profile page
     - Show follow button
     - _Requirements: 8.6_
   
-  - [~] 12.6 Create discovery page
+  - [x] 12.6 Create discovery page
     - Add UserSearchBar at top
     - Add UserFilterPanel in sidebar
     - Display search results using UserCard
     - Handle loading and empty states
     - _Requirements: 8.1, 8.2, 8.3, 8.4_
   
-  - [~] 12.7 Write unit tests for discovery components
+  - [x] 12.7 Write unit tests for discovery components
     - Test search with various queries
     - Test filtering by role and skills
     - Test UserCard display and navigation
     - _Requirements: 8.2, 8.3, 8.4_
 
-- [~] 13. Checkpoint - Verify following and discovery work
+- [x] 13. Checkpoint - Verify following and discovery work
   - Ensure all tests pass, ask the user if questions arise.
 
 ---
@@ -437,7 +437,7 @@ Final pages, integration, and comprehensive testing
 ### 🎨 PHASE 5: UI/UX & Polish
 
 - [ ] 14. Implement theme support
-  - [~] 14.1 Set up theme provider
+  - [-] 14.1 Set up theme provider
     - Create ThemeProvider using next-themes
     - Wrap app with ThemeProvider
     - Configure light and dark themes

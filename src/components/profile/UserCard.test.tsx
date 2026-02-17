@@ -24,6 +24,7 @@ describe("UserCard", () => {
     profilePicture: "https://example.com/avatar.jpg",
     role: "Student" as const,
     university: "Stanford University",
+    skills: ["React", "TypeScript", "Node.js"],
   }
 
   it("should render user name", () => {
@@ -85,5 +86,45 @@ describe("UserCard", () => {
     render(<UserCard user={faculty} />)
 
     expect(screen.getByText("Faculty")).toBeInTheDocument()
+  })
+
+  it("should display skills when provided", () => {
+    render(<UserCard user={mockUser} />)
+
+    expect(screen.getByText("React")).toBeInTheDocument()
+    expect(screen.getByText("TypeScript")).toBeInTheDocument()
+    expect(screen.getByText("Node.js")).toBeInTheDocument()
+  })
+
+  it("should not display skills section when no skills", () => {
+    const userWithoutSkills = { ...mockUser, skills: [] }
+    render(<UserCard user={userWithoutSkills} />)
+
+    expect(screen.queryByText("React")).not.toBeInTheDocument()
+  })
+
+  it("should display only first 5 skills", () => {
+    const userWithManySkills = {
+      ...mockUser,
+      skills: ["React", "TypeScript", "Node.js", "Python", "Java", "C++", "Go"],
+    }
+    render(<UserCard user={userWithManySkills} />)
+
+    expect(screen.getByText("React")).toBeInTheDocument()
+    expect(screen.getByText("TypeScript")).toBeInTheDocument()
+    expect(screen.getByText("Node.js")).toBeInTheDocument()
+    expect(screen.getByText("Python")).toBeInTheDocument()
+    expect(screen.getByText("Java")).toBeInTheDocument()
+    expect(screen.getByText("+2 more")).toBeInTheDocument()
+  })
+
+  it("should not display '+X more' when exactly 5 skills", () => {
+    const userWith5Skills = {
+      ...mockUser,
+      skills: ["React", "TypeScript", "Node.js", "Python", "Java"],
+    }
+    render(<UserCard user={userWith5Skills} />)
+
+    expect(screen.queryByText(/\+\d+ more/)).not.toBeInTheDocument()
   })
 })

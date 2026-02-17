@@ -10,6 +10,7 @@ interface User {
   profilePicture?: string
   role: "Student" | "Research Scholar" | "Faculty"
   university?: string
+  skills: string[]
 }
 
 interface UserCardProps {
@@ -19,7 +20,7 @@ interface UserCardProps {
 export function UserCard({ user }: UserCardProps) {
   return (
     <Link href={`/profile/${user._id}`}>
-      <div className="flex items-center gap-4 rounded-lg border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md">
+      <div className="flex items-start gap-4 rounded-lg border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md">
         {/* Avatar */}
         <div className="relative h-12 w-12 flex-shrink-0">
           {user.profilePicture ? (
@@ -49,6 +50,25 @@ export function UserCard({ user }: UserCardProps) {
               </span>
             )}
           </div>
+          
+          {/* Skills */}
+          {user.skills.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1">
+              {user.skills.slice(0, 5).map((skill) => (
+                <span
+                  key={skill}
+                  className="text-xs rounded-full bg-gray-100 px-2 py-0.5 text-gray-700"
+                >
+                  {skill}
+                </span>
+              ))}
+              {user.skills.length > 5 && (
+                <span className="text-xs text-gray-500">
+                  +{user.skills.length - 5} more
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </Link>

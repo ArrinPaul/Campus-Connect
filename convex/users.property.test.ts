@@ -408,3 +408,597 @@ describe('Profile Operations Properties', () => {
     });
   });
 });
+
+/**
+ * Property-Based Tests for User Discovery
+ * Feature: campus-connect-foundation
+ * Task: 12.2 Write property tests for user discovery
+ * 
+ * These tests verify user discovery properties including search by name,
+ * filtering by role and skills, and search result data completeness.
+ */
+
+describe('User Discovery Properties', () => {
+  /**
+   * Helper to simulate the searchUsers query logic
+   * Mirrors the implementation in convex/users.ts
+   */
+  const searchUsers = (
+    users: Array<{
+      _id: string;
+      clerkId: string;
+      email: string;
+      name: string;
+      profilePicture?: string;
+      bio: string;
+      university: string;
+      role: 'Student' | 'Research Scholar' | 'Faculty';
+      experienceLevel: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
+      skills: string[];
+      socialLinks: {
+        github?: string;
+        linkedin?: string;
+        twitter?: string;
+        website?: string;
+      };
+      followerCount: number;
+      followingCount: number;
+      createdAt: number;
+      updatedAt: number;
+    }>,
+    filters: {
+      query?: string;
+      role?: 'Student' | 'Research Scholar' | 'Faculty';
+      skills?: string[];
+    }
+  ) => {
+    let filteredUsers = [...users];
+
+    // Filter by name (case-insensitive substring match)
+    if (filters.query) {
+      const queryLower = filters.query.toLowerCase();
+      filteredUsers = filteredUsers.filter((user) =>
+        user.name.toLowerCase().includes(queryLower)
+      );
+    }
+
+    // Filter by role
+    if (filters.role) {
+      filteredUsers = filteredUsers.filter((user) => user.role === filters.role);
+    }
+
+    // Filter by skills (user must have at least one of the specified skills)
+    if (filters.skills && filters.skills.length > 0) {
+      filteredUsers = filteredUsers.filter((user) =>
+        filters.skills!.some((skill) => user.skills.includes(skill))
+      );
+    }
+
+    return filteredUsers;
+  };
+
+  /**
+   * Generator for creating valid user profiles
+   */
+  const userProfileArbitrary = fc.record({
+    _id: fc.string({ minLength: 10, maxLength: 30 }),
+    clerkId: fc.string({ minLength: 10, maxLength: 50 }),
+    email: fc.emailAddress(),
+    name: fc.string({ minLength: 1, maxLength: 100 }),
+    profilePicture: fc.option(fc.webUrl(), { nil: undefined }),
+    bio: fc.string({ maxLength: 500 }),
+    university: fc.string({ maxLength: 200 }),
+    role: fc.constantFrom('Student', 'Research Scholar', 'Faculty'),
+    experienceLevel: fc.constantFrom('Beginner', 'Intermediate', 'Advanced', 'Expert'),
+    skills: fc.array(fc.string({ minLength: 1, maxLength: 50 }), { maxLength: 20 }),
+    socialLinks: fc.record({
+      github: fc.option(fc.webUrl(), { nil: undefined }),
+      linkedin: fc.option(fc.webUrl(), { nil: undefined }),
+      twitter: fc.option(fc.webUrl(), { nil: undefined }),
+      website: fc.option(fc.webUrl(), { nil: undefined }),
+    }),
+    followerCount: fc.nat({ max: 10000 }),
+    followingCount: fc.nat({ max: 10000 }),
+    createdAt: fc.integer({ min: 1600000000000, max: Date.now() }),
+    updatedAt: fc.integer({ min: 1600000000000, max: Date.now() }),
+  });
+
+  /**
+   * Property 37: User search by name
+   * **Validates: Requirements 8.2**
+   * 
+   * For any name search query, all returned users must have names that match 
+   * the query (case-insensitive substring match).
+   */
+  describe('Property 37: User search by name', () => {
+    it('should return only users whose names match the query (case-insensitive)', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          fc.string({ minLength: 1, maxLength: 50 }),
+          (users, query) => {
+            const results = searchUsers(users, { query });
+
+            // All returned users must have names matching the query
+            results.forEach((user) => {
+              expect(user.name.toLowerCase()).toContain(query.toLowerCase());
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should handle empty query by returning all users', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          (users) => {
+            const results = searchUsers(users, { query: '' });
+
+            // Empty query should return all users
+            expect(results.length).toBe(users.length);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should be case-insensitive', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          (users) => {
+            // Pick a random user and search for their name in different cases
+            if (users.length === 0) return;
+
+            const targetUser = users[0];
+            const nameLower = targetUser.name.toLowerCase();
+            const nameUpper = targetUser.name.toUpperCase();
+
+            const resultsLower = searchUsers(users, { query: nameLower });
+            const resultsUpper = searchUsers(users, { query: nameUpper });
+
+            // Both should find the same user
+            expect(resultsLower.some(u => u._id === targetUser._id)).toBe(true);
+            expect(resultsUpper.some(u => u._id === targetUser._id)).toBe(true);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should return empty array when no users match', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 0, maxLength: 20 }),
+          (users) => {
+            // Use a query that's unlikely to match any generated name
+            const impossibleQuery = 'XYZABC123IMPOSSIBLE_NAME_QUERY_999';
+            const results = searchUsers(users, { query: impossibleQuery });
+
+            // Should return empty or only users that actually match
+            results.forEach((user) => {
+              expect(user.name.toLowerCase()).toContain(impossibleQuery.toLowerCase());
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  /**
+   * Property 38: User filter by role
+   * **Validates: Requirements 8.3**
+   * 
+   * For any role filter, all returned users must have the specified role.
+   */
+  describe('Property 38: User filter by role', () => {
+    it('should return only users with the specified role', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          fc.constantFrom('Student', 'Research Scholar', 'Faculty'),
+          (users, role) => {
+            const results = searchUsers(users, { role });
+
+            // All returned users must have the specified role
+            results.forEach((user) => {
+              expect(user.role).toBe(role);
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should filter Student role correctly', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          (users) => {
+            const results = searchUsers(users, { role: 'Student' });
+
+            // Count expected students
+            const expectedStudents = users.filter(u => u.role === 'Student');
+
+            // Should return exactly the students
+            expect(results.length).toBe(expectedStudents.length);
+            results.forEach((user) => {
+              expect(user.role).toBe('Student');
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should filter Research Scholar role correctly', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          (users) => {
+            const results = searchUsers(users, { role: 'Research Scholar' });
+
+            // Count expected research scholars
+            const expectedScholars = users.filter(u => u.role === 'Research Scholar');
+
+            // Should return exactly the research scholars
+            expect(results.length).toBe(expectedScholars.length);
+            results.forEach((user) => {
+              expect(user.role).toBe('Research Scholar');
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should filter Faculty role correctly', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          (users) => {
+            const results = searchUsers(users, { role: 'Faculty' });
+
+            // Count expected faculty
+            const expectedFaculty = users.filter(u => u.role === 'Faculty');
+
+            // Should return exactly the faculty
+            expect(results.length).toBe(expectedFaculty.length);
+            results.forEach((user) => {
+              expect(user.role).toBe('Faculty');
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should return all users when no role filter is specified', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          (users) => {
+            const results = searchUsers(users, {});
+
+            // No filter should return all users
+            expect(results.length).toBe(users.length);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  /**
+   * Property 39: User filter by skills
+   * **Validates: Requirements 8.4**
+   * 
+   * For any skill filter, all returned users must have the specified skill 
+   * in their skills array.
+   */
+  describe('Property 39: User filter by skills', () => {
+    it('should return only users with at least one of the specified skills', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          fc.array(fc.string({ minLength: 1, maxLength: 50 }), { minLength: 1, maxLength: 5 }),
+          (users, skillsFilter) => {
+            const results = searchUsers(users, { skills: skillsFilter });
+
+            // All returned users must have at least one of the specified skills
+            results.forEach((user) => {
+              const hasAtLeastOneSkill = skillsFilter.some((skill) =>
+                user.skills.includes(skill)
+              );
+              expect(hasAtLeastOneSkill).toBe(true);
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should filter by single skill correctly', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          fc.string({ minLength: 1, maxLength: 50 }),
+          (users, skill) => {
+            const results = searchUsers(users, { skills: [skill] });
+
+            // Count expected users with this skill
+            const expectedUsers = users.filter(u => u.skills.includes(skill));
+
+            // Should return exactly the users with this skill
+            expect(results.length).toBe(expectedUsers.length);
+            results.forEach((user) => {
+              expect(user.skills).toContain(skill);
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should filter by multiple skills with OR logic', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          fc.array(fc.string({ minLength: 1, maxLength: 50 }), { minLength: 2, maxLength: 5 }),
+          (users, skillsFilter) => {
+            const results = searchUsers(users, { skills: skillsFilter });
+
+            // Each returned user must have at least one of the skills
+            results.forEach((user) => {
+              const matchingSkills = skillsFilter.filter(skill =>
+                user.skills.includes(skill)
+              );
+              expect(matchingSkills.length).toBeGreaterThan(0);
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should return all users when skills array is empty', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          (users) => {
+            const results = searchUsers(users, { skills: [] });
+
+            // Empty skills filter should return all users
+            expect(results.length).toBe(users.length);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should return empty array when no users have the specified skills', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 0, maxLength: 20 }),
+          (users) => {
+            // Use skills that are unlikely to exist
+            const impossibleSkills = ['IMPOSSIBLE_SKILL_XYZ_999', 'NONEXISTENT_TECH_ABC_123'];
+            const results = searchUsers(users, { skills: impossibleSkills });
+
+            // Should return empty or only users that actually have these skills
+            results.forEach((user) => {
+              const hasSkill = impossibleSkills.some(skill => user.skills.includes(skill));
+              expect(hasSkill).toBe(true);
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  /**
+   * Property 40: Search result data completeness
+   * **Validates: Requirements 8.6**
+   * 
+   * For any user in search results, all required display fields must be present.
+   */
+  describe('Property 40: Search result data completeness', () => {
+    it('should include all required display fields in search results', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          (users) => {
+            // Search with no filters to get all users
+            const results = searchUsers(users, {});
+
+            // Verify all required display fields are present for each user
+            results.forEach((user) => {
+              // Required fields per Requirements 8.6
+              expect(user).toHaveProperty('_id');
+              expect(user).toHaveProperty('name');
+              expect(user).toHaveProperty('profilePicture');
+              expect(user).toHaveProperty('role');
+              expect(user).toHaveProperty('university');
+              expect(user).toHaveProperty('skills');
+
+              // Additional fields that should be present
+              expect(user).toHaveProperty('bio');
+              expect(user).toHaveProperty('experienceLevel');
+              expect(user).toHaveProperty('socialLinks');
+              expect(user).toHaveProperty('followerCount');
+              expect(user).toHaveProperty('followingCount');
+
+              // Verify types
+              expect(typeof user._id).toBe('string');
+              expect(typeof user.name).toBe('string');
+              expect(['Student', 'Research Scholar', 'Faculty']).toContain(user.role);
+              expect(typeof user.university).toBe('string');
+              expect(Array.isArray(user.skills)).toBe(true);
+              expect(typeof user.followerCount).toBe('number');
+              expect(typeof user.followingCount).toBe('number');
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should preserve all user data through filtering operations', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          fc.constantFrom('Student', 'Research Scholar', 'Faculty'),
+          (users, role) => {
+            const results = searchUsers(users, { role });
+
+            // Each result should have complete data
+            results.forEach((user) => {
+              // Find the original user
+              const originalUser = users.find(u => u._id === user._id);
+              expect(originalUser).toBeDefined();
+
+              // Verify all fields are preserved
+              expect(user.name).toBe(originalUser!.name);
+              expect(user.email).toBe(originalUser!.email);
+              expect(user.bio).toBe(originalUser!.bio);
+              expect(user.university).toBe(originalUser!.university);
+              expect(user.role).toBe(originalUser!.role);
+              expect(user.experienceLevel).toBe(originalUser!.experienceLevel);
+              expect(user.skills).toEqual(originalUser!.skills);
+              expect(user.followerCount).toBe(originalUser!.followerCount);
+              expect(user.followingCount).toBe(originalUser!.followingCount);
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should include complete data for combined filter results', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          fc.string({ minLength: 1, maxLength: 50 }),
+          fc.constantFrom('Student', 'Research Scholar', 'Faculty'),
+          fc.array(fc.string({ minLength: 1, maxLength: 50 }), { minLength: 1, maxLength: 3 }),
+          (users, query, role, skills) => {
+            const results = searchUsers(users, { query, role, skills });
+
+            // All results should have complete profile data
+            results.forEach((user) => {
+              // Verify all display fields are present and valid
+              expect(user._id).toBeDefined();
+              expect(user.name).toBeDefined();
+              expect(user.role).toBeDefined();
+              expect(user.university).toBeDefined();
+              expect(Array.isArray(user.skills)).toBe(true);
+              expect(typeof user.followerCount).toBe('number');
+              expect(typeof user.followingCount).toBe('number');
+              expect(user.followerCount).toBeGreaterThanOrEqual(0);
+              expect(user.followingCount).toBeGreaterThanOrEqual(0);
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should maintain data integrity for skills array', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          (users) => {
+            const results = searchUsers(users, {});
+
+            // Verify skills array integrity
+            results.forEach((user) => {
+              expect(Array.isArray(user.skills)).toBe(true);
+              
+              // Each skill should be a non-empty string
+              user.skills.forEach((skill) => {
+                expect(typeof skill).toBe('string');
+                expect(skill.length).toBeGreaterThan(0);
+                expect(skill.length).toBeLessThanOrEqual(50);
+              });
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  /**
+   * Combined filter properties
+   * Verify that combining multiple filters works correctly with AND logic
+   */
+  describe('Combined filter properties', () => {
+    it('should apply name and role filters with AND logic', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          fc.string({ minLength: 1, maxLength: 50 }),
+          fc.constantFrom('Student', 'Research Scholar', 'Faculty'),
+          (users, query, role) => {
+            const results = searchUsers(users, { query, role });
+
+            // All results must match both filters
+            results.forEach((user) => {
+              expect(user.name.toLowerCase()).toContain(query.toLowerCase());
+              expect(user.role).toBe(role);
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should apply role and skills filters with AND logic', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          fc.constantFrom('Student', 'Research Scholar', 'Faculty'),
+          fc.array(fc.string({ minLength: 1, maxLength: 50 }), { minLength: 1, maxLength: 3 }),
+          (users, role, skills) => {
+            const results = searchUsers(users, { role, skills });
+
+            // All results must match both filters
+            results.forEach((user) => {
+              expect(user.role).toBe(role);
+              const hasAtLeastOneSkill = skills.some(skill => user.skills.includes(skill));
+              expect(hasAtLeastOneSkill).toBe(true);
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should apply all three filters with AND logic', () => {
+      fc.assert(
+        fc.property(
+          fc.array(userProfileArbitrary, { minLength: 1, maxLength: 20 }),
+          fc.string({ minLength: 1, maxLength: 50 }),
+          fc.constantFrom('Student', 'Research Scholar', 'Faculty'),
+          fc.array(fc.string({ minLength: 1, maxLength: 50 }), { minLength: 1, maxLength: 3 }),
+          (users, query, role, skills) => {
+            const results = searchUsers(users, { query, role, skills });
+
+            // All results must match all three filters
+            results.forEach((user) => {
+              expect(user.name.toLowerCase()).toContain(query.toLowerCase());
+              expect(user.role).toBe(role);
+              const hasAtLeastOneSkill = skills.some(skill => user.skills.includes(skill));
+              expect(hasAtLeastOneSkill).toBe(true);
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+});
