@@ -41,9 +41,13 @@ describe("FeedPage", () => {
   it("should have proper layout structure", () => {
     render(<FeedPage />)
     
-    // Check for the main container with proper classes
+    // Check for the main container with proper responsive classes
     const mainContainer = screen.getByTestId("post-composer").parentElement?.parentElement
-    expect(mainContainer).toHaveClass("mx-auto", "max-w-2xl", "space-y-6")
+    expect(mainContainer).toHaveClass("mx-auto", "max-w-2xl")
+    // Should have responsive spacing and padding
+    expect(mainContainer?.className).toContain("space-y-")
+    expect(mainContainer?.className).toContain("px-")
+    expect(mainContainer?.className).toContain("py-")
   })
 
   it("should display 'Create a Post' heading", () => {

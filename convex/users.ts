@@ -1,5 +1,6 @@
 import { v } from "convex/values"
 import { internalMutation, query, mutation } from "./_generated/server"
+import { sanitizeText } from "./sanitize"
 
 /**
  * Internal mutation to create a user from Clerk webhook
@@ -245,17 +246,27 @@ export const updateProfile = mutation({
       throw new Error("University name must not exceed 200 characters")
     }
 
+    // Sanitize text fields to prevent XSS attacks
+    const sanitizedBio = args.bio !== undefined ? sanitizeText(args.bio) : undefined
+    const sanitizedUniversity = args.university !== undefined ? sanitizeText(args.university) : undefined
+    const sanitizedSocialLinks = args.socialLinks !== undefined ? {
+      github: args.socialLinks.github ? sanitizeText(args.socialLinks.github) : undefined,
+      linkedin: args.socialLinks.linkedin ? sanitizeText(args.socialLinks.linkedin) : undefined,
+      twitter: args.socialLinks.twitter ? sanitizeText(args.socialLinks.twitter) : undefined,
+      website: args.socialLinks.website ? sanitizeText(args.socialLinks.website) : undefined,
+    } : undefined
+
     // Update user profile
     const updates: any = {
       updatedAt: Date.now(),
     }
 
-    if (args.bio !== undefined) updates.bio = args.bio
-    if (args.university !== undefined) updates.university = args.university
+    if (sanitizedBio !== undefined) updates.bio = sanitizedBio
+    if (sanitizedUniversity !== undefined) updates.university = sanitizedUniversity
     if (args.role !== undefined) updates.role = args.role
     if (args.experienceLevel !== undefined)
       updates.experienceLevel = args.experienceLevel
-    if (args.socialLinks !== undefined) updates.socialLinks = args.socialLinks
+    if (sanitizedSocialLinks !== undefined) updates.socialLinks = sanitizedSocialLinks
 
     await ctx.db.patch(user._id, updates)
 
@@ -297,13 +308,16 @@ export const addSkill = mutation({
       throw new Error("Skill name must not exceed 50 characters")
     }
 
+    // Sanitize skill name to prevent XSS attacks
+    const sanitizedSkill = sanitizeText(args.skill)
+
     // Check for duplicate
-    if (user.skills.includes(args.skill)) {
+    if (user.skills.includes(sanitizedSkill)) {
       throw new Error("Skill already exists")
     }
 
     // Add skill to user's skills array
-    const updatedSkills = [...user.skills, args.skill]
+    const updatedSkills = [...user.skills, sanitizedSkill]
 
     await ctx.db.patch(user._id, {
       skills: updatedSkills,

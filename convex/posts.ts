@@ -1,6 +1,7 @@
 import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
 import { Id } from "./_generated/dataModel"
+import { sanitizeText } from "./sanitize"
 
 /**
  * Get feed posts with pagination
@@ -165,11 +166,14 @@ export const createPost = mutation({
       throw new Error("Post content must not exceed 5000 characters")
     }
 
+    // Sanitize content to prevent XSS attacks
+    const sanitizedContent = sanitizeText(args.content)
+
     // Create post with initialized counts
     const now = Date.now()
     const postId = await ctx.db.insert("posts", {
       authorId: user._id,
-      content: args.content,
+      content: sanitizedContent,
       likeCount: 0,
       commentCount: 0,
       createdAt: now,

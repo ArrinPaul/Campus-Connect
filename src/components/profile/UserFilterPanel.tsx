@@ -68,9 +68,9 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
   const hasActiveFilters = selectedRole !== "" || selectedSkills.length > 0
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4">
+    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Filters</h3>
         {hasActiveFilters && (
           <button
             type="button"

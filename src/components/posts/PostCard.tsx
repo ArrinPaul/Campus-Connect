@@ -114,21 +114,22 @@ export function PostCard({ post, author }: PostCardProps) {
   }
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow">
+    <div className="rounded-lg bg-white dark:bg-gray-800 p-4 shadow dark:shadow-gray-900/50 sm:p-6">
       {/* Author Info */}
       <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {/* Avatar */}
-          <div className="relative h-10 w-10 flex-shrink-0">
+          <div className="relative h-8 w-8 flex-shrink-0 sm:h-10 sm:w-10">
             {author.profilePicture ? (
               <Image
                 src={author.profilePicture}
                 alt={author.name}
                 fill
+                sizes="(max-width: 640px) 32px, 40px"
                 className="rounded-full object-cover"
               />
             ) : (
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white sm:h-10 sm:w-10 sm:text-sm">
                 {author.name.charAt(0).toUpperCase()}
               </div>
             )}
@@ -136,8 +137,8 @@ export function PostCard({ post, author }: PostCardProps) {
 
           {/* Name and Timestamp */}
           <div>
-            <p className="font-semibold text-gray-900">{author.name}</p>
-            <p className="text-sm text-gray-500">{formatTimestamp(post.createdAt)}</p>
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 sm:text-base">{author.name}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">{formatTimestamp(post.createdAt)}</p>
           </div>
         </div>
 
@@ -146,8 +147,9 @@ export function PostCard({ post, author }: PostCardProps) {
           <button
             onClick={handleDelete}
             disabled={isDeleting}
-            className="text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
+            className="text-xs text-red-600 hover:text-red-800 disabled:opacity-50 sm:text-sm"
             aria-label="Delete post"
+            style={{ minWidth: "44px", minHeight: "44px" }}
           >
             {isDeleting ? "Deleting..." : "Delete"}
           </button>
@@ -155,18 +157,19 @@ export function PostCard({ post, author }: PostCardProps) {
       </div>
 
       {/* Post Content */}
-      <div className="mt-4">
-        <p className="whitespace-pre-wrap text-gray-800">{post.content}</p>
+      <div className="mt-3 sm:mt-4">
+        <p className="whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200 sm:text-base">{post.content}</p>
       </div>
 
       {/* Engagement Stats and Actions */}
-      <div className="mt-4 flex items-center gap-6 border-t pt-4">
+      <div className="mt-3 flex items-center gap-4 border-t dark:border-gray-700 pt-3 sm:mt-4 sm:gap-6 sm:pt-4">
         {/* Like Button */}
         <button
           onClick={handleLikeToggle}
           disabled={isLiking || !currentUser}
-          className="flex items-center gap-2 text-gray-600 hover:text-red-600 disabled:opacity-50"
+          className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 disabled:opacity-50 sm:gap-2"
           aria-label={displayHasLiked ? "Unlike post" : "Like post"}
+          style={{ minWidth: "44px", minHeight: "44px" }}
         >
           <svg
             className={`h-5 w-5 ${displayHasLiked ? "fill-red-600 text-red-600" : "fill-none"}`}
@@ -181,11 +184,11 @@ export function PostCard({ post, author }: PostCardProps) {
               d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
             />
           </svg>
-          <span className="text-sm font-medium">{displayLikeCount}</span>
+          <span className="text-xs font-medium sm:text-sm">{displayLikeCount}</span>
         </button>
 
         {/* Comment Count */}
-        <div className="flex items-center gap-2 text-gray-600">
+        <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 sm:gap-2">
           <svg
             className="h-5 w-5"
             fill="none"
@@ -200,7 +203,7 @@ export function PostCard({ post, author }: PostCardProps) {
               d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
             />
           </svg>
-          <span className="text-sm font-medium">{post.commentCount}</span>
+          <span className="text-xs font-medium sm:text-sm">{post.commentCount}</span>
         </div>
       </div>
     </div>

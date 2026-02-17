@@ -1,5 +1,6 @@
 import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
+import { sanitizeText } from "./sanitize"
 
 /**
  * Get all comments for a post
@@ -86,11 +87,14 @@ export const createComment = mutation({
       throw new Error("Comment content must not exceed 1000 characters")
     }
 
+    // Sanitize content to prevent XSS attacks
+    const sanitizedContent = sanitizeText(args.content)
+
     // Create comment
     const commentId = await ctx.db.insert("comments", {
       postId: args.postId,
       authorId: user._id,
-      content: args.content,
+      content: sanitizedContent,
       createdAt: Date.now(),
     })
 

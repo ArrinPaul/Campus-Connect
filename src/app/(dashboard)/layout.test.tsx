@@ -1,15 +1,40 @@
 import { render, screen } from "@testing-library/react"
 import DashboardLayout from "./layout"
 
+// Mock matchMedia
+Object.defineProperty(window, "matchMedia", {
+  writable: true,
+  value: jest.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+})
+
 // Mock Clerk's UserButton
 jest.mock("@clerk/nextjs", () => ({
   UserButton: () => <div data-testid="user-button">UserButton</div>,
 }))
 
+// Mock ThemeToggle
+jest.mock("@/components/theme/theme-toggle", () => ({
+  ThemeToggle: () => <div data-testid="theme-toggle">ThemeToggle</div>,
+}))
+
+// Mock MobileNav
+jest.mock("@/components/navigation/mobile-nav", () => ({
+  MobileNav: () => <div data-testid="mobile-nav">MobileNav</div>,
+}))
+
 // Mock Next.js Link
 jest.mock("next/link", () => {
-  return ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href}>{children}</a>
+  return ({ children, ...props }: any) => (
+    <a {...props}>{children}</a>
   )
 })
 

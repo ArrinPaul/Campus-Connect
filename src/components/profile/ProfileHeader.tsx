@@ -57,19 +57,21 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
     }
   }
   return (
-    <div className="rounded-lg bg-white p-6 shadow">
-      <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
+    <div className="rounded-lg bg-white dark:bg-gray-800 p-4 shadow dark:shadow-gray-900/50 sm:p-6">
+      <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">
         {/* Avatar */}
-        <div className="relative h-24 w-24 flex-shrink-0">
+        <div className="relative h-20 w-20 flex-shrink-0 sm:h-24 sm:w-24">
           {user.profilePicture ? (
             <Image
               src={user.profilePicture}
               alt={user.name}
               fill
+              sizes="(max-width: 640px) 80px, 96px"
               className="rounded-full object-cover"
+              priority
             />
           ) : (
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-3xl font-bold text-white">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-600 text-2xl font-bold text-white sm:h-24 sm:w-24 sm:text-3xl">
               {user.name.charAt(0).toUpperCase()}
             </div>
           )}
@@ -77,53 +79,54 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
 
         {/* User Info */}
         <div className="flex-1 text-center sm:text-left">
-          <h1 className="text-2xl font-bold text-gray-900">{user.name}</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl">{user.name}</h1>
 
           <div className="mt-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-            <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
+            <span className="rounded-full bg-blue-100 dark:bg-blue-900 px-3 py-1 text-xs font-medium text-blue-800 dark:text-blue-200 sm:text-sm">
               {user.role}
             </span>
-            <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800">
+            <span className="rounded-full bg-gray-100 dark:bg-gray-700 px-3 py-1 text-xs font-medium text-gray-800 dark:text-gray-200 sm:text-sm">
               {user.experienceLevel}
             </span>
           </div>
 
           {user.university && (
-            <p className="mt-2 text-sm text-gray-600">{user.university}</p>
+            <p className="mt-2 text-xs text-gray-600 dark:text-gray-400 sm:text-sm">{user.university}</p>
           )}
 
           {user.bio && (
-            <p className="mt-3 text-gray-700">{user.bio}</p>
+            <p className="mt-2 text-sm text-gray-700 dark:text-gray-300 sm:mt-3">{user.bio}</p>
           )}
 
           {/* Stats */}
-          <div className="mt-4 flex justify-center gap-6 sm:justify-start">
+          <div className="mt-3 flex justify-center gap-4 sm:mt-4 sm:justify-start sm:gap-6">
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl">
                 {user.followerCount}
               </p>
-              <p className="text-sm text-gray-600">Followers</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 sm:text-sm">Followers</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl">
                 {user.followingCount}
               </p>
-              <p className="text-sm text-gray-600">Following</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 sm:text-sm">Following</p>
             </div>
           </div>
         </div>
 
         {/* Follow Button (only for other users) */}
         {!isOwnProfile && (
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 w-full sm:w-auto">
             <button 
               onClick={handleFollowToggle}
               disabled={isLoading}
-              className={`rounded-md px-6 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+              className={`w-full rounded-md px-6 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto ${
                 isFollowing 
-                  ? "bg-gray-600 hover:bg-gray-700" 
+                  ? "bg-gray-600 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600" 
                   : "bg-blue-600 hover:bg-blue-700"
               } disabled:opacity-50 disabled:cursor-not-allowed`}
+              style={{ minHeight: "44px" }}
             >
               {isLoading ? "..." : isFollowing ? "Unfollow" : "Follow"}
             </button>
