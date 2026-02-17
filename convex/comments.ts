@@ -108,3 +108,56 @@ export const createComment = mutation({
     return comment
   },
 })
+
+/**
+ * Delete a comment
+ * Validates user is the comment author (authorization)
+ * Decrements post commentCount
+ * Validates: Requirements 12.5, 12.6
+ */
+export const deleteComment = mutation({
+  args: {
+    commentId: v.id("comments"),
+  },
+  handler: async (ctx, args) => {
+    // Require authentication
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    // Get current user
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .unique()
+
+    if (!user) {
+      throw new Error("User not found")
+    }
+
+    // Get the comment
+    const comment = await ctx.db.get(args.commentId)
+    if (!comment) {
+      throw new Error("Comment not found")
+    }
+
+    // Verify user is the comment author (authorization)
+    if (comment.authorId !== user._id) {
+      throw new Error("Forbidden: You can only delete your own comments")
+    }
+
+    // Decrement post commentCount
+    const post = await ctx.db.get(comment.postId)
+    if (post) {
+      await ctx.db.patch(comment.postId, {
+        commentCount: Math.max(0, post.commentCount - 1),
+      })
+    }
+
+    // Delete the comment
+    await ctx.db.delete(args.commentId)
+
+    return { success: true }
+  },
+})

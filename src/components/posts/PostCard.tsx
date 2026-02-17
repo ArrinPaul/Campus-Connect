@@ -5,6 +5,8 @@ import Image from "next/image"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
+import { CommentList } from "@/components/posts/CommentList"
+import { CommentComposer } from "@/components/posts/CommentComposer"
 
 interface User {
   _id: Id<"users">
@@ -38,10 +40,17 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
 
   const [isDeleting, setIsDeleting] = useState(false)
   const [isLiking, setIsLiking] = useState(false)
+  const [showComments, setShowComments] = useState(false)
   const [optimisticLikeCount, setOptimisticLikeCount] = useState<number | null>(null)
   const [optimisticHasLiked, setOptimisticHasLiked] = useState<boolean | null>(null)
 
   const isOwnPost = currentUser?._id === post.authorId
+
+  // Only fetch comments when expanded
+  const comments = useQuery(
+    api.comments.getPostComments,
+    showComments ? { postId: post._id } : "skip"
+  )
   
   // Use optimistic values if available, otherwise use actual values
   const displayLikeCount = optimisticLikeCount !== null ? optimisticLikeCount : post.likeCount
@@ -187,8 +196,13 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
           <span className="text-xs font-medium sm:text-sm">{displayLikeCount}</span>
         </button>
 
-        {/* Comment Count */}
-        <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 sm:gap-2">
+        {/* Comment Toggle Button */}
+        <button
+          onClick={() => setShowComments(!showComments)}
+          className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 sm:gap-2"
+          aria-label={showComments ? "Hide comments" : "Show comments"}
+          style={{ minWidth: "44px", minHeight: "44px" }}
+        >
           <svg
             className="h-5 w-5"
             fill="none"
@@ -204,8 +218,16 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
             />
           </svg>
           <span className="text-xs font-medium sm:text-sm">{post.commentCount}</span>
-        </div>
+        </button>
       </div>
+
+      {/* Inline Comments Section */}
+      {showComments && (
+        <div className="mt-3 border-t dark:border-gray-700 pt-3 sm:mt-4 sm:pt-4 space-y-4">
+          <CommentList postId={post._id} comments={comments} isLoading={comments === undefined} />
+          <CommentComposer postId={post._id} />
+        </div>
+      )}
     </div>
   )
 })

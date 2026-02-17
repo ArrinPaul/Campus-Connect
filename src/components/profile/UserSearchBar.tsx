@@ -34,7 +34,7 @@ export function UserSearchBar({ onSearch }: UserSearchBarProps) {
         value={searchInput}
         onChange={(e) => setSearchInput(e.target.value)}
         placeholder="Search users by name..."
-        className="block w-full rounded-md border border-gray-300 py-2 pl-10 pr-10 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 py-2 pl-10 pr-10 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         aria-label="Search users"
       />
 

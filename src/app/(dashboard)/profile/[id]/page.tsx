@@ -4,12 +4,12 @@ import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import { useUser } from "@clerk/nextjs"
-import { ProfileHeader } from "@/src/components/profile/ProfileHeader"
-import { SkillsManager } from "@/src/components/profile/SkillsManager"
-import { ProfileForm } from "@/src/components/profile/ProfileForm"
-import { FollowersList } from "@/src/components/profile/FollowersList"
-import { FollowingList } from "@/src/components/profile/FollowingList"
-import { ProfileHeaderSkeleton, FullPageLoadingSpinner } from "@/src/components/ui/loading-skeleton"
+import { ProfileHeader } from "@/components/profile/ProfileHeader"
+import { SkillsManager } from "@/components/profile/SkillsManager"
+import { ProfileForm } from "@/components/profile/ProfileForm"
+import { FollowersList } from "@/components/profile/FollowersList"
+import { FollowingList } from "@/components/profile/FollowingList"
+import { ProfileHeaderSkeleton, FullPageLoadingSpinner } from "@/components/ui/loading-skeleton"
 
 interface ProfilePageProps {
   params: {

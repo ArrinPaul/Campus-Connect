@@ -41,5 +41,26 @@ export function sanitizeText(input: string): string {
   // Remove meta tags
   sanitized = sanitized.replace(/<meta\b[^>]*>/gi, '');
   
+  // Remove img tags (can trigger onerror XSS)
+  sanitized = sanitized.replace(/<img\b[^>]*\/?>/gi, '');
+  
+  // Remove svg tags and their content (can contain scripts)
+  sanitized = sanitized.replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, '');
+  sanitized = sanitized.replace(/<svg\b[^>]*\/?>/gi, '');
+  
+  // Remove form tags (phishing vector)
+  sanitized = sanitized.replace(/<\/?form\b[^>]*>/gi, '');
+  sanitized = sanitized.replace(/<(input|button|textarea|select)\b[^>]*\/?>/gi, '');
+  
+  // Remove base tags (can redirect all relative URLs)
+  sanitized = sanitized.replace(/<base\b[^>]*\/?>/gi, '');
+  
+  // HTML-encode remaining special characters to prevent injection
+  sanitized = sanitized.replace(/&(?!amp;|lt;|gt;|quot;|#39;)/g, '&amp;');
+  sanitized = sanitized.replace(/</g, '&lt;');
+  sanitized = sanitized.replace(/>/g, '&gt;');
+  sanitized = sanitized.replace(/"/g, '&quot;');
+  sanitized = sanitized.replace(/'/g, '&#39;');
+  
   return sanitized;
 }

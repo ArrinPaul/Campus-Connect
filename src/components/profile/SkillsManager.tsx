@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { validateSkill } from "../../../lib/validations"
-import { ButtonLoadingSpinner } from "@/src/components/ui/loading-skeleton"
+import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 
 interface SkillsManagerProps {
   skills: string[]
@@ -83,9 +83,9 @@ export function SkillsManager({ skills, onUpdate }: SkillsManagerProps) {
             onChange={handleInputChange}
             maxLength={50}
             placeholder="Add a skill (e.g., React, Python, Machine Learning)"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-          {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+          {error && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>}
         </div>
         <button
           type="submit"
@@ -103,12 +103,12 @@ export function SkillsManager({ skills, onUpdate }: SkillsManagerProps) {
           {skills.map((skill) => (
             <div
               key={skill}
-              className="flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800"
+              className="flex items-center gap-2 rounded-full bg-blue-100 dark:bg-blue-900 px-3 py-1 text-sm text-blue-800 dark:text-blue-200"
             >
               <span>{skill}</span>
               <button
                 onClick={() => handleRemoveSkill(skill)}
-                className="text-blue-600 hover:text-blue-800 focus:outline-none"
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 focus:outline-none"
                 aria-label={`Remove ${skill}`}
               >
                 <svg
@@ -129,7 +129,7 @@ export function SkillsManager({ skills, onUpdate }: SkillsManagerProps) {
           ))}
         </div>
       ) : (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           No skills added yet. Add your first skill above!
         </p>
       )}

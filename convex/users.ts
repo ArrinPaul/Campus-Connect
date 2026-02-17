@@ -1,5 +1,6 @@
 import { v } from "convex/values"
 import { internalMutation, query, mutation } from "./_generated/server"
+import { Id } from "./_generated/dataModel"
 import { sanitizeText } from "./sanitize"
 
 /**
@@ -88,6 +89,120 @@ export const updateUserFromWebhook = internalMutation({
 
     console.log(`Updated user ${user._id} for clerkId ${args.clerkId}`)
     return user._id
+  },
+})
+
+/**
+ * Internal mutation to delete a user and all their associated data from Clerk webhook
+ * Called when user.deleted event is received
+ * Cascade deletes: posts (and their likes/comments), likes, comments, follows
+ */
+export const deleteUserFromWebhook = internalMutation({
+  args: {
+    clerkId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Find the user by clerkId
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", args.clerkId))
+      .first()
+
+    if (!user) {
+      console.error(`User with clerkId ${args.clerkId} not found for deletion`)
+      return
+    }
+
+    // Delete all posts by this user (and their associated likes/comments)
+    const posts = await ctx.db
+      .query("posts")
+      .withIndex("by_author", (q) => q.eq("authorId", user._id))
+      .collect()
+    for (const post of posts) {
+      // Delete likes on this post
+      const postLikes = await ctx.db
+        .query("likes")
+        .withIndex("by_post", (q) => q.eq("postId", post._id))
+        .collect()
+      for (const like of postLikes) {
+        await ctx.db.delete(like._id)
+      }
+      // Delete comments on this post
+      const postComments = await ctx.db
+        .query("comments")
+        .withIndex("by_post", (q) => q.eq("postId", post._id))
+        .collect()
+      for (const c of postComments) {
+        await ctx.db.delete(c._id)
+      }
+      await ctx.db.delete(post._id)
+    }
+
+    // Delete likes by this user on other posts
+    const userLikes = await ctx.db
+      .query("likes")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+    for (const like of userLikes) {
+      // Decrement the liked post's likeCount
+      const likedPost = await ctx.db.get(like.postId)
+      if (likedPost) {
+        await ctx.db.patch(like.postId, {
+          likeCount: Math.max(0, likedPost.likeCount - 1),
+        })
+      }
+      await ctx.db.delete(like._id)
+    }
+
+    // Delete comments by this user on other posts
+    const userComments = await ctx.db
+      .query("comments")
+      .withIndex("by_author", (q) => q.eq("authorId", user._id))
+      .collect()
+    for (const comment of userComments) {
+      const commentedPost = await ctx.db.get(comment.postId)
+      if (commentedPost) {
+        await ctx.db.patch(comment.postId, {
+          commentCount: Math.max(0, commentedPost.commentCount - 1),
+        })
+      }
+      await ctx.db.delete(comment._id)
+    }
+
+    // Delete follows where this user is the follower
+    const following = await ctx.db
+      .query("follows")
+      .withIndex("by_follower", (q) => q.eq("followerId", user._id))
+      .collect()
+    for (const follow of following) {
+      const followedUser = await ctx.db.get(follow.followingId)
+      if (followedUser) {
+        await ctx.db.patch(follow.followingId, {
+          followerCount: Math.max(0, followedUser.followerCount - 1),
+        })
+      }
+      await ctx.db.delete(follow._id)
+    }
+
+    // Delete follows where this user is being followed
+    const followers = await ctx.db
+      .query("follows")
+      .withIndex("by_following", (q) => q.eq("followingId", user._id))
+      .collect()
+    for (const follow of followers) {
+      const followerUser = await ctx.db.get(follow.followerId)
+      if (followerUser) {
+        await ctx.db.patch(follow.followerId, {
+          followingCount: Math.max(0, followerUser.followingCount - 1),
+        })
+      }
+      await ctx.db.delete(follow._id)
+    }
+
+    // Finally delete the user record
+    await ctx.db.delete(user._id)
+
+    console.log(`Deleted user ${user._id} and all associated data for clerkId ${args.clerkId}`)
   },
 })
 

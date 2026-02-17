@@ -98,6 +98,21 @@ http.route({
       })
     }
 
+    if (eventType === "user.deleted") {
+      const { id } = evt.data
+
+      // Delete user and all associated data from Convex
+      await ctx.runMutation(internal.users.deleteUserFromWebhook, {
+        clerkId: id,
+      })
+
+      console.log(`User deleted: ${id}`)
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    }
+
     // For other event types, return success
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

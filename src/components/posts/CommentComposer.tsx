@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
-import { ButtonLoadingSpinner } from "@/src/components/ui/loading-skeleton"
+import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 
 interface CommentComposerProps {
   postId: Id<"posts">
@@ -65,12 +65,12 @@ export function CommentComposer({ postId, onCommentAdded }: CommentComposerProps
           onChange={(e) => setContent(e.target.value)}
           rows={2}
           maxLength={maxLength}
-          className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           placeholder="Write a comment..."
         />
         <div className="mt-1 flex justify-between text-xs">
-          <span className="text-red-600">{error}</span>
-          <span className={`${content.length > maxLength ? "text-red-600" : "text-gray-500"}`}>
+          <span className="text-red-600 dark:text-red-400">{error}</span>
+          <span className={`${content.length > maxLength ? "text-red-600 dark:text-red-400" : "text-gray-500 dark:text-gray-400"}`}>
             {content.length}/{maxLength}
           </span>
         </div>

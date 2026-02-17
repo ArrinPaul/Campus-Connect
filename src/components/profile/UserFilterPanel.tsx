@@ -87,7 +87,7 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
       <div className="mb-4">
         <label
           htmlFor="role-filter"
-          className="mb-2 block text-sm font-medium text-gray-700"
+          className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
         >
           Role
         </label>
@@ -95,7 +95,7 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
           id="role-filter"
           value={selectedRole}
           onChange={(e) => handleRoleChange(e.target.value)}
-          className="block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           aria-label="Filter by role"
         >
           <option value="">All Roles</option>
@@ -109,7 +109,7 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
       <div>
         <label
           htmlFor="skills-filter"
-          className="mb-2 block text-sm font-medium text-gray-700"
+          className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
         >
           Skills
         </label>
@@ -128,7 +128,7 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
               }
             }}
             placeholder="Add skill..."
-            className="block flex-1 rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="block flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             aria-label="Add skill filter"
           />
           <button
@@ -148,7 +148,7 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
             {selectedSkills.map((skill) => (
               <div
                 key={skill}
-                className="flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800"
+                className="flex items-center gap-1 rounded-full bg-blue-100 dark:bg-blue-900 px-3 py-1 text-sm text-blue-800 dark:text-blue-200"
               >
                 <span>{skill}</span>
                 <button

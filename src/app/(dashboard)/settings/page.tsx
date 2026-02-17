@@ -2,9 +2,9 @@
 
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
-import { ProfileForm } from "@/src/components/profile/ProfileForm"
-import { ThemeToggle } from "@/src/components/theme/theme-toggle"
-import { LoadingSpinner } from "@/src/components/ui/loading-skeleton"
+import { ProfileForm } from "@/components/profile/ProfileForm"
+import { ThemeToggle } from "@/components/theme/theme-toggle"
+import { LoadingSpinner } from "@/components/ui/loading-skeleton"
 
 export default function SettingsPage() {
   const currentUser = useQuery(api.users.getCurrentUser)
@@ -44,8 +44,8 @@ export default function SettingsPage() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Not Authenticated</h1>
-          <p className="text-gray-600">Please sign in to access settings.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Not Authenticated</h1>
+          <p className="text-gray-600 dark:text-gray-400">Please sign in to access settings.</p>
         </div>
       </div>
     )
@@ -53,23 +53,23 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Settings</h1>
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">Settings</h1>
 
       {/* Theme Settings */}
-      <div className="mb-8 rounded-lg border border-gray-200 bg-white p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Appearance</h2>
+      <div className="mb-8 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Appearance</h2>
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-medium text-gray-900">Theme</p>
-            <p className="text-sm text-gray-500">Choose your preferred theme</p>
+            <p className="font-medium text-gray-900 dark:text-gray-100">Theme</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Choose your preferred theme</p>
           </div>
           <ThemeToggle />
         </div>
       </div>
 
       {/* Profile Settings */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Profile Information</h2>
+      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Profile Information</h2>
         <ProfileForm initialData={currentUser} />
       </div>
     </div>

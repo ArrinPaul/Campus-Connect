@@ -19,6 +19,11 @@ export const api = {
     unlikePost: 'posts:unlikePost',
     hasUserLikedPost: 'posts:hasUserLikedPost',
   },
+  comments: {
+    getPostComments: 'comments:getPostComments',
+    createComment: 'comments:createComment',
+    deleteComment: 'comments:deleteComment',
+  },
   follows: {
     followUser: 'follows:followUser',
     unfollowUser: 'follows:unfollowUser',

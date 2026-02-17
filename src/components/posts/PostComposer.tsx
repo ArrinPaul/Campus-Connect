@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
-import { ButtonLoadingSpinner } from "@/src/components/ui/loading-skeleton"
+import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 
 interface PostComposerProps {
   onPostCreated?: () => void

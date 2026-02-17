@@ -224,6 +224,24 @@ export const deletePost = mutation({
       throw new Error("Forbidden: You can only delete your own posts")
     }
 
+    // Cascade delete: remove all likes associated with this post
+    const likes = await ctx.db
+      .query("likes")
+      .withIndex("by_post", (q) => q.eq("postId", args.postId))
+      .collect()
+    for (const like of likes) {
+      await ctx.db.delete(like._id)
+    }
+
+    // Cascade delete: remove all comments associated with this post
+    const comments = await ctx.db
+      .query("comments")
+      .withIndex("by_post", (q) => q.eq("postId", args.postId))
+      .collect()
+    for (const comment of comments) {
+      await ctx.db.delete(comment._id)
+    }
+
     // Delete the post
     await ctx.db.delete(args.postId)
 

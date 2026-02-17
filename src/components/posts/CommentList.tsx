@@ -1,8 +1,11 @@
 "use client"
 
+import { useState } from "react"
 import Image from "next/image"
+import { useMutation, useQuery } from "convex/react"
+import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
-import { CommentSkeleton } from "@/src/components/ui/loading-skeleton"
+import { CommentSkeleton } from "@/components/ui/loading-skeleton"
 
 interface User {
   _id: Id<"users">
@@ -27,6 +30,21 @@ interface CommentListProps {
 }
 
 export function CommentList({ postId, comments, isLoading = false }: CommentListProps) {
+  const deleteComment = useMutation(api.comments.deleteComment)
+  const currentUser = useQuery(api.users.getCurrentUser)
+  const [deletingId, setDeletingId] = useState<Id<"comments"> | null>(null)
+
+  const handleDeleteComment = async (commentId: Id<"comments">) => {
+    try {
+      setDeletingId(commentId)
+      await deleteComment({ commentId })
+    } catch (error) {
+      console.error("Failed to delete comment:", error)
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
   const formatTimestamp = (timestamp: number) => {
     const date = new Date(timestamp)
     const now = new Date()
@@ -94,17 +112,27 @@ export function CommentList({ postId, comments, isLoading = false }: CommentList
 
             {/* Comment Content */}
             <div className="flex-1">
-              <div className="rounded-lg bg-gray-100 px-4 py-2">
-                <p className="text-sm font-semibold text-gray-900">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-700 px-4 py-2">
+                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                   {author?.name || "Unknown User"}
                 </p>
-                <p className="mt-1 whitespace-pre-wrap text-sm text-gray-800">
+                <p className="mt-1 whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200">
                   {comment.content}
                 </p>
               </div>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 {formatTimestamp(comment.createdAt)}
               </p>
+              {currentUser && currentUser._id === comment.authorId && (
+                <button
+                  onClick={() => handleDeleteComment(comment._id)}
+                  disabled={deletingId === comment._id}
+                  className="mt-1 text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50"
+                  aria-label="Delete comment"
+                >
+                  {deletingId === comment._id ? "Deleting..." : "Delete"}
+                </button>
+              )}
             </div>
           </div>
         )
