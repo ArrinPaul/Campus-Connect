@@ -5,8 +5,13 @@ import Link from "next/link"
 import { Menu, X } from "lucide-react"
 import { UserButton } from "@clerk/nextjs"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
+import { Id } from "@/convex/_generated/dataModel"
 
-export function MobileNav() {
+interface MobileNavProps {
+  currentUserId?: Id<"users">
+}
+
+export function MobileNav({ currentUserId }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   const toggleMenu = () => setIsOpen(!isOpen)
@@ -78,13 +83,23 @@ export function MobileNav() {
             >
               Discover
             </Link>
+            {currentUserId && (
+              <Link
+                href={`/profile/${currentUserId}`}
+                onClick={closeMenu}
+                className="block rounded-md px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-blue-400"
+                style={{ minHeight: "44px" }}
+              >
+                Profile
+              </Link>
+            )}
             <Link
-              href="/profile"
+              href="/settings"
               onClick={closeMenu}
               className="block rounded-md px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-blue-400"
               style={{ minHeight: "44px" }}
             >
-              Profile
+              Settings
             </Link>
           </nav>
 
@@ -103,6 +118,7 @@ export function MobileNav() {
                     avatarBox: "h-10 w-10",
                   },
                 }}
+                afterSignOutUrl="/"
               />
             </div>
           </div>

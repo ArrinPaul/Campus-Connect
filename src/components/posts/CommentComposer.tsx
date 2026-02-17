@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
+import { ButtonLoadingSpinner } from "@/src/components/ui/loading-skeleton"
 
 interface CommentComposerProps {
   postId: Id<"posts">
@@ -79,8 +80,9 @@ export function CommentComposer({ postId, onCommentAdded }: CommentComposerProps
         <button
           type="submit"
           disabled={isSubmitting || content.trim().length === 0}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+          className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 flex items-center gap-2"
         >
+          {isSubmitting && <ButtonLoadingSpinner />}
           {isSubmitting ? "Posting..." : "Comment"}
         </button>
       </div>

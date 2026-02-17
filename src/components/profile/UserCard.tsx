@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Id } from "@/convex/_generated/dataModel"
@@ -17,7 +18,7 @@ interface UserCardProps {
   user: User
 }
 
-export function UserCard({ user }: UserCardProps) {
+export const UserCard = memo(function UserCard({ user }: UserCardProps) {
   return (
     <Link href={`/profile/${user._id}`}>
       <div className="flex items-start gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 transition-shadow hover:shadow-md dark:hover:shadow-gray-900/50 sm:gap-4 sm:p-4">
@@ -74,4 +75,4 @@ export function UserCard({ user }: UserCardProps) {
       </div>
     </Link>
   )
-}
+})

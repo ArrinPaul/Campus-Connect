@@ -1,13 +1,18 @@
+"use client"
+
 import { UserButton } from "@clerk/nextjs"
 import Link from "next/link"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
 import { MobileNav } from "@/components/navigation/mobile-nav"
+import { useQuery } from "convex/react"
+import { api } from "@/convex/_generated/api"
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const currentUser = useQuery(api.users.getCurrentUser)
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Navigation Bar */}
@@ -35,29 +40,38 @@ export default function DashboardLayout({
               >
                 Discover
               </Link>
+              {currentUser && (
+                <Link
+                  href={`/profile/${currentUser._id}`}
+                  className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
+                >
+                  Profile
+                </Link>
+              )}
               <Link
-                href="/profile"
+                href="/settings"
                 className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
               >
-                Profile
+                Settings
               </Link>
               
               {/* Theme Toggle */}
               <ThemeToggle />
               
-              {/* User Button */}
+              {/* User Button with logout */}
               <UserButton
                 appearance={{
                   elements: {
                     avatarBox: "h-9 w-9",
                   },
                 }}
+                afterSignOutUrl="/"
               />
             </div>
 
             {/* Mobile Navigation - Shown only on mobile */}
             <div className="flex items-center md:hidden">
-              <MobileNav />
+              <MobileNav currentUserId={currentUser?._id} />
             </div>
           </div>
         </div>

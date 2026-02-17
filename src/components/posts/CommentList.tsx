@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import { Id } from "@/convex/_generated/dataModel"
+import { CommentSkeleton } from "@/src/components/ui/loading-skeleton"
 
 interface User {
   _id: Id<"users">
@@ -21,10 +22,11 @@ interface Comment {
 
 interface CommentListProps {
   postId: Id<"posts">
-  comments: Comment[]
+  comments: Comment[] | undefined
+  isLoading?: boolean
 }
 
-export function CommentList({ postId, comments }: CommentListProps) {
+export function CommentList({ postId, comments, isLoading = false }: CommentListProps) {
   const formatTimestamp = (timestamp: number) => {
     const date = new Date(timestamp)
     const now = new Date()
@@ -44,6 +46,17 @@ export function CommentList({ postId, comments }: CommentListProps) {
     } else {
       return date.toLocaleDateString()
     }
+  }
+
+  // Loading state
+  if (isLoading || comments === undefined) {
+    return (
+      <div className="space-y-4">
+        {[...Array(2)].map((_, i) => (
+          <CommentSkeleton key={i} />
+        ))}
+      </div>
+    )
   }
 
   // Handle empty state

@@ -9,6 +9,7 @@ import {
   validateRole,
   validateExperienceLevel,
 } from "../../../lib/validations"
+import { ButtonLoadingSpinner } from "@/src/components/ui/loading-skeleton"
 
 interface ProfileFormProps {
   initialData?: {
@@ -405,8 +406,9 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+          className="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2"
         >
+          {isSubmitting && <ButtonLoadingSpinner />}
           {isSubmitting ? "Saving..." : "Save Profile"}
         </button>
       </div>

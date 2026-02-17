@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, memo } from "react"
 import Image from "next/image"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
@@ -28,7 +28,7 @@ interface PostCardProps {
   author: User
 }
 
-export function PostCard({ post, author }: PostCardProps) {
+export const PostCard = memo(function PostCard({ post, author }: PostCardProps) {
   const deletePost = useMutation(api.posts.deletePost)
   const likePost = useMutation(api.posts.likePost)
   const unlikePost = useMutation(api.posts.unlikePost)
@@ -208,4 +208,4 @@ export function PostCard({ post, author }: PostCardProps) {
       </div>
     </div>
   )
-}
+})

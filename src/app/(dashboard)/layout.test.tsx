@@ -38,6 +38,11 @@ jest.mock("next/link", () => {
   )
 })
 
+// Mock Convex
+jest.mock("convex/react", () => ({
+  useQuery: jest.fn(() => ({ _id: "test-user-id" })),
+}))
+
 describe("DashboardLayout", () => {
   it("should render navigation bar", () => {
     render(
@@ -71,6 +76,7 @@ describe("DashboardLayout", () => {
     expect(screen.getByText("Feed")).toBeInTheDocument()
     expect(screen.getByText("Discover")).toBeInTheDocument()
     expect(screen.getByText("Profile")).toBeInTheDocument()
+    expect(screen.getByText("Settings")).toBeInTheDocument()
   })
 
   it("should render UserButton", () => {
@@ -117,9 +123,11 @@ describe("DashboardLayout", () => {
     const feedLink = screen.getByText("Feed").closest("a")
     const discoverLink = screen.getByText("Discover").closest("a")
     const profileLink = screen.getByText("Profile").closest("a")
+    const settingsLink = screen.getByText("Settings").closest("a")
     
     expect(feedLink).toHaveAttribute("href", "/feed")
     expect(discoverLink).toHaveAttribute("href", "/discover")
-    expect(profileLink).toHaveAttribute("href", "/profile")
+    expect(profileLink).toHaveAttribute("href", "/profile/test-user-id")
+    expect(settingsLink).toHaveAttribute("href", "/settings")
   })
 })

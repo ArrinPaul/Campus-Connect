@@ -102,7 +102,7 @@ describe("MobileNav", () => {
   })
 
   it("should display all navigation links", async () => {
-    render(<MobileNav />)
+    render(<MobileNav currentUserId="test-user-id" />)
     
     const menuButton = screen.getByLabelText("Toggle navigation menu")
     fireEvent.click(menuButton)
@@ -111,6 +111,7 @@ describe("MobileNav", () => {
       expect(screen.getByText("Feed")).toBeInTheDocument()
       expect(screen.getByText("Discover")).toBeInTheDocument()
       expect(screen.getByText("Profile")).toBeInTheDocument()
+      expect(screen.getByText("Settings")).toBeInTheDocument()
     })
   })
 
@@ -167,7 +168,7 @@ describe("MobileNav", () => {
   })
 
   it("should have minimum touch target size for all interactive elements", async () => {
-    const { container } = render(<MobileNav />)
+    const { container } = render(<MobileNav currentUserId="test-user-id" />)
     
     const menuButton = screen.getByLabelText("Toggle navigation menu")
     fireEvent.click(menuButton)
@@ -182,10 +183,12 @@ describe("MobileNav", () => {
     const feedLink = screen.getByText("Feed").closest("a")
     const discoverLink = screen.getByText("Discover").closest("a")
     const profileLink = screen.getByText("Profile").closest("a")
+    const settingsLink = screen.getByText("Settings").closest("a")
     
     // Check that links have proper padding for touch targets (py-3 provides vertical padding)
     expect(feedLink?.className).toContain("py-3")
     expect(discoverLink?.className).toContain("py-3")
     expect(profileLink?.className).toContain("py-3")
+    expect(settingsLink?.className).toContain("py-3")
   })
 })

@@ -5,6 +5,7 @@ import { useState } from "react"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
+import { ButtonLoadingSpinner } from "@/src/components/ui/loading-skeleton"
 
 interface User {
   _id: Id<"users">
@@ -121,13 +122,14 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
             <button 
               onClick={handleFollowToggle}
               disabled={isLoading}
-              className={`w-full rounded-md px-6 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto ${
+              className={`w-full rounded-md px-6 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto flex items-center justify-center gap-2 ${
                 isFollowing 
                   ? "bg-gray-600 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600" 
                   : "bg-blue-600 hover:bg-blue-700"
               } disabled:opacity-50 disabled:cursor-not-allowed`}
               style={{ minHeight: "44px" }}
             >
+              {isLoading && <ButtonLoadingSpinner />}
               {isLoading ? "..." : isFollowing ? "Unfollow" : "Follow"}
             </button>
           </div>

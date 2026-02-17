@@ -4,16 +4,37 @@ import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { ProfileForm } from "@/src/components/profile/ProfileForm"
 import { ThemeToggle } from "@/src/components/theme/theme-toggle"
+import { LoadingSpinner } from "@/src/components/ui/loading-skeleton"
 
 export default function SettingsPage() {
   const currentUser = useQuery(api.users.getCurrentUser)
 
   if (currentUser === undefined) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading settings...</p>
+      <div className="mx-auto max-w-4xl px-4 py-8">
+        <div className="h-10 w-32 rounded bg-gray-200 dark:bg-gray-700 mb-8" />
+        
+        <div className="mb-8 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+          <div className="h-7 w-40 rounded bg-gray-200 dark:bg-gray-700 mb-4" />
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <div className="h-5 w-24 rounded bg-gray-200 dark:bg-gray-700" />
+              <div className="h-4 w-48 rounded bg-gray-200 dark:bg-gray-700" />
+            </div>
+            <div className="h-10 w-20 rounded bg-gray-200 dark:bg-gray-700" />
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+          <div className="h-7 w-48 rounded bg-gray-200 dark:bg-gray-700 mb-4" />
+          <div className="space-y-6">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="space-y-2">
+                <div className="h-4 w-24 rounded bg-gray-200 dark:bg-gray-700" />
+                <div className="h-10 w-full rounded bg-gray-200 dark:bg-gray-700" />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     )

@@ -6,7 +6,7 @@ import { api } from "@/convex/_generated/api"
 import { UserSearchBar } from "@/components/profile/UserSearchBar"
 import { UserFilterPanel } from "@/components/profile/UserFilterPanel"
 import { UserCard } from "@/components/profile/UserCard"
-import { Loader2 } from "lucide-react"
+import { UserCardSkeleton } from "@/components/ui/loading-skeleton"
 
 interface FilterCriteria {
   role?: "Student" | "Research Scholar" | "Faculty"
@@ -64,10 +64,12 @@ export default function DiscoverPage() {
           {/* Results */}
           <div className="space-y-3 sm:space-y-4">
             {users === undefined ? (
-              // Loading state
-              <div className="flex items-center justify-center py-8 sm:py-12">
-                <Loader2 className="h-6 w-6 animate-spin text-blue-600 sm:h-8 sm:w-8" />
-              </div>
+              // Loading state with skeletons
+              <>
+                {[...Array(5)].map((_, i) => (
+                  <UserCardSkeleton key={i} />
+                ))}
+              </>
             ) : users.length === 0 ? (
               // Empty state
               <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8 text-center sm:p-12">

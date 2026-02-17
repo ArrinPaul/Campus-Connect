@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
+import { ButtonLoadingSpinner } from "@/src/components/ui/loading-skeleton"
 
 interface PostComposerProps {
   onPostCreated?: () => void
@@ -77,9 +78,10 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
         <button
           type="submit"
           disabled={isSubmitting || content.trim().length === 0}
-          className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 sm:text-base"
+          className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 sm:text-base flex items-center justify-center gap-2"
           style={{ minHeight: "44px" }}
         >
+          {isSubmitting && <ButtonLoadingSpinner />}
           {isSubmitting ? "Posting..." : "Post"}
         </button>
       </div>

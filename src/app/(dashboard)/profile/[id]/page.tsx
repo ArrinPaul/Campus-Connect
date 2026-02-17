@@ -9,6 +9,7 @@ import { SkillsManager } from "@/src/components/profile/SkillsManager"
 import { ProfileForm } from "@/src/components/profile/ProfileForm"
 import { FollowersList } from "@/src/components/profile/FollowersList"
 import { FollowingList } from "@/src/components/profile/FollowingList"
+import { ProfileHeaderSkeleton, FullPageLoadingSpinner } from "@/src/components/ui/loading-skeleton"
 
 interface ProfilePageProps {
   params: {
@@ -26,10 +27,31 @@ export default function ProfilePage({ params }: ProfilePageProps) {
   // Loading state
   if (profileUser === undefined || currentUser === undefined) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading profile...</p>
+      <div className="mx-auto max-w-4xl px-4 py-8">
+        <ProfileHeaderSkeleton />
+        
+        <div className="mt-8">
+          <div className="h-8 w-32 rounded bg-gray-200 dark:bg-gray-700 mb-4" />
+          <div className="flex flex-wrap gap-2">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-8 w-20 rounded-full bg-gray-200 dark:bg-gray-700" />
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-3">
+            <div className="h-8 w-40 rounded bg-gray-200 dark:bg-gray-700" />
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="h-20 rounded-lg bg-gray-200 dark:bg-gray-700" />
+            ))}
+          </div>
+          <div className="space-y-3">
+            <div className="h-8 w-40 rounded bg-gray-200 dark:bg-gray-700" />
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="h-20 rounded-lg bg-gray-200 dark:bg-gray-700" />
+            ))}
+          </div>
         </div>
       </div>
     )

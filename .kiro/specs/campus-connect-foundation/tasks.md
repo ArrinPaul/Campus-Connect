@@ -590,7 +590,7 @@ Final pages, integration, and comprehensive testing
     - Test theme switching
     - _Requirements: 2.3, 10.3_
 
-- [ ] 20. Create landing page
+- [x] 20. Create landing page
   - [x] 20.1 Build landing page
     - Create app/page.tsx
     - Add hero section with platform description
@@ -599,47 +599,47 @@ Final pages, integration, and comprehensive testing
     - Redirect authenticated users to feed
     - _Requirements: 1.2_
   
-  - [-] 20.2 Write unit tests for landing page
+  - [x] 20.2 Write unit tests for landing page
     - Test redirect for authenticated users
     - Test CTA button navigation
     - _Requirements: 1.2_
 
-- [ ] 21. Integration and polish
-  - [ ] 21.1 Set up navigation and routing
+- [x] 21. Integration and polish
+  - [x] 21.1 Set up navigation and routing
     - Create navigation bar with links
     - Add user menu with profile and settings
     - Add logout functionality
     - Ensure all routes are properly protected
     - _Requirements: 1.6, 1.7_
   
-  - [ ] 21.2 Add loading states
+  - [x] 21.2 Add loading states
     - Create loading skeletons for all components
     - Add loading indicators for async operations
     - Handle Convex query loading states
     - _Requirements: 6.7, 11.4_
   
-  - [ ] 21.3 Add error boundaries
+  - [x] 21.3 Add error boundaries
     - Create error boundary component
     - Wrap app sections with error boundaries
     - Display user-friendly error messages
     - Log errors for debugging
     - _Requirements: 12.7_
   
-  - [ ] 21.4 Optimize performance
+  - [x] 21.4 Optimize performance
     - Add React.memo to expensive components
     - Implement code splitting for routes
     - Optimize Convex queries (indexes, pagination)
     - Minimize bundle size
     - _Requirements: 6.4, 6.5_
   
-  - [ ] 21.5 Write integration tests
+  - [x] 21.5 Write integration tests
     - Test complete user registration and profile creation flow
     - Test post creation, engagement, and feed display flow
     - Test user discovery, following, and feed filtering flow
     - Test theme switching and persistence
     - _Requirements: 1.5, 4.1, 5.1, 7.1, 10.2_
 
-- [ ] 22. Final checkpoint - Comprehensive testing
+- [x] 22. Final checkpoint - Comprehensive testing
   - Run all unit tests and ensure they pass
   - Run all property tests and ensure they pass
   - Run all integration tests and ensure they pass
