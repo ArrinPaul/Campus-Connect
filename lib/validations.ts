@@ -1,142 +1,115 @@
-/**
- * Validation utilities for Campus Connect
- * Feature: campus-connect-foundation
- * 
- * These functions validate user input according to requirements.
- */
+import { z } from "zod"
 
-/**
- * Validate bio text length
- * Validates: Requirement 2.5
- */
-export function validateBio(bio: string): { valid: boolean; error?: string } {
+// User profile validation schema
+export const profileSchema = z.object({
+  name: z.string().min(1, "Name is required").max(100, "Name too long"),
+  bio: z.string().max(500, "Bio must be 500 characters or less").optional(),
+  university: z.string().optional(),
+  role: z.enum(["Student", "Research Scholar", "Faculty"]),
+  experienceLevel: z.enum(["Beginner", "Intermediate", "Advanced", "Expert"]),
+  skills: z.array(z.string()).max(20, "Maximum 20 skills allowed"),
+  socialLinks: z.object({
+    github: z.string().url("Invalid GitHub URL").optional().or(z.literal("")),
+    linkedin: z.string().url("Invalid LinkedIn URL").optional().or(z.literal("")),
+    twitter: z.string().url("Invalid Twitter URL").optional().or(z.literal("")),
+    website: z.string().url("Invalid website URL").optional().or(z.literal("")),
+  }),
+})
+
+export type ProfileFormData = z.infer<typeof profileSchema>
+
+// Post validation schema
+export const postSchema = z.object({
+  content: z
+    .string()
+    .min(1, "Content is required")
+    .max(5000, "Content must be 5000 characters or less"),
+})
+
+export type PostFormData = z.infer<typeof postSchema>
+
+// Comment validation schema
+export const commentSchema = z.object({
+  content: z
+    .string()
+    .min(1, "Comment is required")
+    .max(2000, "Comment must be 2000 characters or less"),
+})
+
+export type CommentFormData = z.infer<typeof commentSchema>
+
+// Skill validation
+export function validateSkill(skill: string): { valid: boolean; error?: string } {
+  if (skill.length === 0) {
+    return { valid: false, error: "Skill name cannot be empty" }
+  }
+  if (skill.length > 50) {
+    return { valid: false, error: "Skill name must be 50 characters or less" }
+  }
+  if (!/^[a-zA-Z0-9\s\-\+\#\.]+$/.test(skill)) {
+    return { valid: false, error: "Skill name contains invalid characters" }
+  }
+  return { valid: true }
+}
+
+// Bio validation
+export function validateBio(bio: string | undefined): { valid: boolean; error?: string } {
+  if (!bio) return { valid: true }
   if (bio.length > 500) {
-    return {
-      valid: false,
-      error: "Bio must not exceed 500 characters",
-    }
+    return { valid: false, error: "Bio must be 500 characters or less" }
   }
   return { valid: true }
 }
 
-/**
- * Validate university name length
- * Validates: Requirement 2.6
- */
-export function validateUniversity(
-  university: string
-): { valid: boolean; error?: string } {
-  if (university.length > 200) {
-    return {
-      valid: false,
-      error: "University name must not exceed 200 characters",
-    }
+// University validation
+export function validateUniversity(university: string | undefined): { valid: boolean; error?: string } {
+  if (!university) return { valid: true }
+  if (university.length > 100) {
+    return { valid: false, error: "University name must be 100 characters or less" }
   }
   return { valid: true }
 }
 
-/**
- * Validate role enum value
- * Validates: Requirement 2.7
- */
-export function validateRole(
-  role: string
-): { valid: boolean; error?: string } {
+// Role validation
+export function validateRole(role: string): { valid: boolean; error?: string } {
   const validRoles = ["Student", "Research Scholar", "Faculty"]
   if (!validRoles.includes(role)) {
-    return {
-      valid: false,
-      error: `Role must be one of: ${validRoles.join(", ")}`,
-    }
+    return { valid: false, error: "Invalid role selected" }
   }
   return { valid: true }
 }
 
-/**
- * Validate experience level enum value
- * Validates: Requirement 2.8
- */
-export function validateExperienceLevel(
-  level: string
-): { valid: boolean; error?: string } {
+// Experience level validation
+export function validateExperienceLevel(level: string): { valid: boolean; error?: string } {
   const validLevels = ["Beginner", "Intermediate", "Advanced", "Expert"]
   if (!validLevels.includes(level)) {
-    return {
-      valid: false,
-      error: `Experience level must be one of: ${validLevels.join(", ")}`,
-    }
+    return { valid: false, error: "Invalid experience level selected" }
   }
   return { valid: true }
 }
 
-/**
- * Validate skill name
- * Validates: Requirements 3.3, 3.4
- */
-export function validateSkill(
-  skill: string
-): { valid: boolean; error?: string } {
-  if (!skill || skill.trim().length === 0) {
-    return {
-      valid: false,
-      error: "Skill name cannot be empty",
-    }
-  }
-
-  if (skill.length > 50) {
-    return {
-      valid: false,
-      error: "Skill name must not exceed 50 characters",
-    }
-  }
-
-  return { valid: true }
+// Sanitize string (basic XSS prevention)
+export function sanitizeString(input: string): string {
+  return input
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;")
+    .replace(/\//g, "&#x2F;")
 }
 
-/**
- * Validate post content
- * Validates: Requirements 4.2, 4.3
- */
-export function validatePostContent(
-  content: string
-): { valid: boolean; error?: string } {
-  if (!content || content.trim().length === 0) {
-    return {
-      valid: false,
-      error: "Post content cannot be empty",
-    }
+// Validate URL
+export function isValidUrl(url: string): boolean {
+  try {
+    new URL(url)
+    return true
+  } catch {
+    return false
   }
-
-  if (content.length > 5000) {
-    return {
-      valid: false,
-      error: "Post content must not exceed 5000 characters",
-    }
-  }
-
-  return { valid: true }
 }
 
-/**
- * Validate comment content
- * Validates: Requirements 5.6, 5.7
- */
-export function validateCommentContent(
-  content: string
-): { valid: boolean; error?: string } {
-  if (!content || content.trim().length === 0) {
-    return {
-      valid: false,
-      error: "Comment content cannot be empty",
-    }
-  }
-
-  if (content.length > 1000) {
-    return {
-      valid: false,
-      error: "Comment content must not exceed 1000 characters",
-    }
-  }
-
-  return { valid: true }
+// Email validation (basic)
+export function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(email)
 }

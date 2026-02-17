@@ -12,6 +12,7 @@ import type * as comments from "../comments.js";
 import type * as follows from "../follows.js";
 import type * as http from "../http.js";
 import type * as posts from "../posts.js";
+import type * as reactions from "../reactions.js";
 import type * as sanitize from "../sanitize.js";
 import type * as users from "../users.js";
 
@@ -26,6 +27,7 @@ declare const fullApi: ApiFromModules<{
   follows: typeof follows;
   http: typeof http;
   posts: typeof posts;
+  reactions: typeof reactions;
   sanitize: typeof sanitize;
   users: typeof users;
 }>;

@@ -8,6 +8,8 @@ import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import { CommentList } from "@/components/posts/CommentList"
 import { CommentComposer } from "@/components/posts/CommentComposer"
+import { ReactionPicker, ReactionSummary } from "@/components/posts/ReactionPicker"
+import { ReactionModal } from "@/components/posts/ReactionModal"
 
 interface User {
   _id: Id<"users">
@@ -34,23 +36,15 @@ interface PostCardProps {
 export const PostCard = memo(function PostCard({ post, author }: PostCardProps) {
   const { isLoaded, isSignedIn } = useUser()
   const deletePost = useMutation(api.posts.deletePost)
-  const likePost = useMutation(api.posts.likePost)
-  const unlikePost = useMutation(api.posts.unlikePost)
   
   const currentUser = useQuery(
     api.users.getCurrentUser,
     isLoaded && isSignedIn ? {} : "skip"
   )
-  const hasLiked = useQuery(
-    api.posts.hasUserLikedPost,
-    isLoaded && isSignedIn ? { postId: post._id } : "skip"
-  )
 
   const [isDeleting, setIsDeleting] = useState(false)
-  const [isLiking, setIsLiking] = useState(false)
   const [showComments, setShowComments] = useState(false)
-  const [optimisticLikeCount, setOptimisticLikeCount] = useState<number | null>(null)
-  const [optimisticHasLiked, setOptimisticHasLiked] = useState<boolean | null>(null)
+  const [showReactionModal, setShowReactionModal] = useState(false)
 
   const isOwnPost = currentUser?._id === post.authorId
 
@@ -59,10 +53,6 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
     api.comments.getPostComments,
     showComments ? { postId: post._id } : "skip"
   )
-  
-  // Use optimistic values if available, otherwise use actual values
-  const displayLikeCount = optimisticLikeCount !== null ? optimisticLikeCount : post.likeCount
-  const displayHasLiked = optimisticHasLiked !== null ? optimisticHasLiked : hasLiked
 
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this post?")) {
@@ -77,35 +67,6 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
       alert("Failed to delete post. Please try again.")
     } finally {
       setIsDeleting(false)
-    }
-  }
-
-  const handleLikeToggle = async () => {
-    if (isLiking) return
-
-    setIsLiking(true)
-    
-    // Optimistic update
-    const wasLiked = hasLiked
-    setOptimisticHasLiked(!wasLiked)
-    setOptimisticLikeCount(wasLiked ? post.likeCount - 1 : post.likeCount + 1)
-    
-    try {
-      if (wasLiked) {
-        await unlikePost({ postId: post._id })
-      } else {
-        await likePost({ postId: post._id })
-      }
-      // Clear optimistic state on success - real data will come from Convex
-      setOptimisticHasLiked(null)
-      setOptimisticLikeCount(null)
-    } catch (error) {
-      console.error("Failed to toggle like:", error)
-      // Revert optimistic update on error
-      setOptimisticHasLiked(null)
-      setOptimisticLikeCount(null)
-    } finally {
-      setIsLiking(false)
     }
   }
 
@@ -180,29 +141,20 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
 
       {/* Engagement Stats and Actions */}
       <div className="mt-3 flex items-center gap-4 border-t dark:border-gray-700 pt-3 sm:mt-4 sm:gap-6 sm:pt-4">
-        {/* Like Button */}
-        <button
-          onClick={handleLikeToggle}
-          disabled={isLiking || !currentUser}
-          className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 disabled:opacity-50 sm:gap-2"
-          aria-label={displayHasLiked ? "Unlike post" : "Like post"}
-          style={{ minWidth: "44px", minHeight: "44px" }}
-        >
-          <svg
-            className={`h-5 w-5 ${displayHasLiked ? "fill-red-600 text-red-600" : "fill-none"}`}
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
-            />
-          </svg>
-          <span className="text-xs font-medium sm:text-sm">{displayLikeCount}</span>
-        </button>
+        {/* Reaction Picker */}
+        {currentUser && (
+          <ReactionPicker
+            targetId={post._id}
+            targetType="post"
+          />
+        )}
+        
+        {/* Reaction Summary - Click to see who reacted */}
+        <ReactionSummary
+          targetId={post._id}
+          targetType="post"
+          onClick={() => setShowReactionModal(true)}
+        />
 
         {/* Comment Toggle Button */}
         <button
@@ -229,13 +181,19 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
         </button>
       </div>
 
+      {/* Reaction Modal */}
+      <ReactionModal
+        targetId={post._id}
+        targetType="post"
+        open={showReactionModal}
+        onOpenChange={setShowReactionModal}
+      />
+
       {/* Inline Comments Section */}
-      {showComments && (
-        <div className="mt-3 border-t dark:border-gray-700 pt-3 sm:mt-4 sm:pt-4 space-y-4">
-          <CommentList postId={post._id} comments={comments} isLoading={comments === undefined} />
-          <CommentComposer postId={post._id} />
-        </div>
-      )}
+      <div className="mt-3 border-t dark:border-gray-700 pt-3 sm:mt-4 sm:pt-4 space-y-4">
+        <CommentList postId={post._id} comments={comments} isLoading={comments === undefined} />
+        <CommentComposer postId={post._id} />
+      </div>
     </div>
   )
 })

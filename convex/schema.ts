@@ -38,8 +38,18 @@ export default defineSchema({
   posts: defineTable({
     authorId: v.id("users"),
     content: v.string(),
-    likeCount: v.number(),
+    likeCount: v.number(), // Legacy - will be replaced by reactionCounts
     commentCount: v.number(),
+    reactionCounts: v.optional(
+      v.object({
+        like: v.number(),
+        love: v.number(),
+        laugh: v.number(),
+        wow: v.number(),
+        sad: v.number(),
+        scholarly: v.number(),
+      })
+    ),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -55,10 +65,48 @@ export default defineSchema({
     .index("by_post", ["postId"])
     .index("by_user_and_post", ["userId", "postId"]),
 
+  reactions: defineTable({
+    userId: v.id("users"),
+    targetId: v.string(), // postId or commentId
+    targetType: v.union(v.literal("post"), v.literal("comment")),
+    type: v.union(
+      v.literal("like"),
+      v.literal("love"),
+      v.literal("laugh"),
+      v.literal("wow"),
+      v.literal("sad"),
+      v.literal("scholarly")
+    ),
+    createdAt: v.number(),
+  })
+    .index("by_target", ["targetId", "targetType"])
+    .index("by_user_target", ["userId", "targetId", "targetType"])
+    .index("by_user", ["userId"]),
+
+  bookmarks: defineTable({
+    userId: v.id("users"),
+    postId: v.id("posts"),
+    collectionName: v.optional(v.string()), // default: "Saved"
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_and_post", ["userId", "postId"])
+    .index("by_user_and_collection", ["userId", "collectionName"]),
+
   comments: defineTable({
     postId: v.id("posts"),
     authorId: v.id("users"),
     content: v.string(),
+    reactionCounts: v.optional(
+      v.object({
+        like: v.number(),
+        love: v.number(),
+        laugh: v.number(),
+        wow: v.number(),
+        sad: v.number(),
+        scholarly: v.number(),
+      })
+    ),
     createdAt: v.number(),
   })
     .index("by_post", ["postId"])

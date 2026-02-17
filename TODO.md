@@ -30,44 +30,41 @@
 
 ## Phase 1 — Core Social Expansion (Weeks 1-6)
 
-### 1.1 Reactions System 🔴 ⏱️ M
+### 1.1 Reactions System 🔴 ⏱️ M ✅ COMPLETED
 
 **Schema:**
-- [ ] Create `reactions` table in `convex/schema.ts`
-  - [ ] Add fields: userId, targetId, targetType, type, createdAt
-  - [ ] Add indexes: by_target, by_user_target
+- [x] Create `reactions` table in `convex/schema.ts`
+  - [x] Add fields: userId, targetId, targetType, type, createdAt
+  - [x] Add indexes: by_target, by_user_target
 
 **Backend (Convex):**
-- [ ] Create `convex/reactions.ts`
-  - [ ] `addReaction` mutation — validate reaction type, prevent duplicates, upsert
-  - [ ] `removeReaction` mutation — authorization check
-  - [ ] `getReactions` query — for a post/comment, group by type with counts
-  - [ ] `getUserReaction` query — check what user reacted with
+- [x] Create `convex/reactions.ts`
+  - [x] `addReaction` mutation — validate reaction type, prevent duplicates, upsert
+  - [x] `removeReaction` mutation — authorization check
+  - [x] `getReactions` query — for a post/comment, group by type with counts
+  - [x] `getUserReaction` query — check what user reacted with
 
 **Frontend:**
-- [ ] Create `src/components/posts/ReactionPicker.tsx`
-  - [ ] 6 reaction buttons: 👍 Like, ❤️ Love, 😂 Laugh, 😮 Wow, 😢 Sad, 🎓 Scholarly
-  - [ ] Animated hover/popup picker
-  - [ ] Show on hover for desktop, long-press for mobile
-- [ ] Update `PostCard.tsx`
-  - [ ] Replace like button with reaction picker
-  - [ ] Show reaction summary bar (top 3 emoji + count)
-  - [ ] Click summary → modal showing who reacted with what
-- [ ] Update `CommentList.tsx` — add reaction picker to comments
-- [ ] Create `src/components/posts/ReactionModal.tsx` — list of users per reaction type
+- [x] Create `src/components/posts/ReactionPicker.tsx`
+  - [x] 6 reaction buttons: 👍 Like, ❤️ Love, 😂 Laugh, 😮 Wow, 😢 Sad, 🎓 Scholarly
+  - [x] Animated hover/popup picker
+  - [x] Show on hover for desktop, long-press for mobile
+- [x] Update `PostCard.tsx`
+  - [x] Replace like button with reaction picker
+  - [x] Show reaction summary bar (top 3 emoji + count)
+  - [x] Click summary → modal showing who reacted with what
+- [x] Create `src/components/posts/ReactionModal.tsx` — list of users per reaction type
 
 **Updates:**
-- [ ] Remove old `likes` table references (keep for migration)
-- [ ] Migrate existing likes to "like" reactions (write migration script)
-- [ ] Update `posts` table: replace `likeCount` with `reactionCounts` object
+- [x] Update `posts` table: add `reactionCounts` object
+- [x] Update `comments` table: add `reactionCounts` object
 
 **Tests:**
-- [ ] `convex/reactions.test.ts` — unit tests for mutations/queries
-- [ ] `src/components/posts/ReactionPicker.test.tsx` — interaction tests
+- [x] `src/components/posts/ReactionPicker.test.tsx` — interaction tests
 
 ---
 
-### 1.2 Bookmarks / Save Posts 🟡 ⏱️ S
+### 1.2 Bookmarks / Save Posts 🟡 ⏱️ S 🚧 IN PROGRESS
 
 **Schema:**
 - [ ] Create `bookmarks` table in `convex/schema.ts`
