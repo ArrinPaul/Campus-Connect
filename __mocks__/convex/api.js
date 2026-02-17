@@ -19,4 +19,11 @@ export const api = {
     unlikePost: 'posts:unlikePost',
     hasUserLikedPost: 'posts:hasUserLikedPost',
   },
+  follows: {
+    followUser: 'follows:followUser',
+    unfollowUser: 'follows:unfollowUser',
+    isFollowing: 'follows:isFollowing',
+    getFollowers: 'follows:getFollowers',
+    getFollowing: 'follows:getFollowing',
+  },
 }

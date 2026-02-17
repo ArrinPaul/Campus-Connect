@@ -1,13 +1,62 @@
 "use client"
 
+import { useState, useCallback, useEffect } from "react"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { PostCard } from "@/components/posts/PostCard"
+import { InfiniteScrollTrigger } from "./InfiniteScrollTrigger"
 
 export function FeedContainer() {
+  const [allPosts, setAllPosts] = useState<any[]>([])
+  const [cursor, setCursor] = useState<string | null>(null)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [hasInitialized, setHasInitialized] = useState(false)
+
+  // Initial query
   const feedData = useQuery(api.posts.getFeedPosts, { limit: 20 })
 
-  // Loading state
+  // Query for loading more posts
+  const moreFeedData = useQuery(
+    api.posts.getFeedPosts,
+    cursor && isLoadingMore ? { limit: 20, cursor } : "skip"
+  )
+
+  // Update allPosts when initial data loads or updates (real-time)
+  useEffect(() => {
+    if (feedData && !hasInitialized) {
+      setAllPosts(feedData.posts)
+      setCursor(feedData.nextCursor)
+      setHasInitialized(true)
+    } else if (feedData && hasInitialized && !isLoadingMore) {
+      // Handle real-time updates for the initial batch
+      // Only update if we're not currently loading more posts
+      setAllPosts((prev) => {
+        // Merge new posts with existing ones, avoiding duplicates
+        const existingIds = new Set(prev.map((p: any) => p._id))
+        const newPosts = feedData.posts.filter((p: any) => !existingIds.has(p._id))
+        return [...newPosts, ...prev]
+      })
+      setCursor(feedData.nextCursor)
+    }
+  }, [feedData, hasInitialized, isLoadingMore])
+
+  // Update allPosts when more data loads
+  useEffect(() => {
+    if (moreFeedData && isLoadingMore) {
+      setAllPosts((prev) => [...prev, ...moreFeedData.posts])
+      setCursor(moreFeedData.nextCursor)
+      setIsLoadingMore(false)
+    }
+  }, [moreFeedData, isLoadingMore])
+
+  // Handle loading more posts
+  const handleLoadMore = useCallback(() => {
+    if (!isLoadingMore && cursor) {
+      setIsLoadingMore(true)
+    }
+  }, [isLoadingMore, cursor])
+
+  // Initial loading state
   if (feedData === undefined) {
     return (
       <div className="space-y-4">
@@ -31,7 +80,7 @@ export function FeedContainer() {
   }
 
   // Empty state
-  if (!feedData.posts || feedData.posts.length === 0) {
+  if (allPosts.length === 0 && hasInitialized) {
     return (
       <div className="rounded-lg bg-white p-12 text-center shadow">
         <svg
@@ -56,10 +105,10 @@ export function FeedContainer() {
     )
   }
 
-  // Display posts
+  // Display posts with infinite scroll
   return (
     <div className="space-y-4">
-      {feedData.posts.map((postWithAuthor) => {
+      {allPosts.map((postWithAuthor) => {
         // Skip posts without author data
         if (!postWithAuthor.author) {
           return null
@@ -73,6 +122,11 @@ export function FeedContainer() {
           />
         )
       })}
+      <InfiniteScrollTrigger
+        onTrigger={handleLoadMore}
+        hasMore={!!cursor}
+        isLoading={isLoadingMore}
+      />
     </div>
   )
 }

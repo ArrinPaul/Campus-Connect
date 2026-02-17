@@ -1,6 +1,9 @@
 "use client"
 
 import Image from "next/image"
+import { useState } from "react"
+import { useMutation, useQuery } from "convex/react"
+import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 
 interface User {
@@ -21,6 +24,38 @@ interface ProfileHeaderProps {
 }
 
 export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
+  const followUser = useMutation(api.follows.followUser)
+  const unfollowUser = useMutation(api.follows.unfollowUser)
+  const isFollowingQuery = useQuery(api.follows.isFollowing, { userId: user._id })
+  
+  const [optimisticFollowing, setOptimisticFollowing] = useState<boolean | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  
+  // Use optimistic state if available, otherwise use query result
+  const isFollowing = optimisticFollowing !== null ? optimisticFollowing : (isFollowingQuery ?? false)
+  
+  const handleFollowToggle = async () => {
+    try {
+      setIsLoading(true)
+      // Optimistically update the UI
+      setOptimisticFollowing(!isFollowing)
+      
+      if (isFollowing) {
+        await unfollowUser({ userId: user._id })
+      } else {
+        await followUser({ userId: user._id })
+      }
+      
+      // Reset optimistic state after successful mutation
+      setOptimisticFollowing(null)
+    } catch (error) {
+      // Revert optimistic update on error
+      setOptimisticFollowing(null)
+      console.error("Failed to toggle follow:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
   return (
     <div className="rounded-lg bg-white p-6 shadow">
       <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
@@ -81,8 +116,16 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
         {/* Follow Button (only for other users) */}
         {!isOwnProfile && (
           <div className="flex-shrink-0">
-            <button className="rounded-md bg-blue-600 px-6 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-              Follow
+            <button 
+              onClick={handleFollowToggle}
+              disabled={isLoading}
+              className={`rounded-md px-6 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                isFollowing 
+                  ? "bg-gray-600 hover:bg-gray-700" 
+                  : "bg-blue-600 hover:bg-blue-700"
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              {isLoading ? "..." : isFollowing ? "Unfollow" : "Follow"}
             </button>
           </div>
         )}

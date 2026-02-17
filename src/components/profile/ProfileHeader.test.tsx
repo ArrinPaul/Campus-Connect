@@ -1,6 +1,29 @@
-import { render, screen } from "@testing-library/react"
+import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { ProfileHeader } from "./ProfileHeader"
 import { Id } from "@/convex/_generated/dataModel"
+
+// Mock Convex hooks
+const mockFollowUser = jest.fn()
+const mockUnfollowUser = jest.fn()
+const mockIsFollowing = jest.fn()
+
+jest.mock("convex/react", () => ({
+  useMutation: jest.fn((apiFunction) => {
+    if (apiFunction === "follows:followUser") {
+      return mockFollowUser
+    }
+    if (apiFunction === "follows:unfollowUser") {
+      return mockUnfollowUser
+    }
+    return jest.fn()
+  }),
+  useQuery: jest.fn((apiFunction) => {
+    if (apiFunction === "follows:isFollowing") {
+      return mockIsFollowing()
+    }
+    return null
+  }),
+}))
 
 // Mock Next.js Image component
 jest.mock("next/image", () => ({
@@ -23,6 +46,13 @@ describe("ProfileHeader", () => {
     followerCount: 150,
     followingCount: 75,
   }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockIsFollowing.mockReturnValue(false)
+    mockFollowUser.mockResolvedValue(true)
+    mockUnfollowUser.mockResolvedValue(true)
+  })
 
   it("should render user name", () => {
     render(<ProfileHeader user={mockUser} isOwnProfile={false} />)
@@ -136,5 +166,76 @@ describe("ProfileHeader", () => {
     render(<ProfileHeader user={expert} isOwnProfile={false} />)
 
     expect(screen.getByText("Expert")).toBeInTheDocument()
+  })
+
+  it("should show Follow button when not following", () => {
+    mockIsFollowing.mockReturnValue(false)
+    render(<ProfileHeader user={mockUser} isOwnProfile={false} />)
+
+    const followButton = screen.getByRole("button", { name: /follow/i })
+    expect(followButton).toBeInTheDocument()
+    expect(followButton).toHaveTextContent("Follow")
+  })
+
+  it("should show Unfollow button when already following", () => {
+    mockIsFollowing.mockReturnValue(true)
+    render(<ProfileHeader user={mockUser} isOwnProfile={false} />)
+
+    const unfollowButton = screen.getByRole("button", { name: /unfollow/i })
+    expect(unfollowButton).toBeInTheDocument()
+    expect(unfollowButton).toHaveTextContent("Unfollow")
+  })
+
+  it("should call followUser when Follow button is clicked", async () => {
+    mockIsFollowing.mockReturnValue(false)
+    render(<ProfileHeader user={mockUser} isOwnProfile={false} />)
+
+    const followButton = screen.getByRole("button", { name: /follow/i })
+    fireEvent.click(followButton)
+
+    await waitFor(() => {
+      expect(mockFollowUser).toHaveBeenCalledWith({ userId: mockUser._id })
+    })
+  })
+
+  it("should call unfollowUser when Unfollow button is clicked", async () => {
+    mockIsFollowing.mockReturnValue(true)
+    render(<ProfileHeader user={mockUser} isOwnProfile={false} />)
+
+    const unfollowButton = screen.getByRole("button", { name: /unfollow/i })
+    fireEvent.click(unfollowButton)
+
+    await waitFor(() => {
+      expect(mockUnfollowUser).toHaveBeenCalledWith({ userId: mockUser._id })
+    })
+  })
+
+  it("should update button state optimistically when following", async () => {
+    mockIsFollowing.mockReturnValue(false)
+    mockFollowUser.mockImplementation(() => new Promise(resolve => setTimeout(() => resolve(true), 100)))
+    
+    render(<ProfileHeader user={mockUser} isOwnProfile={false} />)
+
+    const followButton = screen.getByRole("button", { name: /follow/i })
+    fireEvent.click(followButton)
+
+    // Button should show loading state
+    await waitFor(() => {
+      expect(screen.getByRole("button")).toHaveTextContent("...")
+    })
+  })
+
+  it("should disable button while loading", async () => {
+    mockIsFollowing.mockReturnValue(false)
+    mockFollowUser.mockImplementation(() => new Promise(resolve => setTimeout(() => resolve(true), 100)))
+    
+    render(<ProfileHeader user={mockUser} isOwnProfile={false} />)
+
+    const followButton = screen.getByRole("button", { name: /follow/i })
+    fireEvent.click(followButton)
+
+    await waitFor(() => {
+      expect(screen.getByRole("button")).toBeDisabled()
+    })
   })
 })
