@@ -1,17 +1,19 @@
 "use client"
 
-import { useState, memo } from "react"
+import { useState, memo, useRef, useEffect } from "react"
 import Image from "next/image"
 import { useUser } from "@clerk/nextjs"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
+import { Share2, Copy, Repeat2 } from "lucide-react"
 import { CommentList } from "@/components/posts/CommentList"
 import { CommentComposer } from "@/components/posts/CommentComposer"
 import { ReactionPicker, ReactionSummary } from "@/components/posts/ReactionPicker"
 import { ReactionModal } from "@/components/posts/ReactionModal"
 import { BookmarkButton } from "@/components/posts/BookmarkButton"
 import { PostContent } from "@/components/posts/PostContent"
+import { RepostModal } from "@/components/posts/RepostModal"
 
 interface User {
   _id: Id<"users">
@@ -26,6 +28,7 @@ interface Post {
   content: string
   likeCount: number
   commentCount: number
+  shareCount: number
   createdAt: number
   updatedAt: number
 }
@@ -47,6 +50,12 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
   const [isDeleting, setIsDeleting] = useState(false)
   const [showComments, setShowComments] = useState(false)
   const [showReactionModal, setShowReactionModal] = useState(false)
+  const [showShareDropdown, setShowShareDropdown] = useState(false)
+  const [showRepostModal, setShowRepostModal] = useState(false)
+  const [shareSuccess, setShareSuccess] = useState<string | null>(null)
+  
+  const shareDropdownRef = useRef<HTMLDivElement>(null)
+  const createRepost = useMutation(api.reposts.createRepost)
 
   const isOwnPost = currentUser?._id === post.authorId
 
@@ -69,6 +78,76 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
       alert("Failed to delete post. Please try again.")
     } finally {
       setIsDeleting(false)
+    }
+  }
+
+  // Close share dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (shareDropdownRef.current && !shareDropdownRef.current.contains(event.target as Node)) {
+        setShowShareDropdown(false)
+      }
+    }
+
+    if (showShareDropdown) {
+      document.addEventListener("mousedown", handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [showShareDropdown])
+
+  const handleDirectRepost = async () => {
+    if (isOwnPost) {
+      alert("You cannot repost your own post")
+      return
+    }
+
+    try {
+      await createRepost({ originalPostId: post._id })
+      setShareSuccess("Post reposted!")
+      setShowShareDropdown(false)
+      setTimeout(() => setShareSuccess(null), 3000)
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to repost")
+    }
+  }
+
+  const handleQuotePost = () => {
+    if (isOwnPost) {
+      alert("You cannot repost your own post")
+      return
+    }
+    setShowShareDropdown(false)
+    setShowRepostModal(true)
+  }
+
+  const handleCopyLink = async () => {
+    try {
+      const url = `${window.location.origin}/feed#post-${post._id}`
+      await navigator.clipboard.writeText(url)
+      setShareSuccess("Link copied!")
+      setShowShareDropdown(false)
+      setTimeout(() => setShareSuccess(null), 3000)
+    } catch (err) {
+      alert("Failed to copy link")
+    }
+  }
+
+  const handleWebShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Post by ${author.name}`,
+          text: post.content.substring(0, 100) + (post.content.length > 100 ? "..." : ""),
+          url: `${window.location.origin}/feed#post-${post._id}`,
+        })
+        setShowShareDropdown(false)
+      } catch (err) {
+        // User cancelled or error occurred
+        console.error("Share failed:", err)
+      }
     }
   }
 
@@ -185,6 +264,68 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
           <span className="text-xs font-medium sm:text-sm">{post.commentCount}</span>
         </button>
 
+        {/* Share Button with Dropdown */}
+        <div className="relative" ref={shareDropdownRef}>
+          <button
+            onClick={() => setShowShareDropdown(!showShareDropdown)}
+            className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 sm:gap-2"
+            aria-label="Share post"
+            style={{ minWidth: "44px", minHeight: "44px" }}
+          >
+            <Share2 className="h-5 w-5" />
+            {post.shareCount > 0 && (
+              <span className="text-xs font-medium sm:text-sm">{post.shareCount}</span>
+            )}
+          </button>
+
+          {/* Share Dropdown Menu */}
+          {showShareDropdown && (
+            <div className="absolute top-full mt-2 left-0 z-50 w-48 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-lg overflow-hidden">
+              {currentUser && !isOwnPost && (
+                <>
+                  <button
+                    onClick={handleDirectRepost}
+                    className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3"
+                  >
+                    <Repeat2 className="w-4 h-4" />
+                    <span>Repost</span>
+                  </button>
+                  <button
+                    onClick={handleQuotePost}
+                    className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 border-t dark:border-gray-700"
+                  >
+                    <Repeat2 className="w-4 h-4" />
+                    <span>Quote Post</span>
+                  </button>
+                </>
+              )}
+              <button
+                onClick={handleCopyLink}
+                className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 border-t dark:border-gray-700"
+              >
+                <Copy className="w-4 h-4" />
+                <span>Copy Link</span>
+              </button>
+              {typeof window !== 'undefined' && 'share' in navigator && (
+                <button
+                  onClick={handleWebShare}
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 border-t dark:border-gray-700"
+                >
+                  <Share2 className="w-4 h-4" />
+                  <span>Share via...</span>
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Share Success Message */}
+        {shareSuccess && (
+          <div className="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+            {shareSuccess}
+          </div>
+        )}
+
         {/* Bookmark Button */}
         {currentUser && (
           <BookmarkButton postId={post._id} />
@@ -197,6 +338,19 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
         targetType="post"
         open={showReactionModal}
         onOpenChange={setShowReactionModal}
+      />
+
+      {/* Repost Modal */}
+      <RepostModal
+        post={{
+          ...post,
+          author: author,
+        }}
+        isOpen={showRepostModal}
+        onClose={() => setShowRepostModal(false)}
+        onSuccess={() => {
+          // Optionally refresh the feed or show success message
+        }}
       />
 
       {/* Inline Comments Section */}

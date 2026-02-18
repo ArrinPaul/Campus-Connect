@@ -13,9 +13,11 @@ import type * as comments from "../comments.js";
 import type * as follows from "../follows.js";
 import type * as hashtags from "../hashtags.js";
 import type * as http from "../http.js";
+import type * as mentionUtils from "../mentionUtils.js";
 import type * as notifications from "../notifications.js";
 import type * as posts from "../posts.js";
 import type * as reactions from "../reactions.js";
+import type * as reposts from "../reposts.js";
 import type * as sanitize from "../sanitize.js";
 import type * as users from "../users.js";
 
@@ -31,9 +33,11 @@ declare const fullApi: ApiFromModules<{
   follows: typeof follows;
   hashtags: typeof hashtags;
   http: typeof http;
+  mentionUtils: typeof mentionUtils;
   notifications: typeof notifications;
   posts: typeof posts;
   reactions: typeof reactions;
+  reposts: typeof reposts;
   sanitize: typeof sanitize;
   users: typeof users;
 }>;

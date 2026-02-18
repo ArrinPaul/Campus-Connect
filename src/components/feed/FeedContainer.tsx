@@ -6,51 +6,50 @@ import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { PostCard } from "@/components/posts/PostCard"
 import { InfiniteScrollTrigger } from "./InfiniteScrollTrigger"
+import { Repeat2 } from "lucide-react"
 
 export function FeedContainer() {
   const { isLoaded, isSignedIn } = useUser()
-  const [allPosts, setAllPosts] = useState<any[]>([])
+  const [allItems, setAllItems] = useState<any[]>([])
   const [cursor, setCursor] = useState<string | null>(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const hasInitializedRef = useRef(false)
 
-  // Initial query - only run when authenticated
+  // Initial query - use unified feed that includes reposts
   const feedData = useQuery(
-    api.posts.getFeedPosts,
+    api.posts.getUnifiedFeed,
     isLoaded && isSignedIn ? { limit: 20 } : "skip"
   )
 
-  // Query for loading more posts
+  // Query for loading more items
   const moreFeedData = useQuery(
-    api.posts.getFeedPosts,
+    api.posts.getUnifiedFeed,
     isLoaded && isSignedIn && cursor && isLoadingMore ? { limit: 20, cursor } : "skip"
   )
 
-  // Update allPosts when initial data loads or updates (real-time)
+  // Update allItems when initial data loads or updates (real-time)
   useEffect(() => {
     if (!feedData) return
     
     if (!hasInitializedRef.current) {
-      setAllPosts(feedData.posts)
+      setAllItems(feedData.items)
       setCursor(feedData.nextCursor)
       hasInitializedRef.current = true
     } else if (!isLoadingMore) {
       // Handle real-time updates for the initial batch
-      // Only update if we're not currently loading more posts
-      setAllPosts((prev) => {
-        // Merge new posts with existing ones, avoiding duplicates
-        const existingIds = new Set(prev.map((p: any) => p._id))
-        const newPosts = feedData.posts.filter((p: any) => !existingIds.has(p._id))
-        return [...newPosts, ...prev]
+      setAllItems((prev) => {
+        const existingIds = new Set(prev.map((item: any) => item._id))
+        const newItems = feedData.items.filter((item: any) => !existingIds.has(item._id))
+        return [...newItems, ...prev]
       })
       setCursor(feedData.nextCursor)
     }
   }, [feedData, isLoadingMore])
 
-  // Update allPosts when more data loads
+  // Update allItems when more data loads
   useEffect(() => {
     if (moreFeedData && isLoadingMore) {
-      setAllPosts((prev) => [...prev, ...moreFeedData.posts])
+      setAllItems((prev) => [...prev, ...moreFeedData.items])
       setCursor(moreFeedData.nextCursor)
       setIsLoadingMore(false)
     }
@@ -119,7 +118,7 @@ export function FeedContainer() {
   }
 
   // Empty state
-  if (allPosts.length === 0 && hasInitializedRef.current) {
+  if (allItems.length === 0 && hasInitializedRef.current) {
     return (
       <div className="rounded-lg bg-white dark:bg-gray-800 p-8 text-center shadow dark:shadow-gray-900/50 sm:p-12">
         <svg
@@ -144,22 +143,56 @@ export function FeedContainer() {
     )
   }
 
-  // Display posts with infinite scroll
+  // Display posts and reposts with infinite scroll
   return (
     <div className="space-y-3 sm:space-y-4">
-      {allPosts.map((postWithAuthor) => {
-        // Skip posts without author data
-        if (!postWithAuthor.author) {
-          return null
+      {allItems.map((item) => {
+        // Handle original posts
+        if (item.type === "post") {
+          if (!item.post.author) return null
+
+          return (
+            <PostCard
+              key={`post-${item._id}`}
+              post={item.post}
+              author={item.post.author}
+            />
+          )
         }
 
-        return (
-          <PostCard
-            key={postWithAuthor._id}
-            post={postWithAuthor}
-            author={postWithAuthor.author}
-          />
-        )
+        // Handle reposts
+        if (item.type === "repost") {
+          if (!item.post.author || !item.reposter) return null
+
+          return (
+            <div key={`repost-${item._id}`} className="space-y-1">
+              {/* Repost header */}
+              <div className="flex items-center gap-2 px-4 pt-3 text-xs text-gray-500 dark:text-gray-400">
+                <Repeat2 className="h-3 w-3" />
+                <span>
+                  {item.reposter.name || item.reposter.username} reposted
+                </span>
+              </div>
+              
+              {/* Quote content if present */}
+              {item.quoteContent && (
+                <div className="px-4 pb-2">
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    {item.quoteContent}
+                  </p>
+                </div>
+              )}
+
+              {/* Original post */}
+              <PostCard
+                post={item.post}
+                author={item.post.author}
+              />
+            </div>
+          )
+        }
+
+        return null
       })}
       <InfiniteScrollTrigger
         onTrigger={handleLoadMore}

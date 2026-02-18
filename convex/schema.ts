@@ -30,6 +30,14 @@ export default defineSchema({
     }),
     followerCount: v.number(),
     followingCount: v.number(),
+    notificationPreferences: v.optional(
+      v.object({
+        reactions: v.boolean(),
+        comments: v.boolean(),
+        mentions: v.boolean(),
+        follows: v.boolean(),
+      })
+    ),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -42,6 +50,7 @@ export default defineSchema({
     content: v.string(),
     likeCount: v.number(), // Legacy - will be replaced by reactionCounts
     commentCount: v.number(),
+    shareCount: v.number(), // Number of reposts/shares
     reactionCounts: v.optional(
       v.object({
         like: v.number(),
@@ -160,4 +169,15 @@ export default defineSchema({
     .index("by_recipient", ["recipientId"])
     .index("by_recipient_unread", ["recipientId", "isRead"])
     .index("by_recipient_created", ["recipientId", "createdAt"]),
+
+  reposts: defineTable({
+    userId: v.id("users"), // user who reposted
+    originalPostId: v.id("posts"), // original post being shared
+    quoteContent: v.optional(v.string()), // optional comment for quote posts
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_original_post", ["originalPostId"])
+    .index("by_user_and_post", ["userId", "originalPostId"])
+    .index("by_createdAt", ["createdAt"]),
 })

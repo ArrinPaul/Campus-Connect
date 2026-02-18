@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback, useEffect, useRef } from "react"
 import { useUser } from "@clerk/nextjs"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
@@ -12,14 +12,19 @@ import { Id } from "@/convex/_generated/dataModel"
 export default function BookmarksPage() {
   const { isLoaded, isSignedIn } = useUser()
   const [selectedCollection, setSelectedCollection] = useState<string>("All")
-  
+  const [allBookmarks, setAllBookmarks] = useState<any[]>([])
+  const [paginationCursor, setPaginationCursor] = useState<string | undefined>(undefined)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const hasInitializedRef = useRef(false)
+  const prevCollectionRef = useRef(selectedCollection)
+
   // Get user's collections
   const collections = useQuery(
     api.bookmarks.getCollections,
     isLoaded && isSignedIn ? {} : "skip"
   )
 
-  // Get bookmarked posts
+  // Get bookmarked posts (initial page)
   const bookmarksResult = useQuery(
     api.bookmarks.getBookmarks,
     isLoaded && isSignedIn
@@ -30,6 +35,53 @@ export default function BookmarksPage() {
         }
       : "skip"
   )
+
+  // Get more bookmarks when loading more
+  const moreBookmarksResult = useQuery(
+    api.bookmarks.getBookmarks,
+    isLoaded && isSignedIn && isLoadingMore && paginationCursor
+      ? {
+          collectionName: selectedCollection === "All" ? undefined : selectedCollection,
+          limit: 20,
+          cursor: paginationCursor
+        }
+      : "skip"
+  )
+
+  // Reset when collection changes
+  useEffect(() => {
+    if (prevCollectionRef.current !== selectedCollection) {
+      setAllBookmarks([])
+      setPaginationCursor(undefined)
+      setIsLoadingMore(false)
+      hasInitializedRef.current = false
+      prevCollectionRef.current = selectedCollection
+    }
+  }, [selectedCollection])
+
+  // Initialize from first page result
+  useEffect(() => {
+    if (bookmarksResult && !hasInitializedRef.current) {
+      setAllBookmarks(bookmarksResult.bookmarks)
+      setPaginationCursor(bookmarksResult.cursor ?? undefined)
+      hasInitializedRef.current = true
+    }
+  }, [bookmarksResult])
+
+  // Append more results
+  useEffect(() => {
+    if (moreBookmarksResult && isLoadingMore) {
+      setAllBookmarks((prev) => [...prev, ...moreBookmarksResult.bookmarks])
+      setPaginationCursor(moreBookmarksResult.cursor ?? undefined)
+      setIsLoadingMore(false)
+    }
+  }, [moreBookmarksResult, isLoadingMore])
+
+  const handleLoadMore = useCallback(() => {
+    if (!isLoadingMore && paginationCursor) {
+      setIsLoadingMore(true)
+    }
+  }, [isLoadingMore, paginationCursor])
 
   if (!isLoaded) {
     return (
@@ -54,7 +106,7 @@ export default function BookmarksPage() {
   }
 
   const collectionsData = collections || []
-  const bookmarks = bookmarksResult?.bookmarks || []
+  const bookmarks = allBookmarks
   const isLoading = collections === undefined || bookmarksResult === undefined
 
   // Calculate total bookmarks for "All" tab
@@ -145,6 +197,7 @@ export default function BookmarksPage() {
                     content: bookmark.post.content,
                     likeCount: bookmark.post.likeCount,
                     commentCount: bookmark.post.commentCount,
+                    shareCount: bookmark.post.shareCount || 0,
                     createdAt: bookmark.post.createdAt,
                     updatedAt: bookmark.post.updatedAt,
                   }}
@@ -161,16 +214,21 @@ export default function BookmarksPage() {
         )}
 
         {/* Load More Button */}
-        {!isLoading && bookmarksResult?.cursor && (
+        {!isLoading && paginationCursor && (
           <div className="mt-6 flex justify-center">
             <button
-              onClick={() => {
-                // TODO: Implement pagination
-                console.log("Load more bookmarks")
-              }}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              onClick={handleLoadMore}
+              disabled={isLoadingMore}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Load More
+              {isLoadingMore ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Loading...
+                </span>
+              ) : (
+                "Load More"
+              )}
             </button>
           </div>
         )}

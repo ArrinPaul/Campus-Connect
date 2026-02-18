@@ -3,7 +3,7 @@ import { query, mutation } from "./_generated/server"
 import { Id } from "./_generated/dataModel"
 import { sanitizeText } from "./sanitize"
 import { linkHashtagsToPost } from "./hashtags"
-import { extractMentions } from "./mention-utils"
+import { extractMentions } from "./mentionUtils"
 
 /**
  * Get feed posts with pagination
@@ -178,6 +178,7 @@ export const createPost = mutation({
       content: sanitizedContent,
       likeCount: 0,
       commentCount: 0,
+      shareCount: 0,
       createdAt: now,
       updatedAt: now,
     })
@@ -437,5 +438,133 @@ export const unlikePost = mutation({
     })
 
     return { success: true }
+  },
+})
+
+/**
+ * Get unified feed with both posts and reposts
+ * Returns posts and reposts in chronological order
+ * Reposts include both the reposter info and original post/author
+ * Validates: Requirements 1.6 (Share/Repost Feed Display)
+ */
+export const getUnifiedFeed = query({
+  args: {
+    limit: v.optional(v.number()),
+    cursor: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Require authentication
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    // Get current user
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .unique()
+
+    if (!user) {
+      throw new Error("User not found")
+    }
+
+    const limit = args.limit ?? 20
+
+    // Get current user's following list
+    const followingList = await ctx.db
+      .query("follows")
+      .withIndex("by_follower", (q) => q.eq("followerId", user._id))
+      .collect()
+
+    const followingIds = followingList.map((follow) => follow.followingId)
+
+    // Get posts from followed users
+    let postsQuery = ctx.db
+      .query("posts")
+      .withIndex("by_createdAt")
+      .order("desc")
+
+    // Filter by followed users if following anyone
+    if (followingIds.length > 0) {
+      postsQuery = postsQuery.filter((q) =>
+        q.or(
+          ...followingIds.map((id) => q.eq(q.field("authorId"), id))
+        )
+      )
+    }
+
+    const posts = await postsQuery.take(limit * 2) // Fetch more to merge with reposts
+
+    // Get reposts from followed users
+    let repostsQuery = ctx.db
+      .query("reposts")
+      .withIndex("by_createdAt")
+      .order("desc")
+
+    if (followingIds.length > 0) {
+      repostsQuery = repostsQuery.filter((q) =>
+        q.or(
+          ...followingIds.map((id) => q.eq(q.field("userId"), id))
+        )
+      )
+    }
+
+    const reposts = await repostsQuery.take(limit * 2)
+
+    // Transform posts into feed items
+    const postItems = await Promise.all(
+      posts.map(async (post) => {
+        const author = await ctx.db.get(post.authorId)
+        return {
+          type: "post" as const,
+          _id: post._id,
+          createdAt: post.createdAt,
+          post: {
+            ...post,
+            author: author || null,
+          },
+        }
+      })
+    )
+
+    // Transform reposts into feed items
+    const repostItems = await Promise.all(
+      reposts.map(async (repost) => {
+        const reposter = await ctx.db.get(repost.userId)
+        const originalPost = await ctx.db.get(repost.originalPostId)
+        
+        if (!originalPost) return null
+
+        const originalAuthor = await ctx.db.get(originalPost.authorId)
+
+        return {
+          type: "repost" as const,
+          _id: repost._id,
+          createdAt: repost.createdAt,
+          reposter: reposter || null,
+          quoteContent: repost.quoteContent,
+          post: {
+            ...originalPost,
+            author: originalAuthor || null,
+          },
+        }
+      })
+    )
+
+    // Filter out null items and combine all items
+    const allItems = [...postItems, ...repostItems.filter((item) => item !== null)]
+      .sort((a, b) => b.createdAt - a.createdAt) // Sort by newest first
+      .slice(0, limit + 1) // Take limit + 1 for pagination
+
+    // Determine if there are more items
+    const hasMore = allItems.length > limit
+    const itemsToReturn = hasMore ? allItems.slice(0, limit) : allItems
+
+    return {
+      items: itemsToReturn,
+      nextCursor: hasMore ? String(itemsToReturn[itemsToReturn.length - 1].createdAt) : null,
+      hasMore,
+    }
   },
 })

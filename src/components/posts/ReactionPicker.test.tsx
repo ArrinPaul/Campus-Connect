@@ -1,42 +1,45 @@
-import { describe, it, expect, vi, beforeEach } from "@jest/globals"
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { ReactionPicker, reactionEmojis } from "./ReactionPicker"
-import { ConvexReactClient } from "convex/react"
-import { ConvexProvider } from "convex/react"
 
 // Mock Convex hooks
-vi.mock("convex/react", async () => {
-  const actual = await vi.importActual("convex/react")
-  return {
-    ...actual,
-    useMutation: vi.fn(() => vi.fn()),
-    useQuery: vi.fn(() => null),
-  }
-})
+jest.mock("convex/react", () => ({
+  useMutation: jest.fn(() => jest.fn()),
+  useQuery: jest.fn(() => null),
+}))
+
+// Mock tooltip components
+jest.mock("@/components/ui/tooltip", () => ({
+  TooltipProvider: ({ children }: any) => <>{children}</>,
+  Tooltip: ({ children }: any) => <>{children}</>,
+  TooltipTrigger: ({ children, asChild }: any) => <>{children}</>,
+  TooltipContent: ({ children }: any) => <span>{children}</span>,
+}))
 
 describe("ReactionPicker", () => {
-  const mockAddReaction = vi.fn()
-  const mockRemoveReaction = vi.fn()
+  const mockAddReaction = jest.fn()
+  const mockRemoveReaction = jest.fn()
 
   beforeEach(() => {
-    vi.clearAllMocks()
+    jest.clearAllMocks()
+    // Set desktop width so hover picker shows
+    Object.defineProperty(window, 'innerWidth', { value: 1024, writable: true, configurable: true })
     const { useMutation, useQuery } = require("convex/react")
     
     useMutation.mockImplementation((api: any) => {
-      if (api.toString().includes("addReaction")) {
+      if (api?.toString().includes("addReaction")) {
         return mockAddReaction
       }
-      if (api.toString().includes("removeReaction")) {
+      if (api?.toString().includes("removeReaction")) {
         return mockRemoveReaction
       }
-      return vi.fn()
+      return jest.fn()
     })
 
     useQuery.mockImplementation((api: any) => {
-      if (api.toString().includes("getUserReaction")) {
+      if (api?.toString().includes("getUserReaction")) {
         return null
       }
-      if (api.toString().includes("getReactions")) {
+      if (api?.toString().includes("getReactions")) {
         return {
           total: 0,
           topReactions: [],
@@ -78,9 +81,11 @@ describe("ReactionPicker", () => {
     fireEvent.mouseEnter(button)
 
     await waitFor(() => {
-      // Check if all reaction emojis are displayed
+      // Check if all reaction emojis are displayed in the picker
+      // Note: 👍 appears twice (main button + picker), so use getAllByText for it
       Object.values(reactionEmojis).forEach((emoji) => {
-        expect(screen.getByText(emoji)).toBeInTheDocument()
+        const elements = screen.getAllByText(emoji)
+        expect(elements.length).toBeGreaterThanOrEqual(1)
       })
     })
   })
@@ -98,7 +103,8 @@ describe("ReactionPicker", () => {
     fireEvent.click(button)
 
     await waitFor(() => {
-      expect(screen.getByText(reactionEmojis.like)).toBeInTheDocument()
+      // 👍 appears in both the main button and the picker, so use getAllByText
+      expect(screen.getAllByText(reactionEmojis.like).length).toBeGreaterThanOrEqual(2)
     })
 
     // Click like reaction

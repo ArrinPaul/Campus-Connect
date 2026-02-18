@@ -107,6 +107,7 @@ export default function HashtagPage() {
                     content: postData.content,
                     likeCount: postData.likeCount,
                     commentCount: postData.commentCount,
+                    shareCount: postData.shareCount || 0,
                     createdAt: postData.createdAt,
                     updatedAt: postData.updatedAt,
                   }}

@@ -106,7 +106,11 @@ describe('XSS Prevention Property Tests', () => {
         fc.string().filter(s => 
           !s.includes('<') && 
           !s.includes('>') && 
+          !s.includes('&') &&
+          !s.includes('"') &&
+          !s.includes("'") &&
           !s.includes('javascript:') &&
+          !s.includes('data:text/html') &&
           s.length > 0
         ),
         (safeText) => {

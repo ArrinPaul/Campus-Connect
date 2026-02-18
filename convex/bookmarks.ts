@@ -157,6 +157,7 @@ export const getBookmarks = query({
             content: post.content,
             likeCount: post.likeCount,
             commentCount: post.commentCount,
+            shareCount: post.shareCount,
             createdAt: post.createdAt,
             updatedAt: post.updatedAt,
             reactionCounts: post.reactionCounts,

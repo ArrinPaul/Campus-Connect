@@ -157,6 +157,7 @@ export const getPostsByHashtag = query({
           content: post.content,
           likeCount: post.likeCount,
           commentCount: post.commentCount,
+          shareCount: post.shareCount,
           reactionCounts: post.reactionCounts,
           createdAt: post.createdAt,
           updatedAt: post.updatedAt,

@@ -13,7 +13,7 @@ jest.mock("convex/react", () => ({
   useQuery: jest.fn((fn: any, args?: any) => {
     if (fn === "users:getCurrentUser") return mockGetCurrentUser()
     if (fn === "posts:hasUserLikedPost") return mockHasUserLikedPost()
-    if (fn.toString().includes("getFeedPosts")) {
+    if (fn.toString().includes("getUnifiedFeed") || fn.toString().includes("getFeedPosts")) {
       // Handle multiple queries for pagination
       const result = mockQueryResults[queryCallCount] || mockQueryResults[0]
       if (args !== "skip") {
@@ -33,6 +33,28 @@ jest.mock("next/image", () => ({
     // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
     return <img {...props} />
   },
+}))
+
+// Mock lucide-react
+jest.mock("lucide-react", () => ({
+  Repeat2: (props: any) => <svg data-testid="repeat-icon" {...props} />,
+  Heart: (props: any) => <svg {...props} />,
+  MessageCircle: (props: any) => <svg {...props} />,
+  Bookmark: (props: any) => <svg {...props} />,
+  Share2: (props: any) => <svg {...props} />,
+  MoreHorizontal: (props: any) => <svg {...props} />,
+  Copy: (props: any) => <svg {...props} />,
+  ExternalLink: (props: any) => <svg {...props} />,
+}))
+
+// Mock PostCard to avoid deep dependency chain
+jest.mock("@/components/posts/PostCard", () => ({
+  PostCard: jest.fn(({ post, author }: any) => (
+    <div data-testid="post-card">
+      <div>{post.content}</div>
+      <div>{author?.name}</div>
+    </div>
+  )),
 }))
 
 // Mock IntersectionObserver
@@ -66,6 +88,43 @@ describe("FeedContainer", () => {
     mockHasUserLikedPost.mockReturnValue(false)
   })
 
+  // Helper to wrap a post in unified feed item format
+  const makePostItem = (post: any) => ({
+    type: "post" as const,
+    _id: post._id,
+    sortKey: post.createdAt,
+    post,
+  })
+
+  const makeAuthor = (overrides: any = {}) => ({
+    _id: (overrides._id || "user1") as Id<"users">,
+    _creationTime: Date.now(),
+    clerkId: overrides.clerkId || "clerk1",
+    email: overrides.email || "user1@test.com",
+    name: overrides.name || "User One",
+    role: overrides.role || ("Student" as const),
+    experienceLevel: overrides.experienceLevel || ("Intermediate" as const),
+    skills: [],
+    socialLinks: {},
+    followerCount: 0,
+    followingCount: 0,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  })
+
+  const makePost = (overrides: any = {}) => ({
+    _id: (overrides._id || "post1") as Id<"posts">,
+    _creationTime: Date.now(),
+    authorId: (overrides.authorId || "user1") as Id<"users">,
+    content: overrides.content || "Test post",
+    likeCount: overrides.likeCount ?? 5,
+    commentCount: overrides.commentCount ?? 2,
+    shareCount: overrides.shareCount ?? 0,
+    createdAt: overrides.createdAt ?? Date.now(),
+    updatedAt: Date.now(),
+    author: overrides.author !== undefined ? overrides.author : makeAuthor(),
+  })
+
   it("should display loading state while fetching posts", () => {
     // Return undefined to simulate loading
     mockQueryResults = [undefined]
@@ -82,9 +141,8 @@ describe("FeedContainer", () => {
   it("should display empty state when no posts exist", () => {
     mockQueryResults = [
       {
-        posts: [],
+        items: [],
         nextCursor: null,
-        hasMore: false,
       },
     ]
 
@@ -99,64 +157,13 @@ describe("FeedContainer", () => {
   })
 
   it("should display posts when data is available", () => {
-    const mockPosts = [
-      {
-        _id: "post1" as Id<"posts">,
-        _creationTime: Date.now(),
-        authorId: "user1" as Id<"users">,
-        content: "Test post 1",
-        likeCount: 5,
-        commentCount: 2,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        author: {
-          _id: "user1" as Id<"users">,
-          _creationTime: Date.now(),
-          clerkId: "clerk1",
-          email: "user1@test.com",
-          name: "User One",
-          role: "Student" as const,
-          experienceLevel: "Intermediate" as const,
-          skills: [],
-          socialLinks: {},
-          followerCount: 0,
-          followingCount: 0,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-        },
-      },
-      {
-        _id: "post2" as Id<"posts">,
-        _creationTime: Date.now(),
-        authorId: "user2" as Id<"users">,
-        content: "Test post 2",
-        likeCount: 3,
-        commentCount: 1,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        author: {
-          _id: "user2" as Id<"users">,
-          _creationTime: Date.now(),
-          clerkId: "clerk2",
-          email: "user2@test.com",
-          name: "User Two",
-          role: "Faculty" as const,
-          experienceLevel: "Expert" as const,
-          skills: [],
-          socialLinks: {},
-          followerCount: 0,
-          followingCount: 0,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-        },
-      },
-    ]
+    const post1 = makePost({ _id: "post1", content: "Test post 1", authorId: "user1", author: makeAuthor({ _id: "user1", name: "User One" }) })
+    const post2 = makePost({ _id: "post2", content: "Test post 2", authorId: "user2", author: makeAuthor({ _id: "user2", clerkId: "clerk2", email: "user2@test.com", name: "User Two", role: "Faculty", experienceLevel: "Expert" }) })
 
     mockQueryResults = [
       {
-        posts: mockPosts,
+        items: [makePostItem(post1), makePostItem(post2)],
         nextCursor: null,
-        hasMore: false,
       },
     ]
 
@@ -169,50 +176,13 @@ describe("FeedContainer", () => {
   })
 
   it("should skip posts without author data", () => {
-    const mockPosts = [
-      {
-        _id: "post1" as Id<"posts">,
-        _creationTime: Date.now(),
-        authorId: "user1" as Id<"users">,
-        content: "Test post with author",
-        likeCount: 5,
-        commentCount: 2,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        author: {
-          _id: "user1" as Id<"users">,
-          _creationTime: Date.now(),
-          clerkId: "clerk1",
-          email: "user1@test.com",
-          name: "User One",
-          role: "Student" as const,
-          experienceLevel: "Intermediate" as const,
-          skills: [],
-          socialLinks: {},
-          followerCount: 0,
-          followingCount: 0,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-        },
-      },
-      {
-        _id: "post2" as Id<"posts">,
-        _creationTime: Date.now(),
-        authorId: "user2" as Id<"users">,
-        content: "Test post without author",
-        likeCount: 3,
-        commentCount: 1,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        author: null,
-      },
-    ]
+    const postWithAuthor = makePost({ _id: "post1", content: "Test post with author", author: makeAuthor({ name: "User One" }) })
+    const postWithoutAuthor = makePost({ _id: "post2", content: "Test post without author", author: null })
 
     mockQueryResults = [
       {
-        posts: mockPosts,
+        items: [makePostItem(postWithAuthor), makePostItem(postWithoutAuthor)],
         nextCursor: null,
-        hasMore: false,
       },
     ]
 
@@ -229,9 +199,8 @@ describe("FeedContainer", () => {
   it("should handle empty posts array", () => {
     mockQueryResults = [
       {
-        posts: [],
+        items: [],
         nextCursor: null,
-        hasMore: false,
       },
     ]
 
@@ -241,39 +210,12 @@ describe("FeedContainer", () => {
   })
 
   it("should display infinite scroll trigger when hasMore is true", () => {
-    const mockPosts = [
-      {
-        _id: "post1" as Id<"posts">,
-        _creationTime: Date.now(),
-        authorId: "user1" as Id<"users">,
-        content: "Test post 1",
-        likeCount: 5,
-        commentCount: 2,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        author: {
-          _id: "user1" as Id<"users">,
-          _creationTime: Date.now(),
-          clerkId: "clerk1",
-          email: "user1@test.com",
-          name: "User One",
-          role: "Student" as const,
-          experienceLevel: "Intermediate" as const,
-          skills: [],
-          socialLinks: {},
-          followerCount: 0,
-          followingCount: 0,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-        },
-      },
-    ]
+    const post1 = makePost({ _id: "post1", content: "Test post 1", author: makeAuthor({ name: "User One" }) })
 
     mockQueryResults = [
       {
-        posts: mockPosts,
+        items: [makePostItem(post1)],
         nextCursor: "cursor123",
-        hasMore: true,
       },
     ]
 
@@ -283,39 +225,12 @@ describe("FeedContainer", () => {
   })
 
   it("should not display infinite scroll trigger when hasMore is false", () => {
-    const mockPosts = [
-      {
-        _id: "post1" as Id<"posts">,
-        _creationTime: Date.now(),
-        authorId: "user1" as Id<"users">,
-        content: "Test post 1",
-        likeCount: 5,
-        commentCount: 2,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        author: {
-          _id: "user1" as Id<"users">,
-          _creationTime: Date.now(),
-          clerkId: "clerk1",
-          email: "user1@test.com",
-          name: "User One",
-          role: "Student" as const,
-          experienceLevel: "Intermediate" as const,
-          skills: [],
-          socialLinks: {},
-          followerCount: 0,
-          followingCount: 0,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-        },
-      },
-    ]
+    const post1 = makePost({ _id: "post1", content: "Test post 1", author: makeAuthor({ name: "User One" }) })
 
     mockQueryResults = [
       {
-        posts: mockPosts,
+        items: [makePostItem(post1)],
         nextCursor: null,
-        hasMore: false,
       },
     ]
 
@@ -325,64 +240,14 @@ describe("FeedContainer", () => {
   })
 
   it("should handle real-time post updates", async () => {
-    const initialPost = {
-      _id: "post1" as Id<"posts">,
-      _creationTime: Date.now(),
-      authorId: "user1" as Id<"users">,
-      content: "Initial post",
-      likeCount: 5,
-      commentCount: 2,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      author: {
-        _id: "user1" as Id<"users">,
-        _creationTime: Date.now(),
-        clerkId: "clerk1",
-        email: "user1@test.com",
-        name: "User One",
-        role: "Student" as const,
-        experienceLevel: "Intermediate" as const,
-        skills: [],
-        socialLinks: {},
-        followerCount: 0,
-        followingCount: 0,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      },
-    }
-
-    const newPost = {
-      _id: "post2" as Id<"posts">,
-      _creationTime: Date.now(),
-      authorId: "user2" as Id<"users">,
-      content: "New real-time post",
-      likeCount: 0,
-      commentCount: 0,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      author: {
-        _id: "user2" as Id<"users">,
-        _creationTime: Date.now(),
-        clerkId: "clerk2",
-        email: "user2@test.com",
-        name: "User Two",
-        role: "Faculty" as const,
-        experienceLevel: "Expert" as const,
-        skills: [],
-        socialLinks: {},
-        followerCount: 0,
-        followingCount: 0,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      },
-    }
+    const initialPost = makePost({ _id: "post1", content: "Initial post", author: makeAuthor({ name: "User One" }) })
+    const newPost = makePost({ _id: "post2", content: "New real-time post", likeCount: 0, commentCount: 0, authorId: "user2", author: makeAuthor({ _id: "user2", clerkId: "clerk2", email: "user2@test.com", name: "User Two", role: "Faculty", experienceLevel: "Expert" }) })
 
     // Initial data
     mockQueryResults = [
       {
-        posts: [initialPost],
+        items: [makePostItem(initialPost)],
         nextCursor: null,
-        hasMore: false,
       },
     ]
 
@@ -395,9 +260,8 @@ describe("FeedContainer", () => {
     // Simulate real-time update with new post
     mockQueryResults = [
       {
-        posts: [newPost, initialPost],
+        items: [makePostItem(newPost), makePostItem(initialPost)],
         nextCursor: null,
-        hasMore: false,
       },
     ]
 

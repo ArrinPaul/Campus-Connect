@@ -260,38 +260,51 @@
 
 ---
 
-### 1.6 Share / Repost 🟡 ⏱️ M
+### 1.6 Share / Repost 🟡 ⏱️ M ✅ COMPLETED
 
 **Schema:**
-- [ ] Create `reposts` table
-  - [ ] Fields: userId, originalPostId, quoteContent, createdAt
-  - [ ] Indexes: by_user, by_original_post
-- [ ] Add `shareCount` field to `posts` table
+- [x] Create `reposts` table
+  - [x] Fields: userId, originalPostId, quoteContent, createdAt
+  - [x] Indexes: by_user, by_original_post, by_user_and_post, by_createdAt
+- [x] Add `shareCount` field to `posts` table (initialized to 0 for new posts)
 
 **Backend:**
-- [ ] Create `convex/reposts.ts`
-  - [ ] `createRepost` mutation — plain repost or quote post
-  - [ ] `deleteRepost` mutation — own reposts only
-  - [ ] `getReposts` query — get reposts of a post
-  - [ ] `hasUserReposted` query — check if user reposted
-- [ ] Update `posts.ts` → `getFeedPosts` to include reposts in feed
+- [x] Create `convex/reposts.ts`
+  - [x] `createRepost` mutation — plain repost or quote post (500 char limit)
+  - [x] `deleteRepost` mutation — own reposts only, decrements shareCount
+  - [x] `getReposts` query — get reposts of a post with user data
+  - [x] `hasUserReposted` query — check if user reposted
+  - [x] `getUserReposts` query — get all reposts by a user
+- [x] Update `posts.ts` → added `getUnifiedFeed` query to include reposts in feed
+- [x] Update `bookmarks.ts` and `hashtags.ts` to include shareCount in responses
 
 **Frontend:**
-- [ ] Update `PostCard.tsx`
-  - [ ] Add share button with count
-  - [ ] Share dropdown: "Repost" | "Quote Post" | "Copy Link" | "Share via..."
-  - [ ] Native Web Share API integration (mobile)
-- [ ] Create `src/components/posts/RepostModal.tsx`
-  - [ ] For quote posts — show original post preview + textarea for comment
-  - [ ] Character limit: 500 chars
-- [ ] Update feed to show reposts
-  - [ ] "🔁 [User] reposted" header
-  - [ ] Show original post card nested
-  - [ ] For quote posts, show user's comment above original
+- [x] Update `PostCard.tsx`
+  - [x] Add share button with count (shows when shareCount > 0)
+  - [x] Share dropdown: "Repost" | "Quote Post" | "Copy Link" | "Share via..." (Web Share API)
+  - [x] Direct repost functionality (no modal)
+  - [x] Success toast notification after sharing
+  - [x] Click-outside detection for dropdown
+- [x] Create `src/components/posts/RepostModal.tsx`
+  - [x] For quote posts — show original post preview + textarea for comment
+  - [x] Character limit: 500 chars with counter
+  - [x] Two buttons: "Repost" (plain) and "Quote Post" (with comment)
+  - [x] Loading states, error handling
+- [x] Update `FeedContainer.tsx` to use unified feed
+  - [x] Display reposts with "🔁 [User] reposted" header
+  - [x] Show quote content if present
+  - [x] Show original post card nested
+  - [x] Merge posts and reposts chronologically
 
 **Tests:**
-- [ ] `convex/reposts.test.ts`
-- [ ] `src/components/posts/RepostModal.test.tsx`
+- [x] `convex/reposts.test.ts` — 28 passing tests (validation, state management, feed integration)
+- [x] `src/components/posts/RepostModal.test.tsx` — 11 passing tests (rendering, character limits, actions)
+
+**Production:**
+- [x] Renamed `convex/mention-utils.ts` to `convex/mentionUtils.ts` (Convex naming requirement)
+- [x] Updated imports in `posts.ts` and `comments.ts`
+- [x] `npx convex dev --once` — added reposts table with 4 indexes, shareCount field
+- [x] `npx next build` — successful production build
 
 ---
 

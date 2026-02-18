@@ -1,27 +1,26 @@
 import { render, screen, waitFor } from "@testing-library/react"
-import { describe, it, expect, vi, beforeEach } from "vitest"
 import BookmarksPage from "./page"
 
 // Mock modules
-vi.mock("@clerk/nextjs", () => ({
-  useUser: vi.fn(),
+jest.mock("convex/react", () => ({
+  useQuery: jest.fn(),
+  useMutation: jest.fn(() => jest.fn()),
 }))
 
-vi.mock("convex/react", () => ({
-  useQuery: vi.fn(),
-}))
-
-vi.mock("@/convex/_generated/api", () => ({
+jest.mock("@/convex/_generated/api", () => ({
   api: {
     bookmarks: {
       getCollections: "bookmarks:getCollections",
       getBookmarks: "bookmarks:getBookmarks",
     },
+    users: {
+      updateNotificationPreferences: "users:updateNotificationPreferences",
+    },
   },
 }))
 
-vi.mock("@/components/posts/PostCard", () => ({
-  PostCard: vi.fn(({ post, author }) => (
+jest.mock("@/components/posts/PostCard", () => ({
+  PostCard: jest.fn(({ post, author }: any) => (
     <div data-testid="post-card">
       <div>{post.content}</div>
       <div>{author.name}</div>
@@ -29,13 +28,18 @@ vi.mock("@/components/posts/PostCard", () => ({
   )),
 }))
 
-vi.mock("@/components/ui/tabs", () => ({
-  Tabs: vi.fn(({ children }) => <div data-testid="tabs">{children}</div>),
-  TabsContent: vi.fn(({ children }) => <div>{children}</div>),
-  TabsList: vi.fn(({ children }) => <div data-testid="tabs-list">{children}</div>),
-  TabsTrigger: vi.fn(({ children, value }) => (
+jest.mock("@/components/ui/tabs", () => ({
+  Tabs: jest.fn(({ children }: any) => <div data-testid="tabs">{children}</div>),
+  TabsContent: jest.fn(({ children }: any) => <div>{children}</div>),
+  TabsList: jest.fn(({ children }: any) => <div data-testid="tabs-list">{children}</div>),
+  TabsTrigger: jest.fn(({ children, value }: any) => (
     <button data-testid={`tab-${value}`}>{children}</button>
   )),
+}))
+
+jest.mock("lucide-react", () => ({
+  Loader2: (props: any) => <div data-testid="loader" className="animate-spin" {...props} />,
+  Bookmark: (props: any) => <svg {...props} />,
 }))
 
 import { useUser } from "@clerk/nextjs"
@@ -46,7 +50,7 @@ describe("BookmarksPage", () => {
   const mockUseQuery = useQuery as any
 
   beforeEach(() => {
-    vi.clearAllMocks()
+    jest.clearAllMocks()
   })
 
   it("should show loading state while auth is loading", () => {
@@ -57,7 +61,8 @@ describe("BookmarksPage", () => {
 
     render(<BookmarksPage />)
 
-    expect(screen.getByRole("status", { hidden: true })).toBeInTheDocument()
+    const loader = document.querySelector(".animate-spin")
+    expect(loader).toBeInTheDocument()
   })
 
   it("should show sign-in message when not authenticated", () => {

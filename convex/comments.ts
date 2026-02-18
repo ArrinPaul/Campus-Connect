@@ -2,7 +2,7 @@ import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
 import { sanitizeText } from "./sanitize"
 import { api } from "./_generated/api"
-import { extractMentions } from "./mention-utils"
+import { extractMentions } from "./mentionUtils"
 
 /**
  * Get all comments for a post

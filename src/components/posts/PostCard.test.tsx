@@ -32,6 +32,42 @@ jest.mock("next/image", () => ({
   },
 }))
 
+// Mock child components that have complex dependencies
+jest.mock("@/components/posts/ReactionPicker", () => ({
+  ReactionPicker: () => <div data-testid="reaction-picker">Reactions</div>,
+  ReactionSummary: () => <div data-testid="reaction-summary">Summary</div>,
+}))
+
+jest.mock("@/components/posts/ReactionModal", () => ({
+  ReactionModal: () => null,
+}))
+
+jest.mock("@/components/posts/BookmarkButton", () => ({
+  BookmarkButton: () => <button data-testid="bookmark-button">Bookmark</button>,
+}))
+
+jest.mock("@/components/posts/PostContent", () => ({
+  PostContent: ({ content }: any) => <div data-testid="post-content">{content}</div>,
+}))
+
+jest.mock("@/components/posts/RepostModal", () => ({
+  RepostModal: () => null,
+}))
+
+jest.mock("@/components/posts/CommentList", () => ({
+  CommentList: () => <div data-testid="comment-list">Comments</div>,
+}))
+
+jest.mock("@/components/posts/CommentComposer", () => ({
+  CommentComposer: () => <div data-testid="comment-composer">Composer</div>,
+}))
+
+jest.mock("lucide-react", () => ({
+  Share2: (props: any) => <svg data-testid="share-icon" {...props} />,
+  Copy: (props: any) => <svg {...props} />,
+  Repeat2: (props: any) => <svg {...props} />,
+}))
+
 // Mock window.confirm
 global.confirm = jest.fn()
 
@@ -48,6 +84,7 @@ describe("PostCard", () => {
     content: "This is a test post content",
     likeCount: 5,
     commentCount: 3,
+    shareCount: 0,
     createdAt: Date.now() - 3600000, // 1 hour ago
     updatedAt: Date.now() - 3600000,
   }
@@ -90,10 +127,10 @@ describe("PostCard", () => {
     expect(screen.getByText("1h ago")).toBeInTheDocument()
   })
 
-  it("should display like count", () => {
+  it("should display reaction summary", () => {
     render(<PostCard post={mockPost} author={mockAuthor} />)
 
-    expect(screen.getByText("5")).toBeInTheDocument()
+    expect(screen.getByTestId("reaction-summary")).toBeInTheDocument()
   })
 
   it("should display comment count", () => {
@@ -151,78 +188,27 @@ describe("PostCard", () => {
     })
   })
 
-  it("should show filled heart icon when post is liked", () => {
+  it("should show reaction picker when authenticated", () => {
     mockGetCurrentUser.mockReturnValue({ _id: "currentUser" as Id<"users"> })
-    mockHasUserLikedPost.mockReturnValue(true)
 
     render(<PostCard post={mockPost} author={mockAuthor} />)
 
-    const likeButton = screen.getByLabelText("Unlike post")
-    expect(likeButton).toBeInTheDocument()
-
-    const heartIcon = likeButton.querySelector("svg")
-    expect(heartIcon).toHaveClass("fill-red-600")
+    expect(screen.getByTestId("reaction-picker")).toBeInTheDocument()
   })
 
-  it("should show empty heart icon when post is not liked", () => {
-    mockGetCurrentUser.mockReturnValue({ _id: "currentUser" as Id<"users"> })
-    mockHasUserLikedPost.mockReturnValue(false)
+  it("should not show reaction picker when not authenticated", () => {
+    mockGetCurrentUser.mockReturnValue(null)
 
     render(<PostCard post={mockPost} author={mockAuthor} />)
 
-    const likeButton = screen.getByLabelText("Like post")
-    expect(likeButton).toBeInTheDocument()
-
-    const heartIcon = likeButton.querySelector("svg")
-    expect(heartIcon).toHaveClass("fill-none")
+    expect(screen.queryByTestId("reaction-picker")).not.toBeInTheDocument()
   })
 
-  it("should handle like post", async () => {
-    mockGetCurrentUser.mockReturnValue({ _id: "currentUser" as Id<"users"> })
-    mockHasUserLikedPost.mockReturnValue(false)
-    mockLikePost.mockResolvedValue({ success: true })
-
+  it("should render reaction summary with click handler", () => {
     render(<PostCard post={mockPost} author={mockAuthor} />)
 
-    const likeButton = screen.getByLabelText("Like post")
-    
-    // Verify initial like count
-    expect(screen.getByText("5")).toBeInTheDocument()
-    
-    fireEvent.click(likeButton)
-
-    // Verify optimistic update - like count should increase immediately
-    await waitFor(() => {
-      expect(screen.getByText("6")).toBeInTheDocument()
-    })
-    
-    await waitFor(() => {
-      expect(mockLikePost).toHaveBeenCalledWith({ postId: "post123" })
-    })
-  })
-
-  it("should handle unlike post", async () => {
-    mockGetCurrentUser.mockReturnValue({ _id: "currentUser" as Id<"users"> })
-    mockHasUserLikedPost.mockReturnValue(true)
-    mockUnlikePost.mockResolvedValue({ success: true })
-
-    render(<PostCard post={mockPost} author={mockAuthor} />)
-
-    const likeButton = screen.getByLabelText("Unlike post")
-    
-    // Verify initial like count
-    expect(screen.getByText("5")).toBeInTheDocument()
-    
-    fireEvent.click(likeButton)
-
-    // Verify optimistic update - like count should decrease immediately
-    await waitFor(() => {
-      expect(screen.getByText("4")).toBeInTheDocument()
-    })
-    
-    await waitFor(() => {
-      expect(mockUnlikePost).toHaveBeenCalledWith({ postId: "post123" })
-    })
+    const reactionSummary = screen.getByTestId("reaction-summary")
+    expect(reactionSummary).toBeInTheDocument()
   })
 
   it("should format timestamp as 'just now' for recent posts", () => {
@@ -270,60 +256,11 @@ describe("PostCard", () => {
     expect(dateText).toBeInTheDocument()
   })
 
-  it("should disable like button when not authenticated", () => {
-    mockGetCurrentUser.mockReturnValue(null)
-
-    render(<PostCard post={mockPost} author={mockAuthor} />)
-
-    const likeButton = screen.getByLabelText("Like post")
-    expect(likeButton).toBeDisabled()
-  })
-
-  it("should revert optimistic update on like error", async () => {
+  it("should show bookmark button when authenticated", () => {
     mockGetCurrentUser.mockReturnValue({ _id: "currentUser" as Id<"users"> })
-    mockHasUserLikedPost.mockReturnValue(false)
-    mockLikePost.mockRejectedValue(new Error("Network error"))
 
     render(<PostCard post={mockPost} author={mockAuthor} />)
 
-    const likeButton = screen.getByLabelText("Like post")
-    
-    // Verify initial like count
-    expect(screen.getByText("5")).toBeInTheDocument()
-    
-    fireEvent.click(likeButton)
-
-    // Verify optimistic update happens
-    await waitFor(() => {
-      expect(screen.getByText("6")).toBeInTheDocument()
-    })
-    
-    // Wait for error and revert
-    await waitFor(() => {
-      expect(screen.getByText("5")).toBeInTheDocument()
-    })
-  })
-
-  it("should show optimistic heart fill when liking", async () => {
-    mockGetCurrentUser.mockReturnValue({ _id: "currentUser" as Id<"users"> })
-    mockHasUserLikedPost.mockReturnValue(false)
-    mockLikePost.mockResolvedValue({ success: true })
-
-    render(<PostCard post={mockPost} author={mockAuthor} />)
-
-    const likeButton = screen.getByLabelText("Like post")
-    const heartIcon = likeButton.querySelector("svg")
-    
-    // Initially empty heart
-    expect(heartIcon).toHaveClass("fill-none")
-    
-    fireEvent.click(likeButton)
-
-    // Optimistically filled heart
-    await waitFor(() => {
-      const updatedButton = screen.getByLabelText("Unlike post")
-      const updatedHeartIcon = updatedButton.querySelector("svg")
-      expect(updatedHeartIcon).toHaveClass("fill-red-600")
-    })
+    expect(screen.getByTestId("bookmark-button")).toBeInTheDocument()
   })
 })

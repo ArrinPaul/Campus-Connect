@@ -70,9 +70,9 @@ describe("DiscoverPage", () => {
     
     render(<DiscoverPage />)
     
-    // Check for loading spinner (Loader2 component)
-    const loader = document.querySelector(".animate-spin")
-    expect(loader).toBeInTheDocument()
+    // Check for loading skeleton elements
+    const skeletons = document.querySelectorAll(".animate-pulse")
+    expect(skeletons.length).toBeGreaterThan(0)
   })
 
   it("should display empty state when no users found", () => {

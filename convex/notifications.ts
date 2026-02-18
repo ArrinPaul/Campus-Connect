@@ -32,6 +32,22 @@ export const createNotification = mutation({
       return null
     }
 
+    // Check recipient's notification preferences
+    const recipient = await ctx.db.get(args.recipientId)
+    if (recipient?.notificationPreferences) {
+      const prefs = recipient.notificationPreferences
+      const typeToPreference: Record<string, boolean | undefined> = {
+        reaction: prefs.reactions,
+        comment: prefs.comments,
+        mention: prefs.mentions,
+        follow: prefs.follows,
+        reply: prefs.comments, // replies are a sub-type of comments
+      }
+      if (typeToPreference[args.type] === false) {
+        return null // User disabled this notification type
+      }
+    }
+
     // Create the notification
     const notificationId = await ctx.db.insert("notifications", {
       recipientId: args.recipientId,

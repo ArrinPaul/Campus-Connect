@@ -1,7 +1,8 @@
 "use client"
 
+import { useState, useEffect, useCallback } from "react"
 import { useUser } from "@clerk/nextjs"
-import { useQuery } from "convex/react"
+import { useQuery, useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { ProfileForm } from "@/components/profile/ProfileForm"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
@@ -13,6 +14,34 @@ export default function SettingsPage() {
     api.users.getCurrentUser,
     isLoaded && isSignedIn ? {} : "skip"
   )
+  const updateNotificationPrefs = useMutation(api.users.updateNotificationPreferences)
+
+  // Default preferences (all enabled)
+  const defaultPrefs = { reactions: true, comments: true, mentions: true, follows: true }
+  const savedPrefs = currentUser?.notificationPreferences ?? defaultPrefs
+  
+  const [notifPrefs, setNotifPrefs] = useState(defaultPrefs)
+  const [prefsInitialized, setPrefsInitialized] = useState(false)
+
+  // Initialize from server data once loaded
+  useEffect(() => {
+    if (currentUser && !prefsInitialized) {
+      setNotifPrefs(currentUser.notificationPreferences ?? defaultPrefs)
+      setPrefsInitialized(true)
+    }
+  }, [currentUser, prefsInitialized])
+
+  const handleToggleNotifPref = useCallback(async (key: keyof typeof notifPrefs) => {
+    const updated = { ...notifPrefs, [key]: !notifPrefs[key] }
+    setNotifPrefs(updated)
+    try {
+      await updateNotificationPrefs(updated)
+    } catch (err) {
+      // Revert on error
+      setNotifPrefs(notifPrefs)
+      console.error("Failed to update notification preferences:", err)
+    }
+  }, [notifPrefs, updateNotificationPrefs])
 
   // Show loading state while auth is being checked
   if (!isLoaded) {
@@ -106,7 +135,7 @@ export default function SettingsPage() {
               <p className="text-sm text-gray-500 dark:text-gray-400">Get notified when someone reacts to your posts or comments</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" defaultChecked className="sr-only peer" />
+              <input type="checkbox" checked={notifPrefs.reactions} onChange={() => handleToggleNotifPref("reactions")} className="sr-only peer" />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
             </label>
           </div>
@@ -117,7 +146,7 @@ export default function SettingsPage() {
               <p className="text-sm text-gray-500 dark:text-gray-400">Get notified when someone comments on your posts</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" defaultChecked className="sr-only peer" />
+              <input type="checkbox" checked={notifPrefs.comments} onChange={() => handleToggleNotifPref("comments")} className="sr-only peer" />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
             </label>
           </div>
@@ -128,7 +157,7 @@ export default function SettingsPage() {
               <p className="text-sm text-gray-500 dark:text-gray-400">Get notified when someone mentions you in a post or comment</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" defaultChecked className="sr-only peer" />
+              <input type="checkbox" checked={notifPrefs.mentions} onChange={() => handleToggleNotifPref("mentions")} className="sr-only peer" />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
             </label>
           </div>
@@ -139,7 +168,7 @@ export default function SettingsPage() {
               <p className="text-sm text-gray-500 dark:text-gray-400">Get notified when someone starts following you</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" defaultChecked className="sr-only peer" />
+              <input type="checkbox" checked={notifPrefs.follows} onChange={() => handleToggleNotifPref("follows")} className="sr-only peer" />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
             </label>
           </div>
