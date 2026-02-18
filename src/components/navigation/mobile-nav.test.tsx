@@ -11,6 +11,11 @@ jest.mock("@/components/theme/theme-toggle", () => ({
   ThemeToggle: () => <div data-testid="theme-toggle">Theme Toggle</div>,
 }))
 
+// Mock Convex
+jest.mock("convex/react", () => ({
+  useQuery: jest.fn(() => 0),
+}))
+
 // Mock Next.js Link
 jest.mock("next/link", () => {
   const MockLink = ({ children, ...props }: any) => (

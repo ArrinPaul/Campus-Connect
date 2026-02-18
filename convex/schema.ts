@@ -263,4 +263,38 @@ export default defineSchema({
   })
     .index("by_conversation", ["conversationId"])
     .index("by_user_conversation", ["userId", "conversationId"]),
+
+  // Voice/Video Calls (Phase 2.4)
+  calls: defineTable({
+    conversationId: v.id("conversations"),
+    callerId: v.id("users"),
+    type: v.union(v.literal("audio"), v.literal("video")),
+    status: v.union(
+      v.literal("ringing"),
+      v.literal("active"),
+      v.literal("ended"),
+      v.literal("missed"),
+      v.literal("rejected"),
+      v.literal("busy")
+    ),
+    participants: v.array(v.object({
+      userId: v.id("users"),
+      joinedAt: v.optional(v.number()),
+      leftAt: v.optional(v.number()),
+      status: v.union(
+        v.literal("ringing"),
+        v.literal("connected"),
+        v.literal("declined"),
+        v.literal("missed"),
+        v.literal("left")
+      ),
+    })),
+    startedAt: v.optional(v.number()),
+    endedAt: v.optional(v.number()),
+    duration: v.optional(v.number()), // in seconds
+    createdAt: v.number(),
+  })
+    .index("by_conversation", ["conversationId", "createdAt"])
+    .index("by_caller", ["callerId", "createdAt"])
+    .index("by_status", ["status", "createdAt"]),
 })

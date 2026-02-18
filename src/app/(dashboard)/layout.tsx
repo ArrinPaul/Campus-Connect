@@ -7,6 +7,8 @@ import { MobileNav } from "@/components/navigation/mobile-nav"
 import { NotificationBell } from "@/components/notifications/NotificationBell"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
+import { useHeartbeat } from "@/hooks/useHeartbeat"
+import { IncomingCallNotification } from "@/components/calls/IncomingCallNotification"
 
 export default function DashboardLayout({
   children,
@@ -14,6 +16,14 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const currentUser = useQuery(api.users.getCurrentUser)
+  const totalUnread = useQuery(
+    api.conversations.getTotalUnreadCount,
+    currentUser ? {} : "skip"
+  )
+
+  // Heartbeat: update lastSeenAt every 60s when tab is active
+  useHeartbeat(!!currentUser)
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Navigation Bar */}
@@ -43,9 +53,14 @@ export default function DashboardLayout({
               </Link>
               <Link
                 href="/messages"
-                className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
+                className="relative text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
               >
                 Messages
+                {typeof totalUnread === "number" && totalUnread > 0 && (
+                  <span className="absolute -top-2 -right-4 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                    {totalUnread > 99 ? "99+" : totalUnread}
+                  </span>
+                )}
               </Link>
               <Link
                 href="/bookmarks"
@@ -95,6 +110,9 @@ export default function DashboardLayout({
 
       {/* Main Content */}
       <main>{children}</main>
+
+      {/* Incoming Call Notification (global) */}
+      {currentUser && <IncomingCallNotification />}
     </div>
   )
 }

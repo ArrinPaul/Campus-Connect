@@ -9,6 +9,7 @@
  */
 
 import type * as bookmarks from "../bookmarks.js";
+import type * as calls from "../calls.js";
 import type * as comments from "../comments.js";
 import type * as conversations from "../conversations.js";
 import type * as follows from "../follows.js";
@@ -32,6 +33,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   bookmarks: typeof bookmarks;
+  calls: typeof calls;
   comments: typeof comments;
   conversations: typeof conversations;
   follows: typeof follows;

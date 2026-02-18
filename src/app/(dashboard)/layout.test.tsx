@@ -36,6 +36,16 @@ jest.mock("@/components/notifications/NotificationBell", () => ({
   NotificationBell: () => <div data-testid="notification-bell">NotificationBell</div>,
 }))
 
+// Mock useHeartbeat
+jest.mock("@/hooks/useHeartbeat", () => ({
+  useHeartbeat: jest.fn(),
+}))
+
+// Mock IncomingCallNotification
+jest.mock("@/components/calls/IncomingCallNotification", () => ({
+  IncomingCallNotification: () => null,
+}))
+
 // Mock Next.js Link
 jest.mock("next/link", () => {
   const MockLink = ({ children, ...props }: any) => (

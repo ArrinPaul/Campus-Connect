@@ -12,6 +12,15 @@ export const api = {
     getUserByUsername: 'users:getUserByUsername',
     updateNotificationPreferences: 'users:updateNotificationPreferences',
   },
+  calls: {
+    initiateCall: 'calls:initiateCall',
+    acceptCall: 'calls:acceptCall',
+    rejectCall: 'calls:rejectCall',
+    endCall: 'calls:endCall',
+    getCallHistory: 'calls:getCallHistory',
+    getActiveCall: 'calls:getActiveCall',
+    getIncomingCalls: 'calls:getIncomingCalls',
+  },
   posts: {
     getFeedPosts: 'posts:getFeedPosts',
     getUnifiedFeed: 'posts:getUnifiedFeed',
@@ -99,5 +108,11 @@ export const api = {
     setTyping: 'presence:setTyping',
     getTypingUsers: 'presence:getTypingUsers',
     clearStaleTyping: 'presence:clearStaleTyping',
+    updateStatus: 'presence:updateStatus',
+    setCustomStatus: 'presence:setCustomStatus',
+    heartbeat: 'presence:heartbeat',
+    getOnlineUsers: 'presence:getOnlineUsers',
+    getUserPresence: 'presence:getUserPresence',
+    updateOnlineStatusVisibility: 'presence:updateOnlineStatusVisibility',
   },
 }

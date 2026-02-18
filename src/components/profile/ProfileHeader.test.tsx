@@ -6,6 +6,7 @@ import { Id } from "@/convex/_generated/dataModel"
 const mockFollowUser = jest.fn()
 const mockUnfollowUser = jest.fn()
 const mockIsFollowing = jest.fn()
+const mockGetOrCreateConversation = jest.fn().mockResolvedValue("conv123")
 
 jest.mock("convex/react", () => ({
   useMutation: jest.fn((apiFunction) => {
@@ -14,6 +15,9 @@ jest.mock("convex/react", () => ({
     }
     if (apiFunction === "follows:unfollowUser") {
       return mockUnfollowUser
+    }
+    if (apiFunction === "conversations:getOrCreateConversation") {
+      return mockGetOrCreateConversation
     }
     return jest.fn()
   }),
@@ -32,6 +36,16 @@ jest.mock("next/image", () => ({
     // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
     return <img {...props} />
   },
+}))
+
+// Mock next/navigation router
+jest.mock("next/navigation", () => ({
+  useRouter: jest.fn(() => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    back: jest.fn(),
+    prefetch: jest.fn(),
+  })),
 }))
 
 describe("ProfileHeader", () => {
@@ -221,7 +235,7 @@ describe("ProfileHeader", () => {
 
     // Button should show loading state
     await waitFor(() => {
-      expect(screen.getByRole("button")).toHaveTextContent("...")
+      expect(screen.getByRole("button", { name: /\.\.\./i })).toBeInTheDocument()
     })
   })
 
@@ -235,7 +249,10 @@ describe("ProfileHeader", () => {
     fireEvent.click(followButton)
 
     await waitFor(() => {
-      expect(screen.getByRole("button")).toBeDisabled()
+      // The follow button shows "..." and is disabled while loading
+      const loadingButton = screen.getAllByRole("button").find(btn => btn.hasAttribute("disabled") && btn.textContent?.includes("..."))
+      expect(loadingButton).toBeTruthy()
+      expect(loadingButton).toBeDisabled()
     })
   })
 })

@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react"
 import { Id } from "@/../convex/_generated/dataModel"
 import { Search, Plus, Users, MessageSquare } from "lucide-react"
+import { OnlineStatusDot } from "@/components/ui/OnlineStatusDot"
 
 interface ConversationUser {
   _id: Id<"users">
@@ -178,6 +179,15 @@ export function ConversationList({
                         getInitials(displayName)
                       )}
                     </div>
+                  )}
+
+                  {/* Online status for DMs */}
+                  {conv.type === "direct" && conv.otherUsers[0] && (
+                    <OnlineStatusDot
+                      userId={conv.otherUsers[0]._id}
+                      size="sm"
+                      overlay
+                    />
                   )}
 
                   {/* Unread badge */}

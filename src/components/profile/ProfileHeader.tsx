@@ -2,11 +2,14 @@
 
 import Image from "next/image"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { useUser } from "@clerk/nextjs"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
+import { OnlineStatusDot, formatLastSeen } from "@/components/ui/OnlineStatusDot"
+import { MessageSquare } from "lucide-react"
 
 interface User {
   _id: Id<"users">
@@ -32,9 +35,11 @@ interface ProfileHeaderProps {
 }
 
 export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
+  const router = useRouter()
   const { isLoaded, isSignedIn } = useUser()
   const followUser = useMutation(api.follows.followUser)
   const unfollowUser = useMutation(api.follows.unfollowUser)
+  const getOrCreateConversation = useMutation(api.conversations.getOrCreateConversation)
   const isFollowingQuery = useQuery(
     api.follows.isFollowing,
     isLoaded && isSignedIn && !isOwnProfile ? { userId: user._id } : "skip"
@@ -42,6 +47,7 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
   
   const [optimisticFollowing, setOptimisticFollowing] = useState<boolean | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isMessageLoading, setIsMessageLoading] = useState(false)
   
   // Use optimistic state if available, otherwise use query result
   const isFollowing = optimisticFollowing !== null ? optimisticFollowing : (isFollowingQuery ?? false)
@@ -71,7 +77,7 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
   return (
     <div className="rounded-lg bg-white dark:bg-gray-800 p-4 shadow dark:shadow-gray-900/50 sm:p-6">
       <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">
-        {/* Avatar */}
+        {/* Avatar with online status */}
         <div className="relative h-20 w-20 flex-shrink-0 sm:h-24 sm:w-24">
           {user.profilePicture ? (
             <Image
@@ -87,11 +93,27 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
               {user.name.charAt(0).toUpperCase()}
             </div>
           )}
+          {!isOwnProfile && (
+            <OnlineStatusDot
+              userId={user._id}
+              size="lg"
+              overlay
+            />
+          )}
         </div>
 
         {/* User Info */}
         <div className="flex-1 text-center sm:text-left">
           <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl">{user.name}</h1>
+
+          {/* Last seen for other profiles */}
+          {!isOwnProfile && (
+            <OnlineStatusDot
+              userId={user._id}
+              showLastSeen
+              className="mt-0.5"
+            />
+          )}
 
           <div className="mt-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
             <span className="rounded-full bg-blue-100 dark:bg-blue-900 px-3 py-1 text-xs font-medium text-blue-800 dark:text-blue-200 sm:text-sm">
@@ -181,9 +203,31 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
           )}
         </div>
 
-        {/* Follow Button (only for other users) */}
+        {/* Action Buttons (only for other users) */}
         {!isOwnProfile && (
-          <div className="flex-shrink-0 w-full sm:w-auto">
+          <div className="flex-shrink-0 w-full sm:w-auto flex flex-col gap-2 sm:flex-row">
+            {/* Message Button */}
+            <button
+              onClick={async () => {
+                try {
+                  setIsMessageLoading(true)
+                  const conversationId = await getOrCreateConversation({ otherUserId: user._id })
+                  router.push(`/messages?conversation=${conversationId}`)
+                } catch (error) {
+                  console.error("Failed to open conversation:", error)
+                } finally {
+                  setIsMessageLoading(false)
+                }
+              }}
+              disabled={isMessageLoading}
+              className="w-full rounded-md px-6 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              style={{ minHeight: "44px" }}
+            >
+              {isMessageLoading ? <ButtonLoadingSpinner /> : <MessageSquare className="h-4 w-4" />}
+              {isMessageLoading ? "..." : "Message"}
+            </button>
+
+            {/* Follow Button */}
             <button 
               onClick={handleFollowToggle}
               disabled={isLoading}

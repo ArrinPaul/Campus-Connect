@@ -21,6 +21,16 @@ jest.mock("@/components/notifications/NotificationBell", () => ({
   NotificationBell: () => <div data-testid="notification-bell">NotificationBell</div>,
 }))
 
+// Mock useHeartbeat
+jest.mock("@/hooks/useHeartbeat", () => ({
+  useHeartbeat: jest.fn(),
+}))
+
+// Mock IncomingCallNotification
+jest.mock("@/components/calls/IncomingCallNotification", () => ({
+  IncomingCallNotification: () => null,
+}))
+
 // Mock Convex
 jest.mock("convex/react", () => ({
   useQuery: jest.fn(() => ({ _id: "test-user-id" })),

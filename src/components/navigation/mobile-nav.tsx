@@ -4,6 +4,8 @@ import { useState } from "react"
 import Link from "next/link"
 import { Menu, X } from "lucide-react"
 import { UserButton } from "@clerk/nextjs"
+import { useQuery } from "convex/react"
+import { api } from "@/convex/_generated/api"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
 import { Id } from "@/convex/_generated/dataModel"
 
@@ -13,6 +15,10 @@ interface MobileNavProps {
 
 export function MobileNav({ currentUserId }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const totalUnread = useQuery(
+    api.conversations.getTotalUnreadCount,
+    currentUserId ? {} : "skip"
+  )
 
   const toggleMenu = () => setIsOpen(!isOpen)
   const closeMenu = () => setIsOpen(false)
@@ -86,10 +92,15 @@ export function MobileNav({ currentUserId }: MobileNavProps) {
             <Link
               href="/messages"
               onClick={closeMenu}
-              className="block rounded-md px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-blue-400"
+              className="flex items-center justify-between rounded-md px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-blue-400"
               style={{ minHeight: "44px" }}
             >
               Messages
+              {typeof totalUnread === "number" && totalUnread > 0 && (
+                <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-bold text-white">
+                  {totalUnread > 99 ? "99+" : totalUnread}
+                </span>
+              )}
             </Link>
             <Link
               href="/bookmarks"

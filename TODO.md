@@ -433,70 +433,102 @@
 
 ---
 
-### 2.3 Presence & Activity Status 🟢 ⏱️ M
+### 2.3 Presence & Activity Status ✅ ⏱️ M
 
 **Schema:**
-- [ ] Add to `users` table:
-  - [ ] `status`: "online" | "away" | "dnd" | "invisible"
-  - [ ] `customStatus`: string (optional)
-  - [ ] `lastSeenAt`: number
+- [x] Add to `users` table:
+  - [x] `status`: "online" | "away" | "dnd" | "invisible"
+  - [x] `customStatus`: string (optional)
+  - [x] `lastSeenAt`: number
+  - [x] `showOnlineStatus`: boolean (privacy toggle)
 
 **Backend:**
-- [ ] Update `convex/presence.ts`
-  - [ ] `updateStatus` mutation — set status (online/away/dnd/invisible)
-  - [ ] `setCustomStatus` mutation — custom message
-  - [ ] Heartbeat mechanism — update `lastSeenAt` every 60s (client-side interval)
-  - [ ] `getOnlineUsers` query — users online in the last 5 minutes
+- [x] Update `convex/presence.ts`
+  - [x] `updateStatus` mutation — set status (online/away/dnd/invisible)
+  - [x] `setCustomStatus` mutation — custom message (max 100 chars, clear on empty)
+  - [x] Heartbeat mechanism — update `lastSeenAt` every 60s (client-side interval)
+  - [x] `getOnlineUsers` query — users online in the last 5 minutes (respects privacy/invisible)
+  - [x] `getUserPresence` query — per-user presence info (privacy-aware)
+  - [x] `updateOnlineStatusVisibility` mutation — toggle privacy setting
 
 **Frontend:**
-- [ ] Add online status indicator (green dot) to:
-  - [ ] User avatars in chat
-  - [ ] User cards on profiles
-  - [ ] Conversation list
-- [ ] Create `src/components/ui/OnlineStatusDot.tsx` — reusable component
-- [ ] Add status selector in Settings or navbar dropdown
-  - [ ] Online / Away / Do Not Disturb / Invisible
-  - [ ] Custom status input field
-- [ ] Add "Last seen [time]" in profile headers (privacy-aware, respects invisible)
-- [ ] Implement heartbeat in `src/app/layout.tsx` — ping every 60s when tab active
+- [x] Add online status indicator (green dot) to:
+  - [x] User avatars in chat (ChatArea header)
+  - [x] User cards on profiles (ProfileHeader)
+  - [x] Conversation list (DM avatars in ConversationList)
+- [x] Create `src/components/ui/OnlineStatusDot.tsx` — reusable component with sm/md/lg sizes, overlay mode, last seen text
+- [x] Create `src/components/ui/StatusSelector.tsx` — status picker with custom status input
+- [x] Add status selector in Settings
+  - [x] Online / Away / Do Not Disturb / Invisible with icons and descriptions
+  - [x] Custom status input field (save on Enter/blur)
+- [x] Add "Last seen [time]" in profile headers and chat header (privacy-aware, respects invisible)
+- [x] Create `src/hooks/useHeartbeat.ts` — heartbeat hook with visibility change detection
+- [x] Integrate heartbeat in dashboard layout — active when user is logged in
 
 **Privacy:**
-- [ ] Add privacy setting: "Show online status" toggle in Settings
+- [x] Add privacy setting: "Show online status" toggle in Settings
+- [x] Invisible users appear offline to others, self always sees own status
 
 **Tests:**
-- [ ] `convex/presence.test.ts`
+- [x] `convex/presence.test.ts` (51 tests covering status, heartbeat, filtering, privacy, formatLastSeen)
+- [x] Updated `__mocks__/convex/api.js` with new presence functions
 
 ---
 
-### 2.4 Voice & Video Calls 🔵 ⏱️ XL
+### 2.4 Voice & Video Calls ✅ ⏱️ XL
 
-> **Note:** Defer to Phase 2 stretch goal or later. Requires WebRTC + TURN/STUN server.
+> **Note:** Signaling and call state management implemented via Convex. WebRTC media integration is a stretch goal — current UI provides full call flow with placeholders for WebRTC streams.
 
 **Research & Planning:**
-- [ ] Evaluate WebRTC libraries: `simple-peer`, `peerjs`, `livekit-client`
-- [ ] Choose TURN/STUN provider: Twilio, LiveKit, Agora, or self-hosted
-- [ ] Design call flow: initiate → ring → accept → in-call → end
+- [x] Design call flow: initiate → ring → accept/reject → in-call → end
+- [x] Call state machine: ringing → active → ended/missed/rejected/busy
+
+**Schema:**
+- [x] Create `calls` table with:
+  - [x] `conversationId`, `callerId`, `type` (audio/video)
+  - [x] `status`: ringing | active | ended | missed | rejected | busy
+  - [x] `participants`: array of { userId, joinedAt, leftAt, status }
+  - [x] `startedAt`, `endedAt`, `duration` (seconds)
+  - [x] Indexes: by_conversation, by_caller, by_status
 
 **Backend:**
-- [ ] Create `convex/calls.ts`
-  - [ ] `initiateCall` mutation — create call record, notify recipient
-  - [ ] `acceptCall` mutation
-  - [ ] `rejectCall` mutation
-  - [ ] `endCall` mutation
-  - [ ] `getCallHistory` query
-- [ ] Integrate with chosen WebRTC service (signaling via Convex or external)
+- [x] Create `convex/calls.ts` (7 exported functions)
+  - [x] `initiateCall` mutation — create call record, verify participant, check for existing active call
+  - [x] `acceptCall` mutation — update participant status, set call to active
+  - [x] `rejectCall` mutation — decline call, auto-end if all declined
+  - [x] `endCall` mutation — leave call, auto-end when no connected remain, handle missed
+  - [x] `getCallHistory` query — paginated call history with caller info
+  - [x] `getActiveCall` query — find active/ringing call for a conversation with participant info
+  - [x] `getIncomingCalls` query — global incoming call detection for current user
 
 **Frontend:**
-- [ ] Create `src/components/calls/CallModal.tsx` — full-screen call UI
-  - [ ] Video tiles, audio meters
-  - [ ] Controls: mute, video toggle, screen share, end call
-- [ ] Create `src/components/calls/IncomingCallNotification.tsx` — ringtone + accept/reject
-- [ ] Add call buttons to DM chat header
+- [x] Create `src/components/calls/CallModal.tsx` — full-screen call UI
+  - [x] Caller avatar with animated ring (pulse for ringing, green for active)
+  - [x] Call duration timer (auto-incrementing mm:ss / hh:mm:ss)
+  - [x] Controls: mute, video toggle, screen share, end call
+  - [x] Video placeholder areas (remote + PIP local) ready for WebRTC
+  - [x] Accept/Reject buttons for incoming calls
+  - [x] Auto-close on call end (2s delay)
+  - [x] Reactive state sync via `getActiveCall` query
+- [x] Create `src/components/calls/IncomingCallNotification.tsx`
+  - [x] Global incoming call toast notification (top-right)
+  - [x] Caller info, call type icon, accept/decline buttons
+  - [x] Gradient header strip, animated avatar
+  - [x] Dismissed call tracking (Set-based)
+  - [x] Opens CallModal on accept
+- [x] Add audio & video call buttons to DM chat header (ChatArea.tsx)
+- [x] Add IncomingCallNotification to dashboard layout (global listener)
 
-**Infrastructure:**
+**Infrastructure (deferred):**
 - [ ] Set up TURN/STUN server or API keys
+- [ ] Integrate WebRTC media streams (simple-peer / livekit-client)
 - [ ] Handle NAT traversal and firewall issues
 - [ ] Implement call quality indicators
+
+**Tests:**
+- [x] `convex/calls.test.ts` (39 tests covering call types, status transitions, participants, duration, filtering, validation)
+- [x] Updated `__mocks__/convex/api.js` with calls functions
+- [x] Updated `convex/_generated/api.d.ts` with calls module
 
 ---
 

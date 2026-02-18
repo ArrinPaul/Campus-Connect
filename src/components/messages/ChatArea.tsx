@@ -8,6 +8,8 @@ import { MessageBubble } from "@/components/messages/MessageBubble"
 import { MessageComposer } from "@/components/messages/MessageComposer"
 import { TypingIndicator } from "@/components/messages/TypingIndicator"
 import { GroupInfoPanel } from "@/components/messages/GroupInfoPanel"
+import { OnlineStatusDot } from "@/components/ui/OnlineStatusDot"
+import { CallModal } from "@/components/calls/CallModal"
 import {
   ArrowLeft,
   Phone,
@@ -42,10 +44,14 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
     content: string
     senderName: string
   } | null>(null)
+  const [activeCallId, setActiveCallId] = useState<Id<"calls"> | null>(null)
+  const [activeCallType, setActiveCallType] = useState<"audio" | "video">("audio")
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messageListRef = useRef<HTMLDivElement>(null)
   const prevMessageCountRef = useRef(0)
+
+  const initiateCall = useMutation(api.calls.initiateCall)
 
   // Queries
   const conversation = useQuery(api.conversations.getConversation, {
@@ -156,8 +162,8 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
           <ArrowLeft className="h-5 w-5" />
         </button>
 
-        {/* Avatar */}
-        <div className="flex-shrink-0">
+        {/* Avatar with online status */}
+        <div className="relative flex-shrink-0">
           {avatarUrl ? (
             <img
               src={avatarUrl}
@@ -184,6 +190,13 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
               )}
             </div>
           )}
+          {!isGroup && otherParticipant && (
+            <OnlineStatusDot
+              userId={otherParticipant._id}
+              size="sm"
+              overlay
+            />
+          )}
         </div>
 
         {/* Name + status */}
@@ -196,16 +209,62 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
               {memberCount} members
             </p>
           ) : (
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {otherParticipant?.username
-                ? `@${otherParticipant.username}`
-                : ""}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {otherParticipant?.username
+                  ? `@${otherParticipant.username}`
+                  : ""}
+              </p>
+              {otherParticipant && (
+                <OnlineStatusDot
+                  userId={otherParticipant._id}
+                  showLastSeen
+                />
+              )}
+            </div>
           )}
         </div>
 
         {/* Actions */}
         <div className="flex items-center gap-1">
+          {/* Audio call button (DM only) */}
+          {!isGroup && (
+            <button
+              onClick={async () => {
+                try {
+                  const result = await initiateCall({ conversationId, type: "audio" })
+                  setActiveCallType("audio")
+                  setActiveCallId(result.callId)
+                } catch (e) {
+                  // Silently handle error (e.g., already in a call)
+                }
+              }}
+              className="p-2 rounded-lg text-gray-500 hover:text-green-600 hover:bg-green-50 dark:text-gray-400 dark:hover:text-green-400 dark:hover:bg-green-900/20 transition-colors"
+              title="Audio call"
+            >
+              <Phone className="h-4 w-4" />
+            </button>
+          )}
+
+          {/* Video call button (DM only) */}
+          {!isGroup && (
+            <button
+              onClick={async () => {
+                try {
+                  const result = await initiateCall({ conversationId, type: "video" })
+                  setActiveCallType("video")
+                  setActiveCallId(result.callId)
+                } catch (e) {
+                  // Silently handle error
+                }
+              }}
+              className="p-2 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 transition-colors"
+              title="Video call"
+            >
+              <Video className="h-4 w-4" />
+            </button>
+          )}
+
           <button
             onClick={() => {
               setShowSearch(!showSearch)
@@ -214,7 +273,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
             className="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700"
             title="Search messages"
           >
-            <Search className="h-4 w-4" />
+          <Search className="h-4 w-4" />
           </button>
 
           {isGroup && (
@@ -390,6 +449,21 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
         <GroupInfoPanel
           conversationId={conversationId}
           onClose={() => setShowGroupInfo(false)}
+        />
+      )}
+
+      {/* Call Modal */}
+      {activeCallId && (
+        <CallModal
+          callId={activeCallId}
+          conversationId={conversationId}
+          isIncoming={false}
+          callType={activeCallType}
+          callerName={displayName}
+          callerProfilePicture={
+            otherParticipant?.profilePicture || undefined
+          }
+          onClose={() => setActiveCallId(null)}
         />
       )}
     </div>
