@@ -38,12 +38,25 @@ export default defineSchema({
         follows: v.boolean(),
       })
     ),
+    // Phase 2.3 — Presence & Activity Status
+    status: v.optional(
+      v.union(
+        v.literal("online"),
+        v.literal("away"),
+        v.literal("dnd"),
+        v.literal("invisible")
+      )
+    ),
+    customStatus: v.optional(v.string()), // custom status message
+    lastSeenAt: v.optional(v.number()), // timestamp of last activity
+    showOnlineStatus: v.optional(v.boolean()), // privacy toggle (default true)
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index("by_clerkId", ["clerkId"])
     .index("by_email", ["email"])
-    .index("by_username", ["username"]),
+    .index("by_username", ["username"])
+    .index("by_lastSeenAt", ["lastSeenAt"]),
 
   posts: defineTable({
     authorId: v.id("users"),
@@ -180,4 +193,74 @@ export default defineSchema({
     .index("by_original_post", ["originalPostId"])
     .index("by_user_and_post", ["userId", "originalPostId"])
     .index("by_createdAt", ["createdAt"]),
+
+  // Phase 2.1 — Direct Messaging / Phase 2.2 — Group Chat
+  conversations: defineTable({
+    type: v.union(v.literal("direct"), v.literal("group")), // DM or group
+    participantIds: v.array(v.id("users")), // sorted for consistent lookup (DMs)
+    name: v.optional(v.string()), // group name (group only)
+    avatar: v.optional(v.string()), // group avatar URL (group only)
+    description: v.optional(v.string()), // group description (group only)
+    createdBy: v.optional(v.id("users")), // group creator
+    lastMessageId: v.optional(v.id("messages")),
+    lastMessageAt: v.optional(v.number()),
+    lastMessagePreview: v.optional(v.string()), // preview text
+    createdAt: v.number(),
+  })
+    .index("by_last_message", ["lastMessageAt"])
+    .index("by_participant", ["participantIds"]),
+
+  messages: defineTable({
+    conversationId: v.id("conversations"),
+    senderId: v.id("users"),
+    content: v.string(),
+    messageType: v.union(
+      v.literal("text"),
+      v.literal("image"),
+      v.literal("file"),
+      v.literal("system")
+    ),
+    attachmentUrl: v.optional(v.string()),
+    attachmentName: v.optional(v.string()),
+    replyToId: v.optional(v.id("messages")),
+    status: v.union(
+      v.literal("sent"),
+      v.literal("delivered"),
+      v.literal("read")
+    ),
+    isDeleted: v.boolean(),
+    deletedForUserIds: v.optional(v.array(v.id("users"))), // "delete for me"
+    isPinned: v.optional(v.boolean()), // pinned messages (group feature)
+    createdAt: v.number(),
+    updatedAt: v.optional(v.number()), // for edited messages
+  })
+    .index("by_conversation", ["conversationId", "createdAt"])
+    .index("by_sender", ["senderId"]),
+
+  conversationParticipants: defineTable({
+    conversationId: v.id("conversations"),
+    userId: v.id("users"),
+    role: v.optional(v.union(
+      v.literal("owner"),
+      v.literal("admin"),
+      v.literal("member")
+    )), // group roles (null for DMs)
+    lastReadMessageId: v.optional(v.id("messages")),
+    lastReadAt: v.optional(v.number()),
+    isMuted: v.boolean(),
+    joinedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_conversation", ["conversationId"])
+    .index("by_user_conversation", ["userId", "conversationId"]),
+
+  // Typing indicators (ephemeral presence data)
+  typingIndicators: defineTable({
+    conversationId: v.id("conversations"),
+    userId: v.id("users"),
+    isTyping: v.boolean(),
+    updatedAt: v.number(),
+  })
+    .index("by_conversation", ["conversationId"])
+    .index("by_user_conversation", ["userId", "conversationId"]),
 })

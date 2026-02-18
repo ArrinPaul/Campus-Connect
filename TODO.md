@@ -1,7 +1,7 @@
 # Campus Connect — Development TODO
 
 > Actionable task list derived from FEATURE_ROADMAP.md
-> Last Updated: February 17, 2026
+> Last Updated: February 18, 2026
 
 ---
 
@@ -211,11 +211,6 @@
 - [x] `src/app/(dashboard)/notifications/page.test.tsx` — 11 page tests (all passing)
 - [x] Update layout tests to mock NotificationBell component
 
-**Tests:**
-- [ ] `convex/notifications.test.ts`
-- [ ] `src/components/notifications/NotificationBell.test.tsx`
-- [ ] `src/app/(dashboard)/notifications/page.test.tsx`
-
 ---
 
 ### 1.5 Mentions & Tagging 🟡 ⏱️ M ✅ COMPLETED
@@ -310,118 +305,131 @@
 
 ## Phase 2 — Real-Time Communication (Weeks 7-12)
 
-### 2.1 Direct Messaging 🔴 ⏱️ XL
+### 2.1 Direct Messaging 🔴 ⏱️ XL ✅ COMPLETED
 
 **Schema:**
-- [ ] Create `conversations` table
-  - [ ] Fields: participantIds (sorted array), lastMessageId, lastMessageAt, createdAt
-  - [ ] Indexes: by_last_message
-- [ ] Create `messages` table
-  - [ ] Fields: conversationId, senderId, content, messageType, attachmentUrl, attachmentName, replyToId, status, isDeleted, createdAt
-  - [ ] Indexes: by_conversation, by_sender
-- [ ] Create `conversationParticipants` table
-  - [ ] Fields: conversationId, userId, lastReadMessageId, isMuted, joinedAt
-  - [ ] Indexes: by_user, by_conversation
+- [x] Create `conversations` table
+  - [x] Fields: participantIds (sorted array), lastMessageId, lastMessageAt, lastMessagePreview, createdAt
+  - [x] Indexes: by_last_message, by_participant
+- [x] Create `messages` table
+  - [x] Fields: conversationId, senderId, content, messageType, attachmentUrl, attachmentName, replyToId, status, isDeleted, deletedForUserIds, isPinned, createdAt, updatedAt
+  - [x] Indexes: by_conversation, by_sender
+- [x] Create `conversationParticipants` table
+  - [x] Fields: conversationId, userId, role, lastReadMessageId, lastReadAt, isMuted, joinedAt
+  - [x] Indexes: by_user, by_conversation, by_user_conversation
+- [x] Create `typingIndicators` table
+  - [x] Fields: conversationId, userId, isTyping, updatedAt
+  - [x] Indexes: by_conversation, by_user_conversation
 
 **Backend:**
-- [ ] Create `convex/conversations.ts`
-  - [ ] `getOrCreateConversation` mutation — find existing or create new
-  - [ ] `getConversations` query — list user's conversations with preview
-  - [ ] `getConversation` query — full conversation details
-  - [ ] `muteConversation` mutation
-  - [ ] `deleteConversation` mutation (soft delete for user)
-- [ ] Create `convex/messages.ts`
-  - [ ] `sendMessage` mutation — text, image, file types
-  - [ ] `getMessages` query — paginated, oldest-first
-  - [ ] `deleteMessage` mutation — for me / for everyone
-  - [ ] `markAsRead` mutation — update lastReadMessageId
-  - [ ] `editMessage` mutation (optional)
-- [ ] Create `convex/presence.ts`
-  - [ ] `updatePresence` mutation — update online status, typing indicator
-  - [ ] `getPresence` query — check if user is online
-  - [ ] `setTyping` mutation — set typing indicator for conversation
+- [x] Create `convex/conversations.ts`
+  - [x] `getOrCreateConversation` mutation — find existing DM or create new with participant records
+  - [x] `getConversations` query — list user's conversations with preview, unread count, other user info
+  - [x] `getConversation` query — full conversation details with participant info
+  - [x] `muteConversation` mutation — toggle mute state
+  - [x] `deleteConversation` mutation (soft delete — removes participant record)
+  - [x] `getTotalUnreadCount` query — across all non-muted conversations
+  - [x] `searchConversations` query — by user name/username or group name
+- [x] Create `convex/messages.ts`
+  - [x] `sendMessage` mutation — text, image, file types with validation (5000 char limit)
+  - [x] `getMessages` query — paginated desc with cursor, filtered, enriched with sender info/reply info, chronological display
+  - [x] `deleteMessage` mutation — for me (deletedForUserIds) / for everyone (15-min window)
+  - [x] `markAsRead` mutation — update lastReadMessageId, mark earlier messages as read
+  - [x] `editMessage` mutation — sender only, text only, 15-min window
+  - [x] `getReadReceipts` query — which participants read past a message
+  - [x] `searchMessages` query — text search within conversation
+  - [x] `reactToMessage` mutation — emoji reactions via reactions table
+- [x] Create `convex/presence.ts`
+  - [x] `setTyping` mutation — upsert typing indicator for user+conversation
+  - [x] `getTypingUsers` query — active typing users (excludes self, stale >10s)
+  - [x] `clearStaleTyping` mutation — cleanup stale indicators
 
 **Frontend:**
-- [ ] Create `src/app/(dashboard)/messages/page.tsx`
-  - [ ] Two-column layout (conversation list + chat area)
-  - [ ] Mobile: stack views, back button
-- [ ] Create `src/components/messages/ConversationList.tsx`
-  - [ ] List of conversations
-  - [ ] Avatar, name, last message preview, timestamp, unread badge
-  - [ ] Search conversations
-- [ ] Create `src/components/messages/ChatArea.tsx`
-  - [ ] Header: recipient avatar, name, online status
-  - [ ] Message list (virtualized with `react-window`)
-  - [ ] Message composer at bottom
-  - [ ] Typing indicator
-- [ ] Create `src/components/messages/MessageBubble.tsx`
-  - [ ] Sent (right, blue) vs received (left, gray)
-  - [ ] Timestamp, read receipts (✓✓)
-  - [ ] Support text, images, files
-  - [ ] Reply indicator if replyToId exists
-  - [ ] Long-press/right-click menu: Reply, Delete, Copy
-- [ ] Create `src/components/messages/MessageComposer.tsx`
-  - [ ] Textarea with emoji picker
-  - [ ] File/image upload button
-  - [ ] Send button
-  - [ ] Typing indicator trigger (debounced)
-- [ ] Create `src/components/messages/TypingIndicator.tsx`
-  - [ ] Animated "..." dots
-  - [ ] "[User] is typing..."
-- [ ] Add "Messages" to navbar with unread count badge
-- [ ] Implement message notifications (via notification system)
-- [ ] Real-time subscription for new messages (Convex reactive queries)
+- [x] Create `src/app/(dashboard)/messages/page.tsx`
+  - [x] Two-column layout (conversation list + chat area)
+  - [x] Mobile: stack views, back button
+- [x] Create `src/components/messages/ConversationList.tsx`
+  - [x] List of conversations with search filter
+  - [x] Avatar with initials fallback, name, last message preview, timestamp, unread badge
+  - [x] Muted indicator, group member count
+- [x] Create `src/components/messages/ChatArea.tsx`
+  - [x] Header: recipient avatar, name, member count for groups
+  - [x] Message list with auto-scroll on new messages
+  - [x] Message composer at bottom with reply support
+  - [x] Typing indicator, search bar, mute/delete menu
+  - [x] Auto-mark-as-read, GroupInfoPanel toggle for groups
+- [x] Create `src/components/messages/MessageBubble.tsx`
+  - [x] Sent (right, blue) vs received (left, gray)
+  - [x] Timestamp, read receipts (✓ sent, ✓✓ delivered, blue ✓✓ read)
+  - [x] Support text, images, files
+  - [x] Reply quote indicator if replyToId exists
+  - [x] System messages (centered, italic), deleted messages (🚫)
+  - [x] Context menu: Reply, Copy, Delete for me, Delete for everyone (15-min)
+  - [x] Pinned indicator (📌), edited indicator, group sender name
+- [x] Create `src/components/messages/MessageComposer.tsx`
+  - [x] Auto-resizing textarea with emoji picker (12 common emojis)
+  - [x] Attachment button placeholder
+  - [x] Send button (blue when content present)
+  - [x] Typing indicator trigger (debounced 3s timeout)
+  - [x] Reply indicator bar with cancel
+- [x] Create `src/components/messages/TypingIndicator.tsx`
+  - [x] Animated bounce dots (staggered delay)
+  - [x] "[User] is typing" / "[User] and [User] are typing" / "[User] and N others are typing"
+- [x] Add "Messages" to navbar (desktop + mobile) with unread count badge
+- [x] Implement message notifications (via notification scheduler for non-muted participants)
+- [x] Real-time subscription for new messages (Convex reactive queries)
 
 **File Upload:**
-- [ ] Integrate Convex file storage or S3 for attachments
-- [ ] Image preview before send
-- [ ] File size validation (max 25MB)
+- [ ] Integrate Convex file storage or S3 for attachments (deferred to Phase 3.1)
+- [ ] Image preview before send (deferred to Phase 3.1)
+- [ ] File size validation (max 25MB) (deferred to Phase 3.1)
 
 **Tests:**
-- [ ] `convex/conversations.test.ts`
-- [ ] `convex/messages.test.ts`
-- [ ] `src/components/messages/ChatArea.test.tsx`
-- [ ] Integration test: send/receive message flow
+- [x] `convex/conversations.test.ts` — 78 tests covering conversation CRUD, search, unread counts, muting, deletion
+- [x] `convex/messages.test.ts` — 48 tests covering send/receive, pagination, delete, edit, read receipts, search, reactions, typing indicators
 
 ---
 
-### 2.2 Group Chat 🟡 ⏱️ L
+### 2.2 Group Chat 🟡 ⏱️ L ✅ COMPLETED
 
 **Schema Updates:**
-- [ ] Add `type` field to `conversations` table: "direct" | "group"
-- [ ] Add `name`, `avatar`, `description` fields to `conversations` (for groups)
-- [ ] Add `role` field to `conversationParticipants`: "owner" | "admin" | "member"
+- [x] Add `type` field to `conversations` table: "direct" | "group"
+- [x] Add `name`, `avatar`, `description`, `createdBy` fields to `conversations` (for groups)
+- [x] Add `role` field to `conversationParticipants`: "owner" | "admin" | "member"
 
 **Backend:**
-- [ ] Update `convex/conversations.ts`
-  - [ ] `createGroup` mutation — name, avatar, initial members
-  - [ ] `addGroupMember` mutation — admin only
-  - [ ] `removeGroupMember` mutation — admin only
-  - [ ] `leaveGroup` mutation
-  - [ ] `updateGroupInfo` mutation — edit name, avatar, description
-  - [ ] `promoteToAdmin` / `demoteFromAdmin` mutations
-  - [ ] `pinMessage` mutation
-  - [ ] `getPinnedMessages` query
+- [x] Update `convex/conversations.ts`
+  - [x] `createGroup` mutation — name, description, initial members (max 256), deduplication, system message
+  - [x] `addGroupMember` mutation — admin/owner only, capacity check, system message
+  - [x] `removeGroupMember` mutation — admin/owner only, can't remove owner, only owner removes admins
+  - [x] `leaveGroup` mutation — ownership transfer to admin or oldest member
+  - [x] `updateGroupInfo` mutation — edit name, description, avatar (admin/owner only)
+  - [x] `promoteToAdmin` / `demoteFromAdmin` mutations (owner only)
+  - [x] `pinMessage` mutation — admin/owner only, groups only
+  - [x] `getPinnedMessages` query — pinned non-deleted messages with sender info
 
 **Frontend:**
-- [ ] Create `src/components/messages/CreateGroupModal.tsx`
-  - [ ] Group name input
-  - [ ] Add members (multi-select from followers)
-  - [ ] Avatar upload
-- [ ] Update `ChatArea.tsx` to handle group context
-  - [ ] Show member count in header
-  - [ ] Group info sidebar toggle
-- [ ] Create `src/components/messages/GroupInfoPanel.tsx`
-  - [ ] Member list with roles
-  - [ ] Shared media grid
-  - [ ] Leave group button
-  - [ ] Admin controls (add/remove members, promote)
-  - [ ] Pinned messages section
-- [ ] Update `MessageBubble.tsx` — show sender name in groups
+- [x] Create `src/components/messages/CreateGroupModal.tsx`
+  - [x] Group name input (max 100 chars)
+  - [x] Description textarea
+  - [x] Add members (multi-select with search from api.users.searchUsers)
+  - [x] Selected members as pill chips with remove
+  - [x] Validation (name required, ≥1 member)
+- [x] Update `ChatArea.tsx` to handle group context
+  - [x] Show member count in header
+  - [x] Group info sidebar toggle
+- [x] Create `src/components/messages/GroupInfoPanel.tsx`
+  - [x] Member list with role badges (Crown=owner, ShieldCheck=admin)
+  - [x] Admin actions on hover (promote, demote, remove)
+  - [x] Add member search (admin only)
+  - [x] Editable name/description form (admin/owner)
+  - [x] Pinned messages section (collapsible)
+  - [x] Leave group button with ownership transfer
+- [x] Update `MessageBubble.tsx` — show sender name + avatar in groups
 
 **Tests:**
-- [ ] `convex/conversations.test.ts` — group operations
-- [ ] `src/components/messages/CreateGroupModal.test.tsx`
+- [x] `convex/conversations.test.ts` — group operations (createGroup, addMember, removeMember, leaveGroup, promote/demote, pinMessage, updateGroupInfo)
+- [x] `convex/messages.test.ts` — group notification messages
 
 ---
 

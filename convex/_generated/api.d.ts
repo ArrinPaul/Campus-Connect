@@ -10,12 +10,15 @@
 
 import type * as bookmarks from "../bookmarks.js";
 import type * as comments from "../comments.js";
+import type * as conversations from "../conversations.js";
 import type * as follows from "../follows.js";
 import type * as hashtags from "../hashtags.js";
 import type * as http from "../http.js";
 import type * as mentionUtils from "../mentionUtils.js";
+import type * as messages from "../messages.js";
 import type * as notifications from "../notifications.js";
 import type * as posts from "../posts.js";
+import type * as presence from "../presence.js";
 import type * as reactions from "../reactions.js";
 import type * as reposts from "../reposts.js";
 import type * as sanitize from "../sanitize.js";
@@ -30,12 +33,15 @@ import type {
 declare const fullApi: ApiFromModules<{
   bookmarks: typeof bookmarks;
   comments: typeof comments;
+  conversations: typeof conversations;
   follows: typeof follows;
   hashtags: typeof hashtags;
   http: typeof http;
   mentionUtils: typeof mentionUtils;
+  messages: typeof messages;
   notifications: typeof notifications;
   posts: typeof posts;
+  presence: typeof presence;
   reactions: typeof reactions;
   reposts: typeof reposts;
   sanitize: typeof sanitize;

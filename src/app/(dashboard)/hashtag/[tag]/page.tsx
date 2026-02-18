@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useParams } from "next/navigation"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
@@ -11,10 +12,25 @@ export default function HashtagPage() {
   const params = useParams()
   const tag = typeof params?.tag === "string" ? decodeURIComponent(params.tag) : ""
 
-  // Get posts with this hashtag
+  // Pagination state
+  const [allPosts, setAllPosts] = useState<any[]>([])
+  const [paginationCursor, setPaginationCursor] = useState<string | null>(null)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const hasInitialized = useRef(false)
+  const prevTag = useRef(tag)
+
+  // Get initial page of posts
   const result = useQuery(
     api.hashtags.getPostsByHashtag,
     tag ? { tag, limit: 20 } : "skip"
+  )
+
+  // Get more posts when cursor is set
+  const morePostsResult = useQuery(
+    api.hashtags.getPostsByHashtag,
+    isLoadingMore && paginationCursor && tag
+      ? { tag, limit: 20, cursor: paginationCursor }
+      : "skip"
   )
 
   // Get hashtag stats
@@ -23,9 +39,44 @@ export default function HashtagPage() {
     tag ? { tag } : "skip"
   )
 
-  const posts = result?.posts || []
+  // Reset when tag changes
+  useEffect(() => {
+    if (tag !== prevTag.current) {
+      prevTag.current = tag
+      hasInitialized.current = false
+      setAllPosts([])
+      setPaginationCursor(null)
+      setIsLoadingMore(false)
+    }
+  }, [tag])
+
+  // Initialize from first result
+  useEffect(() => {
+    if (result && !hasInitialized.current) {
+      hasInitialized.current = true
+      setAllPosts(result.posts || [])
+      setPaginationCursor(result.cursor || null)
+    }
+  }, [result])
+
+  // Append more results
+  useEffect(() => {
+    if (morePostsResult && isLoadingMore) {
+      setAllPosts(prev => [...prev, ...(morePostsResult.posts || [])])
+      setPaginationCursor(morePostsResult.cursor || null)
+      setIsLoadingMore(false)
+    }
+  }, [morePostsResult, isLoadingMore])
+
+  const handleLoadMore = useCallback(() => {
+    if (paginationCursor && !isLoadingMore) {
+      setIsLoadingMore(true)
+    }
+  }, [paginationCursor, isLoadingMore])
+
+  const posts = allPosts
   const hashtag = result?.hashtag || hashtagStats
-  const isLoading = result === undefined
+  const isLoading = result === undefined && !hasInitialized.current
 
   if (!tag) {
     return (
@@ -124,16 +175,15 @@ export default function HashtagPage() {
         )}
 
         {/* Load More Button */}
-        {!isLoading && result?.cursor && (
+        {!isLoading && paginationCursor && (
           <div className="mt-6 flex justify-center">
             <button
-              onClick={() => {
-                // TODO: Implement pagination
-                console.log("Load more posts")
-              }}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              onClick={handleLoadMore}
+              disabled={isLoadingMore}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
             >
-              Load More
+              {isLoadingMore && <Loader2 className="w-4 h-4 animate-spin" />}
+              {isLoadingMore ? "Loading..." : "Load More"}
             </button>
           </div>
         )}

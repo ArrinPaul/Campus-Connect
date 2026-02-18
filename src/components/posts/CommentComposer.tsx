@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 import { parseMentions } from "../../../lib/mention-utils"
+import { parseHashtags } from "../../../lib/hashtag-utils"
 import { MentionAutocomplete } from "./MentionAutocomplete"
 
 interface CommentComposerProps {
@@ -126,6 +127,44 @@ export function CommentComposer({ postId, onCommentAdded }: CommentComposerProps
         <label htmlFor={`comment-${postId}`} className="sr-only">
           Add a comment
         </label>
+        {/* Highlight overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none px-3 py-2 text-sm whitespace-pre-wrap break-words overflow-hidden"
+          aria-hidden="true"
+        >
+          {(() => {
+            // First parse hashtags, then parse mentions within text segments
+            const hashtagSegments = parseHashtags(content)
+            const segments: { type: string; content: string }[] = []
+            for (const seg of hashtagSegments) {
+              if (seg.type === "hashtag") {
+                segments.push({ type: "hashtag", content: seg.content })
+              } else {
+                const mentionSegs = parseMentions(seg.content)
+                for (const ms of mentionSegs) {
+                  segments.push({ type: ms.type, content: ms.content })
+                }
+              }
+            }
+            return segments.map((seg, i) => {
+              if (seg.type === "hashtag") {
+                return (
+                  <span key={i} className="text-blue-600 dark:text-blue-400">
+                    {seg.content}
+                  </span>
+                )
+              }
+              if (seg.type === "mention") {
+                return (
+                  <span key={i} className="text-blue-600 dark:text-blue-400">
+                    @{seg.content}
+                  </span>
+                )
+              }
+              return <span key={i} className="text-transparent">{seg.content}</span>
+            })
+          })()}
+        </div>
         <textarea
           ref={textareaRef}
           id={`comment-${postId}`}
@@ -135,7 +174,8 @@ export function CommentComposer({ postId, onCommentAdded }: CommentComposerProps
           onClick={(e) => setCursorPosition(e.currentTarget.selectionStart)}
           rows={2}
           maxLength={maxLength}
-          className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-transparent px-3 py-2 text-sm text-transparent caret-gray-900 dark:caret-gray-100 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 relative z-10"
+          style={{ caretColor: "inherit" }}
           placeholder="Write a comment..."
         />
         

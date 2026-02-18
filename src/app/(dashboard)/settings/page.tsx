@@ -6,6 +6,7 @@ import { useQuery, useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { ProfileForm } from "@/components/profile/ProfileForm"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
+import { StatusSelector } from "@/components/ui/StatusSelector"
 import { LoadingSpinner } from "@/components/ui/loading-skeleton"
 
 export default function SettingsPage() {
@@ -15,6 +16,7 @@ export default function SettingsPage() {
     isLoaded && isSignedIn ? {} : "skip"
   )
   const updateNotificationPrefs = useMutation(api.users.updateNotificationPreferences)
+  const updateOnlineVisibility = useMutation(api.presence.updateOnlineStatusVisibility)
 
   // Default preferences (all enabled)
   const defaultPrefs = { reactions: true, comments: true, mentions: true, follows: true }
@@ -22,11 +24,13 @@ export default function SettingsPage() {
   
   const [notifPrefs, setNotifPrefs] = useState(defaultPrefs)
   const [prefsInitialized, setPrefsInitialized] = useState(false)
+  const [showOnlineStatus, setShowOnlineStatus] = useState(true)
 
   // Initialize from server data once loaded
   useEffect(() => {
     if (currentUser && !prefsInitialized) {
       setNotifPrefs(currentUser.notificationPreferences ?? defaultPrefs)
+      setShowOnlineStatus(currentUser.showOnlineStatus !== false)
       setPrefsInitialized(true)
     }
   }, [currentUser, prefsInitialized])
@@ -42,6 +46,17 @@ export default function SettingsPage() {
       console.error("Failed to update notification preferences:", err)
     }
   }, [notifPrefs, updateNotificationPrefs])
+
+  const handleToggleOnlineVisibility = useCallback(async () => {
+    const newValue = !showOnlineStatus
+    setShowOnlineStatus(newValue)
+    try {
+      await updateOnlineVisibility({ showOnlineStatus: newValue })
+    } catch (err) {
+      setShowOnlineStatus(!newValue) // revert
+      console.error("Failed to update online visibility:", err)
+    }
+  }, [showOnlineStatus, updateOnlineVisibility])
 
   // Show loading state while auth is being checked
   if (!isLoaded) {
@@ -119,6 +134,35 @@ export default function SettingsPage() {
             <p className="text-sm text-gray-500 dark:text-gray-400">Choose your preferred theme</p>
           </div>
           <ThemeToggle />
+        </div>
+      </div>
+
+      {/* Activity Status Settings */}
+      <div className="mb-8 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Activity Status</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          Set your presence status and custom message
+        </p>
+        <StatusSelector
+          currentStatus={(currentUser?.status as any) || "online"}
+          currentCustomStatus={currentUser?.customStatus || ""}
+        />
+      </div>
+
+      {/* Privacy Settings */}
+      <div className="mb-8 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Privacy</h2>
+        <div className="flex items-center justify-between py-3">
+          <div>
+            <p className="font-medium text-gray-900 dark:text-gray-100">Show Online Status</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Let others see when you&apos;re online. When off, your status and last seen will be hidden.
+            </p>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" checked={showOnlineStatus} onChange={handleToggleOnlineVisibility} className="sr-only peer" />
+            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+          </label>
         </div>
       </div>
 

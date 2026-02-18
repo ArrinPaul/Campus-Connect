@@ -42,6 +42,12 @@ export default function DashboardLayout({
                 Discover
               </Link>
               <Link
+                href="/messages"
+                className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
+              >
+                Messages
+              </Link>
+              <Link
                 href="/bookmarks"
                 className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
               >
