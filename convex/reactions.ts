@@ -1,6 +1,7 @@
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import { Doc, Id } from "./_generated/dataModel"
+import { api } from "./_generated/api"
 
 // Reaction types
 export const reactionTypes = ["like", "love", "laugh", "wow", "sad", "scholarly"] as const
@@ -75,6 +76,37 @@ export const addReaction = mutation({
 
       // Update target reaction counts
       await updateReactionCounts(ctx, args.targetId, args.targetType)
+
+      // Create notification for target owner
+      // Get the target (post or comment) to find the author
+      let authorId: Id<"users"> | null = null
+      if (args.targetType === "post") {
+        const post = await ctx.db.get(args.targetId as Id<"posts">)
+        if (post) authorId = post.authorId
+      } else if (args.targetType === "comment") {
+        const comment = await ctx.db.get(args.targetId as Id<"comments">)
+        if (comment) authorId = comment.authorId
+      }
+
+      // Send notification if author exists and is not the same as the reactor
+      if (authorId && authorId !== user._id) {
+        const reactionEmoji = {
+          like: "👍",
+          love: "❤️",
+          laugh: "😂",
+          wow: "😮",
+          sad: "😢",
+          scholarly: "🎓",
+        }[args.type]
+
+        await ctx.scheduler.runAfter(0, api.notifications.createNotification, {
+          recipientId: authorId,
+          actorId: user._id,
+          type: "reaction" as const,
+          referenceId: args.targetId,
+          message: `${user.name} reacted ${reactionEmoji} to your ${args.targetType}`,
+        })
+      }
 
       return { success: true, action: "created" }
     }

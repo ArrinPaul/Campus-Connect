@@ -31,6 +31,11 @@ jest.mock("@/components/navigation/mobile-nav", () => ({
   MobileNav: () => <div data-testid="mobile-nav">MobileNav</div>,
 }))
 
+// Mock NotificationBell
+jest.mock("@/components/notifications/NotificationBell", () => ({
+  NotificationBell: () => <div data-testid="notification-bell">NotificationBell</div>,
+}))
+
 // Mock Next.js Link
 jest.mock("next/link", () => {
   const MockLink = ({ children, ...props }: any) => (

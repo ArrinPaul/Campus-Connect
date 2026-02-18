@@ -6,6 +6,7 @@ export default defineSchema({
     clerkId: v.string(),
     email: v.string(),
     name: v.string(),
+    username: v.optional(v.string()), // Used for @mentions
     profilePicture: v.optional(v.string()),
     bio: v.optional(v.string()),
     university: v.optional(v.string()),
@@ -33,7 +34,8 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_clerkId", ["clerkId"])
-    .index("by_email", ["email"]),
+    .index("by_email", ["email"])
+    .index("by_username", ["username"]),
 
   posts: defineTable({
     authorId: v.id("users"),

@@ -4,6 +4,7 @@ import { UserButton } from "@clerk/nextjs"
 import Link from "next/link"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
 import { MobileNav } from "@/components/navigation/mobile-nav"
+import { NotificationBell } from "@/components/notifications/NotificationBell"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 
@@ -60,6 +61,9 @@ export default function DashboardLayout({
               >
                 Settings
               </Link>
+              
+              {/* Notification Bell */}
+              <NotificationBell />
               
               {/* Theme Toggle */}
               <ThemeToggle />

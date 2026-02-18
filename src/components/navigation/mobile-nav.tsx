@@ -91,6 +91,14 @@ export function MobileNav({ currentUserId }: MobileNavProps) {
             >
               Bookmarks
             </Link>
+            <Link
+              href="/notifications"
+              onClick={closeMenu}
+              className="block rounded-md px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-blue-400"
+              style={{ minHeight: "44px" }}
+            >
+              Notifications
+            </Link>
             {currentUserId && (
               <Link
                 href={`/profile/${currentUserId}`}

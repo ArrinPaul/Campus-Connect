@@ -3,8 +3,10 @@ import { PostComposer } from "./PostComposer"
 
 // Mock convex/react
 const mockCreatePost = jest.fn()
+const mockUseQuery = jest.fn(() => undefined)
 jest.mock("convex/react", () => ({
   useMutation: jest.fn(() => mockCreatePost),
+  useQuery: jest.fn(() => mockUseQuery()),
 }))
 
 // Mock the Convex API
@@ -12,6 +14,9 @@ jest.mock("../../../convex/_generated/api", () => ({
   api: {
     posts: {
       createPost: "posts:createPost",
+    },
+    hashtags: {
+      searchHashtags: "hashtags:searchHashtags",
     },
   },
 }))

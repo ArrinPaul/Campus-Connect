@@ -16,6 +16,16 @@ jest.mock("@/components/navigation/mobile-nav", () => ({
   MobileNav: () => <div data-testid="mobile-nav">Mobile Nav</div>,
 }))
 
+// Mock NotificationBell
+jest.mock("@/components/notifications/NotificationBell", () => ({
+  NotificationBell: () => <div data-testid="notification-bell">NotificationBell</div>,
+}))
+
+// Mock Convex
+jest.mock("convex/react", () => ({
+  useQuery: jest.fn(() => ({ _id: "test-user-id" })),
+}))
+
 // Mock Next.js Link
 jest.mock("next/link", () => {
   const MockLink = ({ children, ...props }: any) => (

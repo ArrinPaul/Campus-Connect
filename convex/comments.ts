@@ -1,6 +1,7 @@
 import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
 import { sanitizeText } from "./sanitize"
+import { api } from "./_generated/api"
 
 /**
  * Get all comments for a post
@@ -102,6 +103,17 @@ export const createComment = mutation({
     await ctx.db.patch(args.postId, {
       commentCount: post.commentCount + 1,
     })
+
+    // Create notification for post author (if not commenting on own post)
+    if (post.authorId !== user._id) {
+      await ctx.scheduler.runAfter(0, api.notifications.createNotification, {
+        recipientId: post.authorId,
+        actorId: user._id,
+        type: "comment" as const,
+        referenceId: args.postId,
+        message: `${user.name} commented on your post`,
+      })
+    }
 
     // Return the created comment
     const comment = await ctx.db.get(commentId)
