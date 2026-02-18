@@ -2,11 +2,13 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { useUser } from "@clerk/nextjs"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import { CommentSkeleton } from "@/components/ui/loading-skeleton"
+import { parseMentions } from "../../../lib/mention-utils"
 
 interface User {
   _id: Id<"users">
@@ -122,7 +124,24 @@ export function CommentList({ postId, comments, isLoading = false }: CommentList
                   {author?.name || "Unknown User"}
                 </p>
                 <p className="mt-1 whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200">
-                  {comment.content}
+                  {/* Parse and render mentions as clickable links */}
+                  {parseMentions(comment.content).map((segment, index) => {
+                    if (segment.type === "mention") {
+                      return (
+                        <Link
+                          key={index}
+                          href={`/profile/${segment.content}`}
+                          className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium hover:underline"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                          }}
+                        >
+                          @{segment.content}
+                        </Link>
+                      )
+                    }
+                    return <span key={index}>{segment.content}</span>
+                  })}
                 </p>
               </div>
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">

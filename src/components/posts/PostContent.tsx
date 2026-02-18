@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { parseHashtags } from "../../../lib/hashtag-utils"
+import { parseMentions } from "../../../lib/mention-utils"
 
 interface PostContentProps {
   content: string
@@ -9,30 +10,50 @@ interface PostContentProps {
 }
 
 /**
- * Component to render post content with clickable hashtags
+ * Component to render post content with clickable hashtags and mentions
  */
 export function PostContent({ content, className = "" }: PostContentProps) {
-  const segments = parseHashtags(content)
+  const hashtagSegments = parseHashtags(content)
 
   return (
     <p className={`whitespace-pre-wrap ${className}`}>
-      {segments.map((segment, index) => {
-        if (segment.type === "hashtag" && segment.tag) {
+      {hashtagSegments.map((hashtagSegment, hashIndex) => {
+        if (hashtagSegment.type === "hashtag" && hashtagSegment.tag) {
           return (
             <Link
-              key={index}
-              href={`/hashtag/${segment.tag}`}
+              key={hashIndex}
+              href={`/hashtag/${hashtagSegment.tag}`}
               className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium hover:underline"
               onClick={(e) => {
                 // Prevent click from bubbling to parent elements
                 e.stopPropagation()
               }}
             >
-              {segment.content}
+              {hashtagSegment.content}
             </Link>
           )
         }
-        return <span key={index}>{segment.content}</span>
+        
+        // For text segments, parse and render mentions
+        const mentionSegments = parseMentions(hashtagSegment.content)
+        return mentionSegments.map((mentionSegment, mentionIndex) => {
+          if (mentionSegment.type === "mention") {
+            return (
+              <Link
+                key={`${hashIndex}-${mentionIndex}`}
+                href={`/profile/${mentionSegment.content}`}
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium hover:underline"
+                onClick={(e) => {
+                  // Prevent click from bubbling to parent elements
+                  e.stopPropagation()
+                }}
+              >
+                @{mentionSegment.content}
+              </Link>
+            )
+          }
+          return <span key={`${hashIndex}-${mentionIndex}`}>{mentionSegment.content}</span>
+        })
       })}
     </p>
   )

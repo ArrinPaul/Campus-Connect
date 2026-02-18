@@ -5,6 +5,8 @@ import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 import { parseHashtags } from "../../../lib/hashtag-utils"
+import { parseMentions } from "../../../lib/mention-utils"
+import { MentionAutocomplete } from "./MentionAutocomplete"
 
 interface PostComposerProps {
   onPostCreated?: () => void
@@ -16,8 +18,10 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
   const [content, setContent] = useState("")
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showAutocomplete, setShowAutocomplete] = useState(false)
-  const [autocompleteQuery, setAutocompleteQuery] = useState("")
+  const [showHashtagAutocomplete, setShowHashtagAutocomplete] = useState(false)
+  const [showMentionAutocomplete, setShowMentionAutocomplete] = useState(false)
+  const [hashtagAutocompleteQuery, setHashtagAutocompleteQuery] = useState("")
+  const [mentionAutocompleteQuery, setMentionAutocompleteQuery] = useState("")
   const [selectedHashtagIndex, setSelectedHashtagIndex] = useState(0)
   const [cursorPosition, setCursorPosition] = useState(0)
   
@@ -28,39 +32,55 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
   // Get hashtag suggestions
   const hashtagSuggestions = useQuery(
     api.hashtags.searchHashtags,
-    showAutocomplete && autocompleteQuery.length > 0
-      ? { query: autocompleteQuery, limit: 5 }
+    showHashtagAutocomplete && hashtagAutocompleteQuery.length > 0
+      ? { query: hashtagAutocompleteQuery, limit: 5 }
       : "skip"
   )
 
-  // Detect hashtag being typed
+  // Detect hashtag or mention being typed
   useEffect(() => {
     if (!textareaRef.current) return
 
     const position = textareaRef.current.selectionStart
     const textBeforeCursor = content.substring(0, position)
     
-    // Find the last # before cursor
-    const lastHashIndex = textBeforeCursor.lastIndexOf("#")
+    // Check for @ mention (prioritize over hashtag if both present)
+    const lastAtIndex = textBeforeCursor.lastIndexOf("@")
+    if (lastAtIndex !== -1) {
+      const textAfterAt = textBeforeCursor.substring(lastAtIndex + 1)
+      
+      // Check if we're still typing the mention (no spaces)
+      if (!textAfterAt.includes(" ") && !textAfterAt.includes("\n")) {
+        setMentionAutocompleteQuery(textAfterAt)
+        setShowMentionAutocomplete(true)
+        setShowHashtagAutocomplete(false)
+        return
+      }
+    }
     
+    // Check for # hashtag
+    const lastHashIndex = textBeforeCursor.lastIndexOf("#")
     if (lastHashIndex !== -1) {
       const textAfterHash = textBeforeCursor.substring(lastHashIndex + 1)
       
       // Check if we're still typing the hashtag (no spaces)
       if (!textAfterHash.includes(" ") && !textAfterHash.includes("\n")) {
-        setAutocompleteQuery(textAfterHash)
-        setShowAutocomplete(true)
+        setHashtagAutocompleteQuery(textAfterHash)
+        setShowHashtagAutocomplete(true)
+        setShowMentionAutocomplete(false)
         setSelectedHashtagIndex(0)
         return
       }
     }
     
-    setShowAutocomplete(false)
+    setShowHashtagAutocomplete(false)
+    setShowMentionAutocomplete(false)
   }, [content, cursorPosition])
 
   // Handle keyboard navigation in autocomplete
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (!showAutocomplete || !hashtagSuggestions || hashtagSuggestions.length === 0) {
+    // Only handle hashtag autocomplete keyboard events (mentions have their own)
+    if (!showHashtagAutocomplete || !hashtagSuggestions || hashtagSuggestions.length === 0) {
       return
     }
 
@@ -72,11 +92,11 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
     } else if (e.key === "ArrowUp") {
       e.preventDefault()
       setSelectedHashtagIndex((prev) => (prev > 0 ? prev - 1 : 0))
-    } else if (e.key === "Enter" && showAutocomplete) {
+    } else if (e.key === "Enter" && showHashtagAutocomplete) {
       e.preventDefault()
       insertHashtag(hashtagSuggestions[selectedHashtagIndex].tag)
     } else if (e.key === "Escape") {
-      setShowAutocomplete(false)
+      setShowHashtagAutocomplete(false)
     }
   }
 
@@ -98,12 +118,44 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
         textAfterCursor
       
       setContent(newContent)
-      setShowAutocomplete(false)
+      setShowHashtagAutocomplete(false)
       
       // Set cursor position after inserted hashtag
       setTimeout(() => {
         if (textareaRef.current) {
           const newPosition = lastHashIndex + tag.length + 2 // +2 for # and space
+          textareaRef.current.selectionStart = newPosition
+          textareaRef.current.selectionEnd = newPosition
+          textareaRef.current.focus()
+        }
+      }, 0)
+    }
+  }
+
+  // Insert selected mention
+  const insertMention = (username: string) => {
+    if (!textareaRef.current) return
+
+    const position = textareaRef.current.selectionStart
+    const textBeforeCursor = content.substring(0, position)
+    const textAfterCursor = content.substring(position)
+    
+    // Find the last @ before cursor
+    const lastAtIndex = textBeforeCursor.lastIndexOf("@")
+    
+    if (lastAtIndex !== -1) {
+      const newContent = 
+        content.substring(0, lastAtIndex) + 
+        `@${username} ` + 
+        textAfterCursor
+      
+      setContent(newContent)
+      setShowMentionAutocomplete(false)
+      
+      // Set cursor position after inserted mention
+      setTimeout(() => {
+        if (textareaRef.current) {
+          const newPosition = lastAtIndex + username.length + 2 // +2 for @ and space
           textareaRef.current.selectionStart = newPosition
           textareaRef.current.selectionEnd = newPosition
           textareaRef.current.focus()
@@ -169,15 +221,26 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
             }}
             aria-hidden="true"
           >
-            {parseHashtags(content).map((segment, index) => {
-              if (segment.type === "hashtag") {
+            {/* Parse and render both hashtags and mentions */}
+            {parseHashtags(content).map((hashtagSegment, hashIndex) => {
+              if (hashtagSegment.type === "hashtag") {
                 return (
-                  <span key={index} className="text-blue-600 dark:text-blue-400 font-medium">
-                    {segment.content}
+                  <span key={hashIndex} className="text-blue-600 dark:text-blue-400 font-medium">
+                    {hashtagSegment.content}
                   </span>
                 )
               }
-              return <span key={index}>{segment.content}</span>
+              // For text segments, parse mentions
+              return parseMentions(hashtagSegment.content).map((mentionSegment, mentionIndex) => {
+                if (mentionSegment.type === "mention") {
+                  return (
+                    <span key={`${hashIndex}-${mentionIndex}`} className="text-blue-600 dark:text-blue-400 font-medium">
+                      @{mentionSegment.content}
+                    </span>
+                  )
+                }
+                return <span key={`${hashIndex}-${mentionIndex}`}>{mentionSegment.content}</span>
+              })
             })}
             {/* Placeholder when empty */}
             {content.length === 0 && (
@@ -206,8 +269,8 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
           />
         </div>
 
-        {/* Autocomplete dropdown */}
-        {showAutocomplete && hashtagSuggestions && hashtagSuggestions.length > 0 && (
+        {/* Hashtag autocomplete dropdown */}
+        {showHashtagAutocomplete && hashtagSuggestions && hashtagSuggestions.length > 0 && (
           <div className="absolute z-10 mt-1 w-64 rounded-md bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700">
             <ul className="py-1">
               {hashtagSuggestions.map((hashtag, index) => (
@@ -236,6 +299,16 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
               <kbd className="ml-1 px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-700">Enter</kbd> to select
             </div>
           </div>
+        )}
+
+        {/* Mention autocomplete dropdown */}
+        {showMentionAutocomplete && (
+          <MentionAutocomplete
+            query={mentionAutocompleteQuery}
+            onSelect={insertMention}
+            onClose={() => setShowMentionAutocomplete(false)}
+            position={{ top: 120, left: 16 }}
+          />
         )}
 
         <div className="mt-1 flex justify-between text-xs sm:text-sm">

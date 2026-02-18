@@ -303,6 +303,109 @@ export const searchUsers = query({
 })
 
 /**
+ * Search users by username for mention autocomplete
+ * Returns users whose username or name starts with the query
+ * Validates: Requirements 1.5 (Mentions & Tagging)
+ */
+export const searchUsersByUsername = query({
+  args: {
+    query: v.string(),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    // Require authentication
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    // Empty query returns no results
+    if (!args.query || args.query.trim().length === 0) {
+      return []
+    }
+
+    const queryLower = args.query.toLowerCase()
+    const limit = args.limit || 5 // Default to 5 suggestions
+
+    // Get all users and filter by username or name
+    let users = await ctx.db.query("users").collect()
+
+    // Filter users whose username or name starts with the query (case-insensitive)
+    users = users.filter((user) => {
+      const usernameLower = user.username?.toLowerCase() || ""
+      const nameLower = user.name.toLowerCase()
+      
+      // Check if username starts with query, or if no username, check if name starts with query
+      return usernameLower.startsWith(queryLower) || 
+             (!user.username && nameLower.startsWith(queryLower))
+    })
+
+    // Sort by exact match first, then alphabetically
+    users.sort((a, b) => {
+      const aUsername = (a.username || a.name).toLowerCase()
+      const bUsername = (b.username || b.name).toLowerCase()
+      
+      // Exact matches first
+      if (aUsername === queryLower && bUsername !== queryLower) return -1
+      if (bUsername === queryLower && aUsername !== queryLower) return 1
+      
+      // Then alphabetically
+      return aUsername.localeCompare(bUsername)
+    })
+
+    // Limit results
+    const limitedUsers = users.slice(0, limit)
+
+    // Return minimal user data for autocomplete
+    return limitedUsers.map((user) => ({
+      _id: user._id,
+      name: user.name,
+      username: user.username || user.name, // Fallback to name if no username
+      profilePicture: user.profilePicture,
+    }))
+  },
+})
+
+/**
+ * Get a user by username (for resolving @mentions)
+ * Validates: Requirements 1.5 (Mentions & Tagging)
+ */
+export const getUserByUsername = query({
+  args: {
+    username: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Require authentication
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    if (!args.username) {
+      return null
+    }
+
+    // Try to find by username first
+    const userByUsername = await ctx.db
+      .query("users")
+      .withIndex("by_username", (q) => q.eq("username", args.username))
+      .first()
+
+    if (userByUsername) {
+      return userByUsername
+    }
+
+    // Fallback: try to find by name (for users without username)
+    const users = await ctx.db.query("users").collect()
+    const userByName = users.find(
+      (user) => user.name.toLowerCase() === args.username.toLowerCase()
+    )
+
+    return userByName || null
+  },
+})
+
+/**
  * Update user profile
  * Validates: Requirements 2.3, 12.5
  */

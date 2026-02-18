@@ -3,6 +3,7 @@ import { query, mutation } from "./_generated/server"
 import { Id } from "./_generated/dataModel"
 import { sanitizeText } from "./sanitize"
 import { linkHashtagsToPost } from "./hashtags"
+import { extractMentions } from "./mention-utils"
 
 /**
  * Get feed posts with pagination
@@ -183,6 +184,37 @@ export const createPost = mutation({
 
     // Link hashtags to post
     await linkHashtagsToPost(ctx, postId, sanitizedContent)
+
+    // Extract mentions and notify mentioned users
+    const mentions = extractMentions(sanitizedContent)
+    for (const username of mentions) {
+      // Find the mentioned user
+      const mentionedUser = await ctx.db
+        .query("users")
+        .withIndex("by_username", (q) => q.eq("username", username))
+        .first()
+
+      // Fallback: try to find by name if username not found
+      let resolvedUser = mentionedUser || null
+      if (!resolvedUser) {
+        const allUsers = await ctx.db.query("users").collect()
+        const foundUser = allUsers.find(
+          (u) => u.name.toLowerCase() === username.toLowerCase()
+        )
+        resolvedUser = foundUser || null
+      }
+
+      // Schedule notification if user found and not self-mention
+      if (resolvedUser && resolvedUser._id !== user._id) {
+        await ctx.scheduler.runAfter(0, "notifications:createNotification" as any, {
+          recipientId: resolvedUser._id,
+          actorId: user._id,
+          type: "mention" as const,
+          referenceId: postId,
+          message: `mentioned you in a post`,
+        })
+      }
+    }
 
     // Return the created post
     const post = await ctx.db.get(postId)

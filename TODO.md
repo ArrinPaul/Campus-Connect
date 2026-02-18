@@ -218,35 +218,45 @@
 
 ---
 
-### 1.5 Mentions & Tagging 🟡 ⏱️ M
+### 1.5 Mentions & Tagging 🟡 ⏱️ M ✅ COMPLETED
 
 **Backend:**
-- [ ] Create `lib/mention-utils.ts`
-  - [ ] `extractMentions(content: string)` — regex to find @username
-  - [ ] `parseMentionsToLinks(content: string)` — convert to clickable links
-- [ ] Update `posts.ts` → `createPost` mutation
-  - [ ] Extract mentions, trigger notifications for mentioned users
-- [ ] Update `comments.ts` → `createComment` mutation (same)
-- [ ] Create `convex/users.ts` → `searchUsersByUsername` query for autocomplete
+- [x] Create `lib/mention-utils.ts`
+  - [x] `extractMentions(content: string)` — regex to find @username
+  - [x] `parseMentionsToLinks(content: string)` — convert to clickable links
+- [x] Create `convex/mention-utils.ts` (backend version for Convex functions)
+- [x] Add `username` field to `users` schema with index
+- [x] Update `posts.ts` → `createPost` mutation
+  - [x] Extract mentions, trigger notifications for mentioned users
+- [x] Update `comments.ts` → `createComment` mutation (same)
+- [x] Create `convex/users.ts` → `searchUsersByUsername` query for autocomplete
+- [x] Create `convex/users.ts` → `getUserByUsername` query for resolving @mentions
 
 **Frontend:**
-- [ ] Create `src/components/composer/MentionAutocomplete.tsx`
-  - [ ] Detect `@` character in textarea
-  - [ ] Show dropdown with matching users (search as you type)
-  - [ ] Arrow keys + Enter to select
-  - [ ] Insert `@username` on selection
-- [ ] Update `PostComposer.tsx` — integrate mention autocomplete
-- [ ] Update `CommentComposer.tsx` — integrate mention autocomplete
-- [ ] Update `PostCard.tsx` — render mentions as blue clickable links
-- [ ] Update `CommentList.tsx` — render mentions as blue clickable links
+- [x] Create `src/components/posts/MentionAutocomplete.tsx`
+  - [x] Detect `@` character in textarea
+  - [x] Show dropdown with matching users (search as you type)
+  - [x] Arrow keys + Enter to select
+  - [x] Insert `@username` on selection
+- [x] Update `PostComposer.tsx` — integrate mention autocomplete
+  - [x] Real-time syntax highlighting for mentions (blue text)
+  - [x] Autocomplete dropdown
+  - [x] Keyboard navigation
+- [x] Update `CommentComposer.tsx` — integrate mention autocomplete
+- [x] Update `PostContent.tsx` (used by PostCard) — render mentions as blue clickable links to /profile/{username}
+- [x] Update `CommentList.tsx` — render mentions as blue clickable links
 
 **Styling:**
-- [ ] Blue text color for mentions: `text-blue-600 dark:text-blue-400`
-- [ ] Hover underline
+- [x] Blue text color for mentions: `text-blue-600 dark:text-blue-400`
+- [x] Hover underline
 
 **Tests:**
-- [ ] `lib/mention-utils.test.ts`
-- [ ] `src/components/composer/MentionAutocomplete.test.tsx`
+- [x] `lib/mention-utils.test.ts` — 35 passing tests (regex, extraction, parsing, validation)
+- [x] `src/components/posts/MentionAutocomplete.test.tsx` — comprehensive component tests
+
+**Production:**
+- [x] `npx convex dev --once` — added username field and by_username index
+- [x] `npx next build` — successful compilation, all types valid
 
 ---
 

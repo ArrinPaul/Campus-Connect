@@ -26,7 +26,7 @@ export function extractMentions(content: string): string[] {
   }
 
   const mentions: string[] = [];
-  const matches = content.matchAll(MENTION_REGEX);
+  const matches = Array.from(content.matchAll(MENTION_REGEX));
 
   for (const match of matches) {
     const username = match[1];

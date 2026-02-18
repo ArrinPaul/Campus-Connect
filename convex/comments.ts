@@ -2,6 +2,7 @@ import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
 import { sanitizeText } from "./sanitize"
 import { api } from "./_generated/api"
+import { extractMentions } from "./mention-utils"
 
 /**
  * Get all comments for a post
@@ -113,6 +114,37 @@ export const createComment = mutation({
         referenceId: args.postId,
         message: `${user.name} commented on your post`,
       })
+    }
+
+    // Extract mentions and notify mentioned users
+    const mentions = extractMentions(sanitizedContent)
+    for (const username of mentions) {
+      // Find the mentioned user
+      const mentionedUser = await ctx.db
+        .query("users")
+        .withIndex("by_username", (q) => q.eq("username", username))
+        .first()
+
+      // Fallback: try to find by name if username not found
+      let resolvedUser = mentionedUser || null
+      if (!resolvedUser) {
+        const allUsers = await ctx.db.query("users").collect()
+        const foundUser = allUsers.find(
+          (u) => u.name.toLowerCase() === username.toLowerCase()
+        )
+        resolvedUser = foundUser || null
+      }
+
+      // Schedule notification if user found and not self-mention
+      if (resolvedUser && resolvedUser._id !== user._id) {
+        await ctx.scheduler.runAfter(0, api.notifications.createNotification, {
+          recipientId: resolvedUser._id,
+          actorId: user._id,
+          type: "mention" as const,
+          referenceId: args.postId,
+          message: `mentioned you in a comment`,
+        })
+      }
     }
 
     // Return the created comment
