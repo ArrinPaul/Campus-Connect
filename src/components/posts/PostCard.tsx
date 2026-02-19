@@ -14,6 +14,8 @@ import { ReactionModal } from "@/components/posts/ReactionModal"
 import { BookmarkButton } from "@/components/posts/BookmarkButton"
 import { PostContent } from "@/components/posts/PostContent"
 import { RepostModal } from "@/components/posts/RepostModal"
+import { MediaGallery } from "@/components/posts/MediaGallery"
+import { LinkPreviewCard } from "@/components/posts/LinkPreviewCard"
 
 interface User {
   _id: Id<"users">
@@ -31,6 +33,16 @@ interface Post {
   shareCount: number
   createdAt: number
   updatedAt: number
+  mediaUrls?: string[]
+  mediaType?: "image" | "video" | "file" | "link"
+  mediaFileNames?: string[]
+  linkPreview?: {
+    url: string
+    title?: string
+    description?: string
+    image?: string
+    favicon?: string
+  }
 }
 
 interface PostCardProps {
@@ -222,6 +234,27 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
           className="text-sm text-gray-800 dark:text-gray-200 sm:text-base"
         />
       </div>
+
+      {/* Media Gallery */}
+      {post.mediaUrls && post.mediaUrls.length > 0 && post.mediaType && post.mediaType !== "link" && (
+        <MediaGallery
+          mediaUrls={post.mediaUrls}
+          mediaType={post.mediaType as "image" | "video" | "file"}
+          mediaFileNames={post.mediaFileNames}
+          altPrefix={`${author.name}'s post media`}
+        />
+      )}
+
+      {/* Link Preview */}
+      {post.linkPreview && (
+        <LinkPreviewCard
+          url={post.linkPreview.url}
+          title={post.linkPreview.title}
+          description={post.linkPreview.description}
+          image={post.linkPreview.image}
+          favicon={post.linkPreview.favicon}
+        />
+      )}
 
       {/* Engagement Stats and Actions */}
       <div className="mt-3 flex items-center gap-4 border-t dark:border-gray-700 pt-3 sm:mt-4 sm:gap-6 sm:pt-4">

@@ -406,6 +406,46 @@ export const getUserByUsername = query({
 })
 
 /**
+ * Get a user by either their Convex ID or username
+ * Used by profile page to handle both ID-based and @mention-based navigation
+ */
+export const getUserByIdOrUsername = query({
+  args: {
+    idOrUsername: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    if (!args.idOrUsername) return null
+
+    // Try ID lookup first (Convex IDs are longer, base32-encoded strings)
+    // ctx.db.get accepts any string but returns null if not a valid document ref
+    try {
+      const userById = await ctx.db.get(args.idOrUsername as Id<"users">)
+      if (userById) return userById
+    } catch {
+      // Not a valid Convex ID format — fall through to username lookup
+    }
+
+    // Try exact username lookup
+    const userByUsername = await ctx.db
+      .query("users")
+      .withIndex("by_username", (q) => q.eq("username", args.idOrUsername))
+      .first()
+
+    if (userByUsername) return userByUsername
+
+    // Fallback: case-insensitive name match (covers users without set username)
+    const allUsers = await ctx.db.query("users").collect()
+    const lower = args.idOrUsername.toLowerCase()
+    return allUsers.find((u) => u.name.toLowerCase() === lower) || null
+  },
+})
+
+/**
  * Update user profile
  * Validates: Requirements 2.3, 12.5
  */

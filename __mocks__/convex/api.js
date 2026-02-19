@@ -10,7 +10,15 @@ export const api = {
     createUserFromWebhook: 'users:createUserFromWebhook',
     updateUserFromWebhook: 'users:updateUserFromWebhook',
     getUserByUsername: 'users:getUserByUsername',
+    getUserByIdOrUsername: 'users:getUserByIdOrUsername',
     updateNotificationPreferences: 'users:updateNotificationPreferences',
+  },
+  media: {
+    generateUploadUrl: 'media:generateUploadUrl',
+    getFileUrl: 'media:getFileUrl',
+    deleteUpload: 'media:deleteUpload',
+    fetchLinkPreview: 'media:fetchLinkPreview',
+    resolveStorageUrls: 'media:resolveStorageUrls',
   },
   calls: {
     initiateCall: 'calls:initiateCall',

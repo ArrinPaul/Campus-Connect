@@ -3,9 +3,21 @@ import { PostComposer } from "./PostComposer"
 
 // Mock convex/react
 const mockCreatePost = jest.fn()
+const mockGenerateUploadUrl = jest.fn()
+const mockResolveStorageUrls = jest.fn()
+const mockFetchLinkPreview = jest.fn()
 const mockUseQuery = jest.fn(() => undefined)
 jest.mock("convex/react", () => ({
-  useMutation: jest.fn(() => mockCreatePost),
+  useMutation: jest.fn((ref: string) => {
+    if (ref === "posts:createPost") return mockCreatePost
+    if (ref === "media:generateUploadUrl") return mockGenerateUploadUrl
+    if (ref === "media:resolveStorageUrls") return mockResolveStorageUrls
+    return jest.fn()
+  }),
+  useAction: jest.fn((ref: string) => {
+    if (ref === "media:fetchLinkPreview") return mockFetchLinkPreview
+    return jest.fn()
+  }),
   useQuery: jest.fn(() => mockUseQuery()),
 }))
 
@@ -18,12 +30,20 @@ jest.mock("../../../convex/_generated/api", () => ({
     hashtags: {
       searchHashtags: "hashtags:searchHashtags",
     },
+    media: {
+      generateUploadUrl: "media:generateUploadUrl",
+      resolveStorageUrls: "media:resolveStorageUrls",
+      fetchLinkPreview: "media:fetchLinkPreview",
+    },
   },
 }))
 
 describe("PostComposer", () => {
   beforeEach(() => {
     mockCreatePost.mockClear()
+    mockGenerateUploadUrl.mockClear()
+    mockResolveStorageUrls.mockClear()
+    mockFetchLinkPreview.mockClear()
   })
 
   it("should render textarea and submit button", () => {

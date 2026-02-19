@@ -140,6 +140,25 @@ export const getPostById = query({
 export const createPost = mutation({
   args: {
     content: v.string(),
+    mediaUrls: v.optional(v.array(v.string())),
+    mediaType: v.optional(
+      v.union(
+        v.literal("image"),
+        v.literal("video"),
+        v.literal("file"),
+        v.literal("link")
+      )
+    ),
+    mediaFileNames: v.optional(v.array(v.string())),
+    linkPreview: v.optional(
+      v.object({
+        url: v.string(),
+        title: v.optional(v.string()),
+        description: v.optional(v.string()),
+        image: v.optional(v.string()),
+        favicon: v.optional(v.string()),
+      })
+    ),
   },
   handler: async (ctx, args) => {
     // Require authentication
@@ -181,6 +200,10 @@ export const createPost = mutation({
       shareCount: 0,
       createdAt: now,
       updatedAt: now,
+      ...(args.mediaUrls ? { mediaUrls: args.mediaUrls } : {}),
+      ...(args.mediaType ? { mediaType: args.mediaType } : {}),
+      ...(args.mediaFileNames ? { mediaFileNames: args.mediaFileNames } : {}),
+      ...(args.linkPreview ? { linkPreview: args.linkPreview } : {}),
     })
 
     // Link hashtags to post

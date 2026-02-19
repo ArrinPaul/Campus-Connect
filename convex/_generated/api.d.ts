@@ -15,6 +15,7 @@ import type * as conversations from "../conversations.js";
 import type * as follows from "../follows.js";
 import type * as hashtags from "../hashtags.js";
 import type * as http from "../http.js";
+import type * as media from "../media.js";
 import type * as mentionUtils from "../mentionUtils.js";
 import type * as messages from "../messages.js";
 import type * as notifications from "../notifications.js";
@@ -39,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   follows: typeof follows;
   hashtags: typeof hashtags;
   http: typeof http;
+  media: typeof media;
   mentionUtils: typeof mentionUtils;
   messages: typeof messages;
   notifications: typeof notifications;

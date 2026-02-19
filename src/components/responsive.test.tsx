@@ -6,6 +6,7 @@ import { PostComposer } from "./posts/PostComposer"
 // Mock Convex
 jest.mock("convex/react", () => ({
   useMutation: jest.fn(() => jest.fn()),
+  useAction: jest.fn(() => jest.fn()),
   useQuery: jest.fn(() => null),
 }))
 
@@ -46,6 +47,13 @@ jest.mock("lucide-react", () => ({
   Hash: (props: any) => <svg {...props} />,
   AtSign: (props: any) => <svg {...props} />,
   MessageCircle: (props: any) => <svg {...props} />,
+  // New icons used by PostComposer
+  Image: (props: any) => <svg {...props} />,
+  Video: (props: any) => <svg {...props} />,
+  FileText: (props: any) => <svg {...props} />,
+  X: (props: any) => <svg {...props} />,
+  Link: (props: any) => <svg {...props} />,
+  Loader2: (props: any) => <svg {...props} />,
 }))
 
 describe("Responsive Component Behavior", () => {

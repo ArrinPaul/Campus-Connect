@@ -74,6 +74,26 @@ export default defineSchema({
         scholarly: v.number(),
       })
     ),
+    // Phase 3.1 — Rich Media
+    mediaUrls: v.optional(v.array(v.string())), // resolved URLs for uploaded media
+    mediaType: v.optional(
+      v.union(
+        v.literal("image"),
+        v.literal("video"),
+        v.literal("file"),
+        v.literal("link")
+      )
+    ),
+    mediaFileNames: v.optional(v.array(v.string())), // original file names
+    linkPreview: v.optional(
+      v.object({
+        url: v.string(),
+        title: v.optional(v.string()),
+        description: v.optional(v.string()),
+        image: v.optional(v.string()),
+        favicon: v.optional(v.string()),
+      })
+    ),
     createdAt: v.number(),
     updatedAt: v.number(),
   })

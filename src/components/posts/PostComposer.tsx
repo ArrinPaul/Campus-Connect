@@ -1,12 +1,36 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import { useMutation, useQuery } from "convex/react"
+import { useState, useRef, useEffect, useCallback } from "react"
+import { useMutation, useQuery, useAction } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 import { parseHashtags } from "../../../lib/hashtag-utils"
 import { parseMentions } from "../../../lib/mention-utils"
 import { MentionAutocomplete } from "./MentionAutocomplete"
+import Image from "next/image"
+import {
+  Image as ImageIcon,
+  Video,
+  FileText,
+  X,
+  Link as LinkIcon,
+  Loader2,
+} from "lucide-react"
+
+// Client-side file type / size constants (mirrored from convex/media.ts)
+const IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"]
+const VIDEO_TYPES = ["video/mp4", "video/webm"]
+const FILE_TYPES = [
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "application/msword",
+  "text/plain",
+]
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024
+const MAX_VIDEO_SIZE = 100 * 1024 * 1024
+const MAX_FILE_SIZE = 25 * 1024 * 1024
+const MAX_IMAGES_PER_POST = 10
 
 interface PostComposerProps {
   onPostCreated?: () => void
@@ -14,6 +38,9 @@ interface PostComposerProps {
 
 export function PostComposer({ onPostCreated }: PostComposerProps) {
   const createPost = useMutation(api.posts.createPost)
+  const generateUploadUrl = useMutation(api.media.generateUploadUrl)
+  const resolveStorageUrls = useMutation(api.media.resolveStorageUrls)
+  const fetchLinkPreview = useAction(api.media.fetchLinkPreview)
 
   const [content, setContent] = useState("")
   const [error, setError] = useState("")
@@ -24,12 +51,164 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
   const [mentionAutocompleteQuery, setMentionAutocompleteQuery] = useState("")
   const [selectedHashtagIndex, setSelectedHashtagIndex] = useState(0)
   const [cursorPosition, setCursorPosition] = useState(0)
-  
+
+  // Media state
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([])
+  const [attachedType, setAttachedType] = useState<"image" | "video" | "file" | null>(null)
+  const [filePreviews, setFilePreviews] = useState<string[]>([])
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [isUploading, setIsUploading] = useState(false)
+  const [detectedLink, setDetectedLink] = useState<string | null>(null)
+  const [linkPreviewData, setLinkPreviewData] = useState<{
+    url: string; title?: string; description?: string; image?: string; favicon?: string
+  } | null>(null)
+  const [isFetchingPreview, setIsFetchingPreview] = useState(false)
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const linkDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const maxLength = 5000
 
-  // Get hashtag suggestions
+  // ── Link auto-detection ────────────────────────────────────────────────
+  const detectAndFetchLink = useCallback(
+    (text: string) => {
+      if (linkDebounceRef.current) clearTimeout(linkDebounceRef.current)
+      // Only detect if no files are already attached
+      if (attachedFiles.length > 0) return
+
+      linkDebounceRef.current = setTimeout(async () => {
+        const urlMatch = text.match(/https?:\/\/[^\s)>]+/)
+        const url = urlMatch?.[0] ?? null
+        if (url === detectedLink) return
+        setDetectedLink(url)
+        if (!url) {
+          setLinkPreviewData(null)
+          return
+        }
+        setIsFetchingPreview(true)
+        try {
+          const data = await fetchLinkPreview({ url })
+          setLinkPreviewData(data ?? null)
+        } catch {
+          setLinkPreviewData(null)
+        } finally {
+          setIsFetchingPreview(false)
+        }
+      }, 800)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [attachedFiles.length, detectedLink, fetchLinkPreview]
+  )
+
+  // ── File validation & selection ───────────────────────────────────────
+  const handleFileSelect = useCallback(
+    (files: FileList | File[], type: "image" | "video" | "file") => {
+      const fileArr = Array.from(files)
+      if (fileArr.length === 0) return
+
+      // Validate
+      for (const file of fileArr) {
+        if (type === "image") {
+          if (!IMAGE_TYPES.includes(file.type)) {
+            setError("Only JPEG, PNG, GIF, or WebP images are allowed")
+            return
+          }
+          if (file.size > MAX_IMAGE_SIZE) {
+            setError("Images must be under 10 MB")
+            return
+          }
+        } else if (type === "video") {
+          if (!VIDEO_TYPES.includes(file.type)) {
+            setError("Only MP4 or WebM videos are allowed")
+            return
+          }
+          if (file.size > MAX_VIDEO_SIZE) {
+            setError("Videos must be under 100 MB")
+            return
+          }
+        } else {
+          if (!FILE_TYPES.includes(file.type)) {
+            setError("Only PDF, DOCX, PPTX, DOC, or TXT files are allowed")
+            return
+          }
+          if (file.size > MAX_FILE_SIZE) {
+            setError("Files must be under 25 MB")
+            return
+          }
+        }
+      }
+
+      if (type === "image" && fileArr.length > MAX_IMAGES_PER_POST) {
+        setError(`You can attach at most ${MAX_IMAGES_PER_POST} images`)
+        return
+      }
+      if (type === "video" && fileArr.length > 1) {
+        setError("You can only attach 1 video")
+        return
+      }
+
+      setError("")
+      setAttachedFiles(fileArr)
+      setAttachedType(type)
+      setLinkPreviewData(null) // Clear link preview when files attached
+
+      // Generate object URL previews for images
+      if (type === "image") {
+        const previews = fileArr.map((f) => URL.createObjectURL(f))
+        setFilePreviews(previews)
+      } else {
+        setFilePreviews([])
+      }
+    },
+    []
+  )
+
+  const removeFile = useCallback(
+    (index: number) => {
+      setAttachedFiles((prev) => {
+        const next = prev.filter((_, i) => i !== index)
+        if (next.length === 0) setAttachedType(null)
+        return next
+      })
+      setFilePreviews((prev) => {
+        const toRevoke = prev[index]
+        if (toRevoke) URL.revokeObjectURL(toRevoke)
+        return prev.filter((_, i) => i !== index)
+      })
+    },
+    []
+  )
+
+  // ── Drag and drop ─────────────────────────────────────────────────────
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }, [])
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      const files = e.dataTransfer.files
+      if (!files || files.length === 0) return
+      const first = files[0]
+      if (IMAGE_TYPES.includes(first.type)) handleFileSelect(files, "image")
+      else if (VIDEO_TYPES.includes(first.type)) handleFileSelect([first], "video")
+      else handleFileSelect([first], "file")
+    },
+    [handleFileSelect]
+  )
+
+  // Cleanup object URLs on unmount
+  useEffect(() => {
+    return () => {
+      filePreviews.forEach((url) => URL.revokeObjectURL(url))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+
   const hashtagSuggestions = useQuery(
     api.hashtags.searchHashtags,
     showHashtagAutocomplete && hashtagAutocompleteQuery.length > 0
@@ -165,8 +344,10 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
   }
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(e.target.value)
+    const val = e.target.value
+    setContent(val)
     setCursorPosition(e.target.selectionStart)
+    detectAndFetchLink(val)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -175,8 +356,10 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
 
     // Client-side validation
     if (!content || content.trim().length === 0) {
-      setError("Post content cannot be empty")
-      return
+      if (attachedFiles.length === 0) {
+        setError("Post content cannot be empty")
+        return
+      }
     }
 
     if (content.length > maxLength) {
@@ -187,23 +370,107 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
     setIsSubmitting(true)
 
     try {
-      await createPost({ content })
-      
+      let mediaUrls: string[] | undefined
+      let finalMediaType: "image" | "video" | "file" | "link" | undefined
+      let mediaFileNames: string[] | undefined
+
+      // ── Upload files if any ──────────────────────────────────────────
+      if (attachedFiles.length > 0 && attachedType) {
+        setIsUploading(true)
+        setUploadProgress(0)
+
+        const storageIds: string[] = []
+        const fileNames: string[] = []
+
+        for (let i = 0; i < attachedFiles.length; i++) {
+          const file = attachedFiles[i]
+          fileNames.push(file.name)
+
+          // 1. Get presigned upload URL
+          const uploadUrl = await generateUploadUrl()
+
+          // 2. Upload file
+          const uploadRes = await fetch(uploadUrl, {
+            method: "POST",
+            body: file,
+            headers: { "Content-Type": file.type },
+          })
+          if (!uploadRes.ok) throw new Error(`Upload failed for ${file.name}`)
+
+          const { storageId } = await uploadRes.json()
+          storageIds.push(storageId)
+
+          setUploadProgress(Math.round(((i + 1) / attachedFiles.length) * 100))
+        }
+
+        // 3. Resolve all storage IDs to public URLs
+        const resolvedUrls = await resolveStorageUrls({
+          storageIds: storageIds as any,
+        })
+
+        mediaUrls = resolvedUrls.filter((u): u is string => u !== null)
+        finalMediaType = attachedType
+        mediaFileNames = fileNames
+        setIsUploading(false)
+      } else if (linkPreviewData) {
+        // Link post — store link preview, set mediaType to "link"
+        finalMediaType = "link"
+      }
+
+      await createPost({
+        content: content.trim() || " ", // Convex requires non-empty, use space if media-only
+        mediaUrls,
+        mediaType: finalMediaType,
+        mediaFileNames,
+        linkPreview: linkPreviewData ?? undefined,
+      })
+
       // Clear form after successful post
       setContent("")
-      
+      setAttachedFiles([])
+      setAttachedType(null)
+      filePreviews.forEach((u) => URL.revokeObjectURL(u))
+      setFilePreviews([])
+      setLinkPreviewData(null)
+      setDetectedLink(null)
+      setUploadProgress(0)
+
       if (onPostCreated) {
         onPostCreated()
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create post")
+      setIsUploading(false)
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      className="space-y-3 sm:space-y-4"
+    >
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        className="hidden"
+        onChange={(e) => {
+          if (!e.target.files || e.target.files.length === 0) return
+          const first = e.target.files[0]
+          if (IMAGE_TYPES.includes(first.type)) handleFileSelect(e.target.files, "image")
+          else if (VIDEO_TYPES.includes(first.type)) handleFileSelect([first], "video")
+          else handleFileSelect([first], "file")
+          // Reset so the same file can be re-selected
+          e.target.value = ""
+        }}
+        accept={[...IMAGE_TYPES, ...VIDEO_TYPES, ...FILE_TYPES].join(",")}
+        multiple
+      />
+
       <div className="relative">
         <label htmlFor="postContent" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           What&apos;s on your mind?
@@ -319,15 +586,174 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
         </div>
       </div>
 
+      {/* ── Media Toolbar ───────────────────────────────────────────────── */}
+      <div className="flex items-center gap-2 border-t border-gray-200 dark:border-gray-700 pt-2">
+        <button
+          type="button"
+          onClick={() => {
+            if (fileInputRef.current) {
+              fileInputRef.current.accept = IMAGE_TYPES.join(",")
+              fileInputRef.current.multiple = true
+              fileInputRef.current.click()
+            }
+          }}
+          disabled={!!attachedType && attachedType !== "image"}
+          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors"
+          title="Attach images"
+        >
+          <ImageIcon className="h-4 w-4" />
+          <span className="hidden sm:inline">Images</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            if (fileInputRef.current) {
+              fileInputRef.current.accept = VIDEO_TYPES.join(",")
+              fileInputRef.current.multiple = false
+              fileInputRef.current.click()
+            }
+          }}
+          disabled={!!attachedType && attachedType !== "video"}
+          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors"
+          title="Attach video"
+        >
+          <Video className="h-4 w-4" />
+          <span className="hidden sm:inline">Video</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            if (fileInputRef.current) {
+              fileInputRef.current.accept = FILE_TYPES.join(",")
+              fileInputRef.current.multiple = true
+              fileInputRef.current.click()
+            }
+          }}
+          disabled={!!attachedType && attachedType !== "file"}
+          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors"
+          title="Attach file"
+        >
+          <FileText className="h-4 w-4" />
+          <span className="hidden sm:inline">File</span>
+        </button>
+
+        {isFetchingPreview && (
+          <div className="ml-auto flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            <span>Fetching preview…</span>
+          </div>
+        )}
+      </div>
+
+      {/* ── Image Previews ───────────────────────────────────────────────── */}
+      {attachedType === "image" && filePreviews.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {filePreviews.map((src, i) => (
+            <div key={i} className="relative h-20 w-20 rounded-lg overflow-hidden border border-border">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt={`Attachment ${i + 1}`} className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={() => removeFile(i)}
+                className="absolute top-0.5 right-0.5 rounded-full bg-black/60 p-0.5 text-white hover:bg-black/80"
+                aria-label="Remove image"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Video/File Attachment List ──────────────────────────────────── */}
+      {attachedType !== "image" && attachedFiles.length > 0 && (
+        <div className="flex flex-col gap-1">
+          {attachedFiles.map((file, i) => (
+            <div key={i} className="flex items-center gap-2 rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-2">
+              {attachedType === "video" ? (
+                <Video className="h-4 w-4 text-blue-500 shrink-0" />
+              ) : (
+                <FileText className="h-4 w-4 text-blue-500 shrink-0" />
+              )}
+              <span className="flex-1 truncate text-sm text-gray-700 dark:text-gray-300">{file.name}</span>
+              <span className="shrink-0 text-xs text-gray-500">
+                {(file.size / (1024 * 1024)).toFixed(1)} MB
+              </span>
+              <button
+                type="button"
+                onClick={() => removeFile(i)}
+                className="shrink-0 text-gray-400 hover:text-red-500 transition-colors"
+                aria-label="Remove file"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Upload progress ──────────────────────────────────────────────── */}
+      {isUploading && (
+        <div className="space-y-1">
+          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+            <span>Uploading…</span>
+            <span>{uploadProgress}%</span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-blue-500 transition-all duration-300"
+              style={{ width: `${uploadProgress}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ── Link Preview ─────────────────────────────────────────────────── */}
+      {linkPreviewData && attachedFiles.length === 0 && (
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => { setLinkPreviewData(null); setDetectedLink(null) }}
+            className="absolute -top-1 -right-1 z-10 rounded-full bg-gray-200 dark:bg-gray-700 p-0.5 hover:bg-gray-300 dark:hover:bg-gray-600"
+            aria-label="Remove link preview"
+          >
+            <X className="h-3.5 w-3.5 text-gray-600 dark:text-gray-300" />
+          </button>
+          <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mb-1">
+            <LinkIcon className="h-3.5 w-3.5" />
+            <span>Link preview</span>
+          </div>
+          <div className="flex overflow-hidden rounded-xl border border-border bg-card">
+            {linkPreviewData.image && (
+              <div className="relative w-24 shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={linkPreviewData.image} alt="" className="h-full w-full object-cover" />
+              </div>
+            )}
+            <div className="flex flex-col justify-center gap-0.5 px-3 py-2 min-w-0">
+              {linkPreviewData.title && (
+                <p className="truncate text-sm font-semibold text-foreground">{linkPreviewData.title}</p>
+              )}
+              {linkPreviewData.description && (
+                <p className="line-clamp-2 text-xs text-muted-foreground">{linkPreviewData.description}</p>
+              )}
+              <p className="truncate text-xs text-muted-foreground">{linkPreviewData.url}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div>
         <button
           type="submit"
-          disabled={isSubmitting || content.trim().length === 0}
+          disabled={isSubmitting || isUploading || (content.trim().length === 0 && attachedFiles.length === 0)}
           className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 sm:text-base flex items-center justify-center gap-2"
           style={{ minHeight: "44px" }}
         >
-          {isSubmitting && <ButtonLoadingSpinner />}
-          {isSubmitting ? "Posting..." : "Post"}
+          {(isSubmitting || isUploading) && <ButtonLoadingSpinner />}
+          {isUploading ? `Uploading ${uploadProgress}%…` : isSubmitting ? "Posting..." : "Post"}
         </button>
       </div>
     </form>

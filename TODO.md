@@ -534,63 +534,68 @@
 
 ## Phase 3 — Content & Media Platform (Weeks 13-18)
 
-### 3.1 Rich Media Posts 🔴 ⏱️ XL
+### 3.1 Rich Media Posts ✅ ⏱️ XL
 
 **Schema:**
-- [ ] Add to `posts` table:
-  - [ ] `mediaUrls`: array of strings (image/video URLs)
-  - [ ] `mediaType`: "image" | "video" | "file" | "link"
-  - [ ] `linkPreview`: object (url, title, description, image)
+- [x] Add to `posts` table:
+  - [x] `mediaUrls`: array of strings (image/video URLs)
+  - [x] `mediaType`: "image" | "video" | "file" | "link"
+  - [x] `mediaFileNames`: array of strings (original filenames)
+  - [x] `linkPreview`: object (url, title, description, image, favicon)
 
 **Backend:**
-- [ ] Update `convex/posts.ts` → `createPost` mutation to handle media uploads
-- [ ] Create `convex/media.ts`
-  - [ ] `generateUploadUrl` mutation — for images/videos/files
-  - [ ] `processImage` action — compress, resize, generate thumbnails (Convex actions + Sharp.js or Cloudflare Images)
-  - [ ] `processVideo` action — generate thumbnail (FFmpeg via external service or Cloud Function)
-  - [ ] `fetchLinkPreview` action — fetch Open Graph metadata from URL
-- [ ] File validation:
-  - [ ] Image: JPEG, PNG, GIF, WebP, max 10MB each, max 10 images
-  - [ ] Video: MP4, WebM, max 100MB, max 1 video per post
-  - [ ] File: PDF, DOCX, PPTX, max 25MB
+- [x] Update `convex/posts.ts` → `createPost` mutation to handle media uploads
+- [x] Create `convex/media.ts`
+  - [x] `generateUploadUrl` mutation — presigned URL for Convex file storage
+  - [x] `getFileUrl` query — resolve storage ID to public URL
+  - [x] `deleteUpload` mutation — delete files from Convex storage
+  - [x] `resolveStorageUrls` mutation — batch resolve storage IDs to URLs
+  - [x] `fetchLinkPreview` action — fetch Open Graph metadata from URL
+- [x] File validation:
+  - [x] Image: JPEG, PNG, GIF, WebP, max 10MB each, max 10 images
+  - [x] Video: MP4, WebM, max 100MB, max 1 video per post
+  - [x] File: PDF, DOCX, PPTX, DOC, TXT, max 25MB
 
 **Frontend:**
-- [ ] Update `PostComposer.tsx`
-  - [ ] Media upload area with drag-and-drop
-  - [ ] Multiple file selection
-  - [ ] Image preview grid with remove button
-  - [ ] Video preview with thumbnail
-  - [ ] File preview with icon + filename
-  - [ ] Automatic link detection → fetch preview
-  - [ ] Upload progress indicators
-- [ ] Create `src/components/posts/MediaGallery.tsx`
-  - [ ] Grid layout for multiple images (1-4 images: different grid templates)
-  - [ ] Single video player with controls
-  - [ ] File download button
-- [ ] Create `src/components/posts/ImageLightbox.tsx`
-  - [ ] Full-screen image viewer
-  - [ ] Swipe/arrow navigation through gallery
-  - [ ] Zoom in/out
-  - [ ] Close button
-- [ ] Create `src/components/posts/LinkPreviewCard.tsx`
-  - [ ] Show favicon, title, description, image
-  - [ ] Click → open link in new tab
-- [ ] Update `PostCard.tsx` to render media
-- [ ] Create `src/components/posts/CodeBlock.tsx` — syntax highlighting with Prism.js or Shiki
-- [ ] LaTeX rendering integration:
-  - [ ] Install `katex`
-  - [ ] Create `src/components/posts/LaTeXRenderer.tsx`
-  - [ ] Parse inline `$...$` and block `$$...$$` in post content
+- [x] Update `PostComposer.tsx`
+  - [x] Media upload area with drag-and-drop
+  - [x] Multiple file selection (images/video/file toolbar buttons)
+  - [x] Image preview grid with remove button
+  - [x] Video preview with icon + filename
+  - [x] File preview list with size indicator
+  - [x] Automatic link detection → fetch Open Graph preview (debounced)
+  - [x] Upload progress bar
+- [x] Create `src/components/posts/MediaGallery.tsx`
+  - [x] Grid layout for multiple images (1-4 images: different grid templates, +N overlay)
+  - [x] Single video player with controls
+  - [x] File download list
+- [x] Create `src/components/posts/ImageLightbox.tsx` (inside MediaGallery.tsx)
+  - [x] Full-screen image viewer
+  - [x] Arrow navigation through gallery
+  - [x] Zoom in/out toggle
+  - [x] Dot indicator + close button + keyboard support
+- [x] Create `src/components/posts/LinkPreviewCard.tsx`
+  - [x] Show favicon, title, description, image
+  - [x] Click → open link in new tab
+- [x] Update `PostCard.tsx` to render MediaGallery + LinkPreviewCard
+- [x] Update `PostContent.tsx` — parse fenced code blocks and block/inline LaTeX segments
+- [x] Create `src/components/posts/CodeBlock.tsx` — syntax highlighting with Prism.js (10+ languages, copy button)
+- [x] LaTeX rendering integration:
+  - [x] Installed `katex`
+  - [x] Created `src/components/posts/LaTeXRenderer.tsx`
+  - [x] Parse inline `$...$` and block `$$...$$` in post content
+  - [x] Import KaTeX + Prism CSS in globals.css
 
 **Infrastructure:**
-- [ ] Migrate from Convex file storage to Cloudflare R2 or AWS S3 (for large files)
-- [ ] Set up CDN for media delivery
-- [ ] Implement image optimization pipeline
+- [ ] Migrate from Convex file storage to Cloudflare R2 or AWS S3 (for large files) — deferred
+- [ ] Set up CDN for media delivery — deferred
+- [ ] Implement image optimization pipeline — deferred
 
 **Tests:**
-- [ ] `convex/media.test.ts`
-- [ ] `src/components/posts/MediaGallery.test.tsx`
-- [ ] Upload integration test
+- [x] `convex/media.test.ts` — 17 tests (auth guards, storage logic, OG parsing, file constants)
+- [x] `src/components/posts/MediaGallery.test.tsx` — 8 tests (render, lightbox, gallery grid)
+- [x] `src/components/posts/PostComposer.test.tsx` — updated for media mutations
+- [x] `src/components/responsive.test.tsx` — updated for new lucide icons
 
 ---
 

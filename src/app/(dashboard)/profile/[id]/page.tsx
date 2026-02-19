@@ -2,7 +2,6 @@
 
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
-import { Id } from "@/convex/_generated/dataModel"
 import { useUser } from "@clerk/nextjs"
 import { ProfileHeader } from "@/components/profile/ProfileHeader"
 import { SkillsManager } from "@/components/profile/SkillsManager"
@@ -20,8 +19,8 @@ interface ProfilePageProps {
 export default function ProfilePage({ params }: ProfilePageProps) {
   const { user: clerkUser, isLoaded, isSignedIn } = useUser()
   const profileUser = useQuery(
-    api.users.getUserById,
-    isLoaded && isSignedIn ? { userId: params.id as Id<"users"> } : "skip"
+    api.users.getUserByIdOrUsername,
+    isLoaded && isSignedIn ? { idOrUsername: params.id } : "skip"
   )
   const currentUser = useQuery(
     api.users.getCurrentUser,
