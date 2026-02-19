@@ -5,6 +5,7 @@ import { PostComposer } from "@/components/posts/PostComposer"
 import { FeedContainer } from "@/components/feed/FeedContainer"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { TrendingHashtags } from "@/components/trending/TrendingHashtags"
+import { StoryRow } from "@/components/stories/StoryRow"
 
 export default function FeedPage() {
   const { isLoaded, isSignedIn } = useUser()
@@ -35,6 +36,13 @@ export default function FeedPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Main Feed - Left Column */}
         <div className="lg:col-span-8 space-y-4 sm:space-y-6">
+          {/* Story Ring Row */}
+          <ErrorBoundary>
+            <div className="rounded-lg bg-white dark:bg-gray-800 shadow dark:shadow-gray-900/50 px-2 py-1">
+              <StoryRow />
+            </div>
+          </ErrorBoundary>
+
           {/* Post Composer */}
           <ErrorBoundary>
             <div className="rounded-lg bg-white dark:bg-gray-800 p-4 shadow dark:shadow-gray-900/50 sm:p-6">

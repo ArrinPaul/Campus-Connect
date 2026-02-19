@@ -599,55 +599,55 @@
 
 ---
 
-### 3.2 Stories / Ephemeral Content 🟡 ⏱️ M
+### 3.2 Stories / Ephemeral Content ✅
 
 **Schema:**
-- [ ] Create `stories` table
-  - [ ] Fields: authorId, content, mediaUrl, backgroundColor, expiresAt, viewCount, createdAt
-  - [ ] Indexes: by_author, by_expiry
-- [ ] Create `storyViews` table
-  - [ ] Fields: storyId, viewerId, viewedAt
-  - [ ] Indexes: by_story, by_viewer
+- [x] Create `stories` table
+  - [x] Fields: authorId, content, mediaUrl, backgroundColor, expiresAt, viewCount, createdAt
+  - [x] Indexes: by_author, by_expiry
+- [x] Create `storyViews` table
+  - [x] Fields: storyId, viewerId, viewedAt
+  - [x] Indexes: by_story, by_viewer
 
 **Backend:**
-- [ ] Create `convex/stories.ts`
-  - [ ] `createStory` mutation — upload image or text-on-color
-  - [ ] `getStories` query — from followed users, not expired, not viewed by current user
-  - [ ] `getStoryById` query
-  - [ ] `viewStory` mutation — increment view count, record view
-  - [ ] `getStoryViewers` query — who viewed (for author only)
-  - [ ] `deleteStory` mutation — own stories only
-- [ ] Convex cron job (every hour) → delete expired stories
+- [x] Create `convex/stories.ts`
+  - [x] `createStory` mutation — upload image or text-on-color
+  - [x] `getStories` query — from followed users, not expired, not viewed by current user
+  - [x] `getStoryById` query
+  - [x] `viewStory` mutation — increment view count, record view
+  - [x] `getStoryViewers` query — who viewed (for author only)
+  - [x] `deleteStory` mutation — own stories only
+- [x] Convex cron job (every hour) → delete expired stories
 
 **Frontend:**
-- [ ] Create `src/app/(dashboard)/stories/page.tsx` — story viewer
-  - [ ] Full-screen story display
-  - [ ] Tap left/right or swipe to navigate
-  - [ ] Progress bars at top (one per story)
-  - [ ] Auto-advance after 5 seconds
-  - [ ] Swipe up/down to skip user
-  - [ ] Close button
-- [ ] Create `src/components/stories/StoryRing.tsx`
-  - [ ] Circular avatar with gradient ring (blue if unseen, gray if seen)
-  - [ ] Show on top of feed, profiles, navbar
-- [ ] Create `src/components/stories/StoryComposer.tsx`
-  - [ ] Camera/gallery upload
-  - [ ] Text-on-color mode (background picker, text input)
-  - [ ] Preview before posting
-  - [ ] "Add to Story" button in navbar
-- [ ] Create story creator flow:
-  - [ ] Click "+" on story ring → open composer modal
-  - [ ] Select image or text mode
-  - [ ] Post → creates story with 24h expiry
-- [ ] Show story rings:
-  - [ ] Horizontal scroll row at top of feed
-  - [ ] On profile header (own profile)
-  - [ ] In navbar (if user has active stories)
+- [x] Create `src/app/(dashboard)/stories/page.tsx` — story viewer
+  - [x] Full-screen story display
+  - [x] Tap left/right or swipe to navigate
+  - [x] Progress bars at top (one per story)
+  - [x] Auto-advance after 5 seconds
+  - [x] Swipe up/down to skip user
+  - [x] Close button
+- [x] Create `src/components/stories/StoryRing.tsx`
+  - [x] Circular avatar with gradient ring (blue if unseen, gray if seen)
+  - [x] Show on top of feed, profiles, navbar
+- [x] Create `src/components/stories/StoryComposer.tsx`
+  - [x] Camera/gallery upload
+  - [x] Text-on-color mode (background picker, text input)
+  - [x] Preview before posting
+  - [x] "Add to Story" button in navbar
+- [x] Create story creator flow:
+  - [x] Click "+" on story ring → open composer modal
+  - [x] Select image or text mode
+  - [x] Post → creates story with 24h expiry
+- [x] Show story rings:
+  - [x] Horizontal scroll row at top of feed
+  - [x] On profile header (own profile)
+  - [x] In navbar (if user has active stories)
 
 **Tests:**
-- [ ] `convex/stories.test.ts`
-- [ ] `src/app/(dashboard)/stories/page.test.tsx`
-- [ ] Story expiry cron job test
+- [x] `convex/stories.test.ts`
+- [x] `src/app/(dashboard)/stories/page.test.tsx`
+- [x] Story expiry cron job test (deleteExpiredStoriesInternal covered in stories.test.ts)
 
 ---
 

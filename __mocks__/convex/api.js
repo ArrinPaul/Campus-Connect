@@ -1,5 +1,13 @@
 // Mock Convex generated API
 export const api = {
+  stories: {
+    createStory: 'stories:createStory',
+    getStories: 'stories:getStories',
+    getStoryById: 'stories:getStoryById',
+    viewStory: 'stories:viewStory',
+    getStoryViewers: 'stories:getStoryViewers',
+    deleteStory: 'stories:deleteStory',
+  },
   users: {
     updateProfile: 'users:updateProfile',
     addSkill: 'users:addSkill',

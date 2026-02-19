@@ -24,6 +24,7 @@ import type * as presence from "../presence.js";
 import type * as reactions from "../reactions.js";
 import type * as reposts from "../reposts.js";
 import type * as sanitize from "../sanitize.js";
+import type * as stories from "../stories.js";
 import type * as users from "../users.js";
 
 import type {
@@ -49,6 +50,7 @@ declare const fullApi: ApiFromModules<{
   reactions: typeof reactions;
   reposts: typeof reposts;
   sanitize: typeof sanitize;
+  stories: typeof stories;
   users: typeof users;
 }>;
 

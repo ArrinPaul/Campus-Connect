@@ -317,4 +317,30 @@ export default defineSchema({
     .index("by_conversation", ["conversationId", "createdAt"])
     .index("by_caller", ["callerId", "createdAt"])
     .index("by_status", ["status", "createdAt"]),
+
+  // Stories — Ephemeral Content (Phase 3.2)
+  stories: defineTable({
+    authorId: v.id("users"),
+    // Text content (optional — may be image-only)
+    content: v.optional(v.string()),
+    // Uploaded media URL (image from Convex storage)
+    mediaUrl: v.optional(v.string()),
+    // Background color for text-only stories (e.g. "#1a73e8")
+    backgroundColor: v.optional(v.string()),
+    // Unix timestamp when story expires (creation + 24h)
+    expiresAt: v.number(),
+    viewCount: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_author", ["authorId", "createdAt"])
+    .index("by_expiry", ["expiresAt"]),
+
+  storyViews: defineTable({
+    storyId: v.id("stories"),
+    viewerId: v.id("users"),
+    viewedAt: v.number(),
+  })
+    .index("by_story", ["storyId", "viewedAt"])
+    .index("by_viewer", ["viewerId", "viewedAt"])
+    .index("by_story_viewer", ["storyId", "viewerId"]),
 })

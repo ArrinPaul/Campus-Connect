@@ -18,6 +18,10 @@ jest.mock("@/components/trending/TrendingHashtags", () => ({
   TrendingHashtags: () => <div data-testid="trending-hashtags">TrendingHashtags</div>,
 }))
 
+jest.mock("@/components/stories/StoryRow", () => ({
+  StoryRow: () => <div data-testid="story-row">StoryRow</div>,
+}))
+
 jest.mock("convex/react", () => ({
   useQuery: jest.fn(() => null),
   useMutation: jest.fn(() => jest.fn()),
