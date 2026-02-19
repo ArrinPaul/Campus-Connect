@@ -1,5 +1,13 @@
 // Mock Convex generated API
 export const api = {
+  polls: {
+    createPoll: 'polls:createPoll',
+    linkPollToPost: 'polls:linkPollToPost',
+    vote: 'polls:vote',
+    getPollResults: 'polls:getPollResults',
+    getUserVote: 'polls:getUserVote',
+    deletePoll: 'polls:deletePoll',
+  },
   stories: {
     createStory: 'stories:createStory',
     getStories: 'stories:getStories',

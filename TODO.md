@@ -651,39 +651,46 @@
 
 ---
 
-### 3.3 Polls & Surveys 🟢 ⏱️ M
+### 3.3 Polls & Surveys ✅
 
 **Schema:**
-- [ ] Create `polls` table
-  - [ ] Fields: postId, options (array of {id, text, voteCount}), totalVotes, endsAt, isAnonymous, createdAt
-  - [ ] Indexes: by_post
-- [ ] Create `pollVotes` table
-  - [ ] Fields: pollId, userId, optionId, createdAt
-  - [ ] Indexes: by_poll, by_user_poll
+- [x] Create `polls` table
+  - [x] Fields: postId, options (array of {id, text, voteCount}), totalVotes, endsAt, isAnonymous, createdAt
+  - [x] Indexes: by_post, by_author
+- [x] Create `pollVotes` table
+  - [x] Fields: pollId, userId, optionId, createdAt
+  - [x] Indexes: by_poll, by_user_poll
+- [x] Add `pollId` optional field to `posts` table
 
 **Backend:**
-- [ ] Create `convex/polls.ts`
-  - [ ] `createPoll` mutation — linked to a post, 2-6 options, duration
-  - [ ] `vote` mutation — validate not expired, upsert vote (allow change)
-  - [ ] `getPollResults` query — get vote counts per option
-  - [ ] `getUserVote` query — check what user voted for
-- [ ] Update `posts.ts` → `createPost` to support poll creation
+- [x] Create `convex/polls.ts`
+  - [x] `createPoll` mutation — 2-6 options, optional duration, anonymous flag
+  - [x] `linkPollToPost` mutation — set two-way reference after post creation
+  - [x] `vote` mutation — validate not expired, upsert vote (allow change)
+  - [x] `getPollResults` query — get vote counts per option + isExpired flag
+  - [x] `getUserVote` query — check what user voted for
+  - [x] `deletePoll` mutation — own polls only, cascades votes
+- [x] Update `posts.ts` → `createPost` to accept optional `pollId`
 
 **Frontend:**
-- [ ] Update `PostComposer.tsx`
-  - [ ] "Add Poll" button
-  - [ ] Poll creation UI: add options (2-6), duration dropdown
-- [ ] Create `src/components/posts/PollCard.tsx`
-  - [ ] Show options as buttons (before voting)
-  - [ ] Show results as progress bars (after voting or after poll ends)
-  - [ ] Display total votes and time remaining
-  - [ ] Highlight user's vote with checkmark
-  - [ ] "Final Results" badge if expired
-- [ ] Embed poll in PostCard when post has poll
+- [x] Update `PostComposer.tsx`
+  - [x] "Poll" toolbar button (BarChart2 icon, toggles UI)
+  - [x] Poll creation UI: add/remove options (2-6), duration dropdown, anonymous checkbox
+  - [x] Inline preview of options before posting
+  - [x] Poll created before post, then linked via `linkPollToPost`
+- [x] Create `src/components/posts/PollCard.tsx`
+  - [x] Show options as clickable buttons (before voting)
+  - [x] Show results as animated progress bars (after voting or after poll ends)
+  - [x] Display total votes and time remaining
+  - [x] Highlight user's vote with checkmark icon
+  - [x] "Final Results" badge if expired
+  - [x] Loading skeleton while data loads
+  - [x] Anonymous badge when applicable
+- [x] Embed poll in PostCard when post has pollId
 
 **Tests:**
-- [ ] `convex/polls.test.ts`
-- [ ] `src/components/posts/PollCard.test.tsx`
+- [x] `convex/polls.test.ts` (25 tests)
+- [x] `src/components/posts/PollCard.test.tsx` (12 tests)
 
 ---
 

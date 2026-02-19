@@ -20,6 +20,7 @@ import type * as mentionUtils from "../mentionUtils.js";
 import type * as messages from "../messages.js";
 import type * as notifications from "../notifications.js";
 import type * as posts from "../posts.js";
+import type * as polls from "../polls.js";
 import type * as presence from "../presence.js";
 import type * as reactions from "../reactions.js";
 import type * as reposts from "../reposts.js";
@@ -46,6 +47,7 @@ declare const fullApi: ApiFromModules<{
   messages: typeof messages;
   notifications: typeof notifications;
   posts: typeof posts;
+  polls: typeof polls;
   presence: typeof presence;
   reactions: typeof reactions;
   reposts: typeof reposts;

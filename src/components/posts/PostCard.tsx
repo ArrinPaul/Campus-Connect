@@ -16,6 +16,7 @@ import { PostContent } from "@/components/posts/PostContent"
 import { RepostModal } from "@/components/posts/RepostModal"
 import { MediaGallery } from "@/components/posts/MediaGallery"
 import { LinkPreviewCard } from "@/components/posts/LinkPreviewCard"
+import { PollCard } from "@/components/posts/PollCard"
 
 interface User {
   _id: Id<"users">
@@ -43,6 +44,7 @@ interface Post {
     image?: string
     favicon?: string
   }
+  pollId?: Id<"polls">
 }
 
 interface PostCardProps {
@@ -254,6 +256,11 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
           image={post.linkPreview.image}
           favicon={post.linkPreview.favicon}
         />
+      )}
+
+      {/* Poll */}
+      {post.pollId && (
+        <PollCard pollId={post.pollId} />
       )}
 
       {/* Engagement Stats and Actions */}

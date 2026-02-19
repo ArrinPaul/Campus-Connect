@@ -159,6 +159,8 @@ export const createPost = mutation({
         favicon: v.optional(v.string()),
       })
     ),
+    // Phase 3.3 — attach a pre-created poll
+    pollId: v.optional(v.id("polls")),
   },
   handler: async (ctx, args) => {
     // Require authentication
@@ -204,6 +206,7 @@ export const createPost = mutation({
       ...(args.mediaType ? { mediaType: args.mediaType } : {}),
       ...(args.mediaFileNames ? { mediaFileNames: args.mediaFileNames } : {}),
       ...(args.linkPreview ? { linkPreview: args.linkPreview } : {}),
+      ...(args.pollId ? { pollId: args.pollId } : {}),
     })
 
     // Link hashtags to post

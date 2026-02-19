@@ -15,6 +15,9 @@ import {
   X,
   Link as LinkIcon,
   Loader2,
+  BarChart2,
+  Plus,
+  Trash2,
 } from "lucide-react"
 
 // Client-side file type / size constants (mirrored from convex/media.ts)
@@ -41,6 +44,8 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
   const generateUploadUrl = useMutation(api.media.generateUploadUrl)
   const resolveStorageUrls = useMutation(api.media.resolveStorageUrls)
   const fetchLinkPreview = useAction(api.media.fetchLinkPreview)
+  const createPollMutation = useMutation(api.polls.createPoll)
+  const linkPollToPost = useMutation(api.polls.linkPollToPost)
 
   const [content, setContent] = useState("")
   const [error, setError] = useState("")
@@ -63,6 +68,12 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
     url: string; title?: string; description?: string; image?: string; favicon?: string
   } | null>(null)
   const [isFetchingPreview, setIsFetchingPreview] = useState(false)
+
+  // ── Poll state ─────────────────────────────────────────────────────────
+  const [showPollUI, setShowPollUI] = useState(false)
+  const [pollOptions, setPollOptions] = useState(["Option 1", "Option 2"])
+  const [pollDuration, setPollDuration] = useState<number | undefined>(24)
+  const [pollIsAnonymous, setPollIsAnonymous] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -370,9 +381,33 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
     setIsSubmitting(true)
 
     try {
+      let postId: string | undefined
+      let pollId: string | undefined
       let mediaUrls: string[] | undefined
       let finalMediaType: "image" | "video" | "file" | "link" | undefined
       let mediaFileNames: string[] | undefined
+
+      // ── Create poll first if active ──────────────────────────────────
+      if (showPollUI) {
+        const validOptions = pollOptions.map((o) => o.trim()).filter(Boolean)
+        if (validOptions.length < 2) {
+          setError("A poll needs at least 2 options")
+          setIsSubmitting(false)
+          return
+        }
+        for (const opt of validOptions) {
+          if (opt.length > 100) {
+            setError("Each poll option must be 100 characters or fewer")
+            setIsSubmitting(false)
+            return
+          }
+        }
+        pollId = await createPollMutation({
+          options: validOptions,
+          durationHours: pollDuration,
+          isAnonymous: pollIsAnonymous,
+        }) as string
+      }
 
       // ── Upload files if any ──────────────────────────────────────────
       if (attachedFiles.length > 0 && attachedType) {
@@ -417,13 +452,20 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
         finalMediaType = "link"
       }
 
-      await createPost({
+      const createdPost = await createPost({
         content: content.trim() || " ", // Convex requires non-empty, use space if media-only
         mediaUrls,
         mediaType: finalMediaType,
         mediaFileNames,
         linkPreview: linkPreviewData ?? undefined,
+        ...(pollId ? { pollId: pollId as any } : {}),
       })
+      postId = createdPost?._id as string | undefined
+
+      // Link poll to post (set two-way reference)
+      if (pollId && postId) {
+        await linkPollToPost({ pollId: pollId as any, postId: postId as any })
+      }
 
       // Clear form after successful post
       setContent("")
@@ -434,6 +476,10 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
       setLinkPreviewData(null)
       setDetectedLink(null)
       setUploadProgress(0)
+      setShowPollUI(false)
+      setPollOptions(["Option 1", "Option 2"])
+      setPollDuration(24)
+      setPollIsAnonymous(false)
 
       if (onPostCreated) {
         onPostCreated()
@@ -639,6 +685,21 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
           <span className="hidden sm:inline">File</span>
         </button>
 
+        {/* Poll toggle */}
+        <button
+          type="button"
+          onClick={() => setShowPollUI((v) => !v)}
+          className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+            showPollUI
+              ? "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400"
+              : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+          }`}
+          title="Add poll"
+        >
+          <BarChart2 className="h-4 w-4" />
+          <span className="hidden sm:inline">Poll</span>
+        </button>
+
         {isFetchingPreview && (
           <div className="ml-auto flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -646,6 +707,100 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
           </div>
         )}
       </div>
+
+      {/* ── Poll Creator ─────────────────────────────────────────────────── */}
+      {showPollUI && (
+        <div className="rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30 p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-blue-700 dark:text-blue-300 flex items-center gap-1.5">
+              <BarChart2 className="h-4 w-4" />
+              Create Poll
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setShowPollUI(false)
+                setPollOptions(["Option 1", "Option 2"])
+              }}
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              aria-label="Remove poll"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Options */}
+          <div className="space-y-2">
+            {pollOptions.map((opt, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={opt}
+                  onChange={(e) => {
+                    const next = [...pollOptions]
+                    next[i] = e.target.value
+                    setPollOptions(next)
+                  }}
+                  placeholder={`Option ${i + 1}`}
+                  maxLength={100}
+                  className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                {pollOptions.length > 2 && (
+                  <button
+                    type="button"
+                    onClick={() => setPollOptions((prev) => prev.filter((_, idx) => idx !== i))}
+                    className="text-gray-400 hover:text-red-500 transition-colors"
+                    aria-label="Remove option"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            ))}
+            {pollOptions.length < 6 && (
+              <button
+                type="button"
+                onClick={() => setPollOptions((prev) => [...prev, ""])}
+                className="flex items-center gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Add option
+              </button>
+            )}
+          </div>
+
+          {/* Duration & Anonymous */}
+          <div className="flex flex-wrap items-center gap-4 pt-1 border-t border-blue-200 dark:border-blue-800">
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">Duration</label>
+              <select
+                value={pollDuration ?? ""}
+                onChange={(e) =>
+                  setPollDuration(e.target.value ? Number(e.target.value) : undefined)
+                }
+                className="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1 text-xs text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="1">1 hour</option>
+                <option value="6">6 hours</option>
+                <option value="12">12 hours</option>
+                <option value="24">1 day</option>
+                <option value="72">3 days</option>
+                <option value="168">1 week</option>
+                <option value="">No expiry</option>
+              </select>
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={pollIsAnonymous}
+                onChange={(e) => setPollIsAnonymous(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-xs text-gray-600 dark:text-gray-400">Anonymous votes</span>
+            </label>
+          </div>
+        </div>
+      )}
 
       {/* ── Image Previews ───────────────────────────────────────────────── */}
       {attachedType === "image" && filePreviews.length > 0 && (

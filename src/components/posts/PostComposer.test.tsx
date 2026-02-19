@@ -35,6 +35,10 @@ jest.mock("../../../convex/_generated/api", () => ({
       resolveStorageUrls: "media:resolveStorageUrls",
       fetchLinkPreview: "media:fetchLinkPreview",
     },
+    polls: {
+      createPoll: "polls:createPoll",
+      linkPollToPost: "polls:linkPollToPost",
+    },
   },
 }))
 

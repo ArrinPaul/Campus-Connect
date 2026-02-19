@@ -94,6 +94,8 @@ export default defineSchema({
         favicon: v.optional(v.string()),
       })
     ),
+    // Phase 3.3 — Poll attachment
+    pollId: v.optional(v.id("polls")),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -343,4 +345,34 @@ export default defineSchema({
     .index("by_story", ["storyId", "viewedAt"])
     .index("by_viewer", ["viewerId", "viewedAt"])
     .index("by_story_viewer", ["storyId", "viewerId"]),
+
+  // Phase 3.3 — Polls & Surveys
+  polls: defineTable({
+    postId: v.optional(v.id("posts")), // linked post (set after post creation)
+    authorId: v.id("users"),
+    question: v.optional(v.string()), // optional separate question text
+    options: v.array(
+      v.object({
+        id: v.string(),      // stable UUID for the option
+        text: v.string(),    // display text
+        voteCount: v.number(),
+      })
+    ),
+    totalVotes: v.number(),
+    // Unix timestamp when poll closes (null = never)
+    endsAt: v.optional(v.number()),
+    isAnonymous: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_post", ["postId"])
+    .index("by_author", ["authorId"]),
+
+  pollVotes: defineTable({
+    pollId: v.id("polls"),
+    userId: v.id("users"),
+    optionId: v.string(), // references polls.options[n].id
+    createdAt: v.number(),
+  })
+    .index("by_poll", ["pollId", "createdAt"])
+    .index("by_user_poll", ["userId", "pollId"]),
 })

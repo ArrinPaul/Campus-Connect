@@ -54,6 +54,18 @@ jest.mock("lucide-react", () => ({
   X: (props: any) => <svg {...props} />,
   Link: (props: any) => <svg {...props} />,
   Loader2: (props: any) => <svg {...props} />,
+  // Phase 3.3 — Poll icons
+  BarChart2: (props: any) => <svg {...props} />,
+  Plus: (props: any) => <svg {...props} />,
+  Trash2: (props: any) => <svg {...props} />,
+  // PollCard icons
+  CheckCircle2: (props: any) => <svg {...props} />,
+  Clock: (props: any) => <svg {...props} />,
+  Lock: (props: any) => <svg {...props} />,
+}))
+
+jest.mock("@/components/posts/PollCard", () => ({
+  PollCard: () => <div data-testid="poll-card">PollCard</div>,
 }))
 
 describe("Responsive Component Behavior", () => {
