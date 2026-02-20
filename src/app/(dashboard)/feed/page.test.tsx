@@ -22,6 +22,10 @@ jest.mock("@/components/stories/StoryRow", () => ({
   StoryRow: () => <div data-testid="story-row">StoryRow</div>,
 }))
 
+jest.mock("@/components/discover/SuggestedUsers", () => ({
+  SuggestedUsers: () => <div data-testid="suggested-users">SuggestedUsers</div>,
+}))
+
 jest.mock("convex/react", () => ({
   useQuery: jest.fn(() => null),
   useMutation: jest.fn(() => jest.fn()),

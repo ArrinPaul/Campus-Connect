@@ -12,6 +12,7 @@ import type * as bookmarks from "../bookmarks.js";
 import type * as calls from "../calls.js";
 import type * as comments from "../comments.js";
 import type * as conversations from "../conversations.js";
+import type * as feedRanking from "../feed-ranking.js";
 import type * as follows from "../follows.js";
 import type * as hashtags from "../hashtags.js";
 import type * as http from "../http.js";
@@ -26,6 +27,7 @@ import type * as reactions from "../reactions.js";
 import type * as reposts from "../reposts.js";
 import type * as sanitize from "../sanitize.js";
 import type * as stories from "../stories.js";
+import type * as suggestions from "../suggestions.js";
 import type * as users from "../users.js";
 
 import type {
@@ -39,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   calls: typeof calls;
   comments: typeof comments;
   conversations: typeof conversations;
+  feedRanking: typeof feedRanking;
   follows: typeof follows;
   hashtags: typeof hashtags;
   http: typeof http;
@@ -53,6 +56,7 @@ declare const fullApi: ApiFromModules<{
   reposts: typeof reposts;
   sanitize: typeof sanitize;
   stories: typeof stories;
+  suggestions: typeof suggestions;
   users: typeof users;
 }>;
 

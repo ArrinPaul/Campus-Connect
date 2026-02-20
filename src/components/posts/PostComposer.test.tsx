@@ -1,6 +1,44 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { PostComposer } from "./PostComposer"
 
+// Mock the RichTextEditor to avoid ESM/TipTap dependencies in Jest
+jest.mock("@/components/editor/RichTextEditor", () => ({
+  RichTextEditor: ({
+    value,
+    onChange,
+    placeholder,
+    maxLength,
+    disabled,
+  }: {
+    value: string
+    onChange: (v: string) => void
+    placeholder?: string
+    maxLength?: number
+    disabled?: boolean
+  }) => (
+    <div>
+      <textarea
+        aria-label="What's on your mind?"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        disabled={disabled}
+      />
+      {maxLength != null && (
+        <span
+          className={
+            value.length > maxLength
+              ? "text-red-600 dark:text-red-400"
+              : "text-gray-500 dark:text-gray-400"
+          }
+        >
+          {value.length}/{maxLength}
+        </span>
+      )}
+    </div>
+  ),
+}))
+
 // Mock convex/react
 const mockCreatePost = jest.fn()
 const mockGenerateUploadUrl = jest.fn()

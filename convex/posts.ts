@@ -1,7 +1,7 @@
 import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
 import { Id } from "./_generated/dataModel"
-import { sanitizeText } from "./sanitize"
+import { sanitizeText, sanitizeMarkdown } from "./sanitize"
 import { linkHashtagsToPost } from "./hashtags"
 import { extractMentions } from "./mentionUtils"
 
@@ -189,8 +189,8 @@ export const createPost = mutation({
       throw new Error("Post content must not exceed 5000 characters")
     }
 
-    // Sanitize content to prevent XSS attacks
-    const sanitizedContent = sanitizeText(args.content)
+    // Sanitize content — preserves markdown syntax while blocking XSS
+    const sanitizedContent = sanitizeMarkdown(args.content)
 
     // Create post with initialized counts
     const now = Date.now()

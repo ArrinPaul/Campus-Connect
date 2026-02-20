@@ -7,25 +7,80 @@ import { api } from "@/convex/_generated/api"
 import { PostCard } from "@/components/posts/PostCard"
 import { InfiniteScrollTrigger } from "./InfiniteScrollTrigger"
 import { Repeat2 } from "lucide-react"
+import type { FeedType } from "@/app/(dashboard)/feed/page"
 
-export function FeedContainer() {
+interface FeedContainerProps {
+  feedType?: FeedType
+}
+
+export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
   const { isLoaded, isSignedIn } = useUser()
   const [allItems, setAllItems] = useState<any[]>([])
   const [cursor, setCursor] = useState<string | null>(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const hasInitializedRef = useRef(false)
+  const prevFeedTypeRef = useRef(feedType)
 
-  // Initial query - use unified feed that includes reposts
-  const feedData = useQuery(
+  // Determine which query to use based on feedType
+  const queryArgs = isLoaded && isSignedIn ? { limit: 20 } : "skip" as const
+  const moreQueryArgs =
+    isLoaded && isSignedIn && cursor && isLoadingMore
+      ? { limit: 20, cursor }
+      : ("skip" as const)
+
+  // Queries for each feed type (Convex requires static query references)
+  const followingData = useQuery(
     api.posts.getUnifiedFeed,
-    isLoaded && isSignedIn ? { limit: 20 } : "skip"
+    feedType === "following" ? queryArgs : "skip"
+  )
+  const forYouData = useQuery(
+    api.feedRanking.getRankedFeed,
+    feedType === "for-you" ? queryArgs : "skip"
+  )
+  const trendingData = useQuery(
+    api.feedRanking.getTrendingFeed,
+    feedType === "trending" ? queryArgs : "skip"
   )
 
-  // Query for loading more items
-  const moreFeedData = useQuery(
+  // More data queries
+  const moreFollowingData = useQuery(
     api.posts.getUnifiedFeed,
-    isLoaded && isSignedIn && cursor && isLoadingMore ? { limit: 20, cursor } : "skip"
+    feedType === "following" ? moreQueryArgs : "skip"
   )
+  const moreForYouData = useQuery(
+    api.feedRanking.getRankedFeed,
+    feedType === "for-you" ? moreQueryArgs : "skip"
+  )
+  const moreTrendingData = useQuery(
+    api.feedRanking.getTrendingFeed,
+    feedType === "trending" ? moreQueryArgs : "skip"
+  )
+
+  // Select active feed data based on feedType
+  const feedData =
+    feedType === "for-you"
+      ? forYouData
+      : feedType === "trending"
+        ? trendingData
+        : followingData
+
+  const moreFeedData =
+    feedType === "for-you"
+      ? moreForYouData
+      : feedType === "trending"
+        ? moreTrendingData
+        : moreFollowingData
+
+  // Reset when feed type changes
+  useEffect(() => {
+    if (prevFeedTypeRef.current !== feedType) {
+      setAllItems([])
+      setCursor(null)
+      setIsLoadingMore(false)
+      hasInitializedRef.current = false
+      prevFeedTypeRef.current = feedType
+    }
+  }, [feedType])
 
   // Update allItems when initial data loads or updates (real-time)
   useEffect(() => {
@@ -62,27 +117,30 @@ export function FeedContainer() {
     }
   }, [isLoadingMore, cursor])
 
-  // Show loading state while auth is being checked
-  if (!isLoaded) {
-    return (
-      <div className="space-y-3 sm:space-y-4">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="animate-pulse rounded-lg bg-white dark:bg-gray-800 p-4 shadow dark:shadow-gray-900/50 sm:p-6">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 sm:h-10 sm:w-10" />
-              <div className="flex-1 space-y-2">
-                <div className="h-3 w-24 rounded bg-gray-200 dark:bg-gray-700 sm:h-4 sm:w-32" />
-                <div className="h-2 w-16 rounded bg-gray-200 dark:bg-gray-700 sm:h-3 sm:w-24" />
-              </div>
-            </div>
-            <div className="mt-3 space-y-2 sm:mt-4">
-              <div className="h-3 w-full rounded bg-gray-200 dark:bg-gray-700 sm:h-4" />
-              <div className="h-3 w-3/4 rounded bg-gray-200 dark:bg-gray-700 sm:h-4" />
+  // Loading skeleton
+  const LoadingSkeleton = () => (
+    <div className="space-y-3 sm:space-y-4">
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className="animate-pulse rounded-lg bg-white dark:bg-gray-800 p-4 shadow dark:shadow-gray-900/50 sm:p-6">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 sm:h-10 sm:w-10" />
+            <div className="flex-1 space-y-2">
+              <div className="h-3 w-24 rounded bg-gray-200 dark:bg-gray-700 sm:h-4 sm:w-32" />
+              <div className="h-2 w-16 rounded bg-gray-200 dark:bg-gray-700 sm:h-3 sm:w-24" />
             </div>
           </div>
-        ))}
-      </div>
-    )
+          <div className="mt-3 space-y-2 sm:mt-4">
+            <div className="h-3 w-full rounded bg-gray-200 dark:bg-gray-700 sm:h-4" />
+            <div className="h-3 w-3/4 rounded bg-gray-200 dark:bg-gray-700 sm:h-4" />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+
+  // Show loading state while auth is being checked
+  if (!isLoaded) {
+    return <LoadingSkeleton />
   }
 
   // Handle not authenticated
@@ -96,29 +154,28 @@ export function FeedContainer() {
 
   // Initial loading state
   if (feedData === undefined) {
-    return (
-      <div className="space-y-3 sm:space-y-4">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="animate-pulse rounded-lg bg-white dark:bg-gray-800 p-4 shadow dark:shadow-gray-900/50 sm:p-6">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 sm:h-10 sm:w-10" />
-              <div className="flex-1 space-y-2">
-                <div className="h-3 w-24 rounded bg-gray-200 dark:bg-gray-700 sm:h-4 sm:w-32" />
-                <div className="h-2 w-16 rounded bg-gray-200 dark:bg-gray-700 sm:h-3 sm:w-24" />
-              </div>
-            </div>
-            <div className="mt-3 space-y-2 sm:mt-4">
-              <div className="h-3 w-full rounded bg-gray-200 dark:bg-gray-700 sm:h-4" />
-              <div className="h-3 w-3/4 rounded bg-gray-200 dark:bg-gray-700 sm:h-4" />
-            </div>
-          </div>
-        ))}
-      </div>
-    )
+    return <LoadingSkeleton />
   }
 
   // Empty state
   if (allItems.length === 0 && hasInitializedRef.current) {
+    const emptyMessages: Record<FeedType, { title: string; description: string }> = {
+      "for-you": {
+        title: "No recommendations yet",
+        description: "Add skills to your profile and interact with posts to get personalized recommendations.",
+      },
+      following: {
+        title: "No posts yet",
+        description: "Be the first to share something or follow users to see their posts here.",
+      },
+      trending: {
+        title: "Nothing trending",
+        description: "No posts have gained traction recently. Check back later!",
+      },
+    }
+
+    const { title, description } = emptyMessages[feedType]
+
     return (
       <div className="rounded-lg bg-white dark:bg-gray-800 p-8 text-center shadow dark:shadow-gray-900/50 sm:p-12">
         <svg
@@ -135,9 +192,9 @@ export function FeedContainer() {
             d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
           />
         </svg>
-        <h3 className="mt-3 text-base font-medium text-gray-900 dark:text-gray-100 sm:mt-4 sm:text-lg">No posts yet</h3>
+        <h3 className="mt-3 text-base font-medium text-gray-900 dark:text-gray-100 sm:mt-4 sm:text-lg">{title}</h3>
         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 sm:mt-2 sm:text-sm">
-          Be the first to share something or follow users to see their posts here.
+          {description}
         </p>
       </div>
     )

@@ -375,4 +375,16 @@ export default defineSchema({
   })
     .index("by_poll", ["pollId", "createdAt"])
     .index("by_user_poll", ["userId", "pollId"]),
+
+  // Phase 4.1 — Friend Suggestion Engine
+  suggestions: defineTable({
+    userId: v.id("users"),             // user receiving the suggestion
+    suggestedUserId: v.id("users"),    // suggested user to follow
+    score: v.number(),                 // composite score 0–1
+    reasons: v.array(v.string()),      // human-readable reason strings
+    isDismissed: v.boolean(),          // user dismissed this suggestion
+    computedAt: v.number(),            // timestamp when computed
+  })
+    .index("by_user", ["userId", "score"])
+    .index("by_user_dismissed", ["userId", "isDismissed"]),
 })

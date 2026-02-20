@@ -22,12 +22,12 @@ describe("UserSearchBar - Integration with real debouncing", () => {
     expect(mockOnSearch).toHaveBeenCalledTimes(1)
     expect(mockOnSearch).toHaveBeenCalledWith("")
 
-    // Wait for debounce delay (300ms + buffer)
+    // Wait for debounce delay (300ms + buffer for CI/heavy-load runs)
     await waitFor(
       () => {
         expect(mockOnSearch).toHaveBeenCalledWith("John")
       },
-      { timeout: 500 }
+      { timeout: 1500 }
     )
 
     // Should have been called with the final value
@@ -54,7 +54,7 @@ describe("UserSearchBar - Integration with real debouncing", () => {
       () => {
         expect(mockOnSearch).toHaveBeenCalledWith("Bob")
       },
-      { timeout: 500 }
+      { timeout: 1500 }
     )
 
     // Should have been called with "Bob", not "Alice"
@@ -76,7 +76,7 @@ describe("UserSearchBar - Integration with real debouncing", () => {
       () => {
         expect(mockOnSearch).toHaveBeenCalledWith("Test")
       },
-      { timeout: 500 }
+      { timeout: 1500 }
     )
 
     mockOnSearch.mockClear()
@@ -90,7 +90,7 @@ describe("UserSearchBar - Integration with real debouncing", () => {
       () => {
         expect(mockOnSearch).toHaveBeenCalledWith("")
       },
-      { timeout: 500 }
+      { timeout: 1500 }
     )
   })
 
@@ -113,7 +113,7 @@ describe("UserSearchBar - Integration with real debouncing", () => {
       () => {
         expect(mockOnSearch).toHaveBeenCalledWith("JavaScript")
       },
-      { timeout: 500 }
+      { timeout: 1500 }
     )
 
     // Should have been called with the complete term

@@ -8,6 +8,7 @@ import { UserSearchBar } from "@/components/profile/UserSearchBar"
 import { UserFilterPanel } from "@/components/profile/UserFilterPanel"
 import { UserCard } from "@/components/profile/UserCard"
 import { UserCardSkeleton } from "@/components/ui/loading-skeleton"
+import { SuggestedUsers } from "@/components/discover/SuggestedUsers"
 
 interface FilterCriteria {
   role?: "Student" | "Research Scholar" | "Faculty"
@@ -51,9 +52,12 @@ export default function DiscoverPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-4">
-        {/* Sidebar with filters - Hidden on mobile, shown on tablet+ */}
+        {/* Sidebar with filters + suggestions - Hidden on mobile, shown on tablet+ */}
         <aside className="hidden lg:col-span-1 lg:block">
-          <UserFilterPanel onFilterChange={handleFilterChange} />
+          <div className="space-y-4">
+            <UserFilterPanel onFilterChange={handleFilterChange} />
+            <SuggestedUsers limit={5} showSeeAll />
+          </div>
         </aside>
 
         {/* Main content area */}

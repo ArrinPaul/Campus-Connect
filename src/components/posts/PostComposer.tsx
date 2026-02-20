@@ -4,9 +4,8 @@ import { useState, useRef, useEffect, useCallback } from "react"
 import { useMutation, useQuery, useAction } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
-import { parseHashtags } from "../../../lib/hashtag-utils"
-import { parseMentions } from "../../../lib/mention-utils"
 import { MentionAutocomplete } from "./MentionAutocomplete"
+import { RichTextEditor } from "@/components/editor/RichTextEditor"
 import Image from "next/image"
 import {
   Image as ImageIcon,
@@ -55,7 +54,6 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
   const [hashtagAutocompleteQuery, setHashtagAutocompleteQuery] = useState("")
   const [mentionAutocompleteQuery, setMentionAutocompleteQuery] = useState("")
   const [selectedHashtagIndex, setSelectedHashtagIndex] = useState(0)
-  const [cursorPosition, setCursorPosition] = useState(0)
 
   // Media state
   const [attachedFiles, setAttachedFiles] = useState<File[]>([])
@@ -76,7 +74,6 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
   const [pollIsAnonymous, setPollIsAnonymous] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const linkDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const maxLength = 5000
@@ -227,58 +224,37 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
       : "skip"
   )
 
-  // Detect hashtag or mention being typed
+  // Detect hashtag or mention being typed (string-based, no cursor dependency)
   useEffect(() => {
-    if (!textareaRef.current) return
-
-    const position = textareaRef.current.selectionStart
-    const textBeforeCursor = content.substring(0, position)
-    
-    // Check for @ mention (prioritize over hashtag if both present)
-    const lastAtIndex = textBeforeCursor.lastIndexOf("@")
-    if (lastAtIndex !== -1) {
-      const textAfterAt = textBeforeCursor.substring(lastAtIndex + 1)
-      
-      // Check if we're still typing the mention (no spaces)
-      if (!textAfterAt.includes(" ") && !textAfterAt.includes("\n")) {
-        setMentionAutocompleteQuery(textAfterAt)
-        setShowMentionAutocomplete(true)
-        setShowHashtagAutocomplete(false)
-        return
-      }
-    }
-    
-    // Check for # hashtag
-    const lastHashIndex = textBeforeCursor.lastIndexOf("#")
-    if (lastHashIndex !== -1) {
-      const textAfterHash = textBeforeCursor.substring(lastHashIndex + 1)
-      
-      // Check if we're still typing the hashtag (no spaces)
-      if (!textAfterHash.includes(" ") && !textAfterHash.includes("\n")) {
-        setHashtagAutocompleteQuery(textAfterHash)
-        setShowHashtagAutocomplete(true)
-        setShowMentionAutocomplete(false)
-        setSelectedHashtagIndex(0)
-        return
-      }
-    }
-    
-    setShowHashtagAutocomplete(false)
-    setShowMentionAutocomplete(false)
-  }, [content, cursorPosition])
-
-  // Handle keyboard navigation in autocomplete
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Only handle hashtag autocomplete keyboard events (mentions have their own)
-    if (!showHashtagAutocomplete || !hashtagSuggestions || hashtagSuggestions.length === 0) {
+    // Check for @ mention at end of content (last word starts with @)
+    const lastAtMatch = content.match(/(?:^|\s)@([^\s@]*)$/);
+    if (lastAtMatch) {
+      setMentionAutocompleteQuery(lastAtMatch[1])
+      setShowMentionAutocomplete(true)
+      setShowHashtagAutocomplete(false)
       return
     }
 
+    // Check for # hashtag at end of content (last word starts with #)
+    const lastHashMatch = content.match(/(?:^|\s)#([^\s#]*)$/)
+    if (lastHashMatch) {
+      setHashtagAutocompleteQuery(lastHashMatch[1])
+      setShowHashtagAutocomplete(true)
+      setShowMentionAutocomplete(false)
+      setSelectedHashtagIndex(0)
+      return
+    }
+
+    setShowHashtagAutocomplete(false)
+    setShowMentionAutocomplete(false)
+  }, [content])
+
+  // Keyboard navigation for hashtag autocomplete (via onKeyDown on wrapper div)
+  const handleWrapperKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!showHashtagAutocomplete || !hashtagSuggestions || hashtagSuggestions.length === 0) return
     if (e.key === "ArrowDown") {
       e.preventDefault()
-      setSelectedHashtagIndex((prev) => 
-        prev < hashtagSuggestions.length - 1 ? prev + 1 : prev
-      )
+      setSelectedHashtagIndex((prev) => (prev < hashtagSuggestions.length - 1 ? prev + 1 : prev))
     } else if (e.key === "ArrowUp") {
       e.preventDefault()
       setSelectedHashtagIndex((prev) => (prev > 0 ? prev - 1 : 0))
@@ -290,74 +266,22 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
     }
   }
 
-  // Insert selected hashtag
+  // Insert selected hashtag (replace trailing #word at end of content)
   const insertHashtag = (tag: string) => {
-    if (!textareaRef.current) return
-
-    const position = textareaRef.current.selectionStart
-    const textBeforeCursor = content.substring(0, position)
-    const textAfterCursor = content.substring(position)
-    
-    // Find the last # before cursor
-    const lastHashIndex = textBeforeCursor.lastIndexOf("#")
-    
-    if (lastHashIndex !== -1) {
-      const newContent = 
-        content.substring(0, lastHashIndex) + 
-        `#${tag} ` + 
-        textAfterCursor
-      
-      setContent(newContent)
-      setShowHashtagAutocomplete(false)
-      
-      // Set cursor position after inserted hashtag
-      setTimeout(() => {
-        if (textareaRef.current) {
-          const newPosition = lastHashIndex + tag.length + 2 // +2 for # and space
-          textareaRef.current.selectionStart = newPosition
-          textareaRef.current.selectionEnd = newPosition
-          textareaRef.current.focus()
-        }
-      }, 0)
-    }
+    const newContent = content.replace(/(?:^|(?<=\s))#[^\s#]*$/, `#${tag} `)
+    setContent(newContent !== content ? newContent : content + `#${tag} `)
+    setShowHashtagAutocomplete(false)
   }
 
-  // Insert selected mention
+  // Insert selected mention (replace trailing @word at end of content)
   const insertMention = (username: string) => {
-    if (!textareaRef.current) return
-
-    const position = textareaRef.current.selectionStart
-    const textBeforeCursor = content.substring(0, position)
-    const textAfterCursor = content.substring(position)
-    
-    // Find the last @ before cursor
-    const lastAtIndex = textBeforeCursor.lastIndexOf("@")
-    
-    if (lastAtIndex !== -1) {
-      const newContent = 
-        content.substring(0, lastAtIndex) + 
-        `@${username} ` + 
-        textAfterCursor
-      
-      setContent(newContent)
-      setShowMentionAutocomplete(false)
-      
-      // Set cursor position after inserted mention
-      setTimeout(() => {
-        if (textareaRef.current) {
-          const newPosition = lastAtIndex + username.length + 2 // +2 for @ and space
-          textareaRef.current.selectionStart = newPosition
-          textareaRef.current.selectionEnd = newPosition
-          textareaRef.current.focus()
-        }
-      }, 0)
-    }
+    const newContent = content.replace(/(?:^|(?<=\s))@[^\s@]*$/, `@${username} `)
+    setContent(newContent !== content ? newContent : content + `@${username} `)
+    setShowMentionAutocomplete(false)
   }
 
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const val = e.target.value
+  const handleContentChange = (val: string) => {
     setContent(val)
-    setCursorPosition(e.target.selectionStart)
     detectAndFetchLink(val)
   }
 
@@ -517,68 +441,19 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
         multiple
       />
 
-      <div className="relative">
-        <label htmlFor="postContent" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+      <div className="relative" onKeyDown={handleWrapperKeyDown}>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           What&apos;s on your mind?
         </label>
-        
-        {/* Syntax-highlighted overlay */}
-        <div className="relative mt-1">
-          {/* Hidden div for syntax highlighting */}
-          <div
-            className="absolute inset-0 rounded-md border border-transparent px-3 py-2 text-gray-900 dark:text-gray-100 pointer-events-none whitespace-pre-wrap break-words overflow-hidden"
-            style={{
-              fontFamily: "inherit",
-              fontSize: "inherit",
-              lineHeight: "inherit",
-            }}
-            aria-hidden="true"
-          >
-            {/* Parse and render both hashtags and mentions */}
-            {parseHashtags(content).map((hashtagSegment, hashIndex) => {
-              if (hashtagSegment.type === "hashtag") {
-                return (
-                  <span key={hashIndex} className="text-blue-600 dark:text-blue-400 font-medium">
-                    {hashtagSegment.content}
-                  </span>
-                )
-              }
-              // For text segments, parse mentions
-              return parseMentions(hashtagSegment.content).map((mentionSegment, mentionIndex) => {
-                if (mentionSegment.type === "mention") {
-                  return (
-                    <span key={`${hashIndex}-${mentionIndex}`} className="text-blue-600 dark:text-blue-400 font-medium">
-                      @{mentionSegment.content}
-                    </span>
-                  )
-                }
-                return <span key={`${hashIndex}-${mentionIndex}`}>{mentionSegment.content}</span>
-              })
-            })}
-            {/* Placeholder when empty */}
-            {content.length === 0 && (
-              <span className="text-gray-400 dark:text-gray-500">
-                Share your thoughts, ideas, or updates...
-              </span>
-            )}
-          </div>
 
-          {/* Actual textarea (transparent text) */}
-          <textarea
-            ref={textareaRef}
-            id="postContent"
+        <div className="mt-1">
+          <RichTextEditor
             value={content}
             onChange={handleContentChange}
-            onKeyDown={handleKeyDown}
-            onSelect={(e) => setCursorPosition(e.currentTarget.selectionStart)}
-            onClick={(e) => setCursorPosition(e.currentTarget.selectionStart)}
-            rows={4}
+            placeholder="Share your thoughts… (supports **markdown** syntax)"
             maxLength={maxLength}
-            className="relative block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 caret-gray-900 dark:caret-gray-100"
-            style={{
-              color: "transparent",
-              caretColor: "currentColor",
-            }}
+            minHeight="120px"
+            disabled={isSubmitting}
           />
         </div>
 
@@ -624,12 +499,9 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
           />
         )}
 
-        <div className="mt-1 flex justify-between text-xs sm:text-sm">
-          <span className="text-red-600 dark:text-red-400">{error}</span>
-          <span className={`${content.length > maxLength ? "text-red-600 dark:text-red-400" : "text-gray-500 dark:text-gray-400"}`}>
-            {content.length}/{maxLength}
-          </span>
-        </div>
+        {error && (
+          <p className="mt-1 text-xs text-red-600 dark:text-red-400">{error}</p>
+        )}
       </div>
 
       {/* ── Media Toolbar ───────────────────────────────────────────────── */}

@@ -1,6 +1,6 @@
 import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
-import { sanitizeText } from "./sanitize"
+import { sanitizeText, sanitizeMarkdown } from "./sanitize"
 import { api } from "./_generated/api"
 import { extractMentions } from "./mentionUtils"
 
@@ -90,7 +90,7 @@ export const createComment = mutation({
     }
 
     // Sanitize content to prevent XSS attacks
-    const sanitizedContent = sanitizeText(args.content)
+    const sanitizedContent = sanitizeMarkdown(args.content)
 
     // Create comment
     const commentId = await ctx.db.insert("comments", {

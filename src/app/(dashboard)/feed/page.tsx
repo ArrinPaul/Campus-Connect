@@ -1,14 +1,34 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { useUser } from "@clerk/nextjs"
 import { PostComposer } from "@/components/posts/PostComposer"
 import { FeedContainer } from "@/components/feed/FeedContainer"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { TrendingHashtags } from "@/components/trending/TrendingHashtags"
 import { StoryRow } from "@/components/stories/StoryRow"
+import { SuggestedUsers } from "@/components/discover/SuggestedUsers"
+
+export type FeedType = "for-you" | "following" | "trending"
+
+const FEED_STORAGE_KEY = "campus-connect-feed-type"
 
 export default function FeedPage() {
   const { isLoaded, isSignedIn } = useUser()
+  const [feedType, setFeedType] = useState<FeedType>("for-you")
+
+  // Persist feed preference in localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem(FEED_STORAGE_KEY) as FeedType | null
+    if (saved && ["for-you", "following", "trending"].includes(saved)) {
+      setFeedType(saved)
+    }
+  }, [])
+
+  const handleFeedTypeChange = (type: FeedType) => {
+    setFeedType(type)
+    localStorage.setItem(FEED_STORAGE_KEY, type)
+  }
 
   // Show loading state while auth is being checked
   if (!isLoaded) {
@@ -51,9 +71,32 @@ export default function FeedPage() {
             </div>
           </ErrorBoundary>
 
+          {/* Feed Type Tabs */}
+          <div className="flex rounded-lg bg-white dark:bg-gray-800 shadow dark:shadow-gray-900/50 p-1">
+            {(
+              [
+                { key: "for-you", label: "For You" },
+                { key: "following", label: "Following" },
+                { key: "trending", label: "Trending" },
+              ] as const
+            ).map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => handleFeedTypeChange(key)}
+                className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                  feedType === key
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
           {/* Feed Container with real-time updates */}
           <ErrorBoundary>
-            <FeedContainer />
+            <FeedContainer feedType={feedType} />
           </ErrorBoundary>
         </div>
 
@@ -62,6 +105,9 @@ export default function FeedPage() {
           <div className="sticky top-20 space-y-4">
             <ErrorBoundary>
               <TrendingHashtags limit={10} />
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <SuggestedUsers limit={3} showSeeAll />
             </ErrorBoundary>
           </div>
         </aside>

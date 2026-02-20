@@ -2,6 +2,44 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { CommentComposer } from "./CommentComposer"
 import { Id } from "@/convex/_generated/dataModel"
 
+// Mock the RichTextEditor module to avoid ESM/TipTap issues in Jest
+jest.mock("@/components/editor/RichTextEditor", () => ({
+  CompactRichTextEditor: ({
+    value,
+    onChange,
+    placeholder,
+    maxLength,
+    disabled,
+  }: {
+    value: string
+    onChange: (v: string) => void
+    placeholder?: string
+    maxLength?: number
+    disabled?: boolean
+  }) => (
+    <div>
+      <textarea
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        maxLength={maxLength}
+        disabled={disabled}
+      />
+      {maxLength != null && (
+        <span
+          className={
+            value.length > maxLength
+              ? "text-red-600 dark:text-red-400"
+              : "text-gray-500 dark:text-gray-400"
+          }
+        >
+          {value.length}/{maxLength}
+        </span>
+      )}
+    </div>
+  ),
+}))
+
 // Mock convex/react
 const mockCreateComment = jest.fn()
 jest.mock("convex/react", () => ({

@@ -39,6 +39,10 @@ jest.mock("@/components/profile/UserCard", () => ({
   ),
 }))
 
+jest.mock("@/components/discover/SuggestedUsers", () => ({
+  SuggestedUsers: () => <div data-testid="suggested-users">SuggestedUsers</div>,
+}))
+
 const mockUseQuery = useQuery as jest.MockedFunction<typeof useQuery>
 
 describe("DiscoverPage", () => {

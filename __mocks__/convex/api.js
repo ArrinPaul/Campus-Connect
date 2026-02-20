@@ -139,4 +139,14 @@ export const api = {
     getUserPresence: 'presence:getUserPresence',
     updateOnlineStatusVisibility: 'presence:updateOnlineStatusVisibility',
   },
+  suggestions: {
+    getSuggestions: 'suggestions:getSuggestions',
+    dismissSuggestion: 'suggestions:dismissSuggestion',
+    refreshSuggestions: 'suggestions:refreshSuggestions',
+  },
+  feedRanking: {
+    getRankedFeed: 'feedRanking:getRankedFeed',
+    getChronologicalFeed: 'feedRanking:getChronologicalFeed',
+    getTrendingFeed: 'feedRanking:getTrendingFeed',
+  },
 }

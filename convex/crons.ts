@@ -13,4 +13,14 @@ crons.interval(
   internal.stories.deleteExpiredStoriesInternal
 )
 
+/**
+ * Re-compute friend suggestions for all active users every 6 hours.
+ * Phase 4.1 — Friend Suggestion Engine
+ */
+crons.interval(
+  "compute friend suggestions",
+  { hours: 6 },
+  internal.suggestions.computeAllSuggestions
+)
+
 export default crons
