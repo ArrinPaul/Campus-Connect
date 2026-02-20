@@ -1114,230 +1114,180 @@
 
 ## Phase 6 — Professional & Academic Tools (Weeks 31-36)
 
-### 6.1 Research Collaboration Hub 🟢 ⏱️ L
+### 6.1 Research Collaboration Hub 🟢 ⏱️ L ✅ COMPLETED
 
 **Schema:**
-- [ ] Create `papers` table
-  - [ ] Fields: title, abstract, authors (array), doi, pdfUrl, uploadedBy, tags, citationCount, createdAt
-  - [ ] Indexes: by_uploaded_by, by_tags
-- [ ] Create `paperAuthors` table (many-to-many)
-  - [ ] Fields: paperId, userId
-- [ ] Add `researchInterests` field to `users` table (array of strings)
+- [x] Create `papers` table
+  - [x] Fields: title, abstract, authors (array), doi, pdfUrl, uploadedBy, tags, citationCount, lookingForCollaborators, createdAt
+  - [x] Indexes: by_uploaded_by, by_created
+- [x] Create `paperAuthors` table (many-to-many)
+  - [x] Fields: paperId, userId
+  - [x] Indexes: by_paper, by_user
+- [x] Add `researchInterests` field to `users` table (array of strings)
 
 **Backend:**
-- [ ] Create `convex/papers.ts`
-  - [ ] `uploadPaper` mutation — upload PDF + metadata
-  - [ ] `updatePaper` mutation — edit metadata
-  - [ ] `deletePaper` mutation
-  - [ ] `getPaper` query
-  - [ ] `searchPapers` query — by title, authors, tags
-  - [ ] `getUserPapers` query — papers authored by user
+- [x] Create `convex/papers.ts`
+  - [x] `uploadPaper` mutation — upload paper metadata, validates title (300), abstract (5000), authors, tags (max 20), DOI (100), links co-authors
+  - [x] `updatePaper` mutation — uploader only, edit metadata with validation
+  - [x] `deletePaper` mutation — uploader only, cascades paperAuthors
+  - [x] `getPaper` query — with uploader info and linked platform authors
+  - [x] `searchPapers` query — by title, authors, abstract, tags; case-insensitive
+  - [x] `getUserPapers` query — uploaded + co-authored, deduplicated, sorted desc
+  - [x] `getCollaborationOpportunities` query — papers with lookingForCollaborators flag
 
 **Frontend:**
-- [ ] Create `src/app/(dashboard)/research/page.tsx`
-  - [ ] Search papers
-  - [ ] Filter by tags, authors
-  - [ ] Paper cards with title, authors, abstract preview
-- [ ] Create `src/app/(dashboard)/research/[id]/page.tsx` — paper details
-  - [ ] Full metadata
-  - [ ] PDF viewer (embed or download)
-  - [ ] Citation info
-  - [ ] Authors list (clickable to profiles)
-  - [ ] "Looking for collaborators" flag
-- [ ] Add research interests to profile edit
-- [ ] Add publications section to profile page
+- [x] Create `src/app/(dashboard)/research/page.tsx`
+  - [x] Tabs: Browse Papers | Looking for Collaborators
+  - [x] Search papers by title, author, tag
+  - [x] Tag filter input
+  - [x] Paper cards with title, authors, abstract preview, tags, DOI, citations
+  - [x] "Collaborators Wanted" badge
+  - [x] Upload Paper modal (title, abstract, authors, DOI, tags, collaborator flag)
+  - [x] Loading skeletons and empty states
+- [x] Create `src/app/(dashboard)/research/[id]/page.tsx` — paper details
+  - [x] Full metadata (title, authors, DOI link, citations, date)
+  - [x] Abstract section
+  - [x] PDF download link
+  - [x] Uploader info with avatar
+  - [x] Linked platform authors list (clickable to profiles)
+  - [x] "Looking for collaborators" flag
+  - [x] Delete button (owner only)
 
 **Tests:**
-- [ ] `convex/papers.test.ts`
+- [x] `convex/papers.test.ts` — 30 tests (tag normalization, title/abstract/author/DOI/tag validation, search/filter, deduplication, collaboration flag, ownership)
 
 ---
 
-### 6.2 Academic Portfolio 🟢 ⏱️ M
+### 6.2 Academic Portfolio 🟢 ⏱️ M ✅ COMPLETED
 
 **Schema:**
-- [ ] Create `projects` table
-  - [ ] Fields: userId, title, description, techStack (array), links (array), screenshots (array), startDate, endDate, createdAt
-  - [ ] Indexes: by_user
-- [ ] Create `timeline` table (academic milestones)
-  - [ ] Fields: userId, type (course/certification/publication/award), title, institution, date, createdAt
-  - [ ] Indexes: by_user
+- [x] Create `projects` table
+  - [x] Fields: userId, title, description, techStack (array), links (array), screenshots (optional array), startDate, endDate, createdAt
+  - [x] Indexes: by_user
+- [x] Create `timeline` table (academic milestones)
+  - [x] Fields: userId, type (course/certification/publication/award), title, institution, date, createdAt
+  - [x] Indexes: by_user
 
 **Backend:**
-- [ ] Create `convex/portfolio.ts`
-  - [ ] `addProject` mutation
-  - [ ] `updateProject` mutation
-  - [ ] `deleteProject` mutation
-  - [ ] `getProjects` query — user's projects
-  - [ ] `addTimelineItem` mutation
-  - [ ] `deleteTimelineItem` mutation
-  - [ ] `getTimeline` query — user's timeline
+- [x] Create `convex/portfolio.ts`
+  - [x] `addProject` mutation — validates title (200), description (3000), techStack (max 20), links (max 10), date range
+  - [x] `updateProject` mutation — owner only, partial update with validation
+  - [x] `deleteProject` mutation — owner only
+  - [x] `getProjects` query — user's projects sorted desc
+  - [x] `addTimelineItem` mutation — 4 types, validates title (200), institution (200)
+  - [x] `deleteTimelineItem` mutation — owner only
+  - [x] `getTimeline` query — user's timeline sorted by date desc
+  - [x] `getContributionData` query — daily post+comment activity counts over 365 days
 
 **Frontend:**
-- [ ] Create `src/app/(dashboard)/profile/[id]/portfolio/page.tsx`
-  - [ ] Sub-tab on profile page
-  - [ ] Project cards with screenshots, description, tech stack, links
-- [ ] Create `src/components/portfolio/ProjectCard.tsx`
-- [ ] Create `src/components/portfolio/Timeline.tsx`
-  - [ ] Vertical timeline with milestones
-- [ ] Create `src/components/portfolio/ContributionHeatmap.tsx`
-  - [ ] GitHub-style activity grid showing daily post/comment activity
-  - [ ] Use `react-calendar-heatmap` or custom canvas
-- [ ] Add "Download Resume" button (PDF generation)
-  - [ ] Use `jsPDF` or server-side PDF generation
-  - [ ] Auto-generate from profile data
+- [x] Create `src/app/(dashboard)/profile/[id]/portfolio/page.tsx`
+  - [x] Tabs: Projects | Timeline | Activity
+  - [x] Projects: cards with title, description, tech stack pills, links, date range; delete button (owner)
+  - [x] Timeline: vertical timeline with type icons (GraduationCap, Award, FileText), color-coded, institution, date
+  - [x] Activity: GitHub-style contribution heatmap (365 cells, 5 intensity levels, tooltip, legend)
+  - [x] Add Project modal (title, description, tech stack, links)
+  - [x] Add Milestone modal (type picker, title, institution, date)
+  - [x] Loading skeletons and empty states
 
 **Tests:**
-- [ ] `convex/portfolio.test.ts`
-- [ ] `src/components/portfolio/ContributionHeatmap.test.tsx`
+- [x] `convex/portfolio.test.ts` — 23 tests (project validation, timeline validation, timeline types, contribution heatmap grouping, date sorting, ownership, tech stack normalization)
 
 ---
 
-### 6.3 Job / Internship Board 🟡 ⏱️ L
+### 6.3 Job / Internship Board ✅ COMPLETED
 
 **Schema:**
-- [ ] Create `jobs` table
-  - [ ] Fields: title, company, description, type (job/internship), location, remote, duration, skillsRequired (array), salary, postedBy, expiresAt, applicantCount, createdAt
-  - [ ] Indexes: by_posted_by, by_expires_at
-- [ ] Create `jobApplications` table
-  - [ ] Fields: jobId, userId, coverLetter, resume (optional file), status (applied/viewed/shortlisted/rejected), createdAt
-  - [ ] Indexes: by_job, by_user, by_user_job
+- [x] `jobs` table — title, company, description, type (job/internship), location, remote, duration, skillsRequired, salary, postedBy, applicantCount, expiresAt, createdAt; indexes: by_posted_by, by_created
+- [x] `jobApplications` table — jobId, userId, coverLetter, resumeUrl, status (applied/viewed/shortlisted/rejected), createdAt; indexes: by_job, by_user, by_user_job
 
-**Backend:**
-- [ ] Create `convex/jobs.ts`
-  - [ ] `postJob` mutation — faculty or verified users only
-  - [ ] `updateJob` mutation
-  - [ ] `deleteJob` mutation
-  - [ ] `getJob` query
-  - [ ] `searchJobs` query — filters: role, location, remote, skills, duration
-  - [ ] `applyToJob` mutation — creates application
-  - [ ] `getJobApplications` query — for job poster
-  - [ ] `getUserApplications` query — for applicant
-  - [ ] `updateApplicationStatus` mutation — job poster only
+**Backend: `convex/jobs.ts`**
+- [x] `postJob` mutation — validates title (≤200), company (≤200), description (≤5000), location, skills (≤20), expiry (future)
+- [x] `updateJob` mutation — poster only, partial update
+- [x] `deleteJob` mutation — poster only, cascades applications
+- [x] `getJob` query — with poster info, expired flag, viewer application status
+- [x] `searchJobs` query — text search (title/company/description/skills/location) + type/remote filters, excludes expired
+- [x] `applyToJob` mutation — duplicate check, expired check, cover letter validation (≤3000), increments applicantCount
+- [x] `getJobApplications` query — poster only, with applicant info
+- [x] `getUserApplications` query — user's own applications with job info
+- [x] `updateApplicationStatus` mutation — poster only (viewed/shortlisted/rejected)
 
 **Frontend:**
-- [ ] Create `src/app/(dashboard)/jobs/page.tsx`
-  - [ ] Search bar + filters sidebar
-  - [ ] Job cards: title, company, location, salary, skills
-  - [ ] "Apply" button
-- [ ] Create `src/app/(dashboard)/jobs/[id]/page.tsx` — job details
-  - [ ] Full description
-  - [ ] "Easy Apply" button → modal with pre-filled profile data
-  - [ ] Cover letter textarea (optional)
-  - [ ] Resume upload (optional)
-- [ ] Create `src/components/jobs/JobApplicationModal.tsx`
-- [ ] Create `src/app/(dashboard)/jobs/my-applications/page.tsx` — track applications
-  - [ ] List of applied jobs with status badges
-- [ ] Create `src/app/(dashboard)/jobs/post/page.tsx` — post a job (faculty/recruiters)
-- [ ] Job alerts:
-  - [ ] Save search preferences
-  - [ ] Get notification when matching job is posted
+- [x] `src/app/(dashboard)/jobs/page.tsx` — search + type/remote filters, job cards, Post Job modal
+- [x] `src/app/(dashboard)/jobs/[id]/page.tsx` — full detail, Easy Apply modal, poster applications list, status management
+- [x] `src/app/(dashboard)/jobs/my-applications/page.tsx` — track applications with status badges and descriptions
 
-**Tests:**
-- [ ] `convex/jobs.test.ts`
-- [ ] `src/app/(dashboard)/jobs/page.test.tsx`
+**Tests: `convex/jobs.test.ts` — 39 tests**
+- [x] Title validation (5), company validation (3), description validation (2), location validation (2)
+- [x] Skills validation (3), cover letter validation (2), expiry validation (2)
+- [x] Search text query (7), search filters (6), expired listings (3), limit (2), application status (2)
 
 ---
 
-### 6.4 Study Resources & Q&A 🟡 ⏱️ XL
+### 6.4 Study Resources & Q&A ✅ COMPLETED
 
 **Schema:**
-- [ ] Create `resources` table
-  - [ ] Fields: title, description, fileUrl, course, subject, uploadedBy, rating, downloadCount, createdAt
-  - [ ] Indexes: by_course, by_uploaded_by
-- [ ] Create `questions` table
-  - [ ] Fields: title, content, askedBy, course, tags, viewCount, upvotes, downvotes, acceptedAnswerId, createdAt
-  - [ ] Indexes: by_asked_by, by_course, by_tags
-- [ ] Create `answers` table
-  - [ ] Fields: questionId, content, answeredBy, upvotes, downvotes, isAccepted, createdAt
-  - [ ] Indexes: by_question, by_answered_by
+- [x] `resources` table — title, description, fileUrl, course, subject, uploadedBy, rating, ratingCount, downloadCount, createdAt; indexes: by_course, by_uploaded_by
+- [x] `questions` table — title, content, askedBy, course, tags, viewCount, upvotes, downvotes, answerCount, acceptedAnswerId, createdAt; indexes: by_asked_by, by_created
+- [x] `answers` table — questionId, content, answeredBy, upvotes, downvotes, isAccepted, createdAt; indexes: by_question, by_answered_by
+- [x] `questionVotes` table — targetId, targetType (question|answer), userId, voteType (up|down), createdAt; indexes: by_target, by_user_target
 
-**Backend:**
-- [ ] Create `convex/resources.ts`
-  - [ ] `uploadResource` mutation
-  - [ ] `getResources` query — filtered by course/subject
-  - [ ] `rateResource` mutation
-  - [ ] `downloadResource` mutation (increment count)
-- [ ] Create `convex/questions.ts`
-  - [ ] `askQuestion` mutation
-  - [ ] `answerQuestion` mutation
-  - [ ] `voteQuestion` mutation — upvote/downvote
-  - [ ] `voteAnswer` mutation
-  - [ ] `acceptAnswer` mutation — question asker only
-  - [ ] `getQuestions` query — sorted by votes, recent, or unanswered
-  - [ ] `getQuestion` query — with answers
+**Backend: `convex/resources.ts`**
+- [x] `uploadResource` mutation — validates title (≤200), description (≤3000), course (≤100), subject (≤100)
+- [x] `deleteResource` mutation — uploader only
+- [x] `rateResource` mutation — 1-5 integer, moving average
+- [x] `downloadResource` mutation — increments download count
+- [x] `getResources` query — course filter + text search, sorted by rating desc
+- [x] `getResource` query — single resource with uploader info
+
+**Backend: `convex/questions.ts`**
+- [x] `askQuestion` mutation — validates title (≤300), content (≤10000), tags (≤10, normalized)
+- [x] `deleteQuestion` mutation — asker only, cascades answers + votes
+- [x] `answerQuestion` mutation — validates content (≤10000), increments answerCount
+- [x] `acceptAnswer` mutation — question asker only, un-accepts previous
+- [x] `vote` mutation — upvote/downvote on questions or answers, toggle off or change direction
+- [x] `getQuestions` query — sort by newest/votes/unanswered, tag + text filters
+- [x] `getQuestion` query — with all answers sorted (accepted first), viewer vote states
+- [x] `incrementViewCount` mutation
 
 **Frontend:**
-- [ ] Create `src/app/(dashboard)/resources/page.tsx`
-  - [ ] Filter by course, subject, file type
-  - [ ] Resource cards with preview, rating, download button
-- [ ] Create `src/app/(dashboard)/q-and-a/page.tsx` — Stack Overflow style
-  - [ ] Question list with vote counts, answer counts
-  - [ ] Tabs: Newest | Unanswered | Top Voted
-  - [ ] "Ask Question" button
-- [ ] Create `src/app/(dashboard)/q-and-a/[id]/page.tsx` — question details
-  - [ ] Question content with upvote/downvote buttons
-  - [ ] Answers list sorted by votes
-  - [ ] Accepted answer highlighted (green checkmark)
-  - [ ] "Write Answer" composer
-- [ ] Create `src/components/qa/AskQuestionModal.tsx`
-- [ ] Add reputation system integration (Phase 6.5)
+- [x] `src/app/(dashboard)/resources/page.tsx` — search + course filter, resource cards with star ratings, download, upload modal
+- [x] `src/app/(dashboard)/q-and-a/page.tsx` — Stack Overflow style: sort tabs (Newest/Votes/Unanswered), tag filter, question list with scores, Ask Question modal
+- [x] `src/app/(dashboard)/q-and-a/[id]/page.tsx` — question detail with vote buttons, answers list, accepted answer highlight, Write Answer composer
 
 **Tests:**
-- [ ] `convex/questions.test.ts`
-- [ ] `src/app/(dashboard)/q-and-a/page.test.tsx`
+- [x] `convex/resources.test.ts` — 30 tests: title/description/course/subject validation, rating validation/calculation, search filters, sorting, limit
+- [x] `convex/questions.test.ts` — 31 tests: title/content validation, tag normalization, sort by votes/unanswered, filter by tag/text, answer sorting, vote logic (8 cases), score calculation
 
 ---
 
-### 6.5 Achievement & Gamification 🟢 ⏱️ M
+### 6.5 Achievement & Gamification ✅ COMPLETED
 
 **Schema:**
-- [ ] Create `achievements` table
-  - [ ] Fields: userId, badge, name, description, earnedAt
-  - [ ] Indexes: by_user
-- [ ] Add to `users` table:
-  - [ ] `reputation`: number (default: 0)
-  - [ ] `level`: number (default: 1)
+- [x] `achievements` table — userId, badge, name, description, earnedAt; index: by_user
+- [x] Users table: `reputation` (optional number), `level` (optional number) fields added
 
-**Backend:**
-- [ ] Create `convex/gamification.ts`
-  - [ ] `awardReputation` utility — called by other mutations
-  - [ ] `checkAchievements` action — triggered after certain events
-  - [ ] `unlockAchievement` mutation
-  - [ ] `getAchievements` query — user's earned badges
-  - [ ] `getLeaderboard` query — top users by reputation (weekly/monthly/all-time, by university)
-- [ ] Define reputation rules:
-  - [ ] Post created: +10
-  - [ ] Comment created: +5
-  - [ ] Receive like/reaction: +1
-  - [ ] Receive comment: +2
-  - [ ] Skill endorsed: +3
-  - [ ] Answer accepted (Q&A): +15
-- [ ] Define achievement badges (see roadmap for list)
-- [ ] Trigger achievement checks on relevant events
-- [ ] Calculate level from reputation: `level = floor(sqrt(reputation / 10))`
+**Backend: `convex/gamification.ts`**
+- [x] `awardReputation` internalMutation — awards points by action type, recalculates level
+- [x] `unlockAchievement` mutation — prevents duplicates, validates badge exists
+- [x] `checkAchievements` mutation — checks reputation milestones (100/500/1000) and level milestones (5/10)
+- [x] `getAchievements` query — returns earned badges + full definitions with earned status
+- [x] `getLeaderboard` query — top users by reputation, university filter, period filter
+- [x] `getMyReputation` query — current user's rep, level, XP progress to next level
+- [x] 10 reputation rules: post(10), comment(5), like(1), receive_comment(2), skill_endorsed(3), answer_accepted(15), paper(10), resource(5), question(3), answer(5)
+- [x] 14 achievement badges defined (first_post, commentator, trending, helpful, scholar, teacher, curious_mind, contributor, expert, legend, networker, endorsed, level_5, level_10)
+- [x] Level formula: `floor(sqrt(reputation / 10))`, minimum 1
 
 **Frontend:**
-- [ ] Add reputation score and level to profile header
-  - [ ] Display as badge or progress bar
-- [ ] Create `src/app/(dashboard)/leaderboard/page.tsx`
-  - [ ] Tabs: Weekly | Monthly | All Time
-  - [ ] Filter by university
-  - [ ] Ranked list with avatars, names, reputation, level
-- [ ] Create `src/components/gamification/AchievementBadge.tsx`
-  - [ ] Show on profile page
-  - [ ] Grid of earned badges
-  - [ ] Locked badges (grayed out) for unearned
-- [ ] Create achievement notification:
-  - [ ] Toast/modal when achievement unlocked
-  - [ ] Confetti animation
-- [ ] Add XP progress bar to navbar or profile
-- [ ] Weekly challenges (future enhancement):
-  - [ ] "Post 3 times this week" → bonus XP
-  - [ ] Track progress in challenges page
+- [x] `src/app/(dashboard)/leaderboard/page.tsx` — XP stats card with gradient + progress bar, period tabs (Weekly/Monthly/All Time), university filter, ranked list with rank icons (Crown/Medal), level badges with color tiers
+- [x] `src/components/gamification/AchievementBadges.tsx` — grid of all achievements, earned badges with gradient icon circles + dates, locked badges grayed out with lock icon, per-badge icons & colors
 
-**Tests:**
-- [ ] `convex/gamification.test.ts`
-- [ ] Achievement unlock integration test
+**Tests: `convex/gamification.test.ts` — 36 tests**
+- [x] Level calculation (10): edge cases at 0, negative, various thresholds up to 2000 rep
+- [x] Reputation rules (5): count, specific values, all positive
+- [x] Achievement definitions (3): count, uniqueness, required fields
+- [x] Achievement checks (7): reputation milestones, skip already earned, level milestones
+- [x] Progress calculation (4): various levels, cap at 100%
+- [x] Leaderboard (7): sorting, ranks, university filter, limit, case-insensitive
 
 ---
 

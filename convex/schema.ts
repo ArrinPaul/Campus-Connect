@@ -50,6 +50,11 @@ export default defineSchema({
     customStatus: v.optional(v.string()), // custom status message
     lastSeenAt: v.optional(v.number()), // timestamp of last activity
     showOnlineStatus: v.optional(v.boolean()), // privacy toggle (default true)
+    // Phase 6.1 — Research Collaboration
+    researchInterests: v.optional(v.array(v.string())),
+    // Phase 6.5 — Gamification
+    reputation: v.optional(v.number()),
+    level: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -481,4 +486,156 @@ export default defineSchema({
     .index("by_event", ["eventId"])
     .index("by_user", ["userId"])
     .index("by_event_user", ["eventId", "userId"]),
+
+  // Phase 6.1 — Research Collaboration Hub
+  papers: defineTable({
+    title: v.string(),
+    abstract: v.string(),
+    authors: v.array(v.string()),         // free-text author names
+    doi: v.optional(v.string()),
+    pdfUrl: v.optional(v.string()),
+    uploadedBy: v.id("users"),
+    tags: v.array(v.string()),
+    citationCount: v.number(),
+    lookingForCollaborators: v.optional(v.boolean()),
+    createdAt: v.number(),
+  })
+    .index("by_uploaded_by", ["uploadedBy"])
+    .index("by_created", ["createdAt"]),
+
+  paperAuthors: defineTable({
+    paperId: v.id("papers"),
+    userId: v.id("users"),
+  })
+    .index("by_paper", ["paperId"])
+    .index("by_user", ["userId"]),
+
+  // Phase 6.2 — Academic Portfolio
+  projects: defineTable({
+    userId: v.id("users"),
+    title: v.string(),
+    description: v.string(),
+    techStack: v.array(v.string()),
+    links: v.array(v.string()),
+    screenshots: v.optional(v.array(v.string())),
+    startDate: v.optional(v.number()),
+    endDate: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"]),
+
+  timeline: defineTable({
+    userId: v.id("users"),
+    type: v.union(
+      v.literal("course"),
+      v.literal("certification"),
+      v.literal("publication"),
+      v.literal("award")
+    ),
+    title: v.string(),
+    institution: v.optional(v.string()),
+    date: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"]),
+
+  // Phase 6.3 — Job / Internship Board
+  jobs: defineTable({
+    title: v.string(),
+    company: v.string(),
+    description: v.string(),
+    type: v.union(v.literal("job"), v.literal("internship")),
+    location: v.string(),
+    remote: v.boolean(),
+    duration: v.optional(v.string()),
+    skillsRequired: v.array(v.string()),
+    salary: v.optional(v.string()),
+    postedBy: v.id("users"),
+    applicantCount: v.number(),
+    expiresAt: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_posted_by", ["postedBy"])
+    .index("by_created", ["createdAt"]),
+
+  jobApplications: defineTable({
+    jobId: v.id("jobs"),
+    userId: v.id("users"),
+    coverLetter: v.optional(v.string()),
+    resumeUrl: v.optional(v.string()),
+    status: v.union(
+      v.literal("applied"),
+      v.literal("viewed"),
+      v.literal("shortlisted"),
+      v.literal("rejected")
+    ),
+    createdAt: v.number(),
+  })
+    .index("by_job", ["jobId"])
+    .index("by_user", ["userId"])
+    .index("by_user_job", ["userId", "jobId"]),
+
+  // Phase 6.4 — Study Resources & Q&A
+  resources: defineTable({
+    title: v.string(),
+    description: v.string(),
+    fileUrl: v.optional(v.string()),
+    course: v.string(),
+    subject: v.optional(v.string()),
+    uploadedBy: v.id("users"),
+    rating: v.number(),
+    ratingCount: v.number(),
+    downloadCount: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_course", ["course"])
+    .index("by_uploaded_by", ["uploadedBy"]),
+
+  questions: defineTable({
+    title: v.string(),
+    content: v.string(),
+    askedBy: v.id("users"),
+    course: v.optional(v.string()),
+    tags: v.array(v.string()),
+    viewCount: v.number(),
+    upvotes: v.number(),
+    downvotes: v.number(),
+    answerCount: v.number(),
+    acceptedAnswerId: v.optional(v.id("answers")),
+    createdAt: v.number(),
+  })
+    .index("by_asked_by", ["askedBy"])
+    .index("by_created", ["createdAt"]),
+
+  answers: defineTable({
+    questionId: v.id("questions"),
+    content: v.string(),
+    answeredBy: v.id("users"),
+    upvotes: v.number(),
+    downvotes: v.number(),
+    isAccepted: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_question", ["questionId"])
+    .index("by_answered_by", ["answeredBy"]),
+
+  questionVotes: defineTable({
+    targetId: v.string(),           // questionId or answerId
+    targetType: v.union(v.literal("question"), v.literal("answer")),
+    userId: v.id("users"),
+    voteType: v.union(v.literal("up"), v.literal("down")),
+    createdAt: v.number(),
+  })
+    .index("by_target", ["targetId", "targetType"])
+    .index("by_user_target", ["userId", "targetId", "targetType"]),
+
+  // Phase 6.5 — Achievement & Gamification
+  achievements: defineTable({
+    userId: v.id("users"),
+    badge: v.string(),
+    name: v.string(),
+    description: v.string(),
+    earnedAt: v.number(),
+  })
+    .index("by_user", ["userId"]),
 })
