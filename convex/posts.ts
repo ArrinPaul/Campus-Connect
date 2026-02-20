@@ -161,6 +161,8 @@ export const createPost = mutation({
     ),
     // Phase 3.3 — attach a pre-created poll
     pollId: v.optional(v.id("polls")),
+    // Phase 5.1 — post to a community
+    communityId: v.optional(v.id("communities")),
   },
   handler: async (ctx, args) => {
     // Require authentication
@@ -207,6 +209,7 @@ export const createPost = mutation({
       ...(args.mediaFileNames ? { mediaFileNames: args.mediaFileNames } : {}),
       ...(args.linkPreview ? { linkPreview: args.linkPreview } : {}),
       ...(args.pollId ? { pollId: args.pollId } : {}),
+      ...(args.communityId ? { communityId: args.communityId } : {}),
     })
 
     // Link hashtags to post

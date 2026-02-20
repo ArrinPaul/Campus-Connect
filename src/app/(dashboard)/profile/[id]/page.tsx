@@ -5,6 +5,7 @@ import { api } from "@/convex/_generated/api"
 import { useUser } from "@clerk/nextjs"
 import { ProfileHeader } from "@/components/profile/ProfileHeader"
 import { SkillsManager } from "@/components/profile/SkillsManager"
+import { SkillEndorsements } from "@/components/profile/SkillEndorsements"
 import { ProfileForm } from "@/components/profile/ProfileForm"
 import { FollowersList } from "@/components/profile/FollowersList"
 import { FollowingList } from "@/components/profile/FollowingList"
@@ -111,24 +112,11 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 
       {/* Skills Section */}
       <div className="mt-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Skills</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Skills</h2>
         {isOwnProfile ? (
           <SkillsManager skills={profileUser.skills} />
         ) : (
-          <div className="flex flex-wrap gap-2">
-            {profileUser.skills.length > 0 ? (
-              profileUser.skills.map((skill) => (
-                <span
-                  key={skill}
-                  className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800"
-                >
-                  {skill}
-                </span>
-              ))
-            ) : (
-              <p className="text-gray-500">No skills added yet</p>
-            )}
-          </div>
+          <SkillEndorsements userId={profileUser._id} isOwnProfile={false} />
         )}
       </div>
 

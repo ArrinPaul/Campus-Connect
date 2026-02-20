@@ -96,11 +96,14 @@ export default defineSchema({
     ),
     // Phase 3.3 — Poll attachment
     pollId: v.optional(v.id("polls")),
+    // Phase 5.1 — Community / Group posts
+    communityId: v.optional(v.id("communities")),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index("by_author", ["authorId"])
-    .index("by_createdAt", ["createdAt"]),
+    .index("by_createdAt", ["createdAt"])
+    .index("by_community", ["communityId"]),
 
   likes: defineTable({
     userId: v.id("users"),
@@ -387,4 +390,53 @@ export default defineSchema({
   })
     .index("by_user", ["userId", "score"])
     .index("by_user_dismissed", ["userId", "isDismissed"]),
+
+  // Phase 4.5 — Skill-Based Matching & Endorsements
+  skillEndorsements: defineTable({
+    skillName: v.string(),             // the skill being endorsed (normalized lowercase)
+    userId: v.id("users"),             // user whose skill is being endorsed
+    endorserId: v.id("users"),         // user giving the endorsement
+    createdAt: v.number(),
+  })
+    .index("by_user_skill", ["userId", "skillName"])
+    .index("by_endorser", ["endorserId"])
+    .index("by_user_skill_endorser", ["userId", "skillName", "endorserId"]),
+
+  // Phase 5.1 — Communities / Groups
+  communities: defineTable({
+    name: v.string(),
+    slug: v.string(),                  // unique URL-friendly identifier
+    description: v.string(),
+    avatar: v.optional(v.string()),    // image URL
+    banner: v.optional(v.string()),    // banner image URL
+    type: v.union(
+      v.literal("public"),
+      v.literal("private"),
+      v.literal("secret")
+    ),
+    category: v.string(),              // e.g. Academic, Research, Social, Sports, Clubs
+    rules: v.array(v.string()),        // community rules list
+    memberCount: v.number(),
+    createdBy: v.id("users"),
+    createdAt: v.number(),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_category", ["category"])
+    .index("by_member_count", ["memberCount"]),
+
+  communityMembers: defineTable({
+    communityId: v.id("communities"),
+    userId: v.id("users"),
+    role: v.union(
+      v.literal("owner"),
+      v.literal("admin"),
+      v.literal("moderator"),
+      v.literal("member"),
+      v.literal("pending")             // awaiting approval for private community
+    ),
+    joinedAt: v.number(),
+  })
+    .index("by_community", ["communityId"])
+    .index("by_user", ["userId"])
+    .index("by_community_user", ["communityId", "userId"]),
 })
