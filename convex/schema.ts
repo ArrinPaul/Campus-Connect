@@ -55,6 +55,14 @@ export default defineSchema({
     // Phase 6.5 — Gamification
     reputation: v.optional(v.number()),
     level: v.optional(v.number()),
+    // Phase 7.1 — Premium
+    isPro: v.optional(v.boolean()),
+    proExpiresAt: v.optional(v.number()),
+    isVerified: v.optional(v.boolean()),
+    stripeCustomerId: v.optional(v.string()),
+    // Phase 7.4 — Email prefs
+    emailDigestFrequency: v.optional(v.union(v.literal("daily"), v.literal("weekly"), v.literal("never"))),
+    emailNotifications: v.optional(v.boolean()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -636,6 +644,102 @@ export default defineSchema({
     name: v.string(),
     description: v.string(),
     earnedAt: v.number(),
+  })
+    .index("by_user", ["userId"]),
+
+  // Phase 7.1 — Subscriptions
+  subscriptions: defineTable({
+    userId: v.id("users"),
+    stripeSubscriptionId: v.optional(v.string()),
+    stripeCustomerId: v.optional(v.string()),
+    plan: v.union(v.literal("free"), v.literal("pro")),
+    status: v.union(
+      v.literal("active"),
+      v.literal("cancelled"),
+      v.literal("past_due"),
+      v.literal("trialing")
+    ),
+    currentPeriodStart: v.optional(v.number()),
+    currentPeriodEnd: v.optional(v.number()),
+    cancelAtPeriodEnd: v.optional(v.boolean()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_stripe_sub", ["stripeSubscriptionId"]),
+
+  // Phase 7.2 — Advertising
+  ads: defineTable({
+    title: v.string(),
+    content: v.string(),
+    imageUrl: v.optional(v.string()),
+    linkUrl: v.string(),
+    advertiserId: v.id("users"),
+    targetUniversity: v.optional(v.string()),
+    targetRole: v.optional(v.string()),
+    targetSkills: v.optional(v.array(v.string())),
+    budget: v.number(),
+    impressions: v.number(),
+    clicks: v.number(),
+    status: v.union(v.literal("active"), v.literal("paused"), v.literal("expired")),
+    expiresAt: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_advertiser", ["advertiserId"])
+    .index("by_status", ["status"]),
+
+  adImpressions: defineTable({
+    adId: v.id("ads"),
+    userId: v.id("users"),
+    viewedAt: v.number(),
+  })
+    .index("by_ad", ["adId"])
+    .index("by_user_ad", ["userId", "adId"]),
+
+  adClicks: defineTable({
+    adId: v.id("ads"),
+    userId: v.id("users"),
+    clickedAt: v.number(),
+  })
+    .index("by_ad", ["adId"]),
+
+  // Phase 7.3 — Marketplace
+  listings: defineTable({
+    title: v.string(),
+    description: v.string(),
+    category: v.union(
+      v.literal("books"),
+      v.literal("electronics"),
+      v.literal("furniture"),
+      v.literal("services"),
+      v.literal("other")
+    ),
+    price: v.number(),
+    condition: v.union(
+      v.literal("new"),
+      v.literal("like_new"),
+      v.literal("good"),
+      v.literal("fair"),
+      v.literal("poor")
+    ),
+    images: v.optional(v.array(v.string())),
+    sellerId: v.id("users"),
+    university: v.optional(v.string()),
+    status: v.union(v.literal("active"), v.literal("sold"), v.literal("expired")),
+    expiresAt: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_seller", ["sellerId"])
+    .index("by_category", ["category"])
+    .index("by_status", ["status"]),
+
+  // Phase 7.4 — Push Notifications
+  pushSubscriptions: defineTable({
+    userId: v.id("users"),
+    endpoint: v.string(),
+    p256dh: v.string(),
+    auth: v.string(),
+    createdAt: v.number(),
   })
     .index("by_user", ["userId"]),
 })
