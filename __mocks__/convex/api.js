@@ -149,4 +149,16 @@ export const api = {
     getChronologicalFeed: 'feedRanking:getChronologicalFeed',
     getTrendingFeed: 'feedRanking:getTrendingFeed',
   },
+  recommendations: {
+    getRecommendedPosts: 'recommendations:getRecommendedPosts',
+    getSimilarPosts: 'recommendations:getSimilarPosts',
+    getTrendingInSkill: 'recommendations:getTrendingInSkill',
+    getPopularInUniversity: 'recommendations:getPopularInUniversity',
+  },
+  search: {
+    universalSearch: 'search:universalSearch',
+    searchPosts: 'search:searchPosts',
+    searchUsersEnhanced: 'search:searchUsersEnhanced',
+    searchHashtags: 'search:searchHashtags',
+  },
 }

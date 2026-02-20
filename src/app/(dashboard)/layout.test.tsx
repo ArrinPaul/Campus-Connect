@@ -31,6 +31,11 @@ jest.mock("@/components/navigation/mobile-nav", () => ({
   MobileNav: () => <div data-testid="mobile-nav">MobileNav</div>,
 }))
 
+// Mock UniversalSearchBar
+jest.mock("@/components/navigation/UniversalSearchBar", () => ({
+  UniversalSearchBar: () => <div data-testid="universal-search-bar">SearchBar</div>,
+}))
+
 // Mock NotificationBell
 jest.mock("@/components/notifications/NotificationBell", () => ({
   NotificationBell: () => <div data-testid="notification-bell">NotificationBell</div>,

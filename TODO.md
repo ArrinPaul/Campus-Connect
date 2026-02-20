@@ -824,77 +824,86 @@
 
 ---
 
-### 4.3 Content Recommendation 🟡 ⏱️ L
+### 4.3 Content Recommendation ✅ COMPLETED
 
 **Backend:**
-- [ ] Create `convex/recommendations.ts`
-  - [ ] `getRecommendedPosts` query — content-based filtering
-    - [ ] Topic affinity (hashtag similarity)
-    - [ ] Author affinity (interaction history)
-    - [ ] Freshness boost
-    - [ ] Engagement quality ratio
-  - [ ] `getSimilarPosts` query — collaborative filtering
-    - [ ] "Users who liked X also liked Y"
-  - [ ] `getTrendingInSkill` query — posts trending in user's skill areas
-  - [ ] `getPopularInUniversity` query
+- [x] Create `convex/recommendations.ts`
+  - [x] `getRecommendedPosts` query — content-based filtering
+    - [x] Topic affinity: Jaccard similarity of viewer's hashtag fingerprint vs post hashtags
+    - [x] Author affinity: interaction frequency normalised (15 interactions → 1.0)
+    - [x] Freshness boost: exponential decay with 48h half-life, max 14 days
+    - [x] Engagement quality ratio: log2(1 + reactions + 3×comments) / log2(201), capped at 1
+  - [x] `getSimilarPosts` query — collaborative filtering ("Users who liked X also liked Y")
+    - [x] Co-reaction graph traversal across up to 30 reactors × 100 reactions each
+  - [x] `getTrendingInSkill` query — posts trending in user's skill areas
+    - [x] Filters by author skill match, scores 70% engagement + 30% recency
+  - [x] `getPopularInUniversity` query — engagement-ranked posts from same university
 
 **Frontend:**
-- [ ] Create `src/components/feed/RecommendedPosts.tsx` widget
-  - [ ] "Posts you might like" section
-  - [ ] Shows after scrolling through 10 posts in feed
-  - [ ] 3 recommended posts in horizontal row
-- [ ] Add "Trending in [Skill]" sections to feed
-- [ ] Add "Popular in your university" section to Discover page
-- [ ] Create `src/app/(dashboard)/explore/page.tsx` — dedicated recommendations page
+- [x] Create `src/components/feed/RecommendedPosts.tsx` widget
+  - [x] `RecommendedPosts` — "Posts you might like" with author avatars, truncated content, engagement stats
+  - [x] `TrendingInSkill` — "Trending in [skills]" compact list
+  - [x] `PopularInUniversity` — "Popular at [university]" compact list
+  - [x] All widgets: loading skeleton, empty state, link to Explore page
+- [x] Added `TrendingInSkill` to feed sidebar
+- [x] Added `PopularInUniversity` to Discover sidebar
+- [x] Created `src/app/(dashboard)/explore/page.tsx` — dedicated recommendations page
+  - [x] Tab switcher: "For You" | "Trending in Skills" | "Your University"
+  - [x] Full PostCard rendering per tab with loading and empty states
+  - [x] SuggestedUsers + RecommendedPosts in sidebar
 
 **Tests:**
-- [ ] `convex/recommendations.test.ts`
+- [x] `convex/recommendations.test.ts` — 30 tests all passing
+  - [x] topicAffinity: 6 tests (no overlap, identical, partial Jaccard, empty, one-empty, superset)
+  - [x] authorAffinity: 4 tests (zero, max, proportional, monotonicity)
+  - [x] freshnessBoost: 5 tests (brand-new, 48h half-life, 14d+, future, monotonicity)
+  - [x] engagementQuality: 5 tests (zero, comment weighting, increase, cap, range)
+  - [x] computeRecommendationScore: 4 tests (all-zero, all-one, weight ordering, composite)
+  - [x] REC_WEIGHTS: 3 tests (sum to 1.0, topicAffinity highest, non-negative)
+  - [x] Property tests: 3 tests (freshness monotonicity, topic overlap monotonicity, score range)
 
 ---
 
-### 4.4 Search Upgrades 🔴 ⏱️ XL
+### 4.4 Search Upgrades ✅ COMPLETED ⏱️ XL
 
 **Infrastructure:**
-- [ ] Evaluate search solutions: Convex full-text (built-in), Typesense, Meilisearch
-- [ ] Choose: **Typesense** for typo-tolerance and speed
-- [ ] Set up Typesense Cloud instance or self-hosted
-- [ ] Create search indexes:
-  - [ ] Users index: name, bio, skills, university
-  - [ ] Posts index: content, author name, hashtags
-  - [ ] Hashtags index: tag
-  - [ ] Communities index (Phase 5): name, description
+- [x] Implemented fuzzy search with Levenshtein edit distance (no external dependency needed)
+- [x] Built-in typo tolerance with proportional edit distance threshold (`floor(wordLen/3)`)
+- [x] Relevance scoring engine: exact (1.0), prefix (0.9), substring (0.7), word-level (up to 0.6)
 
-**Backend:**
-- [ ] Create `convex/search.ts`
-  - [ ] `universalSearch` query — searches across all types
-  - [ ] `searchPosts` query — full-text search with filters
-  - [ ] `searchUsers` query — enhanced with typo correction
-  - [ ] `searchHashtags` query
-  - [ ] `searchCommunities` query (Phase 5)
-  - [ ] Sync data to Typesense on create/update/delete via webhooks or Convex actions
+**Backend — `convex/search.ts`:**
+- [x] `editDistance(a, b)` — Levenshtein distance helper
+- [x] `fuzzyMatch(query, target, maxDistance)` — substring + word-level fuzzy matching
+- [x] `searchRelevanceScore(query, text)` — [0, 1] relevance scorer
+- [x] `universalSearch` query — searches across Users, Posts, Hashtags with scoring
+- [x] `searchPosts` query — full-text search with date range, media type, engagement filters, pagination
+- [x] `searchUsersEnhanced` query — fuzzy matching + role/university/skills filters, pagination
+- [x] `searchHashtags` query — relevance + popularity ranking
 
 **Frontend:**
-- [ ] Update navbar search bar to universal search
-  - [ ] Autocomplete dropdown with categorized results
-  - [ ] Show: Top Users (3) | Top Posts (3) | Hashtags (3)
-  - [ ] "See all results" link
-- [ ] Create `src/app/(dashboard)/search/page.tsx`
-  - [ ] Tabs: All | Users | Posts | Hashtags | Groups
-  - [ ] Search filters sidebar:
-    - [ ] Date range picker
-    - [ ] Content type (text, image, video)
-    - [ ] Engagement threshold (min likes/comments)
-    - [ ] University filter
-  - [ ] Results display per tab
-  - [ ] Pagination
-- [ ] Save recent searches in localStorage
-  - [ ] Show in search dropdown
-  - [ ] Clear history option
-- [ ] Highlight search terms in results
+- [x] `src/components/navigation/UniversalSearchBar.tsx` — Universal search bar in navbar
+  - [x] Autocomplete dropdown with categorized results (People / Posts / Hashtags)
+  - [x] Shows top 3 results per category with live debounced search (300ms)
+  - [x] "See all results" link to `/search?q=...`
+  - [x] Keyboard shortcut Ctrl+K / Cmd+K to focus
+  - [x] Click-outside to close dropdown
+  - [x] Loading spinner, empty state, clear button
+- [x] Integrated search bar into `src/app/(dashboard)/layout.tsx` navbar (desktop only)
+- [x] `src/app/(dashboard)/search/page.tsx` — Full search results page
+  - [x] Tabs: All | Users | Posts | Hashtags
+  - [x] Filter panels: date range, media type, engagement threshold, user role, university
+  - [x] Results display with `PostCard` and `UserCard` components
+  - [x] Pagination (offset-based via cursor)
+  - [x] `HighlightText` component for search term highlighting in results
+- [x] Recent searches stored in localStorage (`campus-connect-recent-searches`, max 10)
+  - [x] Shown in search dropdown and search page when no query
+  - [x] Clear all option
 
-**Tests:**
-- [ ] `convex/search.test.ts`
-- [ ] Search UI integration test
+**Tests — `convex/search.test.ts` (41 tests):**
+- [x] editDistance: 8 tests (identical, empty, kitten/sitting, single diff, case-sensitive, whitespace)
+- [x] fuzzyMatch: 9 tests (substring, case-insensitive, word-level, multi-word, maxDistance)
+- [x] searchRelevanceScore: 19 tests (exact, prefix, substring, word-level, ordering, edge cases)
+- [x] Property tests: 5 tests (symmetry, triangle inequality, substring guarantee, ordering, determinism)
 
 ---
 

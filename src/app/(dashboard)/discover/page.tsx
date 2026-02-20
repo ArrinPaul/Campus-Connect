@@ -9,6 +9,7 @@ import { UserFilterPanel } from "@/components/profile/UserFilterPanel"
 import { UserCard } from "@/components/profile/UserCard"
 import { UserCardSkeleton } from "@/components/ui/loading-skeleton"
 import { SuggestedUsers } from "@/components/discover/SuggestedUsers"
+import { PopularInUniversity } from "@/components/feed/RecommendedPosts"
 
 interface FilterCriteria {
   role?: "Student" | "Research Scholar" | "Faculty"
@@ -57,6 +58,7 @@ export default function DiscoverPage() {
           <div className="space-y-4">
             <UserFilterPanel onFilterChange={handleFilterChange} />
             <SuggestedUsers limit={5} showSeeAll />
+            <PopularInUniversity limit={5} />
           </div>
         </aside>
 

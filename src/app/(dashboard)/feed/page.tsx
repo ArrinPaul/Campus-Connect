@@ -8,6 +8,7 @@ import { ErrorBoundary } from "@/components/error-boundary"
 import { TrendingHashtags } from "@/components/trending/TrendingHashtags"
 import { StoryRow } from "@/components/stories/StoryRow"
 import { SuggestedUsers } from "@/components/discover/SuggestedUsers"
+import { RecommendedPosts, TrendingInSkill } from "@/components/feed/RecommendedPosts"
 
 export type FeedType = "for-you" | "following" | "trending"
 
@@ -108,6 +109,12 @@ export default function FeedPage() {
             </ErrorBoundary>
             <ErrorBoundary>
               <SuggestedUsers limit={3} showSeeAll />
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <RecommendedPosts limit={3} />
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <TrendingInSkill limit={5} />
             </ErrorBoundary>
           </div>
         </aside>

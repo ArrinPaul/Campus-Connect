@@ -5,6 +5,7 @@ import Link from "next/link"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
 import { MobileNav } from "@/components/navigation/mobile-nav"
 import { NotificationBell } from "@/components/notifications/NotificationBell"
+import { UniversalSearchBar } from "@/components/navigation/UniversalSearchBar"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { useHeartbeat } from "@/hooks/useHeartbeat"
@@ -35,6 +36,11 @@ export default function DashboardLayout({
               <Link href="/feed" className="text-lg font-bold text-blue-600 dark:text-blue-400 sm:text-xl">
                 Campus Connect
               </Link>
+            </div>
+
+            {/* Universal Search Bar - Hidden on mobile */}
+            <div className="hidden flex-1 justify-center px-4 md:flex lg:px-8">
+              <UniversalSearchBar />
             </div>
 
             {/* Desktop Navigation Links - Hidden on mobile */}

@@ -26,6 +26,11 @@ jest.mock("@/components/discover/SuggestedUsers", () => ({
   SuggestedUsers: () => <div data-testid="suggested-users">SuggestedUsers</div>,
 }))
 
+jest.mock("@/components/feed/RecommendedPosts", () => ({
+  RecommendedPosts: () => <div data-testid="recommended-posts">RecommendedPosts</div>,
+  TrendingInSkill: () => <div data-testid="trending-in-skill">TrendingInSkill</div>,
+}))
+
 jest.mock("convex/react", () => ({
   useQuery: jest.fn(() => null),
   useMutation: jest.fn(() => jest.fn()),
