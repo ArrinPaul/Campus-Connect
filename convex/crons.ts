@@ -23,4 +23,15 @@ crons.interval(
   internal.suggestions.computeAllSuggestions
 )
 
+/**
+ * Send event reminders every hour.
+ * Notifies attendees of events starting in ~24h or ~1h.
+ * Phase 5.3 — Events & Scheduling
+ */
+crons.interval(
+  "send event reminders",
+  { hours: 1 },
+  internal.events.sendEventReminders
+)
+
 export default crons

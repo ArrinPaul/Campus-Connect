@@ -8,6 +8,11 @@ jest.mock("convex/react", () => ({
   useQuery: jest.fn(() => null),
 }))
 
+// Mock Clerk
+jest.mock("@clerk/nextjs", () => ({
+  useUser: jest.fn(() => ({ isLoaded: true, isSignedIn: false })),
+}))
+
 // Mock next/image
 jest.mock("next/image", () => ({
   __esModule: true,
@@ -21,6 +26,25 @@ jest.mock("next/image", () => ({
 jest.mock("next/link", () => ({
   __esModule: true,
   default: ({ children, ...props }: any) => <a {...props}>{children}</a>,
+}))
+
+// Mock RichTextEditor (uses react-markdown which is ESM-only)
+jest.mock("@/components/editor/RichTextEditor", () => ({
+  CompactRichTextEditor: ({ value, onChange, placeholder, disabled }: any) => (
+    <textarea
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      disabled={disabled}
+      data-testid="rich-text-editor"
+    />
+  ),
+}))
+
+// Mock loading-skeleton
+jest.mock("@/components/ui/loading-skeleton", () => ({
+  CommentSkeleton: () => <div data-testid="comment-skeleton" />,
+  ButtonLoadingSpinner: () => <span data-testid="loading-spinner" />,
 }))
 
 describe("CommentList", () => {

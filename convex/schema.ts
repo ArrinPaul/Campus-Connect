@@ -146,6 +146,9 @@ export default defineSchema({
     postId: v.id("posts"),
     authorId: v.id("users"),
     content: v.string(),
+    parentCommentId: v.optional(v.id("comments")),
+    depth: v.optional(v.number()),
+    replyCount: v.optional(v.number()),
     reactionCounts: v.optional(
       v.object({
         like: v.number(),
@@ -159,7 +162,8 @@ export default defineSchema({
     createdAt: v.number(),
   })
     .index("by_post", ["postId"])
-    .index("by_author", ["authorId"]),
+    .index("by_author", ["authorId"])
+    .index("by_parent", ["parentCommentId"]),
 
   follows: defineTable({
     followerId: v.id("users"),
@@ -439,4 +443,42 @@ export default defineSchema({
     .index("by_community", ["communityId"])
     .index("by_user", ["userId"])
     .index("by_community_user", ["communityId", "userId"]),
+
+  // Phase 5.3 — Events & Scheduling
+  events: defineTable({
+    title: v.string(),
+    description: v.string(),
+    organizerId: v.id("users"),
+    communityId: v.optional(v.id("communities")),
+    eventType: v.union(
+      v.literal("in_person"),
+      v.literal("virtual"),
+      v.literal("hybrid")
+    ),
+    startDate: v.number(),             // Unix timestamp
+    endDate: v.number(),               // Unix timestamp
+    location: v.optional(v.string()), // physical location / address
+    virtualLink: v.optional(v.string()), // video call URL
+    isRecurring: v.boolean(),
+    maxAttendees: v.optional(v.number()),
+    attendeeCount: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_start_date", ["startDate"])
+    .index("by_organizer", ["organizerId"])
+    .index("by_community", ["communityId"]),
+
+  eventRSVPs: defineTable({
+    eventId: v.id("events"),
+    userId: v.id("users"),
+    status: v.union(
+      v.literal("going"),
+      v.literal("maybe"),
+      v.literal("not_going")
+    ),
+    createdAt: v.number(),
+  })
+    .index("by_event", ["eventId"])
+    .index("by_user", ["userId"])
+    .index("by_event_user", ["eventId", "userId"]),
 })

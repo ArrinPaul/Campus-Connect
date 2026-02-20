@@ -58,6 +58,7 @@ export const api = {
   },
   comments: {
     getPostComments: 'comments:getPostComments',
+    getCommentReplies: 'comments:getCommentReplies',
     createComment: 'comments:createComment',
     deleteComment: 'comments:deleteComment',
   },
@@ -191,5 +192,17 @@ export const api = {
     findExperts: 'matching:findExperts',
     findStudyPartners: 'matching:findStudyPartners',
     findMentors: 'matching:findMentors',
+  },
+  events: {
+    createEvent: 'events:createEvent',
+    updateEvent: 'events:updateEvent',
+    deleteEvent: 'events:deleteEvent',
+    rsvpEvent: 'events:rsvpEvent',
+    getEvent: 'events:getEvent',
+    getUpcomingEvents: 'events:getUpcomingEvents',
+    getPastEvents: 'events:getPastEvents',
+    getUserEvents: 'events:getUserEvents',
+    getCommunityEvents: 'events:getCommunityEvents',
+    getEventAttendees: 'events:getEventAttendees',
   },
 }
