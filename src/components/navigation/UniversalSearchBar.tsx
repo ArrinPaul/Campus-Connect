@@ -126,8 +126,9 @@ export function UniversalSearchBar() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsFocused(true)}
-          placeholder="Search... (Ctrl+K)"
+          placeholder="Search... (/ or Ctrl+K)"
           aria-label="Search"
+          data-search-input
           className="h-9 w-full rounded-full border border-border bg-muted pl-9 pr-8 text-sm text-foreground placeholder:text-muted-foreground transition-colors focus:border-ring focus:bg-card focus:outline-none focus:ring-1 focus:ring-ring border-border bg-muted text-foreground dark:placeholder:text-muted-foreground dark:focus:border-blue-400 dark:focus:bg-muted"
         />
         {query && (

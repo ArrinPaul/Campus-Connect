@@ -5,6 +5,8 @@ import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { X, Image as ImageIcon, Type, Check, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import imageCompression from "browser-image-compression"
+import imageCompression from "browser-image-compression"
 
 // Preset background colours for text stories
 const BG_PRESETS = [
@@ -64,10 +66,10 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
     onClose()
   }
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    if (!["image/jpeg", "image/png", "image/gif", "image/webp"].includes(file.type)) {
+    if (![ "image/jpeg", "image/png", "image/gif", "image/webp"].includes(file.type)) {
       setError("Only JPEG, PNG, GIF, or WebP images are allowed")
       return
     }
@@ -76,9 +78,24 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
       return
     }
     setError("")
-    setImageFile(file)
-    if (imagePreview) URL.revokeObjectURL(imagePreview)
-    setImagePreview(URL.createObjectURL(file))
+    
+    // Compress image before setting
+    try {
+      const compressed = await imageCompression(file, {
+        maxSizeMB: 2,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      })
+      setImageFile(compressed)
+      if (imagePreview) URL.revokeObjectURL(imagePreview)
+      setImagePreview(URL.createObjectURL(compressed))
+    } catch (err) {
+      console.error("Image compression failed:", err)
+      // Fallback to original file if compression fails
+      setImageFile(file)
+      if (imagePreview) URL.revokeObjectURL(imagePreview)
+      setImagePreview(URL.createObjectURL(file))
+    }
     e.target.value = ""
   }
 

@@ -7,6 +7,8 @@ import { ConvexClientProvider } from "@/components/providers/convex-provider"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { PostHogProvider } from "@/components/providers/posthog-provider"
 import { PostHogPageView } from "@/components/analytics/posthog-pageview"
+import { LiveRegionProvider } from "@/components/accessibility/LiveRegion"
+import { SkipLink } from "@/components/accessibility/SkipLink"
 import { Toaster } from "sonner"
 import "./globals.css"
 
@@ -90,6 +92,8 @@ export default function RootLayout({
     >
       <html lang="en" suppressHydrationWarning className={inter.variable}>
         <body className="font-sans antialiased">
+          {/* Skip link — must be the absolute first focusable element */}
+          <SkipLink />
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -98,8 +102,10 @@ export default function RootLayout({
           >
             <ConvexClientProvider>
               <PostHogProvider>
-                <PostHogPageView />
-                {children}
+                <LiveRegionProvider>
+                  <PostHogPageView />
+                  {children}
+                </LiveRegionProvider>
               </PostHogProvider>
             </ConvexClientProvider>
           </ThemeProvider>

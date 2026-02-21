@@ -3,6 +3,7 @@
 import { useState, useRef } from "react"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
+import imageCompression from "browser-image-compression"
 import {
   validateBio,
   validateUniversity,
@@ -58,7 +59,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [successMessage, setSuccessMessage] = useState("")
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       // Validate file type
@@ -73,15 +74,34 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
         return
       }
 
-      setSelectedImage(file)
-      setErrors({ ...errors, image: "" })
+      // Compress image before upload
+      try {
+        const compressed = await imageCompression(file, {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 800, // Profile pictures don't need to be huge
+          useWebWorker: true,
+        })
+        setSelectedImage(compressed)
+        setErrors({ ...errors, image: "" })
 
-      // Create preview
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string)
+        // Create preview
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string)
+        }
+        reader.readAsDataURL(compressed)
+      } catch (err) {
+        console.error("Image compression failed:", err)
+        // Fallback to original file
+        setSelectedImage(file)
+        setErrors({ ...errors, image: "" })
+
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string)
+        }
+        reader.readAsDataURL(file)
       }
-      reader.readAsDataURL(file)
     }
   }
 

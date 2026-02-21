@@ -92,6 +92,7 @@ export function BookmarkButton({
                       ? "text-primary"
                       : "text-muted-foreground hover:text-foreground"
                   } ${compact ? "px-2 py-1 text-sm" : ""}`}
+                  aria-label={isBookmarked ? "Remove bookmark" : "Bookmark post"}
                 >
                   {isBookmarked ? (
                     <BookmarkCheck className="h-5 w-5" />
@@ -182,6 +183,7 @@ export function BookmarkButton({
                 onClick={handleCreateCollection}
                 disabled={!newCollectionName.trim()}
                 className="px-2 py-1 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Create collection"
               >
                 <FolderPlus className="h-4 w-4" />
               </button>

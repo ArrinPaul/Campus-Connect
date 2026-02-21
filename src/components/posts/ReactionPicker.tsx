@@ -125,6 +125,7 @@ export function ReactionPicker({
                   ? "bg-primary/10 dark:bg-blue-900/30 text-primary"
                   : "text-muted-foreground hover:text-foreground"
               } ${compact ? "px-2 py-1 text-sm" : ""}`}
+              aria-label={userReaction ? `You reacted with ${reactionLabels[userReaction as ReactionType]}` : "React to this post"}
             >
               {userReaction ? (
                 <span className="text-lg">{reactionEmojis[userReaction as ReactionType]}</span>
@@ -160,6 +161,7 @@ export function ReactionPicker({
                   userReaction === type ? "scale-110 bg-accent" : ""
                 }`}
                 title={reactionLabels[type]}
+                aria-label={`React with ${reactionLabels[type]}`}
               >
                 {reactionEmojis[type]}
               </button>

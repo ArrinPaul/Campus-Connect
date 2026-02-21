@@ -7,6 +7,7 @@ import { api } from "@/../convex/_generated/api"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
+import { useLiveRegion } from "@/components/accessibility/LiveRegion"
 
 /**
  * NotificationBell component
@@ -16,7 +17,9 @@ import { formatDistanceToNow } from "date-fns"
 export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const prevUnreadRef = useRef<number | undefined>(undefined)
   const router = useRouter()
+  const { announce } = useLiveRegion()
 
   const unreadCount = useQuery(api.notifications.getUnreadCount)
   const recentNotifications = useQuery(api.notifications.getRecentNotifications)
@@ -33,9 +36,24 @@ export function NotificationBell() {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
+  // Announce changes in unread notification count to screen readers
+  useEffect(() => {
+    if (unreadCount === undefined) return
+    const prev = prevUnreadRef.current
+    if (prev !== undefined && unreadCount > prev) {
+      const diff = unreadCount - prev
+      announce(
+        diff === 1
+          ? "1 new notification"
+          : `${diff} new notifications`,
+        "polite"
+      )
+    }
+    prevUnreadRef.current = unreadCount
+  }, [unreadCount, announce])
+
   const handleNotificationClick = (notificationId: string, referenceId?: string) => {
     setIsOpen(false)
-    // Navigate to the referenced post/profile if available
     if (referenceId) {
       router.push(`/feed?post=${referenceId}`)
     }
@@ -47,13 +65,23 @@ export function NotificationBell() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 text-muted-foreground hover:bg-accent rounded-lg transition-colors"
-        aria-label="Notifications"
+        aria-label={
+          unreadCount
+            ? `Notifications, ${unreadCount} unread`
+            : "Notifications"
+        }
+        aria-haspopup="dialog"
+        aria-expanded={isOpen}
+        aria-controls="notification-dropdown"
       >
-        <Bell className="w-6 h-6" />
-        
+        <Bell className="w-6 h-6" aria-hidden="true" />
+
         {/* Unread Badge */}
         {unreadCount !== undefined && unreadCount > 0 && (
-          <span className="absolute top-0 right-0 flex items-center justify-center w-5 h-5 text-xs font-bold text-primary-foreground bg-destructive rounded-full">
+          <span
+            aria-hidden="true"
+            className="absolute top-0 right-0 flex items-center justify-center w-5 h-5 text-xs font-bold text-primary-foreground bg-destructive rounded-full"
+          >
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
@@ -61,7 +89,13 @@ export function NotificationBell() {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-card border border-border rounded-lg shadow-lg z-50">
+        <div
+          id="notification-dropdown"
+          role="dialog"
+          aria-label="Notifications"
+          aria-modal="false"
+          className="absolute right-0 mt-2 w-80 bg-card border border-border rounded-lg shadow-lg z-50"
+        >
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <h3 className="font-semibold text-foreground">Notifications</h3>

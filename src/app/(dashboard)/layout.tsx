@@ -2,11 +2,12 @@
 
 import { UserButton } from "@clerk/nextjs"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
 import { MobileNav } from "@/components/navigation/mobile-nav"
 import { NotificationBell } from "@/components/notifications/NotificationBell"
 import { UniversalSearchBar } from "@/components/navigation/UniversalSearchBar"
+import { KeyboardShortcutsModal } from "@/components/accessibility/KeyboardShortcutsModal"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { useHeartbeat } from "@/hooks/useHeartbeat"
@@ -30,10 +31,11 @@ import {
   Trophy,
   Megaphone,
   Search,
+  Keyboard,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 interface NavItem {
   label: string
@@ -54,8 +56,87 @@ export default function DashboardLayout({
   )
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
+  const [shortcutsOpen, setShortcutsOpen] = useState(false)
+  const router = useRouter()
+  const gPressedRef = useRef(false)
+  const gTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   useHeartbeat(!!currentUser)
+
+  // ── Global keyboard shortcuts ──────────────────────────────
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      const tag = (e.target as HTMLElement).tagName
+      const isEditable =
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        (e.target as HTMLElement).isContentEditable
+
+      // ? → open keyboard shortcuts (any context)
+      if (e.key === "?" && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault()
+        setShortcutsOpen((o) => !o)
+        return
+      }
+
+      // Remaining shortcuts are disabled when typing
+      if (isEditable) return
+
+      // / → focus search
+      if (e.key === "/") {
+        e.preventDefault()
+        const searchInput = document.querySelector<HTMLInputElement>(
+          "[data-search-input]"
+        )
+        searchInput?.focus()
+        return
+      }
+
+      // G + <key> navigation sequences
+      if (e.key === "g" || e.key === "G") {
+        gPressedRef.current = true
+        if (gTimerRef.current) clearTimeout(gTimerRef.current)
+        gTimerRef.current = setTimeout(() => {
+          gPressedRef.current = false
+        }, 1000)
+        return
+      }
+
+      if (gPressedRef.current) {
+        gPressedRef.current = false
+        if (gTimerRef.current) clearTimeout(gTimerRef.current)
+        const map: Record<string, string> = {
+          f: "/feed",
+          F: "/feed",
+          d: "/discover",
+          D: "/discover",
+          m: "/messages",
+          M: "/messages",
+          b: "/bookmarks",
+          B: "/bookmarks",
+          p: "/profile",
+          P: "/profile",
+          s: "/settings",
+          S: "/settings",
+        }
+        const dest = map[e.key]
+        if (dest) {
+          e.preventDefault()
+          if (dest === "/profile" && currentUser) {
+            router.push(`/profile/${currentUser._id}`)
+          } else {
+            router.push(dest)
+          }
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+      if (gTimerRef.current) clearTimeout(gTimerRef.current)
+    }
+  }, [router, currentUser])
 
   const mainNav: NavItem[] = [
     { label: "Feed", href: "/feed", icon: Home },
@@ -89,8 +170,12 @@ export default function DashboardLayout({
 
   return (
     <div className="flex min-h-screen bg-background">
+      {/* Keyboard shortcuts modal */}
+      <KeyboardShortcutsModal open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
+
       {/* ── Sidebar (desktop) ─────────────────────────────── */}
       <aside
+        aria-label="Main navigation"
         className={cn(
           "hidden md:flex flex-col fixed inset-y-0 left-0 z-40 border-r border-sidebar-border bg-sidebar transition-all duration-300 ease-in-out",
           collapsed ? "w-[68px]" : "w-60"
@@ -109,9 +194,9 @@ export default function DashboardLayout({
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-4 px-2 scrollbar-thin">
+        <nav className="flex-1 overflow-y-auto py-4 px-2 scrollbar-thin" aria-label="Primary">
           {/* Main */}
-          <div className="space-y-1">
+          <div className="space-y-1" role="region" aria-label="Main links">
             {mainNav.map((item) => (
               <Link
                 key={item.href}
@@ -145,12 +230,12 @@ export default function DashboardLayout({
 
           {/* Explore section */}
           {!collapsed && (
-            <p className="mt-6 mb-2 px-3 text-xs font-medium uppercase tracking-wider text-muted-foreground/70">
+            <p className="mt-6 mb-2 px-3 text-xs font-medium uppercase tracking-wider text-muted-foreground/70" id="explore-nav-label">
               Explore
             </p>
           )}
           {collapsed && <div className="my-4 mx-3 h-px bg-sidebar-border" />}
-          <div className="space-y-1">
+          <div className="space-y-1" role="region" aria-labelledby={!collapsed ? "explore-nav-label" : undefined} aria-label={collapsed ? "Explore links" : undefined}>
             {exploreNav.map((item) => (
               <Link
                 key={item.href}
@@ -170,7 +255,7 @@ export default function DashboardLayout({
         </nav>
 
         {/* Bottom section */}
-        <div className="border-t border-sidebar-border p-2 space-y-1">
+        <div className="border-t border-sidebar-border p-2 space-y-1" role="region" aria-label="User actions">
           {currentUser && (
             <Link
               href={`/profile/${currentUser._id}`}
@@ -218,7 +303,11 @@ export default function DashboardLayout({
       {/* ── Main Area ─────────────────────────────────────── */}
       <div className={cn("flex flex-1 flex-col transition-all duration-300", collapsed ? "md:pl-[68px]" : "md:pl-60")}>
         {/* Top Bar */}
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-background/80 backdrop-blur-xl px-4 sm:px-6">
+        <header
+          role="banner"
+          aria-label="Site header"
+          className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-background/80 backdrop-blur-xl px-4 sm:px-6"
+        >
           {/* Mobile hamburger */}
           <div className="flex items-center md:hidden">
             <MobileNav currentUserId={currentUser?._id} />
@@ -246,6 +335,15 @@ export default function DashboardLayout({
           <div className="flex items-center gap-2 ml-auto">
             <NotificationBell />
             <ThemeToggle />
+            {/* Keyboard shortcuts trigger */}
+            <button
+              onClick={() => setShortcutsOpen(true)}
+              className="p-2 text-muted-foreground hover:bg-accent hover:text-foreground rounded-lg transition-colors"
+              aria-label="Keyboard shortcuts (press ? to open)"
+              title="Keyboard shortcuts"
+            >
+              <Keyboard className="h-[18px] w-[18px]" aria-hidden="true" />
+            </button>
             <UserButton
               appearance={{
                 elements: {
@@ -258,7 +356,14 @@ export default function DashboardLayout({
         </header>
 
         {/* Page Content */}
-        <main className="flex-1">{children}</main>
+        <main
+          id="main-content"
+          className="flex-1"
+          aria-label="Main content"
+          tabIndex={-1}
+        >
+          {children}
+        </main>
       </div>
 
       {/* Incoming Call Notification (global) */}

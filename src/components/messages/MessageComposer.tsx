@@ -144,6 +144,7 @@ export function MessageComposer({
             <button
               onClick={onCancelReply}
               className="p-1 rounded-full text-muted-foreground hover:text-muted-foreground"
+              aria-label="Cancel reply"
             >
               <X className="h-3 w-3" />
             </button>
@@ -163,6 +164,7 @@ export function MessageComposer({
                   textareaRef.current?.focus()
                 }}
                 className="p-1.5 text-lg hover:bg-muted dark:hover:bg-muted rounded transition-colors"
+                aria-label={`Insert ${emoji} emoji`}
               >
                 {emoji}
               </button>
@@ -178,6 +180,7 @@ export function MessageComposer({
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
           className="p-2 rounded-full text-muted-foreground hover:text-muted-foreground hover:bg-muted dark:hover:text-muted-foreground hover:bg-accent flex-shrink-0"
           title="Add emoji"
+          aria-label="Add emoji"
         >
           <Smile className="h-5 w-5" />
         </button>
@@ -186,6 +189,7 @@ export function MessageComposer({
         <button
           className="p-2 rounded-full text-muted-foreground hover:text-muted-foreground hover:bg-muted dark:hover:text-muted-foreground hover:bg-accent flex-shrink-0"
           title="Attach file"
+          aria-label="Attach file"
         >
           <Paperclip className="h-5 w-5" />
         </button>
@@ -214,6 +218,7 @@ export function MessageComposer({
               : "bg-muted text-muted-foreground bg-muted dark:text-muted-foreground cursor-not-allowed"
           }`}
           title="Send message"
+          aria-label="Send message"
         >
           <Send className="h-5 w-5" />
         </button>

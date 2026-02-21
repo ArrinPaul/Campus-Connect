@@ -315,6 +315,7 @@ export function MessageBubble({
           <button
             onClick={() => setShowContextMenu(!showContextMenu)}
             className="p-1 rounded-full text-muted-foreground hover:text-muted-foreground hover:bg-accent"
+            aria-label="Message options"
           >
             <MoreHorizontal className="h-4 w-4" />
           </button>

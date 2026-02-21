@@ -241,6 +241,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
               }}
               className="p-2 rounded-lg text-muted-foreground hover:text-success hover:bg-green-50 text-muted-foreground dark:hover:text-green-400 dark:hover:bg-green-900/20 transition-colors"
               title="Audio call"
+              aria-label="Start audio call"
             >
               <Phone className="h-4 w-4" />
             </button>
@@ -260,6 +261,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
               }}
               className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
               title="Video call"
+              aria-label="Start video call"
             >
               <Video className="h-4 w-4" />
             </button>
@@ -272,6 +274,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
             }}
             className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted text-muted-foreground hover:text-foreground hover:bg-accent"
             title="Search messages"
+            aria-label="Search messages"
           >
           <Search className="h-4 w-4" />
           </button>
@@ -281,6 +284,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
               onClick={() => setShowGroupInfo(!showGroupInfo)}
               className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted text-muted-foreground hover:text-foreground hover:bg-accent"
               title="Group info"
+              aria-label="Show group info"
             >
               <Info className="h-4 w-4" />
             </button>
@@ -291,6 +295,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
             <button
               onClick={() => setShowMenu(!showMenu)}
               className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted text-muted-foreground hover:text-foreground hover:bg-accent"
+              aria-label="More options"
             >
               <MoreVertical className="h-4 w-4" />
             </button>

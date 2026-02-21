@@ -6,6 +6,7 @@ import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
+import { ListingDetailSkeleton } from "@/components/ui/loading-skeleton"
 
 const CONDITION_LABELS: Record<string, string> = {
   new: "New",
@@ -25,7 +26,7 @@ export default function ListingDetailPage() {
   const [loading, setLoading] = useState(false)
 
   if (listing === undefined) {
-    return <div className="p-8 text-center text-muted-foreground">Loading…</div>
+    return <ListingDetailSkeleton />
   }
   if (listing === null) {
     return (
