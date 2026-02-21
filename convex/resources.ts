@@ -84,7 +84,7 @@ export const deleteResource = mutation({
 })
 
 /**
- * Rate a resource (1-5 stars)
+ * Rate a resource (1-5 stars) — per-user dedup, allows updating existing rating
  */
 export const rateResource = mutation({
   args: {
@@ -92,21 +92,47 @@ export const rateResource = mutation({
     rating: v.number(),
   },
   handler: async (ctx, args) => {
-    await getAuthUser(ctx)
+    const user = await getAuthUser(ctx)
     const resource = await ctx.db.get(args.resourceId)
     if (!resource) throw new Error("Resource not found")
 
     if (args.rating < 1 || args.rating > 5) throw new Error("Rating must be between 1 and 5")
     if (!Number.isInteger(args.rating)) throw new Error("Rating must be a whole number")
 
-    // Simple moving average (in production, track per-user ratings to prevent duplicates)
-    const newCount = resource.ratingCount + 1
-    const newRating = ((resource.rating * resource.ratingCount) + args.rating) / newCount
+    // Check for existing rating by this user (dedup)
+    const existingRating = await ctx.db
+      .query("resourceRatings")
+      .withIndex("by_user_resource", (q: any) =>
+        q.eq("userId", user._id).eq("resourceId", args.resourceId)
+      )
+      .unique()
 
-    await ctx.db.patch(args.resourceId, {
-      rating: Math.round(newRating * 100) / 100,
-      ratingCount: newCount,
-    })
+    if (existingRating) {
+      // Update existing rating: recalculate average
+      const oldRating = existingRating.rating
+      const newAvg = resource.ratingCount > 1
+        ? ((resource.rating * resource.ratingCount) - oldRating + args.rating) / resource.ratingCount
+        : args.rating
+      await ctx.db.patch(existingRating._id, { rating: args.rating, updatedAt: Date.now() })
+      await ctx.db.patch(args.resourceId, {
+        rating: Math.round(newAvg * 100) / 100,
+      })
+    } else {
+      // New rating
+      const newCount = resource.ratingCount + 1
+      const newAvg = ((resource.rating * resource.ratingCount) + args.rating) / newCount
+      await ctx.db.insert("resourceRatings", {
+        resourceId: args.resourceId,
+        userId: user._id,
+        rating: args.rating,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      })
+      await ctx.db.patch(args.resourceId, {
+        rating: Math.round(newAvg * 100) / 100,
+        ratingCount: newCount,
+      })
+    }
   },
 })
 

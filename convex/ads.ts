@@ -133,7 +133,11 @@ export const updateAd = mutation({
     if (args.budget !== undefined) validateBudget(args.budget)
     if (args.linkUrl !== undefined) validateLinkUrl(args.linkUrl)
 
-    const { adId, ...updates } = args
+    const { adId, ...rest } = args
+    const updates: Record<string, unknown> = {}
+    for (const [key, val] of Object.entries(rest)) {
+      if (val !== undefined) updates[key] = val
+    }
     await ctx.db.patch(adId, updates)
     return { success: true }
   },
@@ -146,6 +150,25 @@ export const deleteAd = mutation({
     const ad = await ctx.db.get(args.adId)
     if (!ad) throw new Error("Ad not found")
     if (ad.advertiserId.toString() !== user._id.toString()) throw new Error("Unauthorized")
+
+    // Cascade: delete impressions
+    const impressions = await ctx.db
+      .query("adImpressions")
+      .withIndex("by_ad", (q: any) => q.eq("adId", args.adId))
+      .collect()
+    for (const imp of impressions) {
+      await ctx.db.delete(imp._id)
+    }
+
+    // Cascade: delete clicks
+    const clicks = await ctx.db
+      .query("adClicks")
+      .withIndex("by_ad", (q: any) => q.eq("adId", args.adId))
+      .collect()
+    for (const click of clicks) {
+      await ctx.db.delete(click._id)
+    }
+
     await ctx.db.delete(args.adId)
     return { success: true }
   },
@@ -187,12 +210,28 @@ export const recordClick = mutation({
     const ad = await ctx.db.get(args.adId)
     if (!ad) return
 
-    await ctx.db.insert("adClicks", {
-      adId: args.adId,
-      userId: user._id,
-      clickedAt: Date.now(),
-    })
-    await ctx.db.patch(args.adId, { clicks: (ad.clicks ?? 0) + 1 })
+    // Deduplication: max 1 click per user per ad per day
+    const startOfDay = new Date()
+    startOfDay.setHours(0, 0, 0, 0)
+    const existing = await ctx.db
+      .query("adClicks")
+      .withIndex("by_ad", (q: any) => q.eq("adId", args.adId))
+      .filter((q: any) =>
+        q.and(
+          q.eq(q.field("userId"), user._id),
+          q.gte(q.field("clickedAt"), startOfDay.getTime())
+        )
+      )
+      .first()
+
+    if (!existing) {
+      await ctx.db.insert("adClicks", {
+        adId: args.adId,
+        userId: user._id,
+        clickedAt: Date.now(),
+      })
+      await ctx.db.patch(args.adId, { clicks: (ad.clicks ?? 0) + 1 })
+    }
   },
 })
 

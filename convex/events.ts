@@ -95,7 +95,7 @@ export const createEvent = mutation({
           await ctx.scheduler.runAfter(0, internal.notifications.createNotification, {
             recipientId: member.userId,
             actorId: user._id,
-            type: "comment" as const,
+            type: "event" as const,
             referenceId: eventId,
             message: `${user.name} created a new event: "${args.title.trim()}"`,
           })
@@ -188,6 +188,15 @@ export const deleteEvent = mutation({
       .collect()
     for (const rsvp of rsvps) {
       await ctx.db.delete(rsvp._id)
+    }
+
+    // Delete notifications referencing this event
+    const notifications = await ctx.db
+      .query("notifications")
+      .filter((q: any) => q.eq(q.field("referenceId"), args.eventId))
+      .collect()
+    for (const n of notifications) {
+      await ctx.db.delete(n._id)
     }
 
     await ctx.db.delete(args.eventId)
@@ -283,7 +292,7 @@ export const sendEventReminders = internalMutation({
           await ctx.scheduler.runAfter(0, internal.notifications.createNotification, {
             recipientId: rsvp.userId,
             actorId: event.organizerId,
-            type: "comment" as const,
+            type: "event" as const,
             referenceId: event._id,
             message: `Reminder: "${event.title}" starts in ${hoursUntil}h`,
           })

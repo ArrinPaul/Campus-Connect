@@ -163,6 +163,91 @@ export const checkAchievements = internalMutation({
       newAchievements.push("level_10")
     }
 
+    // ── Activity-based achievements ──
+
+    // first_post: Published your first post
+    if (!earnedBadges.has("first_post")) {
+      const postCount = (await ctx.db
+        .query("posts")
+        .withIndex("by_author", (q: any) => q.eq("authorId", args.userId))
+        .take(1)).length
+      if (postCount > 0) newAchievements.push("first_post")
+    }
+
+    // first_comment: Left your first comment
+    if (!earnedBadges.has("first_comment")) {
+      const commentCount = (await ctx.db
+        .query("comments")
+        .withIndex("by_author", (q: any) => q.eq("authorId", args.userId))
+        .take(1)).length
+      if (commentCount > 0) newAchievements.push("first_comment")
+    }
+
+    // popular_post: Got 10+ likes on a post
+    if (!earnedBadges.has("popular_post")) {
+      const popularPost = await ctx.db
+        .query("posts")
+        .withIndex("by_author", (q: any) => q.eq("authorId", args.userId))
+        .filter((q: any) => q.gte(q.field("likeCount"), 10))
+        .first()
+      if (popularPost) newAchievements.push("popular_post")
+    }
+
+    // helpful: Had an answer accepted
+    if (!earnedBadges.has("helpful")) {
+      const acceptedAnswer = await ctx.db
+        .query("answers")
+        .withIndex("by_answered_by", (q: any) => q.eq("answeredBy", args.userId))
+        .filter((q: any) => q.eq(q.field("isAccepted"), true))
+        .first()
+      if (acceptedAnswer) newAchievements.push("helpful")
+    }
+
+    // scholar: Uploaded a research paper
+    if (!earnedBadges.has("scholar")) {
+      const paper = (await ctx.db
+        .query("papers")
+        .withIndex("by_uploaded_by", (q: any) => q.eq("uploadedBy", args.userId))
+        .take(1)).length
+      if (paper > 0) newAchievements.push("scholar")
+    }
+
+    // teacher: Shared a study resource
+    if (!earnedBadges.has("teacher")) {
+      const resource = (await ctx.db
+        .query("resources")
+        .withIndex("by_uploaded_by", (q: any) => q.eq("uploadedBy", args.userId))
+        .take(1)).length
+      if (resource > 0) newAchievements.push("teacher")
+    }
+
+    // questioner: Asked 10 questions
+    if (!earnedBadges.has("questioner")) {
+      const questionCount = (await ctx.db
+        .query("questions")
+        .withIndex("by_asked_by", (q: any) => q.eq("askedBy", args.userId))
+        .take(10)).length
+      if (questionCount >= 10) newAchievements.push("questioner")
+    }
+
+    // networker: Followed 20 people
+    if (!earnedBadges.has("networker")) {
+      const followCount = (await ctx.db
+        .query("follows")
+        .withIndex("by_follower", (q: any) => q.eq("followerId", args.userId))
+        .take(20)).length
+      if (followCount >= 20) newAchievements.push("networker")
+    }
+
+    // endorsed: Received 5 skill endorsements
+    if (!earnedBadges.has("endorsed")) {
+      const endorsements = await ctx.db
+        .query("skillEndorsements")
+        .withIndex("by_user_skill", (q: any) => q.eq("userId", args.userId))
+        .take(5)
+      if (endorsements.length >= 5) newAchievements.push("endorsed")
+    }
+
     // Insert new achievements
     for (const badge of newAchievements) {
       const def = ACHIEVEMENT_DEFINITIONS.find((d) => d.badge === badge)

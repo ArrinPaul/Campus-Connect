@@ -56,4 +56,15 @@ crons.interval(
   internal.hashtags.updateTrendingScores
 )
 
+/**
+ * Expire ringing calls that have been ringing > 60 seconds.
+ * Prevents orphaned calls when the caller's client crashes.
+ * Phase 2.4 — Voice & Video Calls
+ */
+crons.interval(
+  "expire stale ringing calls",
+  { minutes: 5 },
+  internal.calls.expireStaleRingingCalls
+)
+
 export default crons

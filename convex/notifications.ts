@@ -24,7 +24,9 @@ export const createNotification = internalMutation({
       v.literal("comment"),
       v.literal("mention"),
       v.literal("follow"),
-      v.literal("reply")
+      v.literal("reply"),
+      v.literal("event"),
+      v.literal("message")
     ),
     referenceId: v.optional(v.string()),
     message: v.string(),
@@ -109,29 +111,43 @@ export const getNotifications = query({
     const userId = user._id
 
     const limit = Math.min(args.limit || 20, 100)
-    const startIndex = args.cursor ? parseInt(args.cursor) : 0
 
-    // Get notifications for the user
+    // Get notifications for the user using proper take-based pagination
     let notificationsQuery = ctx.db
       .query("notifications")
       .withIndex("by_recipient", (q) => q.eq("recipientId", userId))
       .order("desc")
 
-    const allNotifications = await notificationsQuery.collect()
+    // If we have a cursor (notification ID), skip past it
+    if (args.cursor) {
+      try {
+        const cursorDoc = await ctx.db.get(args.cursor as any) as any
+        if (cursorDoc) {
+          notificationsQuery = notificationsQuery.filter((q) =>
+            q.lt(q.field("createdAt"), cursorDoc.createdAt)
+          )
+        }
+      } catch {
+        // Invalid cursor — return results from the beginning
+      }
+    }
 
-    // Apply filter
-    let filteredNotifications = allNotifications
+    // Fetch limit+1 to check if there are more
+    const allFetched = await notificationsQuery.take(
+      args.filter && args.filter !== "all" ? limit * 5 : limit + 1
+    )
+
+    // Apply filter if needed
+    let filteredNotifications = allFetched
     if (args.filter && args.filter !== "all") {
-      filteredNotifications = allNotifications.filter(
+      filteredNotifications = allFetched.filter(
         (n) => n.type === args.filter
       )
     }
 
     // Paginate
-    const paginatedNotifications = filteredNotifications.slice(
-      startIndex,
-      startIndex + limit
-    )
+    const hasMore = filteredNotifications.length > limit
+    const paginatedNotifications = filteredNotifications.slice(0, limit)
 
     // Get actor details for each notification
     const notificationsWithActors = await Promise.all(
@@ -150,9 +166,10 @@ export const getNotifications = query({
       })
     )
 
-    // Calculate next cursor
-    const hasMore = startIndex + limit < filteredNotifications.length
-    const nextCursor = hasMore ? String(startIndex + limit) : null
+    // Calculate next cursor (use last notification's ID for cursor-based pagination)
+    const nextCursor = hasMore && paginatedNotifications.length > 0
+      ? paginatedNotifications[paginatedNotifications.length - 1]._id
+      : null
 
     return {
       notifications: notificationsWithActors,

@@ -8,7 +8,7 @@
  */
 
 import { v } from "convex/values"
-import { mutation, query } from "./_generated/server"
+import { mutation, query, internalMutation } from "./_generated/server"
 import { Id } from "./_generated/dataModel"
 
 /**
@@ -432,19 +432,34 @@ export const getIncomingCalls = query({
     const currentUser = await getCurrentUser(ctx)
     if (!currentUser) return []
 
-    // Get all ringing calls
-    const ringingCalls = await ctx.db
-      .query("calls")
-      .withIndex("by_status", (q: any) => q.eq("status", "ringing"))
+    // Scope to user's conversations instead of scanning ALL ringing calls
+    const participations = await ctx.db
+      .query("conversationParticipants")
+      .withIndex("by_user", (q: any) => q.eq("userId", currentUser._id))
       .collect()
 
-    // Filter to calls where current user is ringing
-    const incomingCalls = ringingCalls.filter((call: any) => {
-      if (call.callerId === currentUser._id) return false // not incoming if I'm the caller
-      return call.participants.some(
-        (p: any) => p.userId === currentUser._id && p.status === "ringing"
-      )
-    })
+    const incomingCalls: any[] = []
+    for (const p of participations) {
+      // Get recent calls for each conversation (only ringing ones)
+      const calls = await ctx.db
+        .query("calls")
+        .withIndex("by_conversation", (q: any) =>
+          q.eq("conversationId", p.conversationId)
+        )
+        .order("desc")
+        .take(5)
+
+      for (const call of calls) {
+        if (call.status !== "ringing") continue
+        if (call.callerId === currentUser._id) continue
+        const myParticipant = call.participants.find(
+          (pt: any) => pt.userId === currentUser._id && pt.status === "ringing"
+        )
+        if (myParticipant) {
+          incomingCalls.push(call)
+        }
+      }
+    }
 
     // Enrich with caller info
     const enrichedCalls = await Promise.all(
@@ -461,5 +476,39 @@ export const getIncomingCalls = query({
     )
 
     return enrichedCalls
+  },
+})
+
+/**
+ * Internal: expire stale ringing calls that have been ringing for too long.
+ * Called by cron every 5 minutes. Marks calls as "missed" if ringing > 60 seconds.
+ */
+export const expireStaleRingingCalls = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const RING_TIMEOUT_MS = 60_000 // 60 seconds
+    const cutoff = Date.now() - RING_TIMEOUT_MS
+
+    const ringingCalls = await ctx.db
+      .query("calls")
+      .withIndex("by_status", (q: any) => q.eq("status", "ringing"))
+      .collect()
+
+    const staleCalls = ringingCalls.filter((c: any) => c.createdAt < cutoff)
+
+    for (const call of staleCalls) {
+      const now = Date.now()
+      const updatedParticipants = call.participants.map((p: any) => {
+        if (p.status === "ringing") {
+          return { ...p, status: "missed" as const, leftAt: now }
+        }
+        return p
+      })
+      await ctx.db.patch(call._id, {
+        status: "missed",
+        endedAt: now,
+        participants: updatedParticipants,
+      })
+    }
   },
 })

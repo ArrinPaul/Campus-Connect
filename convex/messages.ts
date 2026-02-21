@@ -122,7 +122,7 @@ export const sendMessage = mutation({
       await ctx.scheduler.runAfter(0, internal.notifications.createNotification, {
         recipientId: p.userId,
         actorId: currentUser._id,
-        type: "mention" as const, // Using "mention" type for DM notifications
+        type: "message" as const,
         referenceId: args.conversationId,
         message: conversation.type === "group"
           ? `${currentUser.name} sent a message in ${conversation.name}`
@@ -158,20 +158,18 @@ export const getMessages = query({
       .withIndex("by_conversation", (q: any) => q.eq("conversationId", args.conversationId))
       .order("desc")
 
-    const allMessages = await messagesQuery.collect()
-
-    // Apply cursor-based pagination
-    let startIndex = 0
+    // Apply cursor-based pagination using createdAt filter
     if (args.cursor) {
       const cursorTime = parseFloat(args.cursor)
-      startIndex = allMessages.findIndex(m => m.createdAt < cursorTime)
-      if (startIndex === -1) startIndex = allMessages.length
+      messagesQuery = messagesQuery.filter((q: any) => q.lt(q.field("createdAt"), cursorTime))
     }
 
-    const pageMessages = allMessages.slice(startIndex, startIndex + limit)
+    const pageMessages = await messagesQuery.take(limit + 1)
+    const hasMore = pageMessages.length > limit
+    const resultMessages = hasMore ? pageMessages.slice(0, limit) : pageMessages
 
     // Filter out messages deleted for this user
-    const filteredMessages = pageMessages.filter(m => {
+    const filteredMessages = resultMessages.filter(m => {
       if (m.deletedForUserIds && m.deletedForUserIds.includes(currentUser._id)) {
         return false
       }
@@ -207,8 +205,8 @@ export const getMessages = query({
     }
 
     // Determine next cursor
-    const nextCursor = pageMessages.length === limit
-      ? String(pageMessages[pageMessages.length - 1].createdAt)
+    const nextCursor = hasMore
+      ? String(resultMessages[resultMessages.length - 1].createdAt)
       : null
 
     // Return in chronological order (oldest first) for display
@@ -481,7 +479,7 @@ export const reactToMessage = mutation({
       .withIndex("by_user_target", (q) =>
         q.eq("userId", currentUser._id)
           .eq("targetId", args.messageId)
-          .eq("targetType", "comment") // reuse "comment" type for message reactions
+          .eq("targetType", "message")
       )
       .unique()
 
@@ -503,7 +501,7 @@ export const reactToMessage = mutation({
     await ctx.db.insert("reactions", {
       userId: currentUser._id,
       targetId: args.messageId,
-      targetType: "comment", // reuse for messages
+      targetType: "message",
       type: args.emoji as any,
       createdAt: Date.now(),
     })

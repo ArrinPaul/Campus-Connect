@@ -13,6 +13,7 @@ export const getPostComments = query({
   args: {
     postId: v.id("posts"),
     sortBy: v.optional(v.union(v.literal("new"), v.literal("old"), v.literal("best"), v.literal("controversial"))),
+    limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     // Require authentication
@@ -21,11 +22,13 @@ export const getPostComments = query({
       throw new Error("Unauthorized")
     }
 
-    // Get all comments for the post
+    const limit = Math.min(args.limit ?? 50, 200)
+
+    // Get comments for the post with a reasonable limit
     const comments = await ctx.db
       .query("comments")
       .withIndex("by_post", (q) => q.eq("postId", args.postId))
-      .collect()
+      .take(limit * 3) // fetch extra to account for replies
 
     // Fetch author data for each comment
     const commentsWithAuthors = await Promise.all(
@@ -211,21 +214,14 @@ export const createComment = mutation({
     // Extract mentions and notify mentioned users
     const mentions = extractMentions(sanitizedContent)
     for (const username of mentions) {
-      // Find the mentioned user
+      // Find the mentioned user by username index (no full table scan fallback)
       const mentionedUser = await ctx.db
         .query("users")
         .withIndex("by_username", (q) => q.eq("username", username))
         .first()
 
-      // Fallback: try to find by name if username not found
-      let resolvedUser = mentionedUser || null
-      if (!resolvedUser) {
-        const allUsers = await ctx.db.query("users").collect()
-        const foundUser = allUsers.find(
-          (u) => u.name.toLowerCase() === username.toLowerCase()
-        )
-        resolvedUser = foundUser || null
-      }
+      // Skip unresolved mentions — no fallback scan
+      const resolvedUser = mentionedUser || null
 
       // Schedule notification if user found and not self-mention
       if (resolvedUser && resolvedUser._id !== user._id) {
@@ -333,8 +329,15 @@ export const deleteComment = mutation({
       }
     }
 
-    // Delete all collected comments
+    // Delete all collected comments and their reactions
     for (const id of toDelete) {
+      const commentReactions = await ctx.db
+        .query("reactions")
+        .withIndex("by_target", (q) => q.eq("targetId", id).eq("targetType", "comment"))
+        .collect()
+      for (const r of commentReactions) {
+        await ctx.db.delete(r._id)
+      }
       await ctx.db.delete(id)
     }
 

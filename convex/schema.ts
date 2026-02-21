@@ -65,6 +65,8 @@ export default defineSchema({
     emailNotifications: v.optional(v.boolean()),
     // Onboarding
     onboardingComplete: v.optional(v.boolean()),
+    // Admin flag
+    isAdmin: v.optional(v.boolean()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -132,7 +134,7 @@ export default defineSchema({
   reactions: defineTable({
     userId: v.id("users"),
     targetId: v.string(), // postId or commentId
-    targetType: v.union(v.literal("post"), v.literal("comment")),
+    targetType: v.union(v.literal("post"), v.literal("comment"), v.literal("message")),
     type: v.union(
       v.literal("like"),
       v.literal("love"),
@@ -216,7 +218,9 @@ export default defineSchema({
       v.literal("comment"), // someone commented on your post
       v.literal("mention"), // someone mentioned you
       v.literal("follow"), // someone followed you
-      v.literal("reply") // someone replied to your comment
+      v.literal("reply"), // someone replied to your comment
+      v.literal("event"), // event-related notification
+      v.literal("message") // direct message notification
     ),
     referenceId: v.optional(v.string()), // postId, commentId, etc.
     message: v.string(), // e.g., "John Doe liked your post"
@@ -600,6 +604,16 @@ export default defineSchema({
   })
     .index("by_course", ["course"])
     .index("by_uploaded_by", ["uploadedBy"]),
+
+  resourceRatings: defineTable({
+    resourceId: v.id("resources"),
+    userId: v.id("users"),
+    rating: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user_resource", ["userId", "resourceId"])
+    .index("by_resource", ["resourceId"]),
 
   questions: defineTable({
     title: v.string(),

@@ -328,6 +328,32 @@ export const deleteCommunity = mutation({
       await ctx.db.delete(m._id)
     }
 
+    // Unset communityId on posts associated with this community
+    const communityPosts = await ctx.db
+      .query("posts")
+      .withIndex("by_community", (q: any) => q.eq("communityId", args.communityId))
+      .collect()
+    for (const post of communityPosts) {
+      await ctx.db.patch(post._id, { communityId: undefined })
+    }
+
+    // Delete events associated with this community
+    const communityEvents = await ctx.db
+      .query("events")
+      .withIndex("by_community", (q: any) => q.eq("communityId", args.communityId))
+      .collect()
+    for (const event of communityEvents) {
+      // Delete event RSVPs
+      const rsvps = await ctx.db
+        .query("eventRSVPs")
+        .withIndex("by_event", (q: any) => q.eq("eventId", event._id))
+        .collect()
+      for (const rsvp of rsvps) {
+        await ctx.db.delete(rsvp._id)
+      }
+      await ctx.db.delete(event._id)
+    }
+
     await ctx.db.delete(args.communityId)
   },
 })
@@ -585,15 +611,15 @@ export const getCommunityMembers = query({
 
     // For non-public communities, require membership
     const identity = await ctx.auth.getUserIdentity()
-    if (community.type !== "public" && identity) {
+    if (community.type !== "public") {
+      if (!identity) return []
       const currentUser = await ctx.db
         .query("users")
         .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
         .unique()
-      if (currentUser) {
-        const membership = await getMembership(ctx, args.communityId, currentUser._id)
-        if (!membership) return []
-      }
+      if (!currentUser) return []
+      const membership = await getMembership(ctx, args.communityId, currentUser._id)
+      if (!membership) return []
     }
 
     const memberships = await ctx.db

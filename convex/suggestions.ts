@@ -1,6 +1,7 @@
 import { v } from "convex/values"
 import { query, mutation, internalMutation } from "./_generated/server"
 import { Id, Doc } from "./_generated/dataModel"
+import { internal } from "./_generated/api"
 import { jaccardSimilarity } from "./math_utils"
 
 // ────────────────────────────────────────────
@@ -263,13 +264,12 @@ export const computeAllSuggestions = internalMutation({
         (u.updatedAt && u.updatedAt > sevenDaysAgo)
     )
 
-    // Process each active user inline (Convex mutations run in a single transaction)
-    // For large deployments this should be split into scheduled actions.
-    // For campus-scale (< 10k users) this is fine.
+    // Fan out: schedule each user's computation as a separate mutation
+    // to avoid single-transaction timeout with many users
     for (const user of activeUsers) {
-      // Inline the computation for each user within the same mutation
-      // to avoid scheduling overhead
-      await computeSuggestionsForUserInline(ctx, user._id)
+      await ctx.scheduler.runAfter(0, internal.suggestions.computeSuggestionsForUser, {
+        userId: user._id,
+      })
     }
   },
 })

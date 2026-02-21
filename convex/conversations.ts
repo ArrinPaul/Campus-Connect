@@ -146,33 +146,39 @@ export const getConversations = query({
         }
       }
 
-      // Calculate unread count
+      // Calculate unread count efficiently
       let unreadCount = 0
       if (conversation.lastMessageId) {
         const lastReadId = record.lastReadMessageId
         if (!lastReadId) {
-          // Never read any messages — count all
-          const allMessages = await ctx.db
+          // Never read any messages — count non-self messages using filter
+          const unreadMessages = await ctx.db
             .query("messages")
             .withIndex("by_conversation", (q) => q.eq("conversationId", conversation._id))
+            .filter((q) =>
+              q.and(
+                q.neq(q.field("senderId"), currentUser._id),
+                q.eq(q.field("isDeleted"), false)
+              )
+            )
             .collect()
-          unreadCount = allMessages.filter(
-            (m) => m.senderId !== currentUser._id && !m.isDeleted
-          ).length
+          unreadCount = unreadMessages.length
         } else {
           // Count messages after last read
           const lastReadMsg = await ctx.db.get(lastReadId)
           if (lastReadMsg) {
-            const messagesAfterRead = await ctx.db
+            const unreadMessages = await ctx.db
               .query("messages")
               .withIndex("by_conversation", (q) => q.eq("conversationId", conversation._id))
+              .filter((q) =>
+                q.and(
+                  q.gt(q.field("createdAt"), lastReadMsg.createdAt),
+                  q.neq(q.field("senderId"), currentUser._id),
+                  q.eq(q.field("isDeleted"), false)
+                )
+              )
               .collect()
-            unreadCount = messagesAfterRead.filter(
-              (m) =>
-                m.createdAt > lastReadMsg.createdAt &&
-                m.senderId !== currentUser._id &&
-                !m.isDeleted
-            ).length
+            unreadCount = unreadMessages.length
           }
         }
       }
@@ -303,8 +309,35 @@ export const deleteConversation = mutation({
       .withIndex("by_conversation", (q) => q.eq("conversationId", args.conversationId))
       .collect()
 
-    // If no participants left, delete the conversation
+    // If no participants left, delete the conversation and all associated data
     if (remaining.length === 0) {
+      // Delete all messages
+      const messages = await ctx.db
+        .query("messages")
+        .withIndex("by_conversation", (q) => q.eq("conversationId", args.conversationId))
+        .collect()
+      for (const m of messages) {
+        await ctx.db.delete(m._id)
+      }
+
+      // Delete typing indicators
+      const typingIndicators = await ctx.db
+        .query("typingIndicators")
+        .withIndex("by_conversation", (q) => q.eq("conversationId", args.conversationId))
+        .collect()
+      for (const ti of typingIndicators) {
+        await ctx.db.delete(ti._id)
+      }
+
+      // Delete calls
+      const calls = await ctx.db
+        .query("calls")
+        .withIndex("by_conversation", (q) => q.eq("conversationId", args.conversationId))
+        .collect()
+      for (const call of calls) {
+        await ctx.db.delete(call._id)
+      }
+
       await ctx.db.delete(args.conversationId)
     }
 
@@ -335,27 +368,33 @@ export const getTotalUnreadCount = query({
 
       const lastReadId = record.lastReadMessageId
       if (!lastReadId) {
-        // Never read — count all messages not from self
-        const allMessages = await ctx.db
+        // Never read — count non-self messages using filter
+        const unreadMessages = await ctx.db
           .query("messages")
           .withIndex("by_conversation", (q) => q.eq("conversationId", conversation._id))
+          .filter((q) =>
+            q.and(
+              q.neq(q.field("senderId"), currentUser._id),
+              q.eq(q.field("isDeleted"), false)
+            )
+          )
           .collect()
-        totalUnread += allMessages.filter(
-          (m) => m.senderId !== currentUser._id && !m.isDeleted
-        ).length
+        totalUnread += unreadMessages.length
       } else {
         const lastReadMsg = await ctx.db.get(lastReadId)
         if (lastReadMsg) {
-          const messagesAfterRead = await ctx.db
+          const unreadMessages = await ctx.db
             .query("messages")
             .withIndex("by_conversation", (q) => q.eq("conversationId", conversation._id))
+            .filter((q) =>
+              q.and(
+                q.gt(q.field("createdAt"), lastReadMsg.createdAt),
+                q.neq(q.field("senderId"), currentUser._id),
+                q.eq(q.field("isDeleted"), false)
+              )
+            )
             .collect()
-          totalUnread += messagesAfterRead.filter(
-            (m) =>
-              m.createdAt > lastReadMsg.createdAt &&
-              m.senderId !== currentUser._id &&
-              !m.isDeleted
-          ).length
+          totalUnread += unreadMessages.length
         }
       }
     }
@@ -745,6 +784,33 @@ export const leaveGroup = mutation({
       .collect()
 
     if (remaining.length === 0) {
+      // Delete all messages
+      const remainingMsgs = await ctx.db
+        .query("messages")
+        .withIndex("by_conversation", (q) => q.eq("conversationId", args.conversationId))
+        .collect()
+      for (const m of remainingMsgs) {
+        await ctx.db.delete(m._id)
+      }
+
+      // Delete typing indicators
+      const typingIndicators = await ctx.db
+        .query("typingIndicators")
+        .withIndex("by_conversation", (q) => q.eq("conversationId", args.conversationId))
+        .collect()
+      for (const ti of typingIndicators) {
+        await ctx.db.delete(ti._id)
+      }
+
+      // Delete calls
+      const calls = await ctx.db
+        .query("calls")
+        .withIndex("by_conversation", (q) => q.eq("conversationId", args.conversationId))
+        .collect()
+      for (const call of calls) {
+        await ctx.db.delete(call._id)
+      }
+
       await ctx.db.delete(args.conversationId)
     }
 

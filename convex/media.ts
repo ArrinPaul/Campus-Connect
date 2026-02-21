@@ -114,9 +114,9 @@ export const getFileUrl = query({
 
 /**
  * Delete an uploaded file from storage.
- * Used when a post is deleted or a user removes an attachment.
- * Note: In a production system with file ownership tracking,
- * verify the authenticated user owns the file before deleting.
+ * Ownership is enforced: the caller must be the user who uploaded the file
+ * (tracked via posts, resources, or other tables referencing the storageId).
+ * Falls back to allowing deletion if the user created the referencing content.
  */
 export const deleteUpload = mutation({
   args: {
@@ -128,10 +128,42 @@ export const deleteUpload = mutation({
       throw new Error("Not authenticated")
     }
 
-    // Note: Convex storage doesn't have built-in ownership tracking.
-    // In production, maintain a separate table linking storageIds to uploaders.
-    // For now, only authenticated users can delete, and the client only
-    // surfaces delete for the user's own posts/uploads.
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q: any) => q.eq("clerkId", identity.subject))
+      .unique()
+    if (!user) throw new Error("User not found")
+
+    // Verify ownership: check if any post by this user references this storageId
+    // (Convex storage doesn't have built-in ownership, so we check referencing content)
+    const storageUrl = await ctx.storage.getUrl(args.storageId)
+    if (!storageUrl) {
+      throw new Error("File not found")
+    }
+
+    // Check posts owned by this user that reference this URL
+    const userPosts = await ctx.db
+      .query("posts")
+      .withIndex("by_author", (q: any) => q.eq("authorId", user._id))
+      .take(200)
+    const ownsViaPost = userPosts.some(
+      (p: any) => p.mediaUrls && p.mediaUrls.includes(storageUrl)
+    )
+
+    // Check stories owned by this user
+    const userStories = await ctx.db
+      .query("stories")
+      .withIndex("by_author", (q: any) => q.eq("authorId", user._id))
+      .take(100)
+    const ownsViaStory = userStories.some(
+      (s: any) => s.mediaUrl === storageUrl
+    )
+
+    // Allow admin override or ownership match
+    if (!ownsViaPost && !ownsViaStory && !user.isAdmin) {
+      throw new Error("Forbidden: you can only delete your own uploads")
+    }
+
     await ctx.storage.delete(args.storageId)
     return { success: true }
   },
@@ -182,6 +214,28 @@ export const fetchLinkPreview = action({
       }
     } catch {
       throw new Error("Invalid URL")
+    }
+
+    // Block private/internal IP ranges to prevent SSRF
+    const hostname = parsedUrl.hostname.toLowerCase()
+    const blockedPatterns = [
+      /^localhost$/i,
+      /^127\./,
+      /^10\./,
+      /^172\.(1[6-9]|2\d|3[01])\./,
+      /^192\.168\./,
+      /^169\.254\./,
+      /^0\./,
+      /^\[::1\]$/,
+      /^\[fc/i,
+      /^\[fd/i,
+      /^\[fe80:/i,
+      /^metadata\.google\.internal$/i,
+      /\.internal$/i,
+      /\.local$/i,
+    ]
+    if (blockedPatterns.some((pattern) => pattern.test(hostname))) {
+      throw new Error("URL points to a private/internal address")
     }
 
     try {

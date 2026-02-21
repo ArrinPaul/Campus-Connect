@@ -220,6 +220,12 @@ export const vote = mutation({
       throw new Error("Invalid target document")
     }
 
+    // Prevent self-voting
+    const authorField = args.targetType === "question" ? target.askedBy : target.answeredBy
+    if (authorField === user._id) {
+      throw new Error("You cannot vote on your own " + args.targetType)
+    }
+
     // Check if user already voted on this target
     const existing = await ctx.db
       .query("questionVotes")

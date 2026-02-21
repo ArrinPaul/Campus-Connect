@@ -188,6 +188,8 @@ export const isFollowing = query({
 export const getFollowers = query({
   args: {
     userId: v.id("users"),
+    limit: v.optional(v.number()),
+    cursor: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     // Require authentication
@@ -196,22 +198,41 @@ export const getFollowers = query({
       throw new Error("Unauthorized")
     }
 
-    // Get all follow records where the user is being followed
-    const followRecords = await ctx.db
+    const limit = Math.min(args.limit ?? 50, 200)
+
+    // Get follow records where the user is being followed
+    let query = ctx.db
       .query("follows")
       .withIndex("by_following", (q) => q.eq("followingId", args.userId))
-      .collect()
+      .order("desc")
+
+    // Cursor-based pagination
+    if (args.cursor) {
+      try {
+        const cursorDoc = await ctx.db.get(args.cursor as any) as any
+        if (cursorDoc) {
+          query = query.filter((q) => q.lt(q.field("createdAt"), cursorDoc.createdAt))
+        }
+      } catch { /* invalid cursor */ }
+    }
+
+    const followRecords = await query.take(limit + 1)
+    const hasMore = followRecords.length > limit
+    const records = hasMore ? followRecords.slice(0, limit) : followRecords
 
     // Get follower user objects
     const followers = await Promise.all(
-      followRecords.map(async (follow) => {
+      records.map(async (follow) => {
         const user = await ctx.db.get(follow.followerId)
         return user
       })
     )
 
-    // Filter out any null values (in case user was deleted)
-    return followers.filter((user) => user !== null)
+    return {
+      users: followers.filter((user) => user !== null),
+      nextCursor: hasMore ? records[records.length - 1]._id : null,
+      hasMore,
+    }
   },
 })
 
@@ -222,6 +243,8 @@ export const getFollowers = query({
 export const getFollowing = query({
   args: {
     userId: v.id("users"),
+    limit: v.optional(v.number()),
+    cursor: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     // Require authentication
@@ -230,21 +253,40 @@ export const getFollowing = query({
       throw new Error("Unauthorized")
     }
 
-    // Get all follow records where the user is the follower
-    const followRecords = await ctx.db
+    const limit = Math.min(args.limit ?? 50, 200)
+
+    // Get follow records where the user is the follower
+    let query = ctx.db
       .query("follows")
       .withIndex("by_follower", (q) => q.eq("followerId", args.userId))
-      .collect()
+      .order("desc")
+
+    // Cursor-based pagination
+    if (args.cursor) {
+      try {
+        const cursorDoc = await ctx.db.get(args.cursor as any) as any
+        if (cursorDoc) {
+          query = query.filter((q) => q.lt(q.field("createdAt"), cursorDoc.createdAt))
+        }
+      } catch { /* invalid cursor */ }
+    }
+
+    const followRecords = await query.take(limit + 1)
+    const hasMore = followRecords.length > limit
+    const records = hasMore ? followRecords.slice(0, limit) : followRecords
 
     // Get following user objects
     const following = await Promise.all(
-      followRecords.map(async (follow) => {
+      records.map(async (follow) => {
         const user = await ctx.db.get(follow.followingId)
         return user
       })
     )
 
-    // Filter out any null values (in case user was deleted)
-    return following.filter((user) => user !== null)
+    return {
+      users: following.filter((user) => user !== null),
+      nextCursor: hasMore ? records[records.length - 1]._id : null,
+      hasMore,
+    }
   },
 })

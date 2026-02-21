@@ -26,6 +26,7 @@
  */
 
 import { internalMutation, action } from "./_generated/server"
+import { internal } from "./_generated/api"
 import { Id } from "./_generated/dataModel"
 
 // ─── Helpers ──────────────────────────────────────────────────────
@@ -411,7 +412,7 @@ const LISTING_DATA = [
 
 // ─── Main Seed Function ──────────────────────────────────────────
 
-const seedAllInternal = internalMutation({
+export const seedAllInternal = internalMutation({
   handler: async (ctx) => {
     const now = Date.now()
 
@@ -1100,7 +1101,7 @@ export const clearAll = internalMutation({
 // Export as action so it can be run via `npx convex run seed:seedAll`
 export const seedAll = action({
   handler: async (ctx) => {
-    await ctx.runMutation(seedAllInternal)
+    await ctx.runMutation(internal.seed.seedAllInternal)
     return { success: true }
   },
 })

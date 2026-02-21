@@ -230,6 +230,7 @@ export const createPost = mutation({
       likeCount: 0,
       commentCount: 0,
       shareCount: 0,
+      reactionCounts: { like: 0, love: 0, laugh: 0, wow: 0, sad: 0, scholarly: 0 },
       createdAt: now,
       updatedAt: now,
       ...(args.mediaUrls ? { mediaUrls: args.mediaUrls } : {}),
@@ -426,6 +427,89 @@ export const deletePost = mutation({
 })
 
 /**
+ * Edit an existing post
+ * Only the post author can edit. Content is validated and sanitized.
+ * Validates: Requirements 4.4, 12.4, 12.5
+ */
+export const editPost = mutation({
+  args: {
+    postId: v.id("posts"),
+    content: v.optional(v.string()),
+    mediaUrls: v.optional(v.array(v.string())),
+    mediaType: v.optional(
+      v.union(
+        v.literal("image"),
+        v.literal("video"),
+        v.literal("file"),
+        v.literal("link")
+      )
+    ),
+    linkPreview: v.optional(
+      v.object({
+        url: v.string(),
+        title: v.optional(v.string()),
+        description: v.optional(v.string()),
+        image: v.optional(v.string()),
+        favicon: v.optional(v.string()),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) throw new Error("Unauthorized")
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .unique()
+    if (!user) throw new Error("User not found")
+
+    const post = await ctx.db.get(args.postId)
+    if (!post) throw new Error("Post not found")
+    if (post.authorId !== user._id) throw new Error("Forbidden: You can only edit your own posts")
+
+    const updates: Record<string, any> = { updatedAt: Date.now() }
+
+    if (args.content !== undefined) {
+      if (!args.content || args.content.trim().length === 0) {
+        throw new Error("Post content cannot be empty")
+      }
+      if (args.content.length > POST_MAX_LENGTH) {
+        throw new Error(`Post content must not exceed ${POST_MAX_LENGTH} characters`)
+      }
+      updates.content = sanitizeMarkdown(args.content)
+
+      // Re-link hashtags
+      await linkHashtagsToPost(ctx, args.postId, updates.content)
+    }
+
+    if (args.mediaUrls !== undefined) {
+      for (const url of args.mediaUrls) {
+        if (!isValidSafeUrl(url)) throw new Error("Invalid media URL")
+      }
+      updates.mediaUrls = args.mediaUrls
+    }
+
+    if (args.mediaType !== undefined) {
+      updates.mediaType = args.mediaType
+    }
+
+    if (args.linkPreview !== undefined) {
+      if (args.linkPreview.url && !isValidSafeUrl(args.linkPreview.url)) {
+        throw new Error("Invalid link preview URL")
+      }
+      updates.linkPreview = args.linkPreview
+    }
+
+    await ctx.db.patch(args.postId, updates)
+
+    const updatedPost = await ctx.db.get(args.postId)
+    const author = await ctx.db.get(post.authorId)
+    return { ...updatedPost, author: author || null }
+  },
+})
+
+/**
  * Check if current user has liked a post
  * Validates: Requirements 5.4, 12.4
  */
@@ -450,22 +534,21 @@ export const hasUserLikedPost = query({
       return false
     }
 
-    // Check if like exists
-    const like = await ctx.db
-      .query("likes")
-      .withIndex("by_user_and_post", (q) =>
-        q.eq("userId", user._id).eq("postId", args.postId)
+    // Check reactions table (single source of truth)
+    const reaction = await ctx.db
+      .query("reactions")
+      .withIndex("by_user_target", (q) =>
+        q.eq("userId", user._id).eq("targetId", args.postId).eq("targetType", "post")
       )
       .unique()
 
-    return like !== null
+    return reaction !== null
   },
 })
 
 /**
- * Like a post
- * Validates user hasn't already liked the post
- * Increments post likeCount
+ * Like a post (delegates to the reactions system for consistency)
+ * Maintains backward compatibility by also updating the legacy likeCount field.
  * Validates: Requirements 5.1, 5.2, 5.4, 12.4
  */
 export const likePost = mutation({
@@ -473,60 +556,68 @@ export const likePost = mutation({
     postId: v.id("posts"),
   },
   handler: async (ctx, args) => {
-    // Require authentication
     const identity = await ctx.auth.getUserIdentity()
-    if (!identity) {
-      throw new Error("Unauthorized")
-    }
+    if (!identity) throw new Error("Unauthorized")
 
-    // Get current user
     const user = await ctx.db
       .query("users")
       .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
       .unique()
+    if (!user) throw new Error("User not found")
 
-    if (!user) {
-      throw new Error("User not found")
-    }
-
-    // Check if post exists
     const post = await ctx.db.get(args.postId)
-    if (!post) {
-      throw new Error("Post not found")
-    }
+    if (!post) throw new Error("Post not found")
 
-    // Check if user has already liked the post
-    const existingLike = await ctx.db
-      .query("likes")
-      .withIndex("by_user_and_post", (q) =>
-        q.eq("userId", user._id).eq("postId", args.postId)
+    // Check if user already reacted (via reactions system)
+    const existingReaction = await ctx.db
+      .query("reactions")
+      .withIndex("by_user_target", (q) =>
+        q.eq("userId", user._id).eq("targetId", args.postId).eq("targetType", "post")
       )
       .unique()
 
-    if (existingLike) {
+    if (existingReaction) {
       throw new Error("You have already liked this post")
     }
 
-    // Create like record
-    await ctx.db.insert("likes", {
+    // Insert reaction record (single source of truth)
+    await ctx.db.insert("reactions", {
       userId: user._id,
-      postId: args.postId,
+      targetId: args.postId,
+      targetType: "post",
+      type: "like",
       createdAt: Date.now(),
     })
 
-    // Increment post likeCount
+    // Sync legacy likeCount + reactionCounts
+    const rc = post.reactionCounts ?? { like: 0, love: 0, laugh: 0, wow: 0, sad: 0, scholarly: 0 }
     await ctx.db.patch(args.postId, {
-      likeCount: post.likeCount + 1,
+      likeCount: (post.likeCount ?? 0) + 1,
+      reactionCounts: { ...rc, like: rc.like + 1 },
     })
+
+    // Notify post author
+    if (post.authorId !== user._id) {
+      await ctx.scheduler.runAfter(0, internal.notifications.createNotification, {
+        recipientId: post.authorId,
+        actorId: user._id,
+        type: "reaction" as const,
+        referenceId: args.postId,
+        message: `${user.name} liked your post`,
+      })
+      await ctx.scheduler.runAfter(0, internal.gamification.awardReputation, {
+        userId: post.authorId,
+        action: "receive_like",
+      })
+    }
 
     return { success: true }
   },
 })
 
 /**
- * Unlike a post
- * Validates user has previously liked the post
- * Decrements post likeCount
+ * Unlike a post (removes user's reaction from the reactions system)
+ * Maintains backward compatibility by also updating the legacy likeCount field.
  * Validates: Requirements 5.3, 12.4
  */
 export const unlikePost = mutation({
@@ -534,46 +625,38 @@ export const unlikePost = mutation({
     postId: v.id("posts"),
   },
   handler: async (ctx, args) => {
-    // Require authentication
     const identity = await ctx.auth.getUserIdentity()
-    if (!identity) {
-      throw new Error("Unauthorized")
-    }
+    if (!identity) throw new Error("Unauthorized")
 
-    // Get current user
     const user = await ctx.db
       .query("users")
       .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
       .unique()
+    if (!user) throw new Error("User not found")
 
-    if (!user) {
-      throw new Error("User not found")
-    }
-
-    // Check if post exists
     const post = await ctx.db.get(args.postId)
-    if (!post) {
-      throw new Error("Post not found")
-    }
+    if (!post) throw new Error("Post not found")
 
-    // Check if user has liked the post
-    const existingLike = await ctx.db
-      .query("likes")
-      .withIndex("by_user_and_post", (q) =>
-        q.eq("userId", user._id).eq("postId", args.postId)
+    // Check for reaction (single source of truth)
+    const existingReaction = await ctx.db
+      .query("reactions")
+      .withIndex("by_user_target", (q) =>
+        q.eq("userId", user._id).eq("targetId", args.postId).eq("targetType", "post")
       )
       .unique()
 
-    if (!existingLike) {
+    if (!existingReaction) {
       throw new Error("You have not liked this post")
     }
 
-    // Delete like record
-    await ctx.db.delete(existingLike._id)
+    await ctx.db.delete(existingReaction._id)
 
-    // Decrement post likeCount
+    // Sync legacy likeCount + reactionCounts
+    const rc = post.reactionCounts ?? { like: 0, love: 0, laugh: 0, wow: 0, sad: 0, scholarly: 0 }
+    const reactType = existingReaction.type as keyof typeof rc
     await ctx.db.patch(args.postId, {
-      likeCount: Math.max(0, post.likeCount - 1), // Ensure count doesn't go negative
+      likeCount: Math.max(0, (post.likeCount ?? 0) - 1),
+      reactionCounts: { ...rc, [reactType]: Math.max(0, (rc[reactType] ?? 0) - 1) },
     })
 
     return { success: true }

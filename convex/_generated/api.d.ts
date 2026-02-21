@@ -44,6 +44,7 @@ import type * as reposts from "../reposts.js";
 import type * as resources from "../resources.js";
 import type * as sanitize from "../sanitize.js";
 import type * as search from "../search.js";
+import type * as seed from "../seed.js";
 import type * as skill_endorsements from "../skill_endorsements.js";
 import type * as stories from "../stories.js";
 import type * as subscriptions from "../subscriptions.js";
@@ -94,6 +95,7 @@ declare const fullApi: ApiFromModules<{
   resources: typeof resources;
   sanitize: typeof sanitize;
   search: typeof search;
+  seed: typeof seed;
   skill_endorsements: typeof skill_endorsements;
   stories: typeof stories;
   subscriptions: typeof subscriptions;

@@ -222,53 +222,6 @@ export const searchHashtags = query({
 })
 
 /**
- * Mutation: Update trending scores (internal — called by cron job only)
- * Calculate trending score based on recent activity
- */
-export const updateTrendingScores = internalMutation({
-  args: {},
-  handler: async (ctx) => {
-    const now = Date.now()
-    const oneDayAgo = now - 24 * 60 * 60 * 1000
-    const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000
-
-    // Get all hashtags
-    const allHashtags = await ctx.db.query("hashtags").collect()
-
-    for (const hashtag of allHashtags) {
-      // Get post count from last 24h
-      const recentLinks = await ctx.db
-        .query("postHashtags")
-        .withIndex("by_hashtag_created", (q) => q.eq("hashtagId", hashtag._id))
-        .filter((q) => q.gte(q.field("createdAt"), oneDayAgo))
-        .collect()
-
-      const dailyCount = recentLinks.length
-
-      // Get post count from last 7 days
-      const weeklyLinks = await ctx.db
-        .query("postHashtags")
-        .withIndex("by_hashtag_created", (q) => q.eq("hashtagId", hashtag._id))
-        .filter((q) => q.gte(q.field("createdAt"), oneWeekAgo))
-        .collect()
-
-      const weeklyCount = weeklyLinks.length
-
-      // Calculate trending score: (daily * 3) + weekly
-      // This gives more weight to recent posts
-      const trendingScore = dailyCount * 3 + weeklyCount
-
-      // Update hashtag
-      await ctx.db.patch(hashtag._id, {
-        trendingScore,
-      })
-    }
-
-    return { success: true, updated: allHashtags.length }
-  },
-})
-
-/**
  * Query: Get hashtag statistics
  */
 export const getHashtagStats = query({

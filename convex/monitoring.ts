@@ -2,9 +2,7 @@ import { query } from "./_generated/server"
 import { Id } from "./_generated/dataModel"
 
 // ──────────────────────────────────────────────
-// Admin auth helper — requires authenticated user
-// In a production system, add an `isAdmin` field to the users table
-// and check it here. For now, require authentication at minimum.
+// Admin auth helper — requires authenticated user with isAdmin flag
 // ──────────────────────────────────────────────
 async function requireAdmin(ctx: any): Promise<Id<"users">> {
   const identity = await ctx.auth.getUserIdentity()
@@ -14,8 +12,7 @@ async function requireAdmin(ctx: any): Promise<Id<"users">> {
     .withIndex("by_clerkId", (q: any) => q.eq("clerkId", identity.subject))
     .unique()
   if (!user) throw new Error("Unauthorized: user not found")
-  // TODO: Add admin role check once `isAdmin` field is added to schema
-  // if (!user.isAdmin) throw new Error("Forbidden: admin access required")
+  if (!user.isAdmin) throw new Error("Forbidden: admin access required")
   return user._id
 }
 
