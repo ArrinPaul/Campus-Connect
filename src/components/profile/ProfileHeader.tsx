@@ -10,6 +10,9 @@ import { Id } from "@/convex/_generated/dataModel"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 import { OnlineStatusDot, formatLastSeen } from "@/components/ui/OnlineStatusDot"
 import { MessageSquare } from "lucide-react"
+import { createLogger } from "@/lib/logger"
+
+const log = createLogger("ProfileHeader")
 
 interface User {
   _id: Id<"users">
@@ -69,7 +72,7 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
     } catch (error) {
       // Revert optimistic update on error
       setOptimisticFollowing(null)
-      console.error("Failed to toggle follow:", error)
+      log.error("Failed to toggle follow", error)
     } finally {
       setIsLoading(false)
     }
@@ -214,7 +217,7 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
                   const conversationId = await getOrCreateConversation({ otherUserId: user._id })
                   router.push(`/messages?conversation=${conversationId}`)
                 } catch (error) {
-                  console.error("Failed to open conversation:", error)
+                  log.error("Failed to open conversation", error)
                 } finally {
                   setIsMessageLoading(false)
                 }

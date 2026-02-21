@@ -1,6 +1,9 @@
 "use client"
 
 import { useEffect } from "react"
+import { createLogger } from "@/lib/logger"
+
+const log = createLogger("dashboard/error")
 
 export default function Error({
   error,
@@ -10,7 +13,7 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error("Dashboard error:", error)
+    log.error("Dashboard error", error)
   }, [error])
 
   return (

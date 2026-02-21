@@ -18,6 +18,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
+import { createLogger } from "@/lib/logger"
+
+const log = createLogger("BookmarkButton")
 import { Bookmark, BookmarkCheck, FolderPlus } from "lucide-react"
 
 interface BookmarkButtonProps {
@@ -49,7 +52,7 @@ export function BookmarkButton({
         onBookmarked?.()
       }
     } catch (error) {
-      console.error("Failed to toggle bookmark:", error)
+      log.error("Failed to toggle bookmark", error)
     }
   }
 
@@ -59,7 +62,7 @@ export function BookmarkButton({
       setShowCollectionMenu(false)
       onBookmarked?.()
     } catch (error) {
-      console.error("Failed to add to collection:", error)
+      log.error("Failed to add to collection", error)
     }
   }
 

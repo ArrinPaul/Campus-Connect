@@ -1,5 +1,36 @@
 import { NextRequest } from "next/server"
 
+// Mock next/server so require("./middleware") works in jsdom (no Web Request API)
+jest.mock("next/server", () => {
+  class MockNextRequest {
+    public nextUrl: { pathname: string }
+    public headers = { get: jest.fn(() => null) }
+    constructor(input: string | URL) {
+      const url = typeof input === "string" ? input : input.toString()
+      this.nextUrl = { pathname: new URL(url, "http://localhost").pathname }
+    }
+  }
+  return {
+    __esModule: true,
+    NextRequest: MockNextRequest,
+    NextResponse: {
+      next: jest.fn(() => ({
+        headers: { set: jest.fn(), get: jest.fn() },
+        status: 200,
+      })),
+      redirect: jest.fn((url: string) => ({
+        headers: { set: jest.fn(), get: jest.fn() },
+        status: 302,
+      })),
+      json: jest.fn((body: unknown, init?: { status?: number }) => ({
+        body,
+        headers: { set: jest.fn(), get: jest.fn() },
+        status: init?.status ?? 200,
+      })),
+    },
+  }
+})
+
 // Mock Clerk middleware
 const mockProtect = jest.fn()
 const mockClerkMiddleware = jest.fn((handler) => handler)
@@ -273,3 +304,94 @@ describe("Middleware - Authentication Flows", () => {
     })
   })
 })
+
+// ─── Rate Limiting Unit Tests ─────────────────────────────────────────────────
+
+describe("Rate Limiting - checkRateLimit", () => {
+  // Import directly from rate-limit module — no next/server dependency
+  const { createRateLimiter, RATE_LIMITS } = require("@/lib/rate-limit")
+
+  it("should allow requests within the limit", () => {
+    const { check } = createRateLimiter()
+    const result = check("1.2.3.4", "default")
+    expect(result.allowed).toBe(true)
+    expect(result.limit).toBe(100)
+    expect(result.remaining).toBe(99)
+  })
+
+  it("should decrement remaining on each request", () => {
+    const { check } = createRateLimiter()
+    const r1 = check("10.0.0.1", "default")
+    const r2 = check("10.0.0.1", "default")
+    expect(r1.remaining).toBe(99)
+    expect(r2.remaining).toBe(98)
+  })
+
+  it("should block requests that exceed the limit", () => {
+    const { check } = createRateLimiter()
+    const ip = "192.168.1.1"
+    for (let i = 0; i < 10; i++) check(ip, "auth")
+    const result = check(ip, "auth")
+    expect(result.allowed).toBe(false)
+    expect(result.remaining).toBe(0)
+  })
+
+  it("should use correct limit for auth routes", () => {
+    const { check } = createRateLimiter()
+    const result = check("5.5.5.5", "auth")
+    expect(result.limit).toBe(10)
+  })
+
+  it("should use correct limit for api routes", () => {
+    const { check } = createRateLimiter()
+    const result = check("6.6.6.6", "api")
+    expect(result.limit).toBe(60)
+  })
+
+  it("should track different IPs independently", () => {
+    const { check } = createRateLimiter()
+    check("100.0.0.1", "auth")
+    check("100.0.0.1", "auth")
+    const otherResult = check("200.0.0.1", "auth")
+    expect(otherResult.remaining).toBe(9)
+  })
+
+  it("should provide a future reset timestamp", () => {
+    const { check } = createRateLimiter()
+    const before = Math.floor(Date.now() / 1000)
+    const result = check("7.7.7.7", "default")
+    expect(result.reset).toBeGreaterThan(before)
+  })
+
+  it("should separate rate limit buckets by route type for same IP", () => {
+    const { check } = createRateLimiter()
+    const apiResult = check("8.8.8.8", "api")
+    const defaultResult = check("8.8.8.8", "default")
+    expect(apiResult.limit).toBe(60)
+    expect(defaultResult.limit).toBe(100)
+  })
+
+  it("should return to allowed after window resets", () => {
+    jest.useFakeTimers()
+    const fastLimits = { default: { limit: 2, windowMs: 100 } } as any
+    const { check } = createRateLimiter(fastLimits)
+    const ip = "9.9.9.9"
+    check(ip, "default")
+    check(ip, "default")
+    const blocked = check(ip, "default")
+    expect(blocked.allowed).toBe(false)
+
+    // Advance past the window → store entry expires
+    jest.advanceTimersByTime(200)
+    const refreshed = check(ip, "default")
+    expect(refreshed.allowed).toBe(true)
+    jest.useRealTimers()
+  })
+
+  it("should have the correct RATE_LIMITS config", () => {
+    expect(RATE_LIMITS.default.limit).toBe(100)
+    expect(RATE_LIMITS.api.limit).toBe(60)
+    expect(RATE_LIMITS.auth.limit).toBe(10)
+  })
+})
+

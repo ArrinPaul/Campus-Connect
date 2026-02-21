@@ -4,6 +4,9 @@ import { useState } from "react"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
+import { createLogger } from "@/lib/logger"
+
+const log = createLogger("ReactionPicker")
 import {
   Tooltip,
   TooltipContent,
@@ -70,7 +73,7 @@ export function ReactionPicker({
       setShowPicker(false)
       onReactionAdded?.()
     } catch (error) {
-      console.error("Failed to react:", error)
+      log.error("Failed to react", error)
     }
   }
 

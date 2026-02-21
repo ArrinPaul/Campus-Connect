@@ -2,6 +2,9 @@ import { v } from "convex/values"
 import { internalMutation, query, mutation } from "./_generated/server"
 import { Id } from "./_generated/dataModel"
 import { sanitizeText } from "./sanitize"
+import { createLogger } from "./logger"
+
+const log = createLogger("users")
 
 /**
  * Internal mutation to create a user from Clerk webhook
@@ -23,7 +26,7 @@ export const createUserFromWebhook = internalMutation({
       .first()
 
     if (existingUser) {
-      console.log(`User with clerkId ${args.clerkId} already exists`)
+      log.info("User already exists, skipping creation", { clerkId: args.clerkId })
       return existingUser._id
     }
 
@@ -50,7 +53,7 @@ export const createUserFromWebhook = internalMutation({
       updatedAt: Date.now(),
     })
 
-    console.log(`Created user ${userId} for clerkId ${args.clerkId}`)
+    log.info("User created", { userId, clerkId: args.clerkId })
     return userId
   },
 })
@@ -75,7 +78,7 @@ export const updateUserFromWebhook = internalMutation({
       .first()
 
     if (!user) {
-      console.error(`User with clerkId ${args.clerkId} not found`)
+      log.error("User not found for update", { clerkId: args.clerkId })
       throw new Error("User not found")
     }
 
@@ -87,7 +90,7 @@ export const updateUserFromWebhook = internalMutation({
       updatedAt: Date.now(),
     })
 
-    console.log(`Updated user ${user._id} for clerkId ${args.clerkId}`)
+    log.info("User updated", { userId: user._id, clerkId: args.clerkId })
     return user._id
   },
 })
@@ -109,7 +112,7 @@ export const deleteUserFromWebhook = internalMutation({
       .first()
 
     if (!user) {
-      console.error(`User with clerkId ${args.clerkId} not found for deletion`)
+      log.warn("User not found for deletion", { clerkId: args.clerkId })
       return
     }
 
@@ -202,7 +205,7 @@ export const deleteUserFromWebhook = internalMutation({
     // Finally delete the user record
     await ctx.db.delete(user._id)
 
-    console.log(`Deleted user ${user._id} and all associated data for clerkId ${args.clerkId}`)
+    log.info("User deleted with all associated data", { userId: user._id, clerkId: args.clerkId })
   },
 })
 

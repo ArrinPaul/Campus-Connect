@@ -5,6 +5,9 @@ import { useMutation } from "convex/react"
 import { api } from "@/../convex/_generated/api"
 import { Id } from "@/../convex/_generated/dataModel"
 import { Send, Paperclip, Smile, X, Image as ImageIcon, FileText } from "lucide-react"
+import { createLogger } from "@/lib/logger"
+
+const log = createLogger("MessageComposer")
 
 interface ReplyTo {
   _id: Id<"messages">
@@ -103,7 +106,7 @@ export function MessageComposer({
       // Re-focus textarea
       textareaRef.current?.focus()
     } catch (error) {
-      console.error("Failed to send message:", error)
+      log.error("Failed to send message", error)
     } finally {
       setIsSending(false)
     }

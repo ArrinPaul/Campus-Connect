@@ -2,7 +2,9 @@ import { httpRouter } from "convex/server"
 import { httpAction } from "./_generated/server"
 import { internal } from "./_generated/api"
 import { Webhook } from "svix"
+import { createLogger } from "./logger"
 
+const log = createLogger("http/webhooks")
 const http = httpRouter()
 
 // ── CORS Configuration ──────────────────────────────
@@ -70,7 +72,7 @@ http.route({
     const webhookSecret = process.env.CLERK_WEBHOOK_SECRET
 
     if (!webhookSecret) {
-      console.error("CLERK_WEBHOOK_SECRET is not set")
+      log.error("CLERK_WEBHOOK_SECRET is not set")
       return new Response("Webhook secret not configured", {
         status: 500,
         headers: corsHeaders,
@@ -102,7 +104,7 @@ http.route({
         "svix-signature": svixSignature,
       })
     } catch (err) {
-      console.error("Error verifying webhook:", err)
+      log.error("Webhook signature verification failed", { error: String(err) })
       return new Response("Invalid signature", { status: 400 })
     }
 
@@ -124,7 +126,7 @@ http.route({
         profilePicture: image_url || undefined,
       })
 
-      console.log(`User created: ${id}`)
+      log.info("Webhook: user created", { clerkId: id })
       return new Response(JSON.stringify({ success: true }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
@@ -146,7 +148,7 @@ http.route({
         profilePicture: image_url || undefined,
       })
 
-      console.log(`User updated: ${id}`)
+      log.info("Webhook: user updated", { clerkId: id })
       return new Response(JSON.stringify({ success: true }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
@@ -161,7 +163,7 @@ http.route({
         clerkId: id,
       })
 
-      console.log(`User deleted: ${id}`)
+      log.info("Webhook: user deleted", { clerkId: id })
       return new Response(JSON.stringify({ success: true }), {
         status: 200,
         headers: { "Content-Type": "application/json" },

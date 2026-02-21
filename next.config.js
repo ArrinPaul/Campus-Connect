@@ -109,6 +109,26 @@ const nextConfig = {
           },
         ],
       },
+      {
+        // Cache Next.js compiled chunks (hashed filenames are immutable)
+        source: "/_next/static/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        // Cache Next.js optimized images (short TTL — dynamic transforms)
+        source: "/_next/image(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800",
+          },
+        ],
+      },
     ]
   },
 }

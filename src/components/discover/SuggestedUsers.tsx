@@ -8,6 +8,9 @@ import Image from "next/image"
 import Link from "next/link"
 import { X, RefreshCw, UserPlus, ChevronRight, Sparkles } from "lucide-react"
 import { Id } from "@/convex/_generated/dataModel"
+import { createLogger } from "@/lib/logger"
+
+const log = createLogger("SuggestedUsers")
 
 interface SuggestedUsersProps {
   /** Max suggestions to show in the widget (default 5) */
@@ -38,7 +41,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
         // Auto-dismiss after following
         await dismissSuggestion({ suggestionId })
       } catch (err) {
-        console.error("Failed to follow:", err)
+        log.error("Failed to follow user", err)
       } finally {
         setLoadingFollow((prev) => {
           const next = new Set(prev)
@@ -56,7 +59,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
       try {
         await dismissSuggestion({ suggestionId })
       } catch (err) {
-        console.error("Failed to dismiss:", err)
+        log.error("Failed to dismiss suggestion", err)
       } finally {
         setDismissing((prev) => {
           const next = new Set(prev)
@@ -73,7 +76,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
     try {
       await refreshSuggestions({})
     } catch (err) {
-      console.error("Failed to refresh suggestions:", err)
+      log.error("Failed to refresh suggestions", err)
     } finally {
       setIsRefreshing(false)
     }

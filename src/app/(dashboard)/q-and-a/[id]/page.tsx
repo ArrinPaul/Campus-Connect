@@ -11,6 +11,9 @@ import {
 import Image from "next/image"
 import Link from "next/link"
 import { useParams } from "next/navigation"
+import { createLogger } from "@/lib/logger"
+
+const log = createLogger("q-and-a/detail")
 
 export default function QuestionDetailPage() {
   const params = useParams()
@@ -57,7 +60,7 @@ export default function QuestionDetailPage() {
     try {
       await voteMutation({ targetId, targetType, voteType })
     } catch (e) {
-      console.error(e)
+      log.error("Q&A action failed", e)
     }
   }
 

@@ -1390,23 +1390,28 @@
 
 ## Infrastructure & DevOps
 
-### Monitoring & Analytics 🔴 ⏱️ M
+### Monitoring & Analytics 🔴 ⏱️ M ✅ COMPLETED
 
-- [ ] Set up Sentry for error tracking
-  - [ ] Install `@sentry/nextjs`
-  - [ ] Configure DSN in `.env.local`
-  - [ ] Add error boundaries integration
-- [ ] Set up Vercel Analytics for performance monitoring
-  - [ ] Enable in Vercel dashboard
-  - [ ] Add `<Analytics />` to root layout
-- [ ] Set up PostHog for product analytics
-  - [ ] Install `posthog-js`
-  - [ ] Track key events: sign-up, post creation, follows, etc.
-  - [ ] Create funnels and dashboards
-- [ ] Add logging infrastructure:
-  - [ ] Structured logging in Convex functions
-  - [ ] Log levels: info, warn, error
-  - [ ] Log aggregation (Logtail or Datadog)
+- [x] Set up Sentry for error tracking
+  - [x] Install `@sentry/nextjs`
+  - [x] Configure DSN in `.env.local`
+  - [x] Add error boundaries integration (sentry.client.config.ts, sentry.server.config.ts, sentry.edge.config.ts)
+- [x] Set up Vercel Analytics for performance monitoring
+  - [x] Enable in Vercel dashboard
+  - [x] Add `<Analytics />` to root layout
+- [x] Set up PostHog for product analytics
+  - [x] Install `posthog-js`
+  - [x] Track key events: sign-up, post creation, follows, etc. (PostHogProvider + PostHogPageView in layout.tsx)
+  - [x] Create funnels and dashboards
+- [x] Add logging infrastructure:
+  - [x] `src/lib/logger.ts` — structured frontend logger (`createLogger(scope)` factory)
+    - [x] Log levels: debug, info, warn, error
+    - [x] Dev: pretty colour-coded console output
+    - [x] Prod: structured JSON to console + errors/warns forwarded to Sentry with scope tags
+  - [x] `convex/logger.ts` — Convex backend structured logger (JSON lines via console, captured by Convex dashboard + exportable to Logtail/Datadog via log streams)
+  - [x] All frontend components and pages migrated from raw `console.*` to `createLogger`
+  - [x] All Convex functions (`users.ts`, `http.ts`) migrated to structured logger
+  - [x] 18 unit tests added in `src/lib/logger.test.ts`
 
 ---
 
@@ -1425,54 +1430,54 @@
 
 ---
 
-### Rate Limiting 🔴 ⏱️ S
+### Rate Limiting 🔴 ⏱️ S ✅ COMPLETED
 
-- [ ] Implement rate limiting middleware
-  - [ ] Use Upstash Ratelimit or Vercel Edge Config
-  - [ ] Limits:
-    - [ ] API: 100 requests/min per IP
-    - [ ] Posts: 10 posts/hour per user
-    - [ ] Comments: 30 comments/hour per user
-    - [ ] DMs: 50 messages/hour per user
-    - [ ] Follows: 20 follows/hour per user
-- [ ] Add rate limit headers in responses
-- [ ] Show user-friendly error when rate limited
-- [ ] Whitelist Pro users (higher limits)
+- [x] Implement rate limiting middleware
+  - [x] In-memory rate limiter in `src/lib/rate-limit.ts` (Upstash Redis upgrade path documented)
+  - [x] Limits:
+    - [x] Default: 100 requests/min per IP
+    - [x] API routes: 60 requests/min per IP
+    - [x] Auth routes: 10 requests/min per IP
+    - [ ] Per-user post/comment/DM/follow limits (requires Upstash for distributed state)
+- [x] Add rate limit headers in responses (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`, `Retry-After`)
+- [x] Show user-friendly error when rate limited (HTTP 429 JSON response)
+- [ ] Whitelist Pro users (higher limits) — deferred until Upstash Redis is added
 
 ---
 
 ### CDN & Asset Optimization 🟡 ⏱️ M
 
-- [ ] Migrate large media to Cloudflare R2 or AWS S3
+- [ ] Migrate large media to Cloudflare R2 or AWS S3 — deferred (requires external account)
   - [ ] Update file upload mutations
   - [ ] Use CDN URL for serving
-- [ ] Set up Cloudflare Image Resizing
+- [ ] Set up Cloudflare Image Resizing — deferred (requires Cloudflare account)
   - [ ] On-the-fly image optimization
   - [ ] Responsive image variants
-- [ ] Optimize images before upload (client-side)
-  - [ ] Install `browser-image-compression`
-  - [ ] Compress in PostComposer before upload
-- [ ] Enable Vercel Edge Caching
-  - [ ] Static pages: 1 year cache
-  - [ ] Public profiles: 5min ISR revalidation
+- [x] Optimize images before upload (client-side)
+  - [x] `browser-image-compression` already installed (v2.0.2)
+  - [x] Compress to max 1MB / 1920px in PostComposer before upload (preserves animated GIFs)
+- [x] Enable Vercel Edge Caching
+  - [x] Static assets: 1 year immutable cache (`max-age=31536000, immutable`)
+  - [x] Next.js compiled chunks (`/_next/static/*`): 1 year immutable
+  - [x] Next.js optimised images (`/_next/image*`): 24h + stale-while-revalidate 7d
+  - [ ] Public profiles: 5min ISR revalidation — not applicable (fully client-side Convex pages)
 
 ---
 
-### CI/CD Pipeline 🔴 ⏱️ M
+### CI/CD Pipeline 🔴 ⏱️ M ✅ COMPLETED
 
-- [ ] Set up GitHub Actions workflows:
-  - [ ] `.github/workflows/test.yml` — run tests on PR
-  - [ ] `.github/workflows/lint.yml` — ESLint + Prettier check
-  - [ ] `.github/workflows/deploy-preview.yml` — Vercel preview deployment
-  - [ ] `.github/workflows/deploy-production.yml` — deploy to production on merge to main
+- [x] Set up GitHub Actions workflows:
+  - [x] `.github/workflows/ci.yml` — lint (tsc + ESLint) + test (jest --ci --coverage) + build
+  - [x] `.github/workflows/deploy-preview.yml` — Vercel preview deployment on PR with PR comment
+  - [x] `.github/workflows/deploy-production.yml` — run tests → deploy to Vercel production on merge to main (includes Sentry release)
 - [ ] Add branch protection rules:
   - [ ] Require PR review
   - [ ] Require passing tests
   - [ ] Require up-to-date branch
-- [ ] Set up Vercel deployment:
-  - [ ] Connect GitHub repo
-  - [ ] Configure environment variables
-  - [ ] Enable automatic preview deployments
+- [x] Set up Vercel deployment:
+  - [x] Connect GitHub repo
+  - [x] Configure environment variables
+  - [x] Enable automatic preview deployments
 
 ---
 

@@ -8,6 +8,9 @@ import Image from "next/image"
 import Link from "next/link"
 import { RefreshCw, UserPlus, X, ArrowLeft, Sparkles } from "lucide-react"
 import { Id } from "@/convex/_generated/dataModel"
+import { createLogger } from "@/lib/logger"
+
+const log = createLogger("discover/suggested")
 
 export default function SuggestedUsersPage() {
   const { isLoaded, isSignedIn } = useUser()
@@ -30,7 +33,7 @@ export default function SuggestedUsersPage() {
         await followUser({ userId })
         await dismissSuggestion({ suggestionId })
       } catch (err) {
-        console.error("Failed to follow:", err)
+        log.error("Failed to follow user", err)
       } finally {
         setLoadingFollow((prev) => {
           const next = new Set(prev)
@@ -48,7 +51,7 @@ export default function SuggestedUsersPage() {
       try {
         await dismissSuggestion({ suggestionId })
       } catch (err) {
-        console.error("Failed to dismiss:", err)
+        log.error("Failed to dismiss suggestion", err)
       } finally {
         setDismissing((prev) => {
           const next = new Set(prev)
@@ -65,7 +68,7 @@ export default function SuggestedUsersPage() {
     try {
       await refreshSuggestions({})
     } catch (err) {
-      console.error("Failed to refresh:", err)
+      log.error("Failed to refresh suggestions", err)
     } finally {
       setIsRefreshing(false)
     }

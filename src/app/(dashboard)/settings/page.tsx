@@ -8,6 +8,17 @@ import { ProfileForm } from "@/components/profile/ProfileForm"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
 import { StatusSelector } from "@/components/ui/StatusSelector"
 import { LoadingSpinner } from "@/components/ui/loading-skeleton"
+import { createLogger } from "@/lib/logger"
+
+const log = createLogger("settings/page")
+
+// Stable default — defined outside component to avoid exhaustive-deps issues
+const DEFAULT_NOTIFICATION_PREFS = {
+  reactions: true,
+  comments: true,
+  mentions: true,
+  follows: true,
+}
 
 export default function SettingsPage() {
   const { isLoaded, isSignedIn } = useUser()
@@ -17,19 +28,16 @@ export default function SettingsPage() {
   )
   const updateNotificationPrefs = useMutation(api.users.updateNotificationPreferences)
   const updateOnlineVisibility = useMutation(api.presence.updateOnlineStatusVisibility)
+  const savedPrefs = currentUser?.notificationPreferences ?? DEFAULT_NOTIFICATION_PREFS
 
-  // Default preferences (all enabled)
-  const defaultPrefs = { reactions: true, comments: true, mentions: true, follows: true }
-  const savedPrefs = currentUser?.notificationPreferences ?? defaultPrefs
-  
-  const [notifPrefs, setNotifPrefs] = useState(defaultPrefs)
+  const [notifPrefs, setNotifPrefs] = useState(DEFAULT_NOTIFICATION_PREFS)
   const [prefsInitialized, setPrefsInitialized] = useState(false)
   const [showOnlineStatus, setShowOnlineStatus] = useState(true)
 
   // Initialize from server data once loaded
   useEffect(() => {
     if (currentUser && !prefsInitialized) {
-      setNotifPrefs(currentUser.notificationPreferences ?? defaultPrefs)
+      setNotifPrefs(currentUser.notificationPreferences ?? DEFAULT_NOTIFICATION_PREFS)
       setShowOnlineStatus(currentUser.showOnlineStatus !== false)
       setPrefsInitialized(true)
     }
@@ -43,7 +51,7 @@ export default function SettingsPage() {
     } catch (err) {
       // Revert on error
       setNotifPrefs(notifPrefs)
-      console.error("Failed to update notification preferences:", err)
+      log.error("Failed to update notification preferences", err)
     }
   }, [notifPrefs, updateNotificationPrefs])
 
@@ -54,7 +62,7 @@ export default function SettingsPage() {
       await updateOnlineVisibility({ showOnlineStatus: newValue })
     } catch (err) {
       setShowOnlineStatus(!newValue) // revert
-      console.error("Failed to update online visibility:", err)
+      log.error("Failed to update online visibility", err)
     }
   }, [showOnlineStatus, updateOnlineVisibility])
 

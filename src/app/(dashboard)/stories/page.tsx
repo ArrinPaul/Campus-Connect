@@ -8,6 +8,9 @@ import Image from "next/image"
 import { X, Trash2, ChevronLeft, ChevronRight, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
+import { createLogger } from "@/lib/logger"
+
+const log = createLogger("stories/page")
 
 const STORY_DURATION_MS = 5000 // 5 seconds per story
 
@@ -169,7 +172,7 @@ export default function StoriesPage() {
       await deleteStory({ storyId: currentStory._id as any })
       advanceStory()
     } catch (err) {
-      console.error("Failed to delete story:", err)
+      log.error("Failed to delete story", err)
     }
   }
 

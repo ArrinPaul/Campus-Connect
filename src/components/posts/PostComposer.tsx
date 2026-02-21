@@ -31,6 +31,7 @@ import {
 } from "lucide-react"
 
 // Client-side file type / size constants (mirrored from convex/media.ts)
+import imageCompression from "browser-image-compression"
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"]
 const VIDEO_TYPES = ["video/mp4", "video/webm"]
 const FILE_TYPES = [
@@ -122,7 +123,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
 
   // ── File validation & selection ───────────────────────────────────────
   const handleFileSelect = useCallback(
-    (files: FileList | File[], type: "image" | "video" | "file") => {
+    async (files: FileList | File[], type: "image" | "video" | "file") => {
       const fileArr = Array.from(files)
       if (fileArr.length === 0) return
 
@@ -168,13 +169,35 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
       }
 
       setError("")
-      setAttachedFiles(fileArr)
+
+      // Compress images client-side before storing (skip GIFs to preserve animation)
+      let finalFiles = fileArr
+      if (type === "image") {
+        const compressionOptions = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+          fileType: "image/webp" as const,
+        }
+        finalFiles = await Promise.all(
+          fileArr.map(async (file) => {
+            if (file.type === "image/gif") return file // preserve animated GIFs
+            try {
+              return await imageCompression(file, compressionOptions)
+            } catch {
+              return file // fall back to original if compression fails
+            }
+          })
+        )
+      }
+
+      setAttachedFiles(finalFiles)
       setAttachedType(type)
       setLinkPreviewData(null) // Clear link preview when files attached
 
       // Generate object URL previews for images
       if (type === "image") {
-        const previews = fileArr.map((f) => URL.createObjectURL(f))
+        const previews = finalFiles.map((f) => URL.createObjectURL(f))
         setFilePreviews(previews)
       } else {
         setFilePreviews([])

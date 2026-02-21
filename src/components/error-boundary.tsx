@@ -2,6 +2,9 @@
 
 import * as Sentry from "@sentry/nextjs"
 import React, { Component, ReactNode } from "react"
+import { createLogger } from "@/lib/logger"
+
+const log = createLogger("ErrorBoundary")
 
 interface Props {
   children: ReactNode
@@ -29,7 +32,7 @@ export class ErrorBoundary extends Component<Props, State> {
         componentStack: errorInfo.componentStack,
       },
     })
-    console.error("Error caught by boundary:", error, errorInfo)
+    log.error("Error caught by boundary", error, { componentStack: errorInfo.componentStack ?? undefined })
   }
 
   render() {

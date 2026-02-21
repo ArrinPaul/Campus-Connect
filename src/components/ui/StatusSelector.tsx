@@ -4,6 +4,9 @@ import { useState } from "react"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Circle, Moon, MinusCircle, EyeOff } from "lucide-react"
+import { createLogger } from "@/lib/logger"
+
+const log = createLogger("StatusSelector")
 
 type Status = "online" | "away" | "dnd" | "invisible"
 
@@ -68,7 +71,7 @@ export function StatusSelector({
       onStatusChange?.(status)
     } catch (err) {
       setSelectedStatus(currentStatus) // revert
-      console.error("Failed to update status:", err)
+      log.error("Failed to update status", err)
     } finally {
       setIsUpdating(false)
     }
@@ -79,7 +82,7 @@ export function StatusSelector({
     try {
       await setCustomStatusMutation({ customStatus })
     } catch (err) {
-      console.error("Failed to set custom status:", err)
+      log.error("Failed to set custom status", err)
     } finally {
       setIsUpdating(false)
     }

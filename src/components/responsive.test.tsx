@@ -143,15 +143,14 @@ describe("Responsive Component Behavior", () => {
       expect(contentDiv?.className).toContain("sm:mt-4")
     })
 
-    it.skip("should have minimum touch target size for interactive elements", () => {
-      // Skipped: PostCard child components are mocked, so interactive elements aren't available
+    it("should have minimum touch target size for interactive elements", () => {
       render(<PostCard post={mockPost} author={mockAuthor} />)
-      
-      const likeButton = screen.getByLabelText(/like post/i)
-      const styles = window.getComputedStyle(likeButton)
-      
-      expect(styles.minWidth).toBe("44px")
-      expect(styles.minHeight).toBe("44px")
+
+      // The "Show comments" button has explicit inline style min-width/min-height of 44px
+      const commentsButton = screen.getByLabelText(/show comments/i)
+      expect(commentsButton).toBeTruthy()
+      expect(commentsButton.style.minWidth).toBe("44px")
+      expect(commentsButton.style.minHeight).toBe("44px")
     })
   })
 

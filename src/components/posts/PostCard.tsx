@@ -17,6 +17,9 @@ import { RepostModal } from "@/components/posts/RepostModal"
 import { MediaGallery } from "@/components/posts/MediaGallery"
 import { LinkPreviewCard } from "@/components/posts/LinkPreviewCard"
 import { PollCard } from "@/components/posts/PollCard"
+import { createLogger } from "@/lib/logger"
+
+const log = createLogger("PostCard")
 
 interface User {
   _id: Id<"users">
@@ -88,7 +91,7 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
     try {
       await deletePost({ postId: post._id })
     } catch (error) {
-      console.error("Failed to delete post:", error)
+      log.error("Failed to delete post", error, { postId: post._id })
       alert("Failed to delete post. Please try again.")
     } finally {
       setIsDeleting(false)
@@ -160,7 +163,7 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
         setShowShareDropdown(false)
       } catch (err) {
         // User cancelled or error occurred
-        console.error("Share failed:", err)
+        log.warn("Share via navigator.share failed", { error: String(err) })
       }
     }
   }
