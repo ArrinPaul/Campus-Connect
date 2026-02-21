@@ -22,8 +22,13 @@ export default function ResourcesPage() {
   const rateResource = useMutation(api.resources.rateResource)
 
   const handleDownload = async (resourceId: Id<"resources">, fileUrl?: string) => {
-    await downloadResource({ resourceId })
-    if (fileUrl) window.open(fileUrl, "_blank")
+    try {
+      await downloadResource({ resourceId })
+      if (fileUrl) window.open(fileUrl, "_blank")
+    } catch (error) {
+      console.error("Failed to track download:", error)
+      if (fileUrl) window.open(fileUrl, "_blank")
+    }
   }
 
   return (

@@ -1,5 +1,6 @@
 import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
+import { internal } from "./_generated/api"
 
 // ──────────────────────────────────────────────
 // Auth helper
@@ -42,7 +43,7 @@ export const uploadResource = mutation({
       throw new Error("Subject must not exceed 100 characters")
     }
 
-    return ctx.db.insert("resources", {
+    const resourceId = await ctx.db.insert("resources", {
       title: args.title.trim(),
       description: args.description.trim(),
       fileUrl: args.fileUrl || undefined,
@@ -54,6 +55,17 @@ export const uploadResource = mutation({
       downloadCount: 0,
       createdAt: Date.now(),
     })
+
+    // Award reputation for uploading a resource
+    await ctx.scheduler.runAfter(0, internal.gamification.awardReputation, {
+      userId: user._id,
+      action: "resource_uploaded",
+    })
+    await ctx.scheduler.runAfter(0, internal.gamification.checkAchievements, {
+      userId: user._id,
+    })
+
+    return resourceId
   },
 })
 

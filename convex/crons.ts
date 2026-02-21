@@ -45,4 +45,15 @@ crons.interval(
   internal.presence.cleanupTypingIndicators
 )
 
+/**
+ * Re-compute hashtag trending scores every hour.
+ * Uses time-decay formula: score = postCount * recencyMultiplier + recentPosts * 2
+ * Phase 3.4 — Trending Hashtags
+ */
+crons.interval(
+  "update trending scores",
+  { hours: 1 },
+  internal.hashtags.updateTrendingScores
+)
+
 export default crons

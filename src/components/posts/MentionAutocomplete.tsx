@@ -79,8 +79,8 @@ export function MentionAutocomplete({
     return () => document.removeEventListener("keydown", handleKeyDown)
   }, [users, selectedIndex, onSelect, onClose])
 
-  // Don't render if no users found
-  if (!users || users.length === 0) {
+  // Don't render if still loading or no users found
+  if (users === undefined || users.length === 0) {
     return null
   }
 

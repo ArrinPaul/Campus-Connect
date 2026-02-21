@@ -239,6 +239,22 @@ export const createComment = mutation({
       }
     }
 
+    // Award reputation for creating a comment
+    await ctx.scheduler.runAfter(0, internal.gamification.awardReputation, {
+      userId: user._id,
+      action: "comment_created",
+    })
+    // Award reputation to post author for receiving a comment
+    if (post.authorId !== user._id) {
+      await ctx.scheduler.runAfter(0, internal.gamification.awardReputation, {
+        userId: post.authorId,
+        action: "receive_comment",
+      })
+    }
+    await ctx.scheduler.runAfter(0, internal.gamification.checkAchievements, {
+      userId: user._id,
+    })
+
     // Return the created comment
     const comment = await ctx.db.get(commentId)
     return comment

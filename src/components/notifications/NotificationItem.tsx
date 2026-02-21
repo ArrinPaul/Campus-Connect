@@ -37,8 +37,12 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
   const handleClick = async () => {
     // Mark as read if unread
     if (!notification.isRead) {
-      await markAsRead({ notificationId: notification._id })
-      onRead?.()
+      try {
+        await markAsRead({ notificationId: notification._id })
+        onRead?.()
+      } catch (error) {
+        console.error("Failed to mark notification as read:", error)
+      }
     }
 
     // Navigate to the referenced content

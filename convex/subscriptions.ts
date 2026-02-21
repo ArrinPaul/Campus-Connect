@@ -40,7 +40,7 @@ export const PRICING = {
 
 /**
  * Initiate a Pro upgrade (creates pending subscription record)
- * In production, this would be called AFTER Stripe checkout completion
+ * In production, this should only be called AFTER Stripe checkout completion
  * via a webhook. The stripeSessionId is required to verify payment.
  */
 export const upgradeToPro = mutation({
@@ -51,12 +51,15 @@ export const upgradeToPro = mutation({
   handler: async (ctx, args) => {
     const user = await getAuthUser(ctx)
 
-    // IMPORTANT: In production, verify stripeSessionId is valid via Stripe API
-    // before activating Pro. This mutation should only be called after
-    // successful payment confirmation. For development/demo, we proceed directly.
-    // In production, comment out the direct activation and use:
-    //   if (!args.stripeSessionId) throw new Error("Payment session required")
-    //   // Verify session with Stripe API
+    // In production, stripeSessionId MUST be provided and verified against Stripe API.
+    // Only bypass in explicit development mode.
+    const isDev = process.env.NODE_ENV === "development" || process.env.CONVEX_CLOUD_URL?.includes("localhost")
+    if (!isDev && !args.stripeSessionId) {
+      throw new Error("Payment session required. Complete Stripe checkout first.")
+    }
+    // TODO: In production, verify stripeSessionId with Stripe API:
+    // const session = await stripe.checkout.sessions.retrieve(args.stripeSessionId)
+    // if (session.payment_status !== "paid") throw new Error("Payment not completed")
 
     // Check if already Pro
     const existing = await ctx.db

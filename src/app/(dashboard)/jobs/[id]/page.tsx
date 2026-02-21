@@ -46,8 +46,12 @@ export default function JobDetailPage() {
 
   const handleDelete = async () => {
     if (!confirm("Delete this job listing? All applications will be removed.")) return
-    await deleteJob({ jobId })
-    router.push("/jobs")
+    try {
+      await deleteJob({ jobId })
+      router.push("/jobs")
+    } catch (error) {
+      console.error("Failed to delete job:", error)
+    }
   }
 
   return (
@@ -309,9 +313,13 @@ function ApplicationsList({ jobId }: { jobId: Id<"jobs"> }) {
           <div className="flex gap-1">
             {app.status !== "shortlisted" && (
               <button
-                onClick={() =>
-                  updateStatus({ applicationId: app._id, status: "shortlisted" })
-                }
+                onClick={async () => {
+                  try {
+                    await updateStatus({ applicationId: app._id, status: "shortlisted" })
+                  } catch (error) {
+                    console.error("Failed to update status:", error)
+                  }
+                }}
                 className="px-3 py-1 text-xs bg-green-50 text-green-700 rounded hover:bg-green-100"
               >
                 Shortlist
@@ -319,9 +327,13 @@ function ApplicationsList({ jobId }: { jobId: Id<"jobs"> }) {
             )}
             {app.status !== "rejected" && (
               <button
-                onClick={() =>
-                  updateStatus({ applicationId: app._id, status: "rejected" })
-                }
+                onClick={async () => {
+                  try {
+                    await updateStatus({ applicationId: app._id, status: "rejected" })
+                  } catch (error) {
+                    console.error("Failed to update status:", error)
+                  }
+                }}
                 className="px-3 py-1 text-xs bg-red-50 text-red-700 rounded hover:bg-red-100"
               >
                 Reject

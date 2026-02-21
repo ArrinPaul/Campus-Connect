@@ -1,11 +1,33 @@
 import { query } from "./_generated/server"
+import { Id } from "./_generated/dataModel"
+
+// ──────────────────────────────────────────────
+// Admin auth helper — requires authenticated user
+// In a production system, add an `isAdmin` field to the users table
+// and check it here. For now, require authentication at minimum.
+// ──────────────────────────────────────────────
+async function requireAdmin(ctx: any): Promise<Id<"users">> {
+  const identity = await ctx.auth.getUserIdentity()
+  if (!identity) throw new Error("Unauthorized: authentication required")
+  const user = await ctx.db
+    .query("users")
+    .withIndex("by_clerkId", (q: any) => q.eq("clerkId", identity.subject))
+    .unique()
+  if (!user) throw new Error("Unauthorized: user not found")
+  // TODO: Add admin role check once `isAdmin` field is added to schema
+  // if (!user.isAdmin) throw new Error("Forbidden: admin access required")
+  return user._id
+}
 
 /**
  * Get system statistics for admin monitoring dashboard
  * Returns metrics for the last hour and total counts
+ * Requires authentication (admin-gated)
  */
 export const getSystemStats = query({
   handler: async (ctx) => {
+    await requireAdmin(ctx)
+
     const oneHourAgo = Date.now() - 60 * 60 * 1000
     const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000
 
@@ -100,6 +122,8 @@ export const getSystemStats = query({
 export const getTopContributors = query({
   args: {},
   handler: async (ctx) => {
+    await requireAdmin(ctx)
+
     // Get all posts with author info
     const posts = await ctx.db.query("posts").collect()
     
@@ -140,6 +164,8 @@ export const getTopContributors = query({
  */
 export const getRecentIssues = query({
   handler: async (ctx) => {
+    await requireAdmin(ctx)
+
     // This would integrate with your error tracking system (Sentry, etc.)
     // For now, return empty array
     // In production, you might track failed operations in a separate table
@@ -152,6 +178,8 @@ export const getRecentIssues = query({
  */
 export const getPerformanceMetrics = query({
   handler: async (ctx) => {
+    await requireAdmin(ctx)
+
     const oneHourAgo = Date.now() - 60 * 60 * 1000
 
     // Count queries/mutations (approximate based on posts/comments created)

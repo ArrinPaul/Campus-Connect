@@ -30,6 +30,8 @@ export default function AdsDashboardPage() {
     setDeleting(adId)
     try {
       await deleteAd({ adId })
+    } catch (error) {
+      console.error("Failed to delete ad:", error)
     } finally {
       setDeleting(null)
     }
@@ -37,7 +39,11 @@ export default function AdsDashboardPage() {
 
   const handleToggle = async (adId: Id<"ads">, currentStatus: string) => {
     const newStatus = currentStatus === "active" ? "paused" : "active"
-    await updateAd({ adId, status: newStatus as "active" | "paused" })
+    try {
+      await updateAd({ adId, status: newStatus as "active" | "paused" })
+    } catch (error) {
+      console.error("Failed to toggle ad status:", error)
+    }
   }
 
   const totalImpressions = analytics?.reduce((s: number, a) => s + a.impressions, 0) ?? 0

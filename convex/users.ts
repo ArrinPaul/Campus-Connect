@@ -203,6 +203,397 @@ export const deleteUserFromWebhook = internalMutation({
       await ctx.db.delete(follow._id)
     }
 
+    // ── Additional cascade deletes (reactions, reposts, bookmarks, etc.) ──
+
+    // Delete reactions by this user
+    const userReactions = await ctx.db
+      .query("reactions")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+    for (const reaction of userReactions) {
+      await ctx.db.delete(reaction._id)
+    }
+
+    // Delete reposts by this user
+    const userReposts = await ctx.db
+      .query("reposts")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+    for (const repost of userReposts) {
+      // Decrement shareCount on original post
+      const originalPost = await ctx.db.get(repost.originalPostId)
+      if (originalPost) {
+        await ctx.db.patch(repost.originalPostId, {
+          shareCount: Math.max(0, originalPost.shareCount - 1),
+        })
+      }
+      await ctx.db.delete(repost._id)
+    }
+
+    // Delete bookmarks by this user
+    const userBookmarks = await ctx.db
+      .query("bookmarks")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+    for (const bookmark of userBookmarks) {
+      await ctx.db.delete(bookmark._id)
+    }
+
+    // Delete notifications for this user (both received and sent)
+    const receivedNotifs = await ctx.db
+      .query("notifications")
+      .withIndex("by_recipient", (q) => q.eq("recipientId", user._id))
+      .collect()
+    for (const notif of receivedNotifs) {
+      await ctx.db.delete(notif._id)
+    }
+    // Notifications where user is the actor
+    const sentNotifs = await ctx.db
+      .query("notifications")
+      .filter((q) => q.eq(q.field("actorId"), user._id))
+      .collect()
+    for (const notif of sentNotifs) {
+      await ctx.db.delete(notif._id)
+    }
+
+    // Delete stories and storyViews by this user
+    const userStories = await ctx.db
+      .query("stories")
+      .withIndex("by_author", (q) => q.eq("authorId", user._id))
+      .collect()
+    for (const story of userStories) {
+      const views = await ctx.db
+        .query("storyViews")
+        .withIndex("by_story", (q) => q.eq("storyId", story._id))
+        .collect()
+      for (const view of views) {
+        await ctx.db.delete(view._id)
+      }
+      await ctx.db.delete(story._id)
+    }
+    // Delete storyViews where user is the viewer
+    const viewedStories = await ctx.db
+      .query("storyViews")
+      .withIndex("by_viewer", (q) => q.eq("viewerId", user._id))
+      .collect()
+    for (const view of viewedStories) {
+      await ctx.db.delete(view._id)
+    }
+
+    // Delete conversation participants and clean up conversations
+    const participantRecords = await ctx.db
+      .query("conversationParticipants")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+    for (const p of participantRecords) {
+      await ctx.db.delete(p._id)
+    }
+
+    // Delete messages sent by this user (soft delete — mark as deleted)
+    const userMessages = await ctx.db
+      .query("messages")
+      .withIndex("by_sender", (q) => q.eq("senderId", user._id))
+      .collect()
+    for (const msg of userMessages) {
+      await ctx.db.patch(msg._id, { isDeleted: true, content: "[Deleted User]" })
+    }
+
+    // Delete typing indicators
+    const typingIndicators = await ctx.db
+      .query("typingIndicators")
+      .filter((q) => q.eq(q.field("userId"), user._id))
+      .collect()
+    for (const indicator of typingIndicators) {
+      await ctx.db.delete(indicator._id)
+    }
+
+    // Delete calls where user is caller
+    const userCalls = await ctx.db
+      .query("calls")
+      .withIndex("by_caller", (q) => q.eq("callerId", user._id))
+      .collect()
+    for (const call of userCalls) {
+      await ctx.db.delete(call._id)
+    }
+
+    // Delete poll votes by this user
+    const userPollVotes = await ctx.db
+      .query("pollVotes")
+      .filter((q) => q.eq(q.field("userId"), user._id))
+      .collect()
+    for (const vote of userPollVotes) {
+      // Decrement the poll option vote count
+      const poll = await ctx.db.get(vote.pollId)
+      if (poll) {
+        const updatedOptions = poll.options.map((opt: any) =>
+          opt.id === vote.optionId
+            ? { ...opt, voteCount: Math.max(0, opt.voteCount - 1) }
+            : opt
+        )
+        await ctx.db.patch(vote.pollId, {
+          options: updatedOptions,
+          totalVotes: Math.max(0, poll.totalVotes - 1),
+        })
+      }
+      await ctx.db.delete(vote._id)
+    }
+
+    // Delete achievements
+    const userAchievements = await ctx.db
+      .query("achievements")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+    for (const achievement of userAchievements) {
+      await ctx.db.delete(achievement._id)
+    }
+
+    // Delete suggestions (both given and received)
+    const userSuggestions = await ctx.db
+      .query("suggestions")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+    for (const suggestion of userSuggestions) {
+      await ctx.db.delete(suggestion._id)
+    }
+
+    // Delete skill endorsements (given and received)
+    const endorsementsReceived = await ctx.db
+      .query("skillEndorsements")
+      .withIndex("by_user_skill", (q) => q.eq("userId", user._id))
+      .collect()
+    for (const endorsement of endorsementsReceived) {
+      await ctx.db.delete(endorsement._id)
+    }
+    const endorsementsGiven = await ctx.db
+      .query("skillEndorsements")
+      .withIndex("by_endorser", (q) => q.eq("endorserId", user._id))
+      .collect()
+    for (const endorsement of endorsementsGiven) {
+      await ctx.db.delete(endorsement._id)
+    }
+
+    // Delete community memberships
+    const communityMemberships = await ctx.db
+      .query("communityMembers")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+    for (const membership of communityMemberships) {
+      // Decrement community member count
+      const community = await ctx.db.get(membership.communityId)
+      if (community) {
+        await ctx.db.patch(membership.communityId, {
+          memberCount: Math.max(0, community.memberCount - 1),
+        })
+      }
+      await ctx.db.delete(membership._id)
+    }
+
+    // Delete event RSVPs
+    const userRsvps = await ctx.db
+      .query("eventRSVPs")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+    for (const rsvp of userRsvps) {
+      if (rsvp.status === "going") {
+        const event = await ctx.db.get(rsvp.eventId)
+        if (event) {
+          await ctx.db.patch(rsvp.eventId, {
+            attendeeCount: Math.max(0, event.attendeeCount - 1),
+          })
+        }
+      }
+      await ctx.db.delete(rsvp._id)
+    }
+
+    // Delete papers and paper authors
+    const userPapers = await ctx.db
+      .query("papers")
+      .withIndex("by_uploaded_by", (q) => q.eq("uploadedBy", user._id))
+      .collect()
+    for (const paper of userPapers) {
+      const paperAuthors = await ctx.db
+        .query("paperAuthors")
+        .withIndex("by_paper", (q) => q.eq("paperId", paper._id))
+        .collect()
+      for (const pa of paperAuthors) {
+        await ctx.db.delete(pa._id)
+      }
+      await ctx.db.delete(paper._id)
+    }
+    // Remove user from papers they co-authored (but didn't upload)
+    const coAuthorLinks = await ctx.db
+      .query("paperAuthors")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+    for (const pa of coAuthorLinks) {
+      await ctx.db.delete(pa._id)
+    }
+
+    // Delete projects and timeline (portfolio)
+    const userProjects = await ctx.db
+      .query("projects")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+    for (const project of userProjects) {
+      await ctx.db.delete(project._id)
+    }
+    const userTimeline = await ctx.db
+      .query("timeline")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+    for (const entry of userTimeline) {
+      await ctx.db.delete(entry._id)
+    }
+
+    // Delete jobs posted by this user and their applications
+    const userJobs = await ctx.db
+      .query("jobs")
+      .withIndex("by_posted_by", (q) => q.eq("postedBy", user._id))
+      .collect()
+    for (const job of userJobs) {
+      const applications = await ctx.db
+        .query("jobApplications")
+        .withIndex("by_job", (q) => q.eq("jobId", job._id))
+        .collect()
+      for (const app of applications) {
+        await ctx.db.delete(app._id)
+      }
+      await ctx.db.delete(job._id)
+    }
+    // Delete job applications by this user
+    const userApplications = await ctx.db
+      .query("jobApplications")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+    for (const app of userApplications) {
+      await ctx.db.delete(app._id)
+    }
+
+    // Delete resources uploaded by this user
+    const userResources = await ctx.db
+      .query("resources")
+      .withIndex("by_uploaded_by", (q) => q.eq("uploadedBy", user._id))
+      .collect()
+    for (const resource of userResources) {
+      await ctx.db.delete(resource._id)
+    }
+
+    // Delete questions asked by this user (and their answers/votes)
+    const userQuestions = await ctx.db
+      .query("questions")
+      .withIndex("by_asked_by", (q) => q.eq("askedBy", user._id))
+      .collect()
+    for (const question of userQuestions) {
+      const answers = await ctx.db
+        .query("answers")
+        .withIndex("by_question", (q) => q.eq("questionId", question._id))
+        .collect()
+      for (const answer of answers) {
+        const aVotes = await ctx.db
+          .query("questionVotes")
+          .withIndex("by_target", (q) => q.eq("targetId", answer._id))
+          .collect()
+        for (const v of aVotes) await ctx.db.delete(v._id)
+        await ctx.db.delete(answer._id)
+      }
+      const qVotes = await ctx.db
+        .query("questionVotes")
+        .withIndex("by_target", (q) => q.eq("targetId", question._id))
+        .collect()
+      for (const v of qVotes) await ctx.db.delete(v._id)
+      await ctx.db.delete(question._id)
+    }
+    // Delete answers by this user on OTHER questions
+    const userAnswers = await ctx.db
+      .query("answers")
+      .withIndex("by_answered_by", (q) => q.eq("answeredBy", user._id))
+      .collect()
+    for (const answer of userAnswers) {
+      const question = await ctx.db.get(answer.questionId)
+      if (question) {
+        await ctx.db.patch(answer.questionId, {
+          answerCount: Math.max(0, question.answerCount - 1),
+        })
+        if (question.acceptedAnswerId === answer._id) {
+          await ctx.db.patch(answer.questionId, { acceptedAnswerId: undefined })
+        }
+      }
+      const aVotes = await ctx.db
+        .query("questionVotes")
+        .withIndex("by_target", (q) => q.eq("targetId", answer._id))
+        .collect()
+      for (const v of aVotes) await ctx.db.delete(v._id)
+      await ctx.db.delete(answer._id)
+    }
+
+    // Delete question votes by this user
+    const userQVotes = await ctx.db
+      .query("questionVotes")
+      .filter((q) => q.eq(q.field("userId"), user._id))
+      .collect()
+    for (const vote of userQVotes) {
+      // Reverse the vote on the target
+      const target = await ctx.db.get(vote.targetId as any)
+      if (target && typeof target.upvotes === "number") {
+        if (vote.voteType === "up") {
+          await ctx.db.patch(vote.targetId as any, {
+            upvotes: Math.max(0, target.upvotes - 1),
+          })
+        } else {
+          await ctx.db.patch(vote.targetId as any, {
+            downvotes: Math.max(0, target.downvotes - 1),
+          })
+        }
+      }
+      await ctx.db.delete(vote._id)
+    }
+
+    // Delete subscription
+    const subscription = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .unique()
+    if (subscription) {
+      await ctx.db.delete(subscription._id)
+    }
+
+    // Delete ads by this user
+    const userAds = await ctx.db
+      .query("ads")
+      .withIndex("by_advertiser", (q) => q.eq("advertiserId", user._id))
+      .collect()
+    for (const ad of userAds) {
+      const impressions = await ctx.db
+        .query("adImpressions")
+        .withIndex("by_ad", (q) => q.eq("adId", ad._id))
+        .collect()
+      for (const imp of impressions) await ctx.db.delete(imp._id)
+      const clicks = await ctx.db
+        .query("adClicks")
+        .withIndex("by_ad", (q) => q.eq("adId", ad._id))
+        .collect()
+      for (const click of clicks) await ctx.db.delete(click._id)
+      await ctx.db.delete(ad._id)
+    }
+
+    // Delete listings by this user
+    const userListings = await ctx.db
+      .query("listings")
+      .withIndex("by_seller", (q) => q.eq("sellerId", user._id))
+      .collect()
+    for (const listing of userListings) {
+      await ctx.db.delete(listing._id)
+    }
+
+    // Delete push subscriptions
+    const pushSubs = await ctx.db
+      .query("pushSubscriptions")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+    for (const sub of pushSubs) {
+      await ctx.db.delete(sub._id)
+    }
+
     // Finally delete the user record
     await ctx.db.delete(user._id)
 

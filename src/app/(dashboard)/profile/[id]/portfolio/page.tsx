@@ -156,7 +156,13 @@ function ProjectsTab({ projects, isOwner }: { projects: PortfolioProject[] | und
             <h3 className="font-semibold text-foreground">{project.title}</h3>
             {isOwner && (
               <button
-                onClick={() => deleteProject({ projectId: project._id })}
+                onClick={async () => {
+                  try {
+                    await deleteProject({ projectId: project._id })
+                  } catch (error) {
+                    console.error("Failed to delete project:", error)
+                  }
+                }}
                 className="text-gray-400 hover:text-destructive"
               >
                 <Trash2 className="h-4 w-4" />
@@ -258,7 +264,13 @@ function TimelineTab({ timeline, isOwner }: { timeline: TimelineEntry[] | undefi
                 </div>
                 {isOwner && (
                   <button
-                    onClick={() => deleteItem({ itemId: item._id })}
+                    onClick={async () => {
+                      try {
+                        await deleteItem({ itemId: item._id })
+                      } catch (error) {
+                        console.error("Failed to delete item:", error)
+                      }
+                    }}
                     className="text-gray-400 hover:text-destructive"
                   >
                     <Trash2 className="h-4 w-4" />

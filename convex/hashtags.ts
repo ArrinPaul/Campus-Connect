@@ -296,3 +296,64 @@ export const getHashtagStats = query({
     }
   },
 })
+
+// ──────────────────────────────────────────────
+// Internal: Compute trending scores
+// ──────────────────────────────────────────────
+
+/**
+ * Re-compute trending scores for all hashtags.
+ * Score formula: postCount * recencyMultiplier
+ * recencyMultiplier = max(0, 1 - (ageInHours / 168)) → decays to 0 over 7 days
+ * Called by cron every hour.
+ */
+export const updateTrendingScores = internalMutation({
+  handler: async (ctx) => {
+    const now = Date.now()
+    const oneWeekMs = 7 * 24 * 60 * 60 * 1000
+
+    // Get all hashtags that have been used in the last 7 days
+    const cutoff = now - oneWeekMs
+    const hashtags = await ctx.db
+      .query("hashtags")
+      .filter((q) => q.gte(q.field("lastUsedAt"), cutoff))
+      .collect()
+
+    for (const hashtag of hashtags) {
+      const ageMs = now - hashtag.lastUsedAt
+      const ageHours = ageMs / (60 * 60 * 1000)
+      const recencyMultiplier = Math.max(0, 1 - ageHours / 168) // 168h = 7 days
+
+      // Get actual recent post count (last 24h) for velocity boost
+      const oneDayAgo = now - 24 * 60 * 60 * 1000
+      const recentLinks = await ctx.db
+        .query("postHashtags")
+        .withIndex("by_hashtag_created", (q) =>
+          q.eq("hashtagId", hashtag._id).gte("createdAt", oneDayAgo)
+        )
+        .collect()
+
+      const recentCount = recentLinks.length
+      const score = Math.round(
+        (hashtag.postCount * recencyMultiplier + recentCount * 2) * 100
+      ) / 100
+
+      await ctx.db.patch(hashtag._id, { trendingScore: score })
+    }
+
+    // Zero out scores for hashtags not used in the last 7 days
+    const staleHashtags = await ctx.db
+      .query("hashtags")
+      .filter((q) =>
+        q.and(
+          q.lt(q.field("lastUsedAt"), cutoff),
+          q.gt(q.field("trendingScore"), 0)
+        )
+      )
+      .collect()
+
+    for (const hashtag of staleHashtags) {
+      await ctx.db.patch(hashtag._id, { trendingScore: 0 })
+    }
+  },
+})

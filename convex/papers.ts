@@ -1,5 +1,6 @@
 import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
+import { internal } from "./_generated/api"
 
 // ──────────────────────────────────────────────
 // Auth helper
@@ -70,6 +71,15 @@ export const uploadPaper = mutation({
         }
       }
     }
+
+    // Award reputation for uploading a paper
+    await ctx.scheduler.runAfter(0, internal.gamification.awardReputation, {
+      userId: user._id,
+      action: "paper_uploaded",
+    })
+    await ctx.scheduler.runAfter(0, internal.gamification.checkAchievements, {
+      userId: user._id,
+    })
 
     return paperId
   },

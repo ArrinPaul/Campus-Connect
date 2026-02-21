@@ -267,6 +267,15 @@ export const createPost = mutation({
       }
     }
 
+    // Award reputation for creating a post
+    await ctx.scheduler.runAfter(0, internal.gamification.awardReputation, {
+      userId: user._id,
+      action: "post_created",
+    })
+    await ctx.scheduler.runAfter(0, internal.gamification.checkAchievements, {
+      userId: user._id,
+    })
+
     // Return the created post
     const post = await ctx.db.get(postId)
     return post
@@ -326,7 +335,87 @@ export const deletePost = mutation({
       .withIndex("by_post", (q) => q.eq("postId", args.postId))
       .collect()
     for (const comment of comments) {
+      // Also delete reactions on each comment
+      const commentReactions = await ctx.db
+        .query("reactions")
+        .withIndex("by_target", (q) =>
+          q.eq("targetId", comment._id).eq("targetType", "comment")
+        )
+        .collect()
+      for (const r of commentReactions) {
+        await ctx.db.delete(r._id)
+      }
       await ctx.db.delete(comment._id)
+    }
+
+    // Cascade delete: remove all reactions on this post
+    const reactions = await ctx.db
+      .query("reactions")
+      .withIndex("by_target", (q) =>
+        q.eq("targetId", args.postId).eq("targetType", "post")
+      )
+      .collect()
+    for (const reaction of reactions) {
+      await ctx.db.delete(reaction._id)
+    }
+
+    // Cascade delete: remove all reposts of this post
+    const reposts = await ctx.db
+      .query("reposts")
+      .withIndex("by_original_post", (q) => q.eq("originalPostId", args.postId))
+      .collect()
+    for (const repost of reposts) {
+      await ctx.db.delete(repost._id)
+    }
+
+    // Cascade delete: remove all bookmarks of this post
+    const bookmarks = await ctx.db
+      .query("bookmarks")
+      .withIndex("by_user_and_post", (q) => q.eq("userId", user._id).eq("postId", args.postId))
+      .collect()
+    // Also delete bookmarks from OTHER users (query by post via filter)
+    const allBookmarks = await ctx.db
+      .query("bookmarks")
+      .filter((q) => q.eq(q.field("postId"), args.postId))
+      .collect()
+    for (const bookmark of allBookmarks) {
+      await ctx.db.delete(bookmark._id)
+    }
+
+    // Cascade delete: remove postHashtag links and decrement hashtag postCounts
+    const postHashtags = await ctx.db
+      .query("postHashtags")
+      .withIndex("by_post", (q) => q.eq("postId", args.postId))
+      .collect()
+    for (const link of postHashtags) {
+      const hashtag = await ctx.db.get(link.hashtagId)
+      if (hashtag) {
+        await ctx.db.patch(link.hashtagId, {
+          postCount: Math.max(0, hashtag.postCount - 1),
+        })
+      }
+      await ctx.db.delete(link._id)
+    }
+
+    // Cascade delete: remove poll and pollVotes if attached
+    if (post.pollId) {
+      const pollVotes = await ctx.db
+        .query("pollVotes")
+        .withIndex("by_poll", (q) => q.eq("pollId", post.pollId!))
+        .collect()
+      for (const vote of pollVotes) {
+        await ctx.db.delete(vote._id)
+      }
+      await ctx.db.delete(post.pollId)
+    }
+
+    // Cascade delete: remove notifications referencing this post
+    const notifications = await ctx.db
+      .query("notifications")
+      .filter((q) => q.eq(q.field("referenceId"), args.postId))
+      .collect()
+    for (const notif of notifications) {
+      await ctx.db.delete(notif._id)
     }
 
     // Delete the post

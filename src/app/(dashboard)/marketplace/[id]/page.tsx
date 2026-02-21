@@ -47,6 +47,8 @@ export default function ListingDetailPage() {
     setLoading(true)
     try {
       await markAsSold({ listingId: id as Id<"listings"> })
+    } catch (error) {
+      console.error("Failed to mark as sold:", error)
     } finally {
       setLoading(false)
     }
@@ -58,6 +60,8 @@ export default function ListingDetailPage() {
     try {
       await deleteListing({ listingId: id as Id<"listings"> })
       router.push("/marketplace")
+    } catch (error) {
+      console.error("Failed to delete listing:", error)
     } finally {
       setLoading(false)
     }

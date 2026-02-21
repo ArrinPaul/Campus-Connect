@@ -34,7 +34,11 @@ export default function NotificationsPage() {
   ]
 
   const handleMarkAllAsRead = async () => {
-    await markAllAsRead({})
+    try {
+      await markAllAsRead({})
+    } catch (error) {
+      console.error("Failed to mark all as read:", error)
+    }
   }
 
   const handleLoadMore = () => {
@@ -100,7 +104,13 @@ export default function NotificationsPage() {
 
           {/* Notifications List */}
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
-            {!notificationsData || notificationsData.notifications.length === 0 ? (
+            {notificationsData === undefined ? (
+              <div className="px-4 py-16 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-muted animate-pulse rounded-full" />
+                <div className="h-5 w-40 mx-auto bg-muted animate-pulse rounded mb-2" />
+                <div className="h-4 w-60 mx-auto bg-muted animate-pulse rounded" />
+              </div>
+            ) : notificationsData.notifications.length === 0 ? (
               <div className="px-4 py-16 text-center">
                 <Bell className="w-16 h-16 mx-auto mb-4 text-muted-foreground dark:text-muted-foreground" />
                 <h3 className="text-lg font-medium text-foreground mb-2">

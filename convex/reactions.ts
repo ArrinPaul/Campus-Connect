@@ -108,6 +108,17 @@ export const addReaction = mutation({
         })
       }
 
+      // Award reputation to the target owner for receiving a like/reaction
+      if (authorId && authorId !== user._id) {
+        await ctx.scheduler.runAfter(0, internal.gamification.awardReputation, {
+          userId: authorId,
+          action: "receive_like",
+        })
+        await ctx.scheduler.runAfter(0, internal.gamification.checkAchievements, {
+          userId: authorId,
+        })
+      }
+
       return { success: true, action: "created" }
     }
   },

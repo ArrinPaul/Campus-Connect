@@ -46,6 +46,10 @@ export function ReactionModal({
       : "skip"
   )
 
+  if (reactions === undefined) {
+    return null // Still loading — skip render
+  }
+
   if (!reactions || reactions.total === 0) {
     return null
   }

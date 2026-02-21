@@ -51,9 +51,14 @@ export default function NotificationSettingsPage() {
     if (pushEnabled) {
       // Unsubscribe
       if (subs?.[0]) {
-        await unsubscribeFromPush({ endpoint: subs[0].endpoint as string })
-        setPushEnabled(false)
-        setMessage("Push notifications disabled.")
+        try {
+          await unsubscribeFromPush({ endpoint: subs[0].endpoint as string })
+          setPushEnabled(false)
+          setMessage("Push notifications disabled.")
+        } catch (error) {
+          console.error("Failed to unsubscribe from push:", error)
+          setMessage("Failed to disable push notifications.")
+        }
       }
       return
     }

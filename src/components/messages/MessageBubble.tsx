@@ -95,12 +95,20 @@ export function MessageBubble({
   }
 
   const handleDeleteForMe = async () => {
-    await deleteMessage({ messageId: message._id })
+    try {
+      await deleteMessage({ messageId: message._id })
+    } catch (error) {
+      console.error("Failed to delete message:", error)
+    }
     setShowContextMenu(false)
   }
 
   const handleDeleteForEveryone = async () => {
-    await deleteMessage({ messageId: message._id, deleteForEveryone: true })
+    try {
+      await deleteMessage({ messageId: message._id, deleteForEveryone: true })
+    } catch (error) {
+      console.error("Failed to delete message:", error)
+    }
     setShowContextMenu(false)
   }
 

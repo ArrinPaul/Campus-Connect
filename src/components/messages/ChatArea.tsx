@@ -105,18 +105,26 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
 
   const handleMute = async () => {
     if (!conversation) return
-    await muteConversation({
-      conversationId,
-      isMuted: !conversation.isMuted,
-    })
+    try {
+      await muteConversation({
+        conversationId,
+        isMuted: !conversation.isMuted,
+      })
+    } catch (error) {
+      console.error("Failed to toggle mute:", error)
+    }
     setShowMenu(false)
   }
 
   const handleDelete = async () => {
     if (!confirm("Delete this conversation? This action cannot be undone.")) return
-    await deleteConversation({ conversationId })
-    setShowMenu(false)
-    onBack()
+    try {
+      await deleteConversation({ conversationId })
+      setShowMenu(false)
+      onBack()
+    } catch (error) {
+      console.error("Failed to delete conversation:", error)
+    }
   }
 
   if (!conversation) {

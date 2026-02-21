@@ -75,6 +75,11 @@ export const followUser = mutation({
       message: `${currentUser.name} started following you`,
     })
 
+    // Check achievements (e.g., "networker" badge for following 20 people)
+    await ctx.scheduler.runAfter(0, internal.gamification.checkAchievements, {
+      userId: currentUser._id,
+    })
+
     return true
   },
 })

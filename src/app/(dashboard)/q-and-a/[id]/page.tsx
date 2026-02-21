@@ -79,8 +79,12 @@ export default function QuestionDetailPage() {
 
   const handleDelete = async () => {
     if (!confirm("Delete this question and all answers?")) return
-    await deleteQuestion({ questionId })
-    window.location.href = "/q-and-a"
+    try {
+      await deleteQuestion({ questionId })
+      window.location.href = "/q-and-a"
+    } catch (error) {
+      console.error("Failed to delete question:", error)
+    }
   }
 
   return (
@@ -208,7 +212,13 @@ export default function QuestionDetailPage() {
                     <CheckCircle className="w-5 h-5 text-success mt-1" />
                   ) : (
                     <button
-                      onClick={() => acceptAnswerMutation({ answerId: answer._id })}
+                      onClick={async () => {
+                        try {
+                          await acceptAnswerMutation({ answerId: answer._id })
+                        } catch (error) {
+                          console.error("Failed to accept answer:", error)
+                        }
+                      }}
                       className="text-gray-300 hover:text-success mt-1"
                       title="Accept this answer"
                     >

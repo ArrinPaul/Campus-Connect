@@ -1,5 +1,6 @@
 import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
+import { internal } from "./_generated/api"
 
 // ────────────────────────────────────────────
 // Skill Endorsements (Phase 4.5)
@@ -60,12 +61,23 @@ export const endorseSkill = mutation({
       throw new Error("You have already endorsed this skill")
     }
 
-    return await ctx.db.insert("skillEndorsements", {
+    const endorsementId = await ctx.db.insert("skillEndorsements", {
       skillName: normalizedSkill,
       userId: args.userId,
       endorserId: currentUser._id,
       createdAt: Date.now(),
     })
+
+    // Award reputation to the endorsed user
+    await ctx.scheduler.runAfter(0, internal.gamification.awardReputation, {
+      userId: args.userId,
+      action: "skill_endorsed",
+    })
+    await ctx.scheduler.runAfter(0, internal.gamification.checkAchievements, {
+      userId: args.userId,
+    })
+
+    return endorsementId
   },
 })
 

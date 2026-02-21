@@ -1,5 +1,6 @@
 import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
+import { internal } from "./_generated/api"
 
 // ──────────────────────────────────────────────
 // Auth helper
@@ -40,7 +41,7 @@ export const askQuestion = mutation({
 
     const tags = args.tags.map((t) => t.trim().toLowerCase()).filter(Boolean)
 
-    return ctx.db.insert("questions", {
+    const questionId = await ctx.db.insert("questions", {
       title: args.title.trim(),
       content: args.content.trim(),
       askedBy: user._id,
@@ -53,6 +54,17 @@ export const askQuestion = mutation({
       acceptedAnswerId: undefined,
       createdAt: Date.now(),
     })
+
+    // Award reputation for asking a question
+    await ctx.scheduler.runAfter(0, internal.gamification.awardReputation, {
+      userId: user._id,
+      action: "question_asked",
+    })
+    await ctx.scheduler.runAfter(0, internal.gamification.checkAchievements, {
+      userId: user._id,
+    })
+
+    return questionId
   },
 })
 
@@ -127,6 +139,15 @@ export const answerQuestion = mutation({
       answerCount: question.answerCount + 1,
     })
 
+    // Award reputation for posting an answer
+    await ctx.scheduler.runAfter(0, internal.gamification.awardReputation, {
+      userId: user._id,
+      action: "answer_posted",
+    })
+    await ctx.scheduler.runAfter(0, internal.gamification.checkAchievements, {
+      userId: user._id,
+    })
+
     return answerId
   },
 })
@@ -152,6 +173,15 @@ export const acceptAnswer = mutation({
 
     await ctx.db.patch(args.answerId, { isAccepted: true })
     await ctx.db.patch(answer.questionId, { acceptedAnswerId: args.answerId })
+
+    // Award reputation to the answerer for accepted answer
+    await ctx.scheduler.runAfter(0, internal.gamification.awardReputation, {
+      userId: answer.answeredBy,
+      action: "answer_accepted",
+    })
+    await ctx.scheduler.runAfter(0, internal.gamification.checkAchievements, {
+      userId: answer.answeredBy,
+    })
   },
 })
 

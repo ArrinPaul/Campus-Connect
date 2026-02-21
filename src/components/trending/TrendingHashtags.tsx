@@ -19,7 +19,26 @@ export function TrendingHashtags({
 }: TrendingHashtagsProps) {
   const trendingHashtags = useQuery(api.hashtags.getTrending, { limit })
 
-  if (!trendingHashtags || trendingHashtags.length === 0) {
+  if (trendingHashtags === undefined) {
+    // Loading state — show skeleton
+    return (
+      <div className={`rounded-lg bg-card p-4 shadow-elevation-1 ${className}`}>
+        {showHeader && (
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-bold text-foreground">Trending Hashtags</h2>
+          </div>
+        )}
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-6 bg-muted animate-pulse rounded" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (trendingHashtags.length === 0) {
     return null
   }
 
