@@ -1,6 +1,23 @@
 "use client"
 
-import { MarkdownRenderer } from "@/components/editor/MarkdownRenderer"
+import dynamic from "next/dynamic"
+
+// Lazy load the markdown renderer (~200KB: react-markdown + remark + rehype + katex)
+const MarkdownRenderer = dynamic(
+  () =>
+    import("@/components/editor/MarkdownRenderer").then(
+      (m) => m.MarkdownRenderer
+    ),
+  {
+    loading: () => (
+      <div className="animate-pulse space-y-2">
+        <div className="h-4 w-3/4 rounded bg-muted" />
+        <div className="h-4 w-1/2 rounded bg-muted" />
+      </div>
+    ),
+    ssr: false,
+  }
+)
 
 interface PostContentProps {
   content: string

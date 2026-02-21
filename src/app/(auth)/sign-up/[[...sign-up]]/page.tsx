@@ -1,5 +1,14 @@
+import type { Metadata } from "next"
 import { SignUp } from "@clerk/nextjs"
 import { GraduationCap } from "lucide-react"
+
+export const metadata: Metadata = {
+  title: "Sign Up — Campus Connect",
+  description: "Create your Campus Connect account to start connecting with academic peers.",
+}
+
+// Revalidate the server-rendered shell every hour
+export const revalidate = 3600
 
 export default function SignUpPage() {
   return (

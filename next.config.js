@@ -1,4 +1,7 @@
 const { withSentryConfig } = require("@sentry/nextjs")
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+})
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -38,10 +41,33 @@ const nextConfig = {
 
   // Security headers
   async headers() {
+    // Content Security Policy
+    // In production, use strict CSP. In development, allow eval for HMR.
+    const isDev = process.env.NODE_ENV === "development"
+    const cspDirectives = [
+      "default-src 'self'",
+      `script-src 'self' ${isDev ? "'unsafe-eval' 'unsafe-inline'" : "'unsafe-inline'"} https://clerk.campus-connect.app https://*.clerk.accounts.dev https://challenges.cloudflare.com`,
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "img-src 'self' data: blob: https://*.convex.cloud https://img.clerk.com https://images.unsplash.com",
+      "font-src 'self' https://fonts.gstatic.com",
+      `connect-src 'self' https://*.convex.cloud https://*.clerk.accounts.dev wss://*.convex.cloud ${isDev ? "ws://localhost:*" : ""} https://*.posthog.com https://*.sentry.io https://clerk.campus-connect.app`,
+      "frame-src 'self' https://*.clerk.accounts.dev https://challenges.cloudflare.com",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+      "upgrade-insecure-requests",
+    ]
+    const cspHeader = cspDirectives.join("; ")
+
     return [
       {
         source: "/(.*)",
         headers: [
+          {
+            key: "Content-Security-Policy",
+            value: cspHeader,
+          },
           {
             key: "X-DNS-Prefetch-Control",
             value: "on",
@@ -52,11 +78,24 @@ const nextConfig = {
           },
           {
             key: "Referrer-Policy",
-            value: "origin-when-cross-origin",
+            value: "strict-origin-when-cross-origin",
           },
           {
             key: "X-Frame-Options",
             value: "DENY",
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+          {
+            key: "Permissions-Policy",
+            value:
+              "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+          },
+          {
+            key: "X-Permitted-Cross-Domain-Policies",
+            value: "none",
           },
         ],
       },
@@ -74,7 +113,7 @@ const nextConfig = {
   },
 }
 
-module.exports = withSentryConfig(nextConfig, {
+module.exports = withBundleAnalyzer(withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
 
@@ -98,4 +137,4 @@ module.exports = withSentryConfig(nextConfig, {
 
   // Enables automatic instrumentation of Vercel Cron Monitors (does not yet work with ISR)
   automaticVercelMonitors: true,
-})
+}))

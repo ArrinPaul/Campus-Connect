@@ -10,8 +10,22 @@ import { Id } from "@/convex/_generated/dataModel"
 import { CommentSkeleton } from "@/components/ui/loading-skeleton"
 import { parseMentions } from "../../../lib/mention-utils"
 import { ChevronDown, ChevronUp, MessageSquare, ArrowRight } from "lucide-react"
-import { CompactRichTextEditor } from "@/components/editor/RichTextEditor"
+import dynamic from "next/dynamic"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
+
+// Lazy load the heavy Tiptap editor
+const CompactRichTextEditor = dynamic(
+  () =>
+    import("@/components/editor/RichTextEditor").then(
+      (m) => m.CompactRichTextEditor
+    ),
+  {
+    loading: () => (
+      <div className="h-20 animate-pulse rounded-lg bg-muted" />
+    ),
+    ssr: false,
+  }
+)
 
 interface User {
   _id: Id<"users">

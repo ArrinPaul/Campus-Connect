@@ -4,8 +4,22 @@ import { useState } from "react"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
+import dynamic from "next/dynamic"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
-import { CompactRichTextEditor } from "@/components/editor/RichTextEditor"
+
+// Lazy load the heavy Tiptap editor
+const CompactRichTextEditor = dynamic(
+  () =>
+    import("@/components/editor/RichTextEditor").then(
+      (m) => m.CompactRichTextEditor
+    ),
+  {
+    loading: () => (
+      <div className="h-20 animate-pulse rounded-lg bg-muted" />
+    ),
+    ssr: false,
+  }
+)
 
 interface CommentComposerProps {
   postId: Id<"posts">

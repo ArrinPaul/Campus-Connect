@@ -57,6 +57,33 @@ jest.mock("@/components/posts/PostCard", () => ({
   )),
 }))
 
+// Mock VirtualizedFeed to render items directly (jsdom has no layout engine)
+jest.mock("./VirtualizedFeed", () => ({
+  VirtualizedFeed: ({ items, hasMore, isLoadingMore, onLoadMore }: any) => {
+    const { PostCard } = require("@/components/posts/PostCard")
+    const { InfiniteScrollTrigger } = require("./InfiniteScrollTrigger")
+    return (
+      <div>
+        {items.map((item: any) => {
+          if (item.type === "post" && item.post.author) {
+            return <PostCard key={`post-${item._id}`} post={item.post} author={item.post.author} />
+          }
+          if (item.type === "repost" && item.post.author && item.reposter) {
+            return (
+              <div key={`repost-${item._id}`}>
+                <span>{item.reposter.name || item.reposter.username} reposted</span>
+                <PostCard post={item.post} author={item.post.author} />
+              </div>
+            )
+          }
+          return null
+        })}
+        <InfiniteScrollTrigger onTrigger={onLoadMore} hasMore={hasMore} isLoading={isLoadingMore} />
+      </div>
+    )
+  },
+}))
+
 // Mock IntersectionObserver
 const mockIntersectionObserver = jest.fn()
 const mockObserve = jest.fn()

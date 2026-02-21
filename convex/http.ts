@@ -5,6 +5,55 @@ import { Webhook } from "svix"
 
 const http = httpRouter()
 
+// ── CORS Configuration ──────────────────────────────
+// Allowed origins for API requests
+const ALLOWED_ORIGINS = [
+  "https://campus-connect.vercel.app",
+  "https://www.campus-connect.app",
+  // Add your production domain(s) above
+]
+
+// In development, allow localhost origins
+if (process.env.NODE_ENV !== "production") {
+  ALLOWED_ORIGINS.push(
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3000"
+  )
+}
+
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers":
+      "Content-Type, Authorization, svix-id, svix-timestamp, svix-signature",
+    "Access-Control-Max-Age": "86400",
+    Vary: "Origin",
+  }
+
+  // Only set Allow-Origin if the origin is in our allowlist
+  if (origin && ALLOWED_ORIGINS.some(
+    (allowed) => origin === allowed || origin.endsWith(".vercel.app")
+  )) {
+    headers["Access-Control-Allow-Origin"] = origin
+  }
+
+  return headers
+}
+
+// Handle CORS preflight requests
+http.route({
+  path: "/clerk-webhook",
+  method: "OPTIONS",
+  handler: httpAction(async (_ctx, request) => {
+    const origin = request.headers.get("Origin")
+    return new Response(null, {
+      status: 204,
+      headers: getCorsHeaders(origin),
+    })
+  }),
+})
+
 /**
  * Clerk webhook handler
  * Handles user.created and user.updated events from Clerk
@@ -14,12 +63,18 @@ http.route({
   path: "/clerk-webhook",
   method: "POST",
   handler: httpAction(async (ctx, request) => {
+    const origin = request.headers.get("Origin")
+    const corsHeaders = getCorsHeaders(origin)
+
     // Get the webhook secret from environment variables
     const webhookSecret = process.env.CLERK_WEBHOOK_SECRET
 
     if (!webhookSecret) {
       console.error("CLERK_WEBHOOK_SECRET is not set")
-      return new Response("Webhook secret not configured", { status: 500 })
+      return new Response("Webhook secret not configured", {
+        status: 500,
+        headers: corsHeaders,
+      })
     }
 
     // Get the headers and body

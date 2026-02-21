@@ -1,5 +1,14 @@
+import type { Metadata } from "next"
 import { SignIn } from "@clerk/nextjs"
 import { GraduationCap } from "lucide-react"
+
+export const metadata: Metadata = {
+  title: "Sign In — Campus Connect",
+  description: "Sign in to Campus Connect to collaborate with peers and advance your academic career.",
+}
+
+// Revalidate the server-rendered shell every hour (Clerk widget hydrates client-side)
+export const revalidate = 3600
 
 export default function SignInPage() {
   return (

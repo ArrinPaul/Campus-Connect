@@ -6,6 +6,7 @@ import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { PostCard } from "@/components/posts/PostCard"
 import { InfiniteScrollTrigger } from "./InfiniteScrollTrigger"
+import { VirtualizedFeed } from "./VirtualizedFeed"
 import { Repeat2 } from "lucide-react"
 import type { FeedType } from "@/app/(dashboard)/feed/page"
 
@@ -200,62 +201,13 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
     )
   }
 
-  // Display posts and reposts with infinite scroll
+  // Display posts and reposts with virtualized infinite scroll
   return (
-    <div className="space-y-3 sm:space-y-4">
-      {allItems.map((item) => {
-        // Handle original posts
-        if (item.type === "post") {
-          if (!item.post.author) return null
-
-          return (
-            <PostCard
-              key={`post-${item._id}`}
-              post={item.post}
-              author={item.post.author}
-            />
-          )
-        }
-
-        // Handle reposts
-        if (item.type === "repost") {
-          if (!item.post.author || !item.reposter) return null
-
-          return (
-            <div key={`repost-${item._id}`} className="space-y-1">
-              {/* Repost header */}
-              <div className="flex items-center gap-2 px-4 pt-3 text-xs text-muted-foreground">
-                <Repeat2 className="h-3 w-3" />
-                <span>
-                  {item.reposter.name || item.reposter.username} reposted
-                </span>
-              </div>
-              
-              {/* Quote content if present */}
-              {item.quoteContent && (
-                <div className="px-4 pb-2">
-                  <p className="text-sm text-foreground">
-                    {item.quoteContent}
-                  </p>
-                </div>
-              )}
-
-              {/* Original post */}
-              <PostCard
-                post={item.post}
-                author={item.post.author}
-              />
-            </div>
-          )
-        }
-
-        return null
-      })}
-      <InfiniteScrollTrigger
-        onTrigger={handleLoadMore}
-        hasMore={!!cursor}
-        isLoading={isLoadingMore}
-      />
-    </div>
+    <VirtualizedFeed
+      items={allItems}
+      hasMore={!!cursor}
+      isLoadingMore={isLoadingMore}
+      onLoadMore={handleLoadMore}
+    />
   )
 }

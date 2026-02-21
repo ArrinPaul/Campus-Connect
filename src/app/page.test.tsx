@@ -13,17 +13,27 @@ jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
 }))
 
-// Mock framer-motion
-jest.mock("framer-motion", () => ({
-  motion: {
-    div: ({ children, className, style, ...rest }: any) => <div className={className} style={style}>{children}</div>,
-    h1: ({ children, className, style, ...rest }: any) => <h1 className={className} style={style}>{children}</h1>,
-    h2: ({ children, className, style, ...rest }: any) => <h2 className={className} style={style}>{children}</h2>,
-    p: ({ children, className, style, ...rest }: any) => <p className={className} style={style}>{children}</p>,
-    span: ({ children, className, style, ...rest }: any) => <span className={className} style={style}>{children}</span>,
-  },
-  AnimatePresence: ({ children }: any) => children,
-}))
+// Mock framer-motion (we use LazyMotion + m components)
+jest.mock("framer-motion", () => {
+  const element = (tag: string) => ({ children, className, style, ...rest }: any) => {
+    const Tag = tag as any
+    return <Tag className={className} style={style}>{children}</Tag>
+  }
+  const m = {
+    div: element("div"),
+    h1: element("h1"),
+    h2: element("h2"),
+    p: element("p"),
+    span: element("span"),
+  }
+  return {
+    motion: m,
+    m,
+    LazyMotion: ({ children }: any) => children,
+    domAnimation: {},
+    AnimatePresence: ({ children }: any) => children,
+  }
+})
 
 // Mock Next.js Link
 jest.mock("next/link", () => {

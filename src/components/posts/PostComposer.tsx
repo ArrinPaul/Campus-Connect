@@ -3,9 +3,20 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { useMutation, useQuery, useAction } from "convex/react"
 import { api } from "@/convex/_generated/api"
+import dynamic from "next/dynamic"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 import { MentionAutocomplete } from "./MentionAutocomplete"
-import { RichTextEditor } from "@/components/editor/RichTextEditor"
+
+// Lazy load the heavy Tiptap editor (~300KB)
+const RichTextEditor = dynamic(
+  () => import("@/components/editor/RichTextEditor").then((m) => m.RichTextEditor),
+  {
+    loading: () => (
+      <div className="h-32 animate-pulse rounded-lg bg-muted" />
+    ),
+    ssr: false,
+  }
+)
 import Image from "next/image"
 import {
   Image as ImageIcon,
