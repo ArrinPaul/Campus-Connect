@@ -120,13 +120,13 @@ export const universalSearch = query({
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) throw new Error("Unauthorized")
 
-    const q = args.query.trim()
+    const q = args.query.trim().slice(0, 200) // Cap query length to prevent abuse
     if (!q) return { users: [], posts: [], hashtags: [] }
 
-    const limitPerCategory = args.limit ?? 3
+    const limitPerCategory = Math.min(args.limit ?? 3, 20)
 
     // --- Users ---
-    const allUsers = await ctx.db.query("users").take(500)
+    const allUsers = await ctx.db.query("users").take(200)
     const scoredUsers = allUsers
       .map((user) => {
         const nameScore = searchRelevanceScore(q, user.name)
@@ -161,7 +161,7 @@ export const universalSearch = query({
       .query("posts")
       .withIndex("by_createdAt")
       .order("desc")
-      .take(500)
+      .take(200)
 
     const scoredPosts = await Promise.all(
       recentPosts.map(async (post) => {
@@ -258,10 +258,10 @@ export const searchPosts = query({
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) throw new Error("Unauthorized")
 
-    const q = args.query.trim()
+    const q = args.query.trim().slice(0, 200)
     if (!q) return { items: [], nextCursor: null, hasMore: false }
 
-    const limit = Math.min(args.limit ?? 20, 100)
+    const limit = Math.min(args.limit ?? 20, 50)
 
     // Fetch candidate posts
     let postsQuery = ctx.db
@@ -281,7 +281,7 @@ export const searchPosts = query({
       )
     }
 
-    const candidates = await postsQuery.take(500)
+    const candidates = await postsQuery.take(200)
 
     // Filter by text match + media + engagement
     const scored = await Promise.all(
@@ -323,7 +323,7 @@ export const searchPosts = query({
     valid.sort((a, b) => b.score - a.score)
 
     // Paginate
-    const startIndex = args.cursor ? parseInt(args.cursor, 10) : 0
+    const startIndex = args.cursor ? Math.max(0, parseInt(args.cursor, 10) || 0) : 0
     const page = valid.slice(startIndex, startIndex + limit + 1)
     const hasMore = page.length > limit
     const items = hasMore ? page.slice(0, limit) : page
@@ -358,10 +358,10 @@ export const searchUsersEnhanced = query({
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) throw new Error("Unauthorized")
 
-    const q = args.query.trim()
-    const limit = Math.min(args.limit ?? 20, 100)
+    const q = args.query.trim().slice(0, 200)
+    const limit = Math.min(args.limit ?? 20, 50)
 
-    let users = await ctx.db.query("users").take(1000)
+    let users = await ctx.db.query("users").take(500)
 
     // Text search (fuzzy)
     if (q) {
@@ -412,7 +412,7 @@ export const searchUsersEnhanced = query({
       : users.map((user) => ({ user, score: 1 }))
 
     // Paginate
-    const startIndex = args.cursor ? parseInt(args.cursor, 10) : 0
+    const startIndex = args.cursor ? Math.max(0, parseInt(args.cursor, 10) || 0) : 0
     const page = scored.slice(startIndex, startIndex + limit + 1)
     const hasMore = page.length > limit
     const items = hasMore ? page.slice(0, limit) : page

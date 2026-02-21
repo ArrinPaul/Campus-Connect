@@ -1,7 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { checkRateLimit } from "@/lib/rate-limit"
+import { checkRateLimit, checkRateLimitAuto } from "@/lib/rate-limit"
 import type { RouteType } from "@/lib/rate-limit"
 
 // ─── Route Matchers ───────────────────────────────────────────────────────────
@@ -31,7 +31,7 @@ function getClientIp(request: NextRequest): string {
 export default clerkMiddleware(async (auth, request) => {
   const ip = getClientIp(request)
   const routeType: RouteType = isAuthRoute(request) ? "auth" : isApiRoute(request) ? "api" : "default"
-  const { allowed, limit, remaining, reset } = checkRateLimit(ip, routeType)
+  const { allowed, limit, remaining, reset } = await checkRateLimitAuto(ip, routeType)
 
   if (!allowed) {
     return NextResponse.json(

@@ -26,6 +26,28 @@ export interface Logger {
   error(message: string, context?: LogContext): void
 }
 
+// ─── Log Level Filtering ─────────────────────────────────────────────────────
+
+const LOG_LEVEL_PRIORITY: Record<LogLevel, number> = {
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3,
+}
+
+/**
+ * Get the minimum log level from environment.
+ * In production, defaults to "info" (skips debug).
+ * In development, defaults to "debug" (shows everything).
+ */
+function getMinLogLevel(): LogLevel {
+  const envLevel = (typeof process !== "undefined" ? process.env.LOG_LEVEL : undefined) as LogLevel | undefined
+  if (envLevel && LOG_LEVEL_PRIORITY[envLevel] !== undefined) return envLevel
+  // Default: skip debug in production
+  const nodeEnv = typeof process !== "undefined" ? process.env.NODE_ENV : undefined
+  return nodeEnv === "production" ? "info" : "debug"
+}
+
 // ─── Core emit ───────────────────────────────────────────────────────────────
 
 function emit(
@@ -34,6 +56,9 @@ function emit(
   message: string,
   context?: LogContext
 ): void {
+  // Skip logs below the configured minimum level
+  if (LOG_LEVEL_PRIORITY[level] < LOG_LEVEL_PRIORITY[getMinLogLevel()]) return
+
   const payload = JSON.stringify({
     level,
     scope,

@@ -34,9 +34,7 @@ function getCorsHeaders(origin: string | null): Record<string, string> {
   }
 
   // Only set Allow-Origin if the origin is in our allowlist
-  if (origin && ALLOWED_ORIGINS.some(
-    (allowed) => origin === allowed || origin.endsWith(".vercel.app")
-  )) {
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
     headers["Access-Control-Allow-Origin"] = origin
   }
 

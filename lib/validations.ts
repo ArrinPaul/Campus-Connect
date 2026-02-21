@@ -1,13 +1,21 @@
 import { z } from "zod"
+import {
+  BIO_MAX_LENGTH,
+  POST_MAX_LENGTH,
+  COMMENT_MAX_LENGTH,
+  MAX_SKILLS,
+  SKILL_MAX_LENGTH,
+  NAME_MAX_LENGTH,
+} from "../convex/validation-constants"
 
 // User profile validation schema
 export const profileSchema = z.object({
-  name: z.string().min(1, "Name is required").max(100, "Name too long"),
-  bio: z.string().max(500, "Bio must be 500 characters or less").optional(),
+  name: z.string().min(1, "Name is required").max(NAME_MAX_LENGTH, "Name too long"),
+  bio: z.string().max(BIO_MAX_LENGTH, `Bio must be ${BIO_MAX_LENGTH} characters or less`).optional(),
   university: z.string().optional(),
   role: z.enum(["Student", "Research Scholar", "Faculty"]),
   experienceLevel: z.enum(["Beginner", "Intermediate", "Advanced", "Expert"]),
-  skills: z.array(z.string()).max(20, "Maximum 20 skills allowed"),
+  skills: z.array(z.string()).max(MAX_SKILLS, `Maximum ${MAX_SKILLS} skills allowed`),
   socialLinks: z.object({
     github: z.string().url("Invalid GitHub URL").optional().or(z.literal("")),
     linkedin: z.string().url("Invalid LinkedIn URL").optional().or(z.literal("")),
@@ -23,7 +31,7 @@ export const postSchema = z.object({
   content: z
     .string()
     .min(1, "Content is required")
-    .max(5000, "Content must be 5000 characters or less"),
+    .max(POST_MAX_LENGTH, `Content must be ${POST_MAX_LENGTH} characters or less`),
 })
 
 export type PostFormData = z.infer<typeof postSchema>
@@ -33,7 +41,7 @@ export const commentSchema = z.object({
   content: z
     .string()
     .min(1, "Comment is required")
-    .max(2000, "Comment must be 2000 characters or less"),
+    .max(COMMENT_MAX_LENGTH, `Comment must be ${COMMENT_MAX_LENGTH} characters or less`),
 })
 
 export type CommentFormData = z.infer<typeof commentSchema>
@@ -43,8 +51,8 @@ export function validateSkill(skill: string): { valid: boolean; error?: string }
   if (skill.length === 0) {
     return { valid: false, error: "Skill name cannot be empty" }
   }
-  if (skill.length > 50) {
-    return { valid: false, error: "Skill name must be 50 characters or less" }
+  if (skill.length > SKILL_MAX_LENGTH) {
+    return { valid: false, error: `Skill name must be ${SKILL_MAX_LENGTH} characters or less` }
   }
   if (!/^[a-zA-Z0-9\s\-\+\#\.]+$/.test(skill)) {
     return { valid: false, error: "Skill name contains invalid characters" }
@@ -55,8 +63,8 @@ export function validateSkill(skill: string): { valid: boolean; error?: string }
 // Bio validation
 export function validateBio(bio: string | undefined): { valid: boolean; error?: string } {
   if (!bio) return { valid: true }
-  if (bio.length > 500) {
-    return { valid: false, error: "Bio must be 500 characters or less" }
+  if (bio.length > BIO_MAX_LENGTH) {
+    return { valid: false, error: `Bio must be ${BIO_MAX_LENGTH} characters or less` }
   }
   return { valid: true }
 }

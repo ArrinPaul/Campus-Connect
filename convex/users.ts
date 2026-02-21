@@ -1,8 +1,9 @@
 import { v } from "convex/values"
 import { internalMutation, query, mutation } from "./_generated/server"
 import { Id } from "./_generated/dataModel"
-import { sanitizeText } from "./sanitize"
+import { sanitizeText, isValidSafeUrl } from "./sanitize"
 import { createLogger } from "./logger"
+import { BIO_MAX_LENGTH, UNIVERSITY_MAX_LENGTH } from "./validation-constants"
 
 const log = createLogger("users")
 
@@ -278,8 +279,8 @@ export const searchUsers = query({
       throw new Error("Unauthorized")
     }
 
-    // Get all users
-    let users = await ctx.db.query("users").collect()
+    // Get users (capped to prevent full table scan)
+    let users = await ctx.db.query("users").take(500)
 
     // Filter by name (case-insensitive substring match)
     if (args.query) {
@@ -330,8 +331,8 @@ export const searchUsersByUsername = query({
     const queryLower = args.query.toLowerCase()
     const limit = Math.min(args.limit || 5, 50) // Default to 5 suggestions
 
-    // Get all users and filter by username or name
-    let users = await ctx.db.query("users").collect()
+    // Get users (capped to prevent full table scan)
+    let users = await ctx.db.query("users").take(500)
 
     // Filter users whose username or name starts with the query (case-insensitive)
     users = users.filter((user) => {
@@ -498,27 +499,45 @@ export const updateProfile = mutation({
     }
 
     // Validate bio length
-    if (args.bio !== undefined && args.bio.length > 500) {
-      throw new Error("Bio must not exceed 500 characters")
+    if (args.bio !== undefined && args.bio.length > BIO_MAX_LENGTH) {
+      throw new Error(`Bio must not exceed ${BIO_MAX_LENGTH} characters`)
     }
 
     // Validate university length
-    if (args.university !== undefined && args.university.length > 200) {
-      throw new Error("University name must not exceed 200 characters")
+    if (args.university !== undefined && args.university.length > UNIVERSITY_MAX_LENGTH) {
+      throw new Error(`University name must not exceed ${UNIVERSITY_MAX_LENGTH} characters`)
     }
 
     // Sanitize text fields to prevent XSS attacks
     const sanitizedBio = args.bio !== undefined ? sanitizeText(args.bio) : undefined
     const sanitizedUniversity = args.university !== undefined ? sanitizeText(args.university) : undefined
+    // Validate social link URLs
+    if (args.socialLinks) {
+      const links = args.socialLinks
+      for (const [key, url] of Object.entries(links)) {
+        if (url && !isValidSafeUrl(url)) {
+          throw new Error(`Invalid ${key} URL — only https:// links are allowed`)
+        }
+      }
+    }
+
+    // Social links are validated as URLs above — no need to sanitizeText (which would break URLs)
     const sanitizedSocialLinks = args.socialLinks !== undefined ? {
-      github: args.socialLinks.github ? sanitizeText(args.socialLinks.github) : undefined,
-      linkedin: args.socialLinks.linkedin ? sanitizeText(args.socialLinks.linkedin) : undefined,
-      twitter: args.socialLinks.twitter ? sanitizeText(args.socialLinks.twitter) : undefined,
-      website: args.socialLinks.website ? sanitizeText(args.socialLinks.website) : undefined,
+      github: args.socialLinks.github || undefined,
+      linkedin: args.socialLinks.linkedin || undefined,
+      twitter: args.socialLinks.twitter || undefined,
+      website: args.socialLinks.website || undefined,
     } : undefined
 
     // Update user profile
-    const updates: any = {
+    const updates: Partial<{
+      bio: string
+      university: string
+      role: typeof args.role
+      experienceLevel: typeof args.experienceLevel
+      socialLinks: typeof sanitizedSocialLinks
+      updatedAt: number
+    }> = {
       updatedAt: Date.now(),
     }
 

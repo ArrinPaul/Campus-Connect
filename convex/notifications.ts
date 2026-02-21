@@ -7,6 +7,8 @@
 
 import { mutation, query, internalMutation } from "./_generated/server"
 import { v } from "convex/values"
+import { sanitizeText } from "./sanitize"
+import { NOTIFICATION_MAX_LENGTH } from "./validation-constants"
 
 /**
  * Create a new notification
@@ -28,9 +30,10 @@ export const createNotification = internalMutation({
     message: v.string(),
   },
   handler: async (ctx, args) => {
-    // Validate message length
-    if (args.message.length > 500) {
-      throw new Error("Notification message too long (max 500 characters)")
+    // Validate and sanitize message
+    const message = sanitizeText(args.message)
+    if (message.length > NOTIFICATION_MAX_LENGTH) {
+      throw new Error(`Notification message too long (max ${NOTIFICATION_MAX_LENGTH} characters)`)
     }
 
     // Don't create notification if actor and recipient are the same
@@ -60,7 +63,7 @@ export const createNotification = internalMutation({
       actorId: args.actorId,
       type: args.type,
       referenceId: args.referenceId,
-      message: args.message,
+      message: message,
       isRead: false,
       createdAt: Date.now(),
     })

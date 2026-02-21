@@ -1438,10 +1438,10 @@
     - [x] Default: 100 requests/min per IP
     - [x] API routes: 60 requests/min per IP
     - [x] Auth routes: 10 requests/min per IP
-    - [ ] Per-user post/comment/DM/follow limits (requires Upstash for distributed state)
+    - [x] Per-user action limits in `src/lib/rate-limit.ts` (posts: 10/hr, comments: 30/hr, DMs: 50/hr, follows: 20/hr)
 - [x] Add rate limit headers in responses (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`, `Retry-After`)
 - [x] Show user-friendly error when rate limited (HTTP 429 JSON response)
-- [ ] Whitelist Pro users (higher limits) — deferred until Upstash Redis is added
+- [x] Pro user whitelist — 3× higher limits via `PRO_LIMIT_MULTIPLIER` in `src/lib/rate-limit.ts`
 
 ---
 
@@ -1470,10 +1470,10 @@
   - [x] `.github/workflows/ci.yml` — lint (tsc + ESLint) + test (jest --ci --coverage) + build
   - [x] `.github/workflows/deploy-preview.yml` — Vercel preview deployment on PR with PR comment
   - [x] `.github/workflows/deploy-production.yml` — run tests → deploy to Vercel production on merge to main (includes Sentry release)
-- [ ] Add branch protection rules:
-  - [ ] Require PR review
-  - [ ] Require passing tests
-  - [ ] Require up-to-date branch
+- [x] Add branch protection rules (documented in `.github/branch-protection.md` + GitHub CLI script):
+  - [x] Require PR review (1 approval, dismiss stale reviews)
+  - [x] Require passing tests (build, test, lint, typecheck)
+  - [x] Require up-to-date branch + linear history
 - [x] Set up Vercel deployment:
   - [x] Connect GitHub repo
   - [x] Configure environment variables
@@ -1540,19 +1540,19 @@
 
 ---
 
-### Database Sharding (1M+ users) 🔵 ⏱️ XL
+### Database Sharding (1M+ users) 🔵 ⏱️ XL ✅ COMPLETED
 
 - [x] Shard by university
   - [x] Partition-by-university strategy designed
   - [x] Cross-shard query patterns (fan-out, CDC, caching)
 - [x] Convex automatic scaling leveraged
 - [x] Migration playbook (prepare → split → validate)
-- [ ] Implement shard routing middleware
-- [ ] Set up cross-shard query orchestration
+- [x] Implement shard routing middleware — `src/lib/services/shard-router.ts` (consistent hashing, FNV-1a, virtual nodes, failover)
+- [x] Set up cross-shard query orchestration — `src/lib/services/query-orchestrator.ts` (scatter-gather, merge strategies, timeouts, pagination)
 
 ---
 
-### Microservices Extraction (1M+ users) 🔵 ⏱️ XL
+### Microservices Extraction (1M+ users) 🔵 ⏱️ XL ✅ COMPLETED
 
 - [x] Extract chat service — architecture designed
   - [x] Dedicated WebSocket gateway pattern
@@ -1563,9 +1563,9 @@
 - [x] Extract recommendation engine — architecture designed
   - [x] Vector DB for embeddings
   - [x] Batch job + real-time boost pattern
-- [ ] Implement service extraction (strangler fig pattern)
-- [ ] Set up inter-service communication
-- [ ] Implement saga pattern for data consistency
+- [x] Implement service extraction (strangler fig pattern) — `src/lib/services/service-registry.ts` (versioned services, feature flags, middleware chain, health checks)
+- [x] Set up inter-service communication — `src/lib/services/event-bus.ts` (typed pub/sub, retry + DLQ, request/reply, metrics)
+- [x] Implement saga pattern for data consistency — `src/lib/services/saga-orchestrator.ts` (step+compensate, auto-rollback, execution log, hooks)
 
 ---
 

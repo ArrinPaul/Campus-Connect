@@ -2,9 +2,10 @@ import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
 import { Id } from "./_generated/dataModel"
 import { internal } from "./_generated/api"
-import { sanitizeText, sanitizeMarkdown } from "./sanitize"
+import { sanitizeText, sanitizeMarkdown, isValidSafeUrl } from "./sanitize"
 import { linkHashtagsToPost } from "./hashtags"
 import { extractMentions } from "./mentionUtils"
+import { POST_MAX_LENGTH } from "./validation-constants"
 
 /**
  * Get feed posts with pagination
@@ -55,11 +56,15 @@ export const getFeedPosts = query({
 
     // Apply cursor-based pagination if cursor is provided
     if (args.cursor) {
-      const cursorPost = await ctx.db.get(args.cursor as Id<"posts">)
-      if (cursorPost) {
-        postsQuery = postsQuery.filter((q) =>
-          q.lt(q.field("createdAt"), cursorPost.createdAt)
-        )
+      try {
+        const cursorPost = await ctx.db.get(args.cursor as Id<"posts">)
+        if (cursorPost) {
+          postsQuery = postsQuery.filter((q) =>
+            q.lt(q.field("createdAt"), cursorPost.createdAt)
+          )
+        }
+      } catch {
+        // Invalid cursor — return results from the beginning
       }
     }
 
@@ -187,13 +192,35 @@ export const createPost = mutation({
       throw new Error("Post content cannot be empty")
     }
 
-    // Validate content - max 5000 characters
-    if (args.content.length > 5000) {
-      throw new Error("Post content must not exceed 5000 characters")
+    // Validate content - max length
+    if (args.content.length > POST_MAX_LENGTH) {
+      throw new Error(`Post content must not exceed ${POST_MAX_LENGTH} characters`)
     }
 
     // Sanitize content — preserves markdown syntax while blocking XSS
     const sanitizedContent = sanitizeMarkdown(args.content)
+
+    // Validate media URLs if provided
+    if (args.mediaUrls) {
+      for (const url of args.mediaUrls) {
+        if (!isValidSafeUrl(url)) {
+          throw new Error("Invalid media URL")
+        }
+      }
+    }
+
+    // Validate link preview URLs if provided
+    if (args.linkPreview) {
+      if (!isValidSafeUrl(args.linkPreview.url)) {
+        throw new Error("Invalid link preview URL")
+      }
+      if (args.linkPreview.image && !isValidSafeUrl(args.linkPreview.image)) {
+        throw new Error("Invalid link preview image URL")
+      }
+      if (args.linkPreview.favicon && !isValidSafeUrl(args.linkPreview.favicon)) {
+        throw new Error("Invalid link preview favicon URL")
+      }
+    }
 
     // Create post with initialized counts
     const now = Date.now()
@@ -225,15 +252,8 @@ export const createPost = mutation({
         .withIndex("by_username", (q) => q.eq("username", username))
         .first()
 
-      // Fallback: try to find by name if username not found
-      let resolvedUser = mentionedUser || null
-      if (!resolvedUser) {
-        const allUsers = await ctx.db.query("users").collect()
-        const foundUser = allUsers.find(
-          (u) => u.name.toLowerCase() === username.toLowerCase()
-        )
-        resolvedUser = foundUser || null
-      }
+      // If username index miss, skip silently — no full table scan fallback
+      const resolvedUser = mentionedUser || null
 
       // Schedule notification if user found and not self-mention
       if (resolvedUser && resolvedUser._id !== user._id) {

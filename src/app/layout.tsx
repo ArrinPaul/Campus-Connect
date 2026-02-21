@@ -7,6 +7,7 @@ import { ConvexClientProvider } from "@/components/providers/convex-provider"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { PostHogProvider } from "@/components/providers/posthog-provider"
 import { PostHogPageView } from "@/components/analytics/posthog-pageview"
+import { Toaster } from "sonner"
 import "./globals.css"
 
 const inter = Inter({
@@ -104,6 +105,7 @@ export default function RootLayout({
           </ThemeProvider>
           <Analytics />
           <SpeedInsights />
+          <Toaster richColors position="bottom-right" closeButton />
         </body>
       </html>
     </ClerkProvider>

@@ -28,18 +28,22 @@ describe('XSS Prevention Property Tests', () => {
     );
   });
 
-  it('Property 42: should remove event handlers from any input', () => {
+  it('Property 42: should neutralize event handlers inside HTML tags', () => {
     fc.assert(
       fc.property(
         fc.string(),
         fc.constantFrom('onclick', 'onerror', 'onload', 'onmouseover'),
         fc.string(),
         (text, eventHandler, payload) => {
-          const maliciousInput = `${text} ${eventHandler}="${payload}"`;
+          // Event handlers inside actual HTML tags must be stripped
+          const maliciousInput = `${text} <div ${eventHandler}="${payload}">x</div>`;
           const sanitized = sanitizeText(maliciousInput);
           
-          // Event handlers should be removed
-          expect(sanitized).not.toMatch(new RegExp(`${eventHandler}\\s*=`, 'i'));
+          // The entire HTML tag (including the event handler) must be removed.
+          // With the allowlist approach ALL HTML tags are stripped, so no
+          // event handler can survive inside a tag.
+          expect(sanitized).not.toContain(`<div`);
+          expect(sanitized).not.toContain(`<`); // HTML-encoded: no raw angle brackets
         }
       ),
       { numRuns: 100 }

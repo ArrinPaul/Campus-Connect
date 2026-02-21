@@ -6,28 +6,31 @@
  */
 
 import { v } from "convex/values"
-import { mutation, query } from "./_generated/server"
+import { mutation, query, MutationCtx, QueryCtx } from "./_generated/server"
 import { internal } from "./_generated/api"
+import { Id } from "./_generated/dataModel"
+import { sanitizeMarkdown, isValidSafeUrl } from "./sanitize"
+import { MESSAGE_MAX_LENGTH } from "./validation-constants"
 
 /**
  * Helper: get current authenticated user from identity
  */
-async function getCurrentUser(ctx: any) {
+async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
   const identity = await ctx.auth.getUserIdentity()
   if (!identity) return null
   return ctx.db
     .query("users")
-    .withIndex("by_clerkId", (q: any) => q.eq("clerkId", identity.subject))
+    .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
     .unique()
 }
 
 /**
  * Helper: verify user is a participant in conversation
  */
-async function verifyParticipant(ctx: any, userId: string, conversationId: string) {
+async function verifyParticipant(ctx: QueryCtx | MutationCtx, userId: Id<"users">, conversationId: Id<"conversations">) {
   return ctx.db
     .query("conversationParticipants")
-    .withIndex("by_user_conversation", (q: any) =>
+    .withIndex("by_user_conversation", (q) =>
       q.eq("userId", userId).eq("conversationId", conversationId)
     )
     .unique()
@@ -59,12 +62,17 @@ export const sendMessage = mutation({
     if (!participant) throw new Error("Not a participant in this conversation")
 
     // Validate content
-    const content = args.content.trim()
+    const content = sanitizeMarkdown(args.content.trim())
     if (!content && !args.attachmentUrl) {
       throw new Error("Message content or attachment is required")
     }
-    if (content.length > 5000) {
-      throw new Error("Message too long (max 5000 characters)")
+    if (content.length > MESSAGE_MAX_LENGTH) {
+      throw new Error(`Message too long (max ${MESSAGE_MAX_LENGTH} characters)`)
+    }
+
+    // Validate attachment URL if provided
+    if (args.attachmentUrl && !isValidSafeUrl(args.attachmentUrl)) {
+      throw new Error("Invalid attachment URL")
     }
 
     // Validate reply reference
@@ -342,9 +350,9 @@ export const editMessage = mutation({
       throw new Error("Cannot edit messages after 15 minutes")
     }
 
-    const content = args.content.trim()
+    const content = sanitizeMarkdown(args.content.trim())
     if (!content) throw new Error("Message content is required")
-    if (content.length > 5000) throw new Error("Message too long (max 5000 characters)")
+    if (content.length > MESSAGE_MAX_LENGTH) throw new Error(`Message too long (max ${MESSAGE_MAX_LENGTH} characters)`)
 
     await ctx.db.patch(args.messageId, {
       content,

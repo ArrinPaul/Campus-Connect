@@ -19,6 +19,7 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
 import { createLogger } from "@/lib/logger"
+import { toast } from "sonner"
 
 const log = createLogger("BookmarkButton")
 import { Bookmark, BookmarkCheck, FolderPlus } from "lucide-react"
@@ -47,12 +48,15 @@ export function BookmarkButton({
     try {
       if (isBookmarked) {
         await removeBookmark({ postId })
+        toast.success("Bookmark removed")
       } else {
         await addBookmark({ postId, collectionName: "Saved" })
+        toast.success("Post bookmarked")
         onBookmarked?.()
       }
     } catch (error) {
       log.error("Failed to toggle bookmark", error)
+      toast.error("Failed to update bookmark")
     }
   }
 
@@ -60,9 +64,11 @@ export function BookmarkButton({
     try {
       await addBookmark({ postId, collectionName })
       setShowCollectionMenu(false)
+      toast.success(`Added to "${collectionName}"`)
       onBookmarked?.()
     } catch (error) {
       log.error("Failed to add to collection", error)
+      toast.error("Failed to add to collection")
     }
   }
 

@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api"
 import dynamic from "next/dynamic"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 import { MentionAutocomplete } from "./MentionAutocomplete"
+import { toast } from "sonner"
 
 // Lazy load the heavy Tiptap editor (~300KB)
 const RichTextEditor = dynamic(
@@ -442,8 +443,12 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
       if (onPostCreated) {
         onPostCreated()
       }
+
+      toast.success("Post published!")
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create post")
+      const msg = err instanceof Error ? err.message : "Failed to create post"
+      setError(msg)
+      toast.error(msg)
       setIsUploading(false)
     } finally {
       setIsSubmitting(false)

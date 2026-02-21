@@ -18,6 +18,7 @@ import { MediaGallery } from "@/components/posts/MediaGallery"
 import { LinkPreviewCard } from "@/components/posts/LinkPreviewCard"
 import { PollCard } from "@/components/posts/PollCard"
 import { createLogger } from "@/lib/logger"
+import { toast } from "sonner"
 
 const log = createLogger("PostCard")
 
@@ -90,9 +91,10 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
     setIsDeleting(true)
     try {
       await deletePost({ postId: post._id })
+      toast.success("Post deleted")
     } catch (error) {
       log.error("Failed to delete post", error, { postId: post._id })
-      alert("Failed to delete post. Please try again.")
+      toast.error("Failed to delete post. Please try again.")
     } finally {
       setIsDeleting(false)
     }
@@ -117,17 +119,17 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
 
   const handleDirectRepost = async () => {
     if (isOwnPost) {
-      alert("You cannot repost your own post")
+      toast.error("You cannot repost your own post")
       return
     }
 
     try {
       await createRepost({ originalPostId: post._id })
-      setShareSuccess("Post reposted!")
+      toast.success("Post reposted!")
       setShowShareDropdown(false)
       setTimeout(() => setShareSuccess(null), 3000)
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to repost")
+      toast.error(err instanceof Error ? err.message : "Failed to repost")
     }
   }
 

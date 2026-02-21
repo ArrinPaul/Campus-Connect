@@ -258,7 +258,7 @@ export const getRankedFeed = query({
     const diversified = enforceAuthorDiversity(validPosts, MAX_POSTS_PER_AUTHOR, DIVERSITY_WINDOW)
 
     // 5. Apply cursor-based pagination (cursor = index offset as string)
-    const startIndex = args.cursor ? parseInt(args.cursor, 10) : 0
+    const startIndex = args.cursor ? Math.max(0, parseInt(args.cursor, 10) || 0) : 0
     const page = diversified.slice(startIndex, startIndex + limit + 1)
     const hasMore = page.length > limit
     const itemsToReturn = hasMore ? page.slice(0, limit) : page
@@ -441,7 +441,7 @@ export const getTrendingFeed = query({
     const diversified = enforceAuthorDiversity(valid, MAX_POSTS_PER_AUTHOR, DIVERSITY_WINDOW)
 
     // Paginate
-    const startIndex = args.cursor ? parseInt(args.cursor, 10) : 0
+    const startIndex = args.cursor ? Math.max(0, parseInt(args.cursor, 10) || 0) : 0
     const page = diversified.slice(startIndex, startIndex + limit + 1)
     const hasMore = page.length > limit
     const itemsToReturn = hasMore ? page.slice(0, limit) : page

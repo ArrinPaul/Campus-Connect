@@ -3,6 +3,7 @@ import { query, mutation } from "./_generated/server"
 import { sanitizeText, sanitizeMarkdown } from "./sanitize"
 import { api, internal } from "./_generated/api"
 import { extractMentions } from "./mentionUtils"
+import { COMMENT_MAX_LENGTH } from "./validation-constants"
 
 /**
  * Get all comments for a post (flat list ordered oldest first, includes depth for client-side tree rendering)
@@ -148,9 +149,9 @@ export const createComment = mutation({
       throw new Error("Comment content cannot be empty")
     }
 
-    // Validate content - max 1000 characters
-    if (args.content.length > 1000) {
-      throw new Error("Comment content must not exceed 1000 characters")
+    // Validate content - max length
+    if (args.content.length > COMMENT_MAX_LENGTH) {
+      throw new Error(`Comment content must not exceed ${COMMENT_MAX_LENGTH} characters`)
     }
 
     // Sanitize content to prevent XSS attacks

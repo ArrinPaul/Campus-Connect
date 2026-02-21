@@ -11,6 +11,7 @@ import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 import { OnlineStatusDot, formatLastSeen } from "@/components/ui/OnlineStatusDot"
 import { MessageSquare } from "lucide-react"
 import { createLogger } from "@/lib/logger"
+import { toast } from "sonner"
 
 const log = createLogger("ProfileHeader")
 
@@ -73,6 +74,7 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
       // Revert optimistic update on error
       setOptimisticFollowing(null)
       log.error("Failed to toggle follow", error)
+      toast.error("Failed to update follow status")
     } finally {
       setIsLoading(false)
     }

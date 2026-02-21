@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import { createLogger } from "@/lib/logger"
+import { toast } from "sonner"
 
 const log = createLogger("ReactionPicker")
 import {
@@ -74,6 +75,7 @@ export function ReactionPicker({
       onReactionAdded?.()
     } catch (error) {
       log.error("Failed to react", error)
+      toast.error("Failed to react")
     }
   }
 

@@ -1,126 +1,115 @@
 /**
- * Sanitizes text input to prevent XSS attacks
- * Removes script tags, event handlers, and other potentially malicious content
- * This is a simple regex-based approach that works in Convex environment
+ * Sanitizes plain text input to prevent XSS attacks.
+ *
+ * APPROACH: Allowlist — strip ALL HTML tags unconditionally, then
+ * HTML-encode the result.  This eliminates all injection vectors
+ * regardless of tag name, nesting tricks, or obfuscation because
+ * nothing resembling a tag survives.
+ *
  * @param input - The text to sanitize
  * @returns Sanitized text safe for storage and display
  */
 export function sanitizeText(input: string): string {
   if (!input) return '';
-  
+
   let sanitized = input;
-  
-  // Remove script tags and their content
-  sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-  
-  // Remove event handlers (onclick, onerror, etc.)
-  sanitized = sanitized.replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '');
-  sanitized = sanitized.replace(/\s*on\w+\s*=\s*[^\s>]*/gi, '');
-  
-  // Remove javascript: protocol
-  sanitized = sanitized.replace(/javascript:/gi, '');
-  
-  // Remove data: protocol (can be used for XSS)
-  sanitized = sanitized.replace(/data:text\/html/gi, '');
-  
-  // Remove iframe tags
-  sanitized = sanitized.replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '');
-  
-  // Remove object and embed tags
-  sanitized = sanitized.replace(/<(object|embed)\b[^<]*(?:(?!<\/\1>)<[^<]*)*<\/\1>/gi, '');
-  
-  // Remove self-closing object and embed tags
-  sanitized = sanitized.replace(/<(object|embed)\b[^>]*\/?>/gi, '');
-  
-  // Remove style tags
-  sanitized = sanitized.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
-  
-  // Remove link tags (can load external stylesheets with XSS)
-  sanitized = sanitized.replace(/<link\b[^>]*>/gi, '');
-  
-  // Remove meta tags
-  sanitized = sanitized.replace(/<meta\b[^>]*>/gi, '');
-  
-  // Remove img tags (can trigger onerror XSS)
-  sanitized = sanitized.replace(/<img\b[^>]*\/?>/gi, '');
-  
-  // Remove svg tags and their content (can contain scripts)
-  sanitized = sanitized.replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, '');
-  sanitized = sanitized.replace(/<svg\b[^>]*\/?>/gi, '');
-  
-  // Remove form tags (phishing vector)
-  sanitized = sanitized.replace(/<\/?form\b[^>]*>/gi, '');
-  sanitized = sanitized.replace(/<(input|button|textarea|select)\b[^>]*\/?>/gi, '');
-  
-  // Remove base tags (can redirect all relative URLs)
-  sanitized = sanitized.replace(/<base\b[^>]*\/?>/gi, '');
-  
-  // HTML-encode remaining special characters to prevent injection
-  sanitized = sanitized.replace(/&(?!amp;|lt;|gt;|quot;|#39;)/g, '&amp;');
+
+  // 1a. Remove content-bearing dangerous tags AND their content
+  //     Script/style content is executable and must not survive.
+  sanitized = sanitized.replace(/<script\b[\s\S]*?<\/script\s*>/gi, '');
+  sanitized = sanitized.replace(/<style\b[\s\S]*?<\/style\s*>/gi, '');
+
+  // 1b. Remove ALL remaining HTML tags (opening, closing, self-closing, comments)
+  //     This is an allowlist approach: nothing is permitted.
+  sanitized = sanitized.replace(/<!--[\s\S]*?-->/g, '');        // HTML comments
+  sanitized = sanitized.replace(/<\/?[a-z][^>]*\/?>/gi, '');    // Any HTML tag
+
+  // 2. Neutralize dangerous URI protocols that may appear in raw text
+  sanitized = sanitized.replace(/javascript\s*:/gi, '');
+  sanitized = sanitized.replace(/vbscript\s*:/gi, '');
+  sanitized = sanitized.replace(/data\s*:\s*text\/html/gi, '');
+
+  // 3. HTML-encode remaining special characters
+  sanitized = sanitized.replace(/&/g, '&amp;');
   sanitized = sanitized.replace(/</g, '&lt;');
   sanitized = sanitized.replace(/>/g, '&gt;');
   sanitized = sanitized.replace(/"/g, '&quot;');
   sanitized = sanitized.replace(/'/g, '&#39;');
-  
+
   return sanitized;
 }
+
 /**
  * Sanitizes markdown content stored as rich text.
  *
- * Unlike `sanitizeText`, this function preserves markdown syntax characters
- * (*, _, #, >, `, ~, [, ], etc.) so they can be rendered later by a
- * markdown renderer like react-markdown.  It still strips XSS injection
- * vectors: <script>, <iframe>, event handlers, and javascript: protocols.
+ * APPROACH: Allowlist — strip ALL HTML tags unconditionally while
+ * preserving markdown syntax characters (*, _, #, >, `, ~, [, ], etc.)
+ * so they can be rendered later by react-markdown.
+ *
+ * Markdown links like `[text](url)` are preserved but dangerous
+ * protocols (javascript:, vbscript:, data:text/html) inside link
+ * targets are neutralized.
+ *
+ * The client-side renderer MUST also run DOMPurify (already in
+ * package.json as isomorphic-dompurify) on the final HTML output
+ * as defense-in-depth.
  *
  * @param input - Markdown string to sanitize
- * @returns Sanitized markdown string safe for database storage and react-markdown rendering
+ * @returns Sanitized markdown safe for database storage and rendering
  */
 export function sanitizeMarkdown(input: string): string {
   if (!input) return '';
 
   let sanitized = input;
 
-  // Remove script tags and their content
-  sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  // 1a. Remove content-bearing dangerous tags AND their content
+  //     Script/style content is executable and must not survive.
+  sanitized = sanitized.replace(/<script\b[\s\S]*?<\/script\s*>/gi, '');
+  sanitized = sanitized.replace(/<style\b[\s\S]*?<\/style\s*>/gi, '');
 
-  // Remove event handler attributes
-  sanitized = sanitized.replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '');
-  sanitized = sanitized.replace(/\s*on\w+\s*=\s*[^\s>]*/gi, '');
+  // 1b. Remove ALL remaining HTML tags (opening, closing, self-closing, comments)
+  //     This strips <iframe>, <a>, <div>, <img>, <svg>, etc.
+  //     regardless of casing, nesting, or obfuscation.
+  sanitized = sanitized.replace(/<!--[\s\S]*?-->/g, '');        // HTML comments
+  sanitized = sanitized.replace(/<\/?[a-z][^>]*\/?>/gi, '');    // Any HTML tag
 
-  // Remove javascript: and vbscript: protocols (used in markdown links)
-  sanitized = sanitized.replace(/\[([^\]]*)\]\(javascript:[^)]*\)/gi, '[$1](#)');
-  sanitized = sanitized.replace(/\[([^\]]*)\]\(vbscript:[^)]*\)/gi, '[$1](#)');
-  sanitized = sanitized.replace(/javascript:/gi, '');
-  sanitized = sanitized.replace(/vbscript:/gi, '');
+  // 2. Neutralize dangerous protocols in markdown link targets
+  //    [text](javascript:...) → [text](#)
+  sanitized = sanitized.replace(
+    /\[([^\]]*)\]\(\s*(?:javascript|vbscript|data\s*:\s*text\/html)\s*:[^)]*\)/gi,
+    '[$1](#)'
+  );
 
-  // Remove data: protocol HTML injections
-  sanitized = sanitized.replace(/data:text\/html/gi, '');
+  // 3. Neutralize any remaining dangerous protocol references in raw text
+  sanitized = sanitized.replace(/javascript\s*:/gi, '');
+  sanitized = sanitized.replace(/vbscript\s*:/gi, '');
+  sanitized = sanitized.replace(/data\s*:\s*text\/html/gi, '');
 
-  // Remove iframe tags
-  sanitized = sanitized.replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '');
-
-  // Remove object and embed tags
-  sanitized = sanitized.replace(/<(object|embed)\b[^<]*(?:(?!<\/\1>)<[^<]*)*<\/\1>/gi, '');
-  sanitized = sanitized.replace(/<(object|embed)\b[^>]*\/?>/gi, '');
-
-  // Remove style and link tags (external stylesheet injection)
-  sanitized = sanitized.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
-  sanitized = sanitized.replace(/<link\b[^>]*>/gi, '');
-
-  // Remove meta and base tags
-  sanitized = sanitized.replace(/<meta\b[^>]*>/gi, '');
-  sanitized = sanitized.replace(/<base\b[^>]*\/?>/gi, '');
-
-  // Remove audio, video, source, details, dialog, template tags
-  sanitized = sanitized.replace(/<audio\b[^<]*(?:(?!<\/audio>)<[^<]*)*<\/audio>/gi, '');
-  sanitized = sanitized.replace(/<video\b[^<]*(?:(?!<\/video>)<[^<]*)*<\/video>/gi, '');
-  sanitized = sanitized.replace(/<(audio|video|source)\b[^>]*\/?>/gi, '');
-  sanitized = sanitized.replace(/<details\b[^<]*(?:(?!<\/details>)<[^<]*)*<\/details>/gi, '');
-  sanitized = sanitized.replace(/<dialog\b[^<]*(?:(?!<\/dialog>)<[^<]*)*<\/dialog>/gi, '');
-  sanitized = sanitized.replace(/<template\b[^<]*(?:(?!<\/template>)<[^<]*)*<\/template>/gi, '');
-  sanitized = sanitized.replace(/<(details|dialog|template|summary)\b[^>]*\/?>/gi, '');
-
-  // Preserve markdown — do NOT HTML-encode remaining characters so that
-  // markdown syntax (* _ # > ` - [ ] etc.) is stored and rendered intact.
+  // Markdown syntax is preserved — we do NOT HTML-encode here so that
+  // * _ # > ` - [ ] ( ) etc. remain intact for the markdown renderer.
   return sanitized;
+}
+
+/**
+ * Validates a user-supplied URL for safe storage.
+ *
+ * Allowlist approach: only https:// (and http:// in dev) URLs are accepted.
+ * Rejects javascript:, data:, blob:, and all other protocols.
+ *
+ * @param url - The URL string to validate
+ * @returns true if the URL is safe to store
+ */
+export function isValidSafeUrl(url: string): boolean {
+  if (!url || !url.trim()) return false;
+  try {
+    const parsed = new URL(url.trim());
+    const allowedProtocols = ['https:'];
+    // Allow http in development for localhost testing
+    if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+      allowedProtocols.push('http:');
+    }
+    return allowedProtocols.includes(parsed.protocol);
+  } catch {
+    return false;
+  }
 }
