@@ -115,7 +115,7 @@ export function RecommendedPosts({ limit = 3, title = "Posts you might like" }: 
                     className="rounded-full"
                   />
                 ) : (
-                  <div className="h-5 w-5 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-[10px] font-bold text-primary-foreground">
+                  <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
                     {author.name.charAt(0).toUpperCase()}
                   </div>
                 )}

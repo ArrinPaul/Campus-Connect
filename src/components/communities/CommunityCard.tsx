@@ -94,7 +94,7 @@ export function CommunityCard({
       <div className="group flex flex-col rounded-xl border border-border bg-card p-4 shadow-sm transition hover:border-primary/50 hover:shadow border-border bg-card dark:hover:border-blue-600">
         {/* Avatar + Name Row */}
         <div className="flex items-start gap-3">
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-purple-500 text-xl font-bold text-primary-foreground select-none">
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-xl font-bold text-primary select-none">
             {community.avatar ? (
               <Image
                 src={community.avatar}

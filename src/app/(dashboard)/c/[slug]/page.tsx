@@ -122,7 +122,7 @@ export default function CommunityPage({ params }: CommunityPageProps) {
     <div className="mx-auto max-w-5xl px-4 py-4 sm:px-6 sm:py-8">
       {/* Banner */}
       <div
-        className="relative h-32 w-full overflow-hidden rounded-xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 sm:h-48"
+        className="relative h-32 w-full overflow-hidden rounded-xl bg-primary sm:h-48"
         style={
           community.banner
             ? {
@@ -137,7 +137,7 @@ export default function CommunityPage({ params }: CommunityPageProps) {
       {/* Community Header */}
       <div className="-mt-8 ml-4 flex items-end gap-4 sm:-mt-12 sm:ml-6">
         <div className="relative">
-          <div className="relative flex h-16 w-16 items-center justify-center rounded-xl border-4 border-white bg-gradient-to-br from-blue-400 to-purple-500 text-2xl font-bold text-white dark:border-gray-900 sm:h-24 sm:w-24 sm:text-4xl">
+          <div className="relative flex h-16 w-16 items-center justify-center rounded-xl border-4 border-white bg-primary text-2xl font-bold text-white dark:border-gray-900 sm:h-24 sm:w-24 sm:text-4xl">
             {community.avatar ? (
               <Image
                 src={community.avatar}
@@ -357,7 +357,7 @@ export default function CommunityPage({ params }: CommunityPageProps) {
                     href={`/profile/${member?.username ?? member?.userId}`}
                     className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 hover:border-blue-300 dark:border-gray-700 dark:bg-gray-800 transition-colors"
                   >
-                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-purple-500 text-sm font-bold text-white">
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
                       {member?.name?.charAt(0) ?? "?"}
                     </div>
                     <div className="min-w-0">

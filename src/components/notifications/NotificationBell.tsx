@@ -136,7 +136,7 @@ export function NotificationBell() {
                               className="w-10 h-10 rounded-full"
                             />
                           ) : (
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-primary-foreground font-semibold">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
                               {notification.actor.name.charAt(0)}
                             </div>
                           )}

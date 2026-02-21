@@ -12,6 +12,7 @@ import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { useHeartbeat } from "@/hooks/useHeartbeat"
 import { IncomingCallNotification } from "@/components/calls/IncomingCallNotification"
+import { BottomNav } from "@/components/navigation/BottomNav"
 import { cn } from "@/lib/utils"
 import {
   Home,
@@ -393,10 +394,13 @@ export default function DashboardLayout({
         </header>
 
         {/* Page Content */}
-        <main id="main-content" className="flex-1" aria-label="Main content" tabIndex={-1}>
+        <main id="main-content" className="flex-1 pb-16 md:pb-0" aria-label="Main content" tabIndex={-1}>
           {children}
         </main>
       </div>
+
+      {/* Mobile bottom tab bar */}
+      <BottomNav currentUserId={currentUser?._id} />
 
       {currentUser && <IncomingCallNotification />}
     </div>

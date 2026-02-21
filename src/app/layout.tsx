@@ -76,22 +76,22 @@ export default function RootLayout({
     <ClerkProvider
       appearance={{
         variables: {
-          colorPrimary: "#DD2A7B",
+          colorPrimary: "#0A84FF",
           colorBackground: "hsl(0 0% 100%)",
-          colorText: "hsl(220 25% 10%)",
+          colorText: "hsl(0 0% 9%)",
           colorInputBackground: "hsl(0 0% 100%)",
-          colorInputText: "hsl(220 25% 10%)",
-          borderRadius: "0.75rem",
+          colorInputText: "hsl(0 0% 9%)",
+          borderRadius: "0.625rem",
           fontFamily: "'DM Sans', system-ui, sans-serif",
         },
         elements: {
           formButtonPrimary:
-            "bg-gradient-to-r from-[#F58529] via-[#DD2A7B] to-[#515BD4] text-white font-semibold shadow-sm transition-all duration-200 active:scale-[0.98] hover:opacity-90",
-          card: "shadow-elevation-2 border border-border rounded-2xl",
+            "bg-[#0A84FF] text-white font-semibold shadow-sm transition-all duration-200 active:scale-[0.98] hover:brightness-110",
+          card: "shadow-elevation-2 border border-border rounded-xl",
           headerTitle: "text-xl font-semibold tracking-tight",
           headerSubtitle: "text-muted-foreground text-sm",
           socialButtonsBlockButton:
-            "border border-border hover:bg-accent transition-colors duration-150 rounded-xl",
+            "border border-border hover:bg-accent transition-colors duration-150 rounded-lg",
           formFieldLabel: "text-foreground font-medium text-sm",
           footerActionLink: "text-primary hover:text-primary/80",
           internal: "font-sans",

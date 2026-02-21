@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useUser } from "@clerk/nextjs"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/../convex/_generated/api"
-import { m, LazyMotion, domAnimation, AnimatePresence } from "framer-motion"
+import { m, LazyMotion, domAnimation, AnimatePresence, type Variants } from "framer-motion"
 import {
   ArrowRight,
   ArrowLeft,
@@ -43,9 +43,9 @@ import { cn } from "@/lib/utils"
 const TOTAL_STEPS = 6
 
 const ROLES = [
-  { value: "Student" as const,           label: "Student",          icon: BookOpen,    color: "from-blue-500 to-cyan-500",     desc: "Undergraduate or postgraduate student" },
-  { value: "Research Scholar" as const,  label: "Research Scholar", icon: FlaskConical, color: "from-violet-500 to-purple-500", desc: "PhD / research fellow" },
-  { value: "Faculty" as const,           label: "Faculty",          icon: GraduationCap, color: "from-rose-500 to-pink-500",   desc: "Professor or teaching staff" },
+  { value: "Student" as const,           label: "Student",          icon: BookOpen,     desc: "Undergraduate or postgraduate student" },
+  { value: "Research Scholar" as const,  label: "Research Scholar", icon: FlaskConical,  desc: "PhD / research fellow" },
+  { value: "Faculty" as const,           label: "Faculty",          icon: GraduationCap, desc: "Professor or teaching staff" },
 ]
 
 const EXPERIENCE_LEVELS = [
@@ -76,7 +76,7 @@ const SKILL_CHIPS = [
 
 // ─── Animation variants ────────────────────────────────────────────────────────
 
-const slideIn = {
+const slideIn: Variants = {
   enter: (dir: number) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
   center: { x: 0, opacity: 1, transition: { duration: 0.38, ease: [0.16, 1, 0.3, 1] } },
   exit:  (dir: number) => ({ x: dir > 0 ? -60 : 60, opacity: 0, transition: { duration: 0.3 } }),
@@ -330,7 +330,7 @@ export default function OnboardingPage() {
                       <p className="mt-1 text-[14px] text-muted-foreground">Help us personalise your experience.</p>
                     </div>
                     <div className="space-y-3">
-                      {ROLES.map(({ value, label, icon: Icon, color, desc }) => (
+                      {ROLES.map(({ value, label, icon: Icon, desc }) => (
                         <button
                           key={value}
                           onClick={() => setRole(value)}
@@ -341,7 +341,7 @@ export default function OnboardingPage() {
                               : "border-border bg-card hover:border-primary/30 hover:bg-muted/30"
                           )}
                         >
-                          <div className={`h-11 w-11 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center shrink-0`}>
+                          <div className="h-11 w-11 rounded-xl bg-primary flex items-center justify-center shrink-0">
                             <Icon className="h-5 w-5 text-white" />
                           </div>
                           <div className="flex-1">

@@ -52,7 +52,7 @@ export function StoryRing({
   const avatarContainerClass = cn(
     "relative flex items-center justify-center rounded-full p-[3px]",
     hasStories && hasUnseen
-      ? "bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500"
+      ? "bg-primary"
       : hasStories
       ? "bg-muted dark:bg-muted"
       : "bg-transparent"

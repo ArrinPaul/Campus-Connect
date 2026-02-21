@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -11,103 +11,42 @@
 /* highlight.js theme for react-markdown code blocks */
 @import "highlight.js/styles/github-dark.css";
 
-/* Google Fonts — DM Sans (body) + Bricolage Grotesque (display) */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap');
-
 /* ─── DESIGN SYSTEM ──────────────────────────────────────────────
-   Campus Connect — Vibrant Social Design System
-   Color palette: Coral-Rose gradient primary · Warm Slate neutrals
-   Inspired by: Instagram warmth · Twitter clarity · Discord depth
+   Campus Connect — Premium Neutral Design System
+   Philosophy: Content-first · Quiet chrome · Single accent
+   Inspired by: Apple HIG · Linear · Vercel · Stripe
    ─────────────────────────────────────────────────────────────── */
 
 @layer base {
   :root {
     /* ── Backgrounds ── */
-    --background: 0 0% 98.5%;
-    --foreground: 220 25% 10%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 9%;
 
     /* ── Cards & Surfaces ── */
     --card: 0 0% 100%;
-    --card-foreground: 220 25% 10%;
+    --card-foreground: 0 0% 9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 10%;
+    --popover-foreground: 0 0% 9%;
 
-    /* ── Primary (Vibrant Rose-Violet) ── */
-    --primary: 329 86% 56%;
+    /* ── Primary (iOS System Blue) ── */
+    --primary: 211 100% 50%;
     --primary-foreground: 0 0% 100%;
 
     /* ── Secondary ── */
-    --secondary: 220 15% 95%;
-    --secondary-foreground: 220 15% 40%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 32%;
 
     /* ── Muted ── */
-    --muted: 220 15% 95%;
-    --muted-foreground: 220 10% 52%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
     /* ── Accent ── */
-    --accent: 329 86% 97%;
-    --accent-foreground: 329 70% 35%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 9%;
 
     /* ── Destructive ── */
-    --destructive: 0 84% 56%;
-    --destructive-foreground: 0 0% 100%;
-
-    /* ── Status Colors ── */
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
-    --warning: 38 95% 46%;
-    --warning-foreground: 0 0% 100%;
-    --info: 204 86% 48%;
-    --info-foreground: 0 0% 100%;
-
-    /* ── Chrome ── */
-    --border: 220 14% 89%;
-    --input: 220 14% 89%;
-    --ring: 329 86% 56%;
-    --radius: 0.75rem;
-
-    /* ── Sidebar ── */
-    --sidebar: 0 0% 99%;
-    --sidebar-foreground: 220 25% 10%;
-    --sidebar-accent: 329 86% 97%;
-    --sidebar-accent-foreground: 329 70% 35%;
-    --sidebar-border: 220 14% 91%;
-
-    /* ── Brand Gradient ── */
-    --gradient-start: #F58529;
-    --gradient-mid: #DD2A7B;
-    --gradient-end: #515BD4;
-  }
-
-  .dark {
-    /* ── Backgrounds ── */
-    --background: 220 18% 7%;
-    --foreground: 210 20% 96%;
-
-    /* ── Cards & Surfaces ── */
-    --card: 220 18% 10%;
-    --card-foreground: 210 20% 96%;
-    --popover: 220 18% 10%;
-    --popover-foreground: 210 20% 96%;
-
-    /* ── Primary (Rose-Violet, slightly brighter in dark) ── */
-    --primary: 329 86% 60%;
-    --primary-foreground: 0 0% 100%;
-
-    /* ── Secondary ── */
-    --secondary: 220 16% 16%;
-    --secondary-foreground: 210 20% 85%;
-
-    /* ── Muted ── */
-    --muted: 220 16% 16%;
-    --muted-foreground: 214 12% 60%;
-
-    /* ── Accent ── */
-    --accent: 329 30% 17%;
-    --accent-foreground: 329 70% 70%;
-
-    /* ── Destructive ── */
-    --destructive: 0 68% 44%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     /* ── Status Colors ── */
@@ -115,20 +54,76 @@
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
-    --info: 199 89% 48%;
+    --info: 211 100% 50%;
     --info-foreground: 0 0% 100%;
 
     /* ── Chrome ── */
-    --border: 220 16% 20%;
-    --input: 220 16% 20%;
-    --ring: 329 86% 60%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 211 100% 50%;
+    --radius: 0.625rem;
 
     /* ── Sidebar ── */
-    --sidebar: 220 18% 8%;
-    --sidebar-foreground: 210 20% 96%;
-    --sidebar-accent: 329 25% 16%;
-    --sidebar-accent-foreground: 329 70% 70%;
-    --sidebar-border: 220 16% 16%;
+    --sidebar: 0 0% 98%;
+    --sidebar-foreground: 0 0% 9%;
+    --sidebar-accent: 0 0% 95%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 92%;
+
+    /* ── Brand Accent ── */
+    --accent-blue: 211 100% 50%;
+  }
+
+  .dark {
+    /* ── Backgrounds ── */
+    --background: 0 0% 5%;
+    --foreground: 0 0% 95%;
+
+    /* ── Cards & Surfaces ── */
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 95%;
+
+    /* ── Primary (iOS Blue, brighter in dark) ── */
+    --primary: 211 100% 56%;
+    --primary-foreground: 0 0% 100%;
+
+    /* ── Secondary ── */
+    --secondary: 0 0% 13%;
+    --secondary-foreground: 0 0% 70%;
+
+    /* ── Muted ── */
+    --muted: 0 0% 13%;
+    --muted-foreground: 0 0% 55%;
+
+    /* ── Accent ── */
+    --accent: 0 0% 13%;
+    --accent-foreground: 0 0% 95%;
+
+    /* ── Destructive ── */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* ── Status Colors ── */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 211 100% 56%;
+    --info-foreground: 0 0% 100%;
+
+    /* ── Chrome ── */
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 211 100% 56%;
+
+    /* ── Sidebar ── */
+    --sidebar: 0 0% 7%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 14%;
   }
 }
 
@@ -158,28 +153,15 @@
 
 /* ─── GLOBAL COMPONENT UTILITIES ──────────────────────────────── */
 @layer components {
-  /* ── Brand gradient (Instagram-style) ── */
+  /* ── Brand accent surface ── */
   .brand-gradient {
-    background: linear-gradient(135deg, #F58529 0%, #DD2A7B 50%, #515BD4 100%);
+    background: hsl(var(--primary));
   }
   .brand-gradient-text {
-    background: linear-gradient(135deg, #F58529 0%, #DD2A7B 50%, #515BD4 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: hsl(var(--primary));
   }
   .brand-gradient-border {
-    border: 2px solid transparent;
-    background-clip: padding-box;
-    position: relative;
-  }
-  .brand-gradient-border::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    background: linear-gradient(135deg, #F58529 0%, #DD2A7B 50%, #515BD4 100%);
-    z-index: -1;
+    border: 2px solid hsl(var(--primary));
   }
 
   /* Glass morphism card surface */
@@ -190,56 +172,45 @@
     @apply bg-card/95 backdrop-blur-2xl border border-border/60;
   }
 
-  /* Gradient text utility */
+  /* Text accent utility */
   .text-gradient {
-    background: linear-gradient(135deg, #F58529 0%, #DD2A7B 50%, #515BD4 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: hsl(var(--primary));
   }
   .text-gradient-subtle {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-foreground to-muted-foreground;
+    @apply text-muted-foreground;
   }
 
   /* Card patterns */
   .card-elevated {
-    @apply bg-card rounded-2xl border border-border shadow-elevation-1 transition-all duration-200 hover:shadow-elevation-2;
+    @apply bg-card rounded-xl border border-border shadow-elevation-1 transition-all duration-200 hover:shadow-elevation-2;
   }
   .card-interactive {
-    @apply bg-card rounded-2xl border border-border shadow-elevation-1 transition-all duration-200 hover:shadow-elevation-2 hover:border-primary/30 cursor-pointer;
+    @apply bg-card rounded-xl border border-border shadow-elevation-1 transition-all duration-200 hover:shadow-elevation-2 hover:border-primary/40 cursor-pointer;
   }
   .card-inset {
-    @apply bg-muted/50 rounded-xl border border-border/50;
+    @apply bg-muted/50 rounded-lg border border-border/50;
   }
 
-  /* Stories ring */
+  /* Stories ring — clean single-color ring */
   .story-ring {
-    background: linear-gradient(135deg, #F58529 0%, #DD2A7B 50%, #515BD4 100%);
-    padding: 2.5px;
+    box-shadow: 0 0 0 2.5px hsl(var(--primary));
     border-radius: 9999px;
   }
   .story-ring-seen {
-    background: hsl(var(--border));
-    padding: 2.5px;
+    box-shadow: 0 0 0 2px hsl(var(--border));
     border-radius: 9999px;
-  }
-  .story-ring > .story-inner,
-  .story-ring-seen > .story-inner {
-    background: hsl(var(--background));
-    border-radius: 9999px;
-    padding: 2px;
   }
 
-  /* Primary button gradient */
+  /* Primary button — solid accent */
   .btn-gradient {
-    background: linear-gradient(135deg, #F58529 0%, #DD2A7B 50%, #515BD4 100%);
-    @apply text-white font-semibold transition-all duration-200 hover:opacity-90 hover:shadow-glow active:scale-[0.97];
+    background: hsl(var(--primary));
+    @apply text-white font-semibold transition-all duration-200 hover:brightness-110 hover:shadow-glow active:scale-[0.97];
   }
 
   /* Dot grid pattern background */
   .bg-dot-pattern {
-    background-image: radial-gradient(circle, hsl(var(--border)) 1.5px, transparent 1.5px);
-    background-size: 28px 28px;
+    background-image: radial-gradient(circle, hsl(var(--border)) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
 
   /* Section wrapper */
@@ -253,8 +224,8 @@
     scrollbar-color: hsl(var(--border)) transparent;
   }
   .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
   .scrollbar-thin::-webkit-scrollbar-track {
     background: transparent;
@@ -264,7 +235,7 @@
     border-radius: 3px;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--muted-foreground) / 0.4);
+    background: hsl(var(--muted-foreground) / 0.3);
   }
 }
 
@@ -281,6 +252,7 @@
   .stagger-4 { animation-delay: 0.2s; }
   .stagger-5 { animation-delay: 0.25s; }
   .stagger-6 { animation-delay: 0.3s; }
+
   /* Pulse soft for loading states */
   @keyframes pulse-soft {
     0%, 100% { opacity: 1; }
@@ -329,20 +301,16 @@
     background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--border)) 50%, hsl(var(--muted)) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
-  }}
+  }
+}
 
 /* ─── SELECTION ───────────────────────────────────────────────── */
 ::selection {
-  background: hsl(var(--primary) / 0.2);
+  background: hsl(var(--primary) / 0.15);
   color: hsl(var(--primary));
 }
 
 /* ─── REDUCED MOTION ──────────────────────────────────────────── */
-/*
- * Respect the user's OS-level "Reduce Motion" preference.
- * We collapse durations to near-zero rather than hard-removing transitions
- * so that JS code relying on transitionend events still fires.
- */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -354,58 +322,49 @@
     scroll-behavior: auto !important;
   }
 
-  /* Keep focus ring instant so it doesn't look broken */
   :focus-visible {
     transition: none !important;
   }
 }
 
 /* ─── HIGH CONTRAST MODE ──────────────────────────────────────── */
-/*
- * Augments contrast for users who have "Increase Contrast" enabled in their
- * OS (Windows High Contrast / macOS Increase Contrast).
- * We also expose a .high-contrast class so a manual toggle can activate it.
- */
 @media (prefers-contrast: more) {
   :root {
-    --border: 220 14% 55%;
-    --ring: 329 86% 46%;
-    --muted-foreground: 220 12% 22%;
-    --primary: 329 90% 48%;
+    --border: 0 0% 55%;
+    --ring: 211 100% 40%;
+    --muted-foreground: 0 0% 22%;
+    --primary: 211 100% 40%;
   }
 
   .dark {
-    --border: 220 16% 50%;
-    --ring: 329 86% 70%;
-    --muted-foreground: 214 12% 78%;
-    --primary: 329 86% 68%;
+    --border: 0 0% 50%;
+    --ring: 211 100% 65%;
+    --muted-foreground: 0 0% 78%;
+    --primary: 211 100% 65%;
   }
 
-  /* Ensure interactive elements have clearly visible focus indicators */
   :focus-visible {
     outline: 3px solid hsl(var(--ring)) !important;
     outline-offset: 2px !important;
   }
 
-  /* Strengthen badge/status contrasts */
   [aria-label*="unread"] {
     outline: 1px solid hsl(var(--background));
   }
 }
 
-/* Manual high-contrast class (toggled by a future settings switch) */
 .high-contrast {
-  --border: 220 14% 55%;
-  --ring: 329 90% 46%;
-  --muted-foreground: 220 12% 18%;
-  --primary: 329 90% 46%;
+  --border: 0 0% 55%;
+  --ring: 211 100% 40%;
+  --muted-foreground: 0 0% 18%;
+  --primary: 211 100% 40%;
 }
 
 .dark.high-contrast {
-  --border: 220 16% 55%;
-  --ring: 329 86% 75%;
-  --muted-foreground: 214 12% 82%;
-  --primary: 329 86% 70%;
+  --border: 0 0% 55%;
+  --ring: 211 100% 70%;
+  --muted-foreground: 0 0% 82%;
+  --primary: 211 100% 70%;
 }
 
 .high-contrast :focus-visible {

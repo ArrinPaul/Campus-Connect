@@ -424,7 +424,7 @@ function UniversalResults({
                     className="rounded-full"
                   />
                 ) : (
-                  <div className="h-9 w-9 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-sm font-bold text-primary-foreground">
+                  <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
                     {user.name.charAt(0).toUpperCase()}
                   </div>
                 )}
@@ -477,7 +477,7 @@ function UniversalResults({
                         className="rounded-full"
                       />
                     ) : (
-                      <div className="h-5 w-5 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-[10px] font-bold text-primary-foreground">
+                      <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
                         {post.author.name.charAt(0).toUpperCase()}
                       </div>
                     )}

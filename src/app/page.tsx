@@ -42,12 +42,12 @@ const scaleIn: Variants = {
 }
 
 const features = [
-  { icon: Users, title: "Smart Networking", description: "AI-powered matching connects you with peers, researchers, and faculty who share your goals.", color: "from-rose-500 to-pink-500" },
-  { icon: FlaskConical, title: "Research Hub", description: "Collaborate, share papers, and get peer feedback — all in one place.", color: "from-violet-500 to-purple-500" },
-  { icon: Rocket, title: "Hackathons & Events", description: "Create and join hackathons, seminars, and workshops. Build your portfolio.", color: "from-orange-500 to-amber-500" },
-  { icon: BookOpen, title: "Academic Resources", description: "Share study materials, datasets, and course resources with your community.", color: "from-blue-500 to-cyan-500" },
-  { icon: MessageSquare, title: "Real-time Chat", description: "Instant messaging with rich media, group chats, and video calls.", color: "from-emerald-500 to-teal-500" },
-  { icon: Globe, title: "Communities", description: "Join or create academic communities around research domains and interests.", color: "from-pink-500 to-rose-500" },
+  { icon: Users, title: "Smart Networking", description: "AI-powered matching connects you with peers, researchers, and faculty who share your goals." },
+  { icon: FlaskConical, title: "Research Hub", description: "Collaborate, share papers, and get peer feedback — all in one place." },
+  { icon: Rocket, title: "Hackathons & Events", description: "Create and join hackathons, seminars, and workshops. Build your portfolio." },
+  { icon: BookOpen, title: "Academic Resources", description: "Share study materials, datasets, and course resources with your community." },
+  { icon: MessageSquare, title: "Real-time Chat", description: "Instant messaging with rich media, group chats, and video calls." },
+  { icon: Globe, title: "Communities", description: "Join or create academic communities around research domains and interests." },
 ]
 
 const stats = [
@@ -58,9 +58,9 @@ const stats = [
 ]
 
 const testimonials = [
-  { name: "Arjun S.", role: "CS Research Scholar", text: "Found 3 co-authors for my thesis in a week! The AI matching is insanely accurate.", gradient: "from-rose-500 to-pink-500" },
-  { name: "Priya M.", role: "ML Engineer", text: "It's like Instagram but for real academic content I actually care about. Addicted.", gradient: "from-violet-500 to-purple-500" },
-  { name: "Rohan G.", role: "Full Stack Dev", text: "Got my current internship through the Jobs board. The platform actually delivers.", gradient: "from-blue-500 to-cyan-500" },
+  { name: "Arjun S.", role: "CS Research Scholar", text: "Found 3 co-authors for my thesis in a week! The AI matching is insanely accurate." },
+  { name: "Priya M.", role: "ML Engineer", text: "It's like Instagram but for real academic content I actually care about. Addicted." },
+  { name: "Rohan G.", role: "Full Stack Dev", text: "Got my current internship through the Jobs board. The platform actually delivers." },
 ]
 
 export default function Home() {
@@ -108,9 +108,9 @@ export default function Home() {
         {/* Hero */}
         <section className="relative flex flex-col items-center justify-center px-4 pt-44 pb-28 text-center overflow-hidden">
           <div className="absolute inset-0 -z-10 overflow-hidden">
-            <div className="absolute top-[-10%] left-[20%] h-[500px] w-[500px] animate-pulse-soft rounded-full bg-[#F58529]/10 blur-[100px]" />
-            <div className="absolute top-[5%] right-[10%] h-[400px] w-[400px] animate-pulse-soft rounded-full bg-[#DD2A7B]/10 blur-[80px]" style={{ animationDelay: "0.7s" }} />
-            <div className="absolute bottom-[10%] left-[5%] h-[350px] w-[350px] animate-pulse-soft rounded-full bg-[#515BD4]/10 blur-[90px]" style={{ animationDelay: "1.4s" }} />
+            <div className="absolute top-[-10%] left-[20%] h-[500px] w-[500px] animate-pulse-soft rounded-full bg-primary/[0.06] blur-[100px]" />
+            <div className="absolute top-[5%] right-[10%] h-[400px] w-[400px] animate-pulse-soft rounded-full bg-primary/[0.04] blur-[80px]" style={{ animationDelay: "0.7s" }} />
+            <div className="absolute bottom-[10%] left-[5%] h-[350px] w-[350px] animate-pulse-soft rounded-full bg-primary/[0.05] blur-[90px]" style={{ animationDelay: "1.4s" }} />
             <div className="absolute inset-0 bg-dot-pattern opacity-30" />
           </div>
 
@@ -139,11 +139,11 @@ export default function Home() {
             </m.div>
 
             <m.div custom={4} variants={fadeUp} className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[13px] text-muted-foreground">
-              <span className="flex items-center gap-1.5"><Shield className="h-4 w-4 text-emerald-500" />100% Free</span>
+              <span className="flex items-center gap-1.5"><Shield className="h-4 w-4 text-primary/70" />100% Free</span>
               <span className="h-3.5 w-px bg-border hidden sm:block" />
-              <span className="flex items-center gap-1.5"><Zap className="h-4 w-4 text-amber-500" />Real-time</span>
+              <span className="flex items-center gap-1.5"><Zap className="h-4 w-4 text-primary/70" />Real-time</span>
               <span className="h-3.5 w-px bg-border hidden sm:block" />
-              <span className="flex items-center gap-1.5"><Star className="h-4 w-4 text-rose-500" />AI-powered</span>
+              <span className="flex items-center gap-1.5"><Star className="h-4 w-4 text-primary/70" />AI-powered</span>
             </m.div>
           </m.div>
 
@@ -152,12 +152,12 @@ export default function Home() {
             <div className="relative rounded-2xl border border-border/60 bg-card/60 backdrop-blur-sm shadow-elevation-4 overflow-hidden p-4 sm:p-6">
               <div className="space-y-3">
                 {[
-                  { name: "Priya M.", role: "AI Researcher", time: "2m", content: "Just published on transformer architectures for low-resource NLP! Looking for collaborators 🚀", likes: 42, comments: 8, gradient: "from-rose-400 to-pink-500" },
-                  { name: "Rohan G.", role: "CS Scholar", time: "15m", content: "Our team won HackCon 2025! Built a real-time sign language translator using computer vision 🏆", likes: 128, comments: 24, gradient: "from-violet-400 to-purple-500" },
-                  { name: "Shreya I.", role: "ML Engineer", time: "1h", content: "Hot take: the best ML papers come from applied problems, not theoretical ones. Change my mind.", likes: 89, comments: 47, gradient: "from-blue-400 to-cyan-500" },
+                  { name: "Priya M.", role: "AI Researcher", time: "2m", content: "Just published on transformer architectures for low-resource NLP! Looking for collaborators 🚀", likes: 42, comments: 8 },
+                  { name: "Rohan G.", role: "CS Scholar", time: "15m", content: "Our team won HackCon 2025! Built a real-time sign language translator using computer vision 🏆", likes: 128, comments: 24 },
+                  { name: "Shreya I.", role: "ML Engineer", time: "1h", content: "Hot take: the best ML papers come from applied problems, not theoretical ones. Change my mind.", likes: 89, comments: 47 },
                 ].map((post, i) => (
                   <div key={i} className="flex gap-3 rounded-xl bg-background/50 p-3 border border-border/40">
-                    <div className={`h-9 w-9 rounded-full bg-gradient-to-br ${post.gradient} shrink-0 flex items-center justify-center text-white text-xs font-bold`}>{post.name[0]}</div>
+                    <div className="h-9 w-9 rounded-full bg-primary/10 shrink-0 flex items-center justify-center text-primary text-xs font-bold">{post.name[0]}</div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-[13px] font-semibold text-foreground">{post.name}</span>
@@ -166,8 +166,8 @@ export default function Home() {
                       </div>
                       <p className="text-[13px] text-foreground/80 line-clamp-2 leading-relaxed">{post.content}</p>
                       <div className="flex items-center gap-4 mt-2">
-                        <span className="flex items-center gap-1 text-[11px] text-muted-foreground"><Heart className="h-3 w-3 text-rose-400" />{post.likes}</span>
-                        <span className="flex items-center gap-1 text-[11px] text-muted-foreground"><MessageSquare className="h-3 w-3 text-blue-400" />{post.comments}</span>
+                        <span className="flex items-center gap-1 text-[11px] text-muted-foreground"><Heart className="h-3 w-3 text-muted-foreground" />{post.likes}</span>
+                        <span className="flex items-center gap-1 text-[11px] text-muted-foreground"><MessageSquare className="h-3 w-3 text-muted-foreground" />{post.comments}</span>
                       </div>
                     </div>
                   </div>
@@ -205,8 +205,8 @@ export default function Home() {
             <m.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {features.map((feature, i) => (
                 <m.div key={feature.title} custom={i} variants={fadeUp} className={`group relative rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:shadow-elevation-3 hover:border-primary/20 hover:-translate-y-0.5 overflow-hidden`}>
-                  <div className={`absolute inset-0 -z-10 opacity-0 group-hover:opacity-5 transition-opacity duration-300 bg-gradient-to-br ${feature.color}`} />
-                  <div className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${feature.color}`}>
+                  <div className="absolute inset-0 -z-10 opacity-0 group-hover:opacity-[0.03] transition-opacity duration-300 bg-primary" />
+                  <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary">
                     <feature.icon className="h-5 w-5 text-white" />
                   </div>
                   <h3 className="text-[15px] font-bold text-foreground mb-2 font-display">{feature.title}</h3>
@@ -232,7 +232,7 @@ export default function Home() {
                   </div>
                   <p className="text-[14px] text-foreground/80 leading-relaxed flex-1">&ldquo;{t.text}&rdquo;</p>
                   <div className="flex items-center gap-3">
-                    <div className={`h-9 w-9 rounded-full bg-gradient-to-br ${t.gradient} flex items-center justify-center text-white text-xs font-bold shrink-0`}>{t.name[0]}</div>
+                    <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold shrink-0">{t.name[0]}</div>
                     <div>
                       <p className="text-[13px] font-semibold text-foreground">{t.name}</p>
                       <p className="text-[11px] text-muted-foreground">{t.role}</p>
@@ -259,7 +259,7 @@ export default function Home() {
                 <m.h2 custom={1} variants={fadeUp} className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white font-display leading-tight">Start your academic journey today</m.h2>
                 <m.p custom={2} variants={fadeUp} className="mt-5 max-w-xl mx-auto text-lg text-white/80">Join 10,000+ students and researchers already using Campus Connect.</m.p>
                 <m.div custom={3} variants={fadeUp} className="mt-9 flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button size="lg" className="bg-white text-[#DD2A7B] hover:bg-white/90 rounded-xl h-12 px-8 font-bold text-base shadow-elevation-3" asChild>
+                  <Button size="lg" className="bg-white text-primary hover:bg-white/90 rounded-xl h-12 px-8 font-bold text-base shadow-elevation-3" asChild>
                     <Link href="/sign-up">Create Free Account <ArrowRight className="h-4 w-4" /></Link>
                   </Button>
                   <Button variant="outline" size="lg" className="border-white/30 text-white hover:bg-white/15 rounded-xl h-12 px-8 text-base bg-white/10" asChild>

@@ -152,7 +152,7 @@ export default function CommunityMembersPage({ params }: MembersPageProps) {
                   href={`/profile/${member.username ?? member.userId}`}
                   className="flex items-center gap-3 min-w-0"
                 >
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-purple-500 text-sm font-bold text-white">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
                     {member.name?.charAt(0) ?? "?"}
                   </div>
                   <div className="min-w-0">

@@ -93,7 +93,7 @@ export default function CommunitiesPage() {
                 href={`/c/${community?.slug}`}
                 className="flex flex-shrink-0 items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground hover:border-blue-400 hover:text-primary border-border bg-card text-foreground hover:border-primary transition-colors"
               >
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-purple-500 text-xs font-bold text-primary-foreground">
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                   {community?.name.charAt(0)}
                 </div>
                 {community?.name}

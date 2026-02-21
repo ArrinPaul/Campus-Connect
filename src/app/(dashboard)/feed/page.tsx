@@ -66,7 +66,7 @@ export default function FeedPage() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
-          <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl brand-gradient mb-4">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-xl brand-gradient mb-4">
             <Sparkles className="h-8 w-8 text-white" />
           </div>
           <h2 className="text-xl font-bold text-foreground font-display">Sign in to see your feed</h2>
@@ -87,14 +87,14 @@ export default function FeedPage() {
 
           {/* Stories */}
           <ErrorBoundary>
-            <div className="rounded-2xl border border-border bg-card shadow-elevation-1 px-4 py-3 overflow-hidden">
+            <div className="rounded-xl border border-border bg-card shadow-elevation-1 px-4 py-3 overflow-hidden">
               <StoryRow />
             </div>
           </ErrorBoundary>
 
           {/* Composer card */}
           <ErrorBoundary>
-            <div className="rounded-2xl border border-border bg-card shadow-elevation-1 overflow-hidden">
+            <div className="rounded-xl border border-border bg-card shadow-elevation-1 overflow-hidden">
               {/* gradient header strip */}
               <div className="h-1 w-full brand-gradient" />
               <div className="p-5">
@@ -120,20 +120,24 @@ export default function FeedPage() {
           </ErrorBoundary>
 
           {/* Feed tabs */}
-          <div className="rounded-2xl border border-border bg-card shadow-elevation-1 p-1.5 flex gap-1">
+          <div className="rounded-xl border border-border bg-card shadow-elevation-1 p-1.5 flex gap-1">
             {FEED_TABS.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
                 onClick={() => handleFeedTypeChange(key)}
                 className={cn(
-                  "relative flex-1 flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-semibold transition-all duration-200",
+                  "relative flex-1 flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-[13px] font-semibold transition-all duration-200",
                   feedType === key
-                    ? "text-white shadow-glow-sm"
+                    ? "text-primary-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                 )}
               >
                 {feedType === key && (
-                  <span className="absolute inset-0 rounded-xl btn-gradient opacity-100" aria-hidden />
+                  <span
+                    className="absolute inset-0 rounded-lg bg-primary transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                    aria-hidden
+                    style={{ willChange: "transform" }}
+                  />
                 )}
                 <Icon className="relative h-3.5 w-3.5" />
                 <span className="relative">{label}</span>
@@ -152,7 +156,7 @@ export default function FeedPage() {
           <div className="sticky top-[76px] space-y-4">
 
             {/* Trending hashtags */}
-            <div className="rounded-2xl border border-border bg-card shadow-elevation-1 overflow-hidden">
+            <div className="rounded-xl border border-border bg-card shadow-elevation-1 overflow-hidden">
               <div className="h-[3px] w-full brand-gradient" />
               <ErrorBoundary>
                 <TrendingHashtags limit={10} />
@@ -160,24 +164,24 @@ export default function FeedPage() {
             </div>
 
             {/* Suggested users */}
-            <div className="rounded-2xl border border-border bg-card shadow-elevation-1 overflow-hidden">
-              <div className="h-[3px] w-full bg-gradient-to-r from-violet-500 to-purple-500" />
+            <div className="rounded-xl border border-border bg-card shadow-elevation-1 overflow-hidden">
+              <div className="h-[3px] w-full bg-primary" />
               <ErrorBoundary>
                 <SuggestedUsers limit={3} showSeeAll />
               </ErrorBoundary>
             </div>
 
             {/* Recommended posts */}
-            <div className="rounded-2xl border border-border bg-card shadow-elevation-1 overflow-hidden">
-              <div className="h-[3px] w-full bg-gradient-to-r from-blue-500 to-cyan-500" />
+            <div className="rounded-xl border border-border bg-card shadow-elevation-1 overflow-hidden">
+              <div className="h-[3px] w-full bg-primary" />
               <ErrorBoundary>
                 <RecommendedPosts limit={3} />
               </ErrorBoundary>
             </div>
 
             {/* Trending in skill */}
-            <div className="rounded-2xl border border-border bg-card shadow-elevation-1 overflow-hidden">
-              <div className="h-[3px] w-full bg-gradient-to-r from-emerald-500 to-teal-500" />
+            <div className="rounded-xl border border-border bg-card shadow-elevation-1 overflow-hidden">
+              <div className="h-[3px] w-full bg-primary" />
               <ErrorBoundary>
                 <TrendingInSkill limit={5} />
               </ErrorBoundary>

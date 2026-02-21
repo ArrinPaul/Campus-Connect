@@ -51,27 +51,27 @@ export default function LeaderboardPage() {
 
       {/* My Stats Card */}
       {myReputation && (
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 text-primary-foreground">
+        <div className="bg-primary rounded-xl p-6 text-primary-foreground">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-blue-100 text-sm">Your Reputation</p>
+              <p className="text-primary-foreground/70 text-sm">Your Reputation</p>
               <p className="text-3xl font-bold">{myReputation.reputation}</p>
             </div>
             <div className="text-right">
-              <p className="text-blue-100 text-sm">Level</p>
+              <p className="text-primary-foreground/70 text-sm">Level</p>
               <p className="text-3xl font-bold">{myReputation.level}</p>
             </div>
           </div>
 
           {/* XP Progress Bar */}
           <div>
-            <div className="flex justify-between text-xs text-blue-200 mb-1">
+            <div className="flex justify-between text-xs text-primary-foreground/60 mb-1">
               <span>Level {myReputation.level}</span>
               <span>Level {myReputation.nextLevel} ({myReputation.repForNextLevel} rep)</span>
             </div>
-            <div className="w-full bg-blue-800 rounded-full h-2.5">
+            <div className="w-full bg-primary-foreground/20 rounded-full h-2.5">
               <div
-                className="bg-yellow-400 h-2.5 rounded-full transition-all"
+                className="bg-white h-2.5 rounded-full transition-all"
                 style={{ width: `${myReputation.progress}%` }}
               />
             </div>

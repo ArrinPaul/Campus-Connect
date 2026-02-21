@@ -89,7 +89,7 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
               className="w-12 h-12 rounded-full"
             />
           ) : (
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-primary-foreground font-semibold text-lg">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-lg">
               {notification.actor?.name.charAt(0) || "?"}
             </div>
           )}
