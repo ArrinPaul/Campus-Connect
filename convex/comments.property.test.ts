@@ -269,12 +269,17 @@ describe('Comment Operations Properties', () => {
               content: fc.string({ minLength: 1, maxLength: 999 }),
             }),
             (data) => {
-              // Simulate validation
+              // Simulate validation - strings may be whitespace-only which is invalid
               const isValid = data.content.length <= 1000 && data.content.trim().length > 0;
 
-              // Verify content below 1000 chars is accepted
-              expect(isValid).toBe(true);
-              expect(data.content.length).toBeLessThanOrEqual(1000);
+              if (data.content.trim().length === 0) {
+                // Whitespace-only content is correctly rejected
+                expect(isValid).toBe(false);
+              } else {
+                // Non-whitespace content below 1000 chars is accepted
+                expect(isValid).toBe(true);
+                expect(data.content.length).toBeLessThanOrEqual(1000);
+              }
             }
           ),
           { numRuns: 100 }

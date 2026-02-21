@@ -1,8 +1,12 @@
 import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import { ClerkProvider } from "@clerk/nextjs"
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import { ConvexClientProvider } from "@/components/providers/convex-provider"
 import { ThemeProvider } from "@/components/providers/theme-provider"
+import { PostHogProvider } from "@/components/providers/posthog-provider"
+import { PostHogPageView } from "@/components/analytics/posthog-pageview"
 import "./globals.css"
 
 const inter = Inter({
@@ -91,8 +95,15 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <ConvexClientProvider>{children}</ConvexClientProvider>
+            <ConvexClientProvider>
+              <PostHogProvider>
+                <PostHogPageView />
+                {children}
+              </PostHogProvider>
+            </ConvexClientProvider>
           </ThemeProvider>
+          <Analytics />
+          <SpeedInsights />
         </body>
       </html>
     </ClerkProvider>

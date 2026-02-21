@@ -37,6 +37,24 @@ jest.mock("@/components/providers/theme-provider", () => ({
   ),
 }))
 
+// Mock Vercel Analytics & Speed Insights
+jest.mock("@vercel/analytics/react", () => ({
+  Analytics: () => <div data-testid="vercel-analytics" />,
+}))
+jest.mock("@vercel/speed-insights/next", () => ({
+  SpeedInsights: () => <div data-testid="speed-insights" />,
+}))
+
+// Mock PostHog
+jest.mock("@/components/providers/posthog-provider", () => ({
+  PostHogProvider: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="posthog-provider">{children}</div>
+  ),
+}))
+jest.mock("@/components/analytics/posthog-pageview", () => ({
+  PostHogPageView: () => <div data-testid="posthog-pageview" />,
+}))
+
 describe("RootLayout", () => {
   it("should wrap app with ClerkProvider", () => {
     const { getByTestId } = render(
