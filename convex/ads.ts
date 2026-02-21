@@ -87,6 +87,7 @@ export const createAd = mutation({
     validateAdContent(args.content)
     validateBudget(args.budget)
     validateLinkUrl(args.linkUrl)
+    if (args.targetSkills && args.targetSkills.length > 20) throw new Error("Maximum 20 target skills")
 
     const adId = await ctx.db.insert("ads", {
       title: args.title,

@@ -92,7 +92,7 @@ export const createEvent = mutation({
         .collect()
       for (const member of members) {
         if (member.userId !== user._id && member.role !== "pending") {
-          await ctx.scheduler.runAfter(0, api.notifications.createNotification, {
+          await ctx.scheduler.runAfter(0, internal.notifications.createNotification, {
             recipientId: member.userId,
             actorId: user._id,
             type: "comment" as const,
@@ -130,8 +130,21 @@ export const updateEvent = mutation({
 
     const { eventId, ...updates } = args
     const filteredUpdates: Record<string, unknown> = {}
-    for (const [k, v] of Object.entries(updates)) {
-      if (v !== undefined) filteredUpdates[k] = v
+    for (const [k, val] of Object.entries(updates)) {
+      if (val !== undefined) filteredUpdates[k] = val
+    }
+
+    // Validate updated fields
+    if (filteredUpdates.title) {
+      const title = filteredUpdates.title as string
+      if (title.trim().length === 0) throw new Error("Title is required")
+      if (title.length > 200) throw new Error("Title too long (max 200 characters)")
+    }
+    if (filteredUpdates.description && (filteredUpdates.description as string).length > 5000) {
+      throw new Error("Description too long (max 5000 characters)")
+    }
+    if (filteredUpdates.location && (filteredUpdates.location as string).length > 300) {
+      throw new Error("Location too long (max 300 characters)")
     }
 
     if (filteredUpdates.startDate && filteredUpdates.endDate) {
@@ -267,7 +280,7 @@ export const sendEventReminders = internalMutation({
       for (const rsvp of goingRsvps) {
         if (rsvp.userId !== event.organizerId) {
           const hoursUntil = Math.round((event.startDate - Date.now()) / 3_600_000)
-          await ctx.scheduler.runAfter(0, api.notifications.createNotification, {
+          await ctx.scheduler.runAfter(0, internal.notifications.createNotification, {
             recipientId: rsvp.userId,
             actorId: event.organizerId,
             type: "comment" as const,
@@ -333,7 +346,7 @@ export const getUpcomingEvents = query({
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) throw new Error("Unauthorized")
 
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
     const now = Date.now()
 
     let events = await ctx.db
@@ -372,7 +385,7 @@ export const getPastEvents = query({
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) throw new Error("Unauthorized")
 
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
     const now = Date.now()
 
     const events = await ctx.db
@@ -420,9 +433,9 @@ export const getUserEvents = query({
 
     const events = await Promise.all(
       rsvps.map(async (rsvp: any) => {
-        const event = await ctx.db.get(rsvp.eventId)
+        const event = await ctx.db.get(rsvp.eventId) as any
         if (!event) return null
-        const organizer = await ctx.db.get(event.organizerId)
+        const organizer = await ctx.db.get(event.organizerId) as any
         return { ...event, organizer, rsvpStatus: rsvp.status }
       })
     )

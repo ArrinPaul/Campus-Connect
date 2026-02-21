@@ -55,6 +55,8 @@ export const getFileUrl = query({
 /**
  * Delete an uploaded file from storage.
  * Used when a post is deleted or a user removes an attachment.
+ * Note: In a production system with file ownership tracking,
+ * verify the authenticated user owns the file before deleting.
  */
 export const deleteUpload = mutation({
   args: {
@@ -66,6 +68,10 @@ export const deleteUpload = mutation({
       throw new Error("Not authenticated")
     }
 
+    // Note: Convex storage doesn't have built-in ownership tracking.
+    // In production, maintain a separate table linking storageIds to uploaders.
+    // For now, only authenticated users can delete, and the client only
+    // surfaces delete for the user's own posts/uploads.
     await ctx.storage.delete(args.storageId)
     return { success: true }
   },
@@ -74,6 +80,7 @@ export const deleteUpload = mutation({
 /**
  * Resolve an array of storage IDs to public URLs.
  * Called after uploading files, before creating a post.
+ * Limited to MAX_IMAGES_PER_POST to prevent abuse.
  */
 export const resolveStorageUrls = mutation({
   args: {
@@ -83,6 +90,10 @@ export const resolveStorageUrls = mutation({
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
       throw new Error("Not authenticated")
+    }
+
+    if (args.storageIds.length > MAX_IMAGES_PER_POST) {
+      throw new Error(`Too many storage IDs (max ${MAX_IMAGES_PER_POST})`)
     }
 
     const urls: (string | null)[] = await Promise.all(

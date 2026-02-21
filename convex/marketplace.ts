@@ -91,6 +91,7 @@ export const createListing = mutation({
     validateListingTitle(args.title)
     validateListingDescription(args.description)
     validatePrice(args.price)
+    if (args.images && args.images.length > 10) throw new Error("Maximum 10 images per listing")
 
     const now = Date.now()
     const id = await ctx.db.insert("listings", {
@@ -213,7 +214,7 @@ export const getListing = query({
     return {
       ...listing,
       seller: seller
-        ? { name: seller.name, username: seller.username, avatarUrl: seller.avatarUrl }
+        ? { name: seller.name, username: seller.username, avatarUrl: seller.profilePicture }
         : null,
     }
   },

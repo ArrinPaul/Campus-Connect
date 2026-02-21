@@ -1,6 +1,7 @@
 import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
 import { Id } from "./_generated/dataModel"
+import { internal } from "./_generated/api"
 import { sanitizeText, sanitizeMarkdown } from "./sanitize"
 import { linkHashtagsToPost } from "./hashtags"
 import { extractMentions } from "./mentionUtils"
@@ -35,7 +36,7 @@ export const getFeedPosts = query({
       throw new Error("User not found")
     }
 
-    const limit = args.limit ?? 20 // Default to 20 posts per page
+    const limit = Math.min(args.limit ?? 20, 100) // Default to 20, max 100
 
     // Get current user's following list
     const followingList = await ctx.db
@@ -236,7 +237,7 @@ export const createPost = mutation({
 
       // Schedule notification if user found and not self-mention
       if (resolvedUser && resolvedUser._id !== user._id) {
-        await ctx.scheduler.runAfter(0, "notifications:createNotification" as any, {
+        await ctx.scheduler.runAfter(0, internal.notifications.createNotification, {
           recipientId: resolvedUser._id,
           actorId: user._id,
           type: "mention" as const,
@@ -498,7 +499,7 @@ export const getUnifiedFeed = query({
       throw new Error("User not found")
     }
 
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
 
     // Get current user's following list
     const followingList = await ctx.db

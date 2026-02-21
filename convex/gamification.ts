@@ -93,9 +93,9 @@ export const awardReputation = internalMutation({
 })
 
 /**
- * Unlock an achievement badge for a user
+ * Unlock an achievement badge for a user (internal — called by system only)
  */
-export const unlockAchievement = mutation({
+export const unlockAchievement = internalMutation({
   args: {
     userId: v.id("users"),
     badge: v.string(),
@@ -125,10 +125,10 @@ export const unlockAchievement = mutation({
 })
 
 /**
- * Check and award achievements based on user stats
+ * Check and award achievements based on user stats (internal — called by system only)
  * Called after significant events
  */
-export const checkAchievements = mutation({
+export const checkAchievements = internalMutation({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
     const user = await ctx.db.get(args.userId)
@@ -220,7 +220,7 @@ export const getLeaderboard = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
 
     let users = await ctx.db.query("users").collect()
 

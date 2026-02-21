@@ -228,7 +228,7 @@ export const getUserReposts = query({
       throw new Error("Unauthorized")
     }
 
-    const limit = args.limit || 50
+    const limit = Math.min(args.limit || 50, 100)
 
     // Get user's reposts
     const reposts = await ctx.db

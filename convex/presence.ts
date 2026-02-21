@@ -6,7 +6,7 @@
  */
 
 import { v } from "convex/values"
-import { mutation, query } from "./_generated/server"
+import { mutation, query, internalMutation } from "./_generated/server"
 
 /**
  * Helper: get current authenticated user from identity
@@ -113,9 +113,9 @@ export const getTypingUsers = query({
 })
 
 /**
- * Clear stale typing indicators (can be called periodically)
+ * Clear stale typing indicators (internal — called by cron or system only)
  */
-export const clearStaleTyping = mutation({
+export const clearStaleTyping = internalMutation({
   args: {},
   handler: async (ctx) => {
     const now = Date.now()
@@ -229,7 +229,7 @@ export const getOnlineUsers = query({
     if (!currentUser) return []
 
     const fiveMinutesAgo = Date.now() - 5 * 60 * 1000
-    const limit = args.limit || 50
+    const limit = Math.min(args.limit || 50, 100)
 
     // Get users with recent activity
     const allUsers = await ctx.db

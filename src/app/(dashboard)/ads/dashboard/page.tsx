@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery, useMutation } from "convex/react"
-import { api } from "@convex/_generated/api"
+import { api } from "@/convex/_generated/api"
 import { useState } from "react"
 import Link from "next/link"
 
@@ -39,8 +39,8 @@ export default function AdsDashboardPage() {
     await updateAd({ adId, status: newStatus as "active" | "paused" })
   }
 
-  const totalImpressions = analytics?.reduce((s, a) => s + a.impressions, 0) ?? 0
-  const totalClicks = analytics?.reduce((s, a) => s + a.clicks, 0) ?? 0
+  const totalImpressions = analytics?.reduce((s: number, a: any) => s + a.impressions, 0) ?? 0
+  const totalClicks = analytics?.reduce((s: number, a: any) => s + a.clicks, 0) ?? 0
   const avgCtr =
     totalImpressions > 0
       ? Math.round((totalClicks / totalImpressions) * 10000) / 100
@@ -98,7 +98,7 @@ export default function AdsDashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {analytics.map((ad) => (
+              {analytics.map((ad: any) => (
                 <tr key={ad.adId.toString()} className="hover:bg-muted/20 transition-colors">
                   <td className="px-4 py-3 font-medium max-w-[200px] truncate">{ad.title}</td>
                   <td className="px-4 py-3">

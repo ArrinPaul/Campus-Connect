@@ -111,6 +111,15 @@ export function sanitizeMarkdown(input: string): string {
   sanitized = sanitized.replace(/<meta\b[^>]*>/gi, '');
   sanitized = sanitized.replace(/<base\b[^>]*\/?>/gi, '');
 
+  // Remove audio, video, source, details, dialog, template tags
+  sanitized = sanitized.replace(/<audio\b[^<]*(?:(?!<\/audio>)<[^<]*)*<\/audio>/gi, '');
+  sanitized = sanitized.replace(/<video\b[^<]*(?:(?!<\/video>)<[^<]*)*<\/video>/gi, '');
+  sanitized = sanitized.replace(/<(audio|video|source)\b[^>]*\/?>/gi, '');
+  sanitized = sanitized.replace(/<details\b[^<]*(?:(?!<\/details>)<[^<]*)*<\/details>/gi, '');
+  sanitized = sanitized.replace(/<dialog\b[^<]*(?:(?!<\/dialog>)<[^<]*)*<\/dialog>/gi, '');
+  sanitized = sanitized.replace(/<template\b[^<]*(?:(?!<\/template>)<[^<]*)*<\/template>/gi, '');
+  sanitized = sanitized.replace(/<(details|dialog|template|summary)\b[^>]*\/?>/gi, '');
+
   // Preserve markdown — do NOT HTML-encode remaining characters so that
   // markdown syntax (* _ # > ` - [ ] etc.) is stored and rendered intact.
   return sanitized;

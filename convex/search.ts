@@ -261,7 +261,7 @@ export const searchPosts = query({
     const q = args.query.trim()
     if (!q) return { items: [], nextCursor: null, hasMore: false }
 
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
 
     // Fetch candidate posts
     let postsQuery = ctx.db
@@ -359,7 +359,7 @@ export const searchUsersEnhanced = query({
     if (!identity) throw new Error("Unauthorized")
 
     const q = args.query.trim()
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
 
     let users = await ctx.db.query("users").take(1000)
 
@@ -441,7 +441,7 @@ export const searchHashtags = query({
     const q = args.query.trim().toLowerCase().replace(/^#/, "")
     if (!q) return { items: [] }
 
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
 
     const allHashtags = await ctx.db
       .query("hashtags")

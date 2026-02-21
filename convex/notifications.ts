@@ -5,14 +5,15 @@
  * Handles creating, reading, and managing user notifications.
  */
 
-import { mutation, query } from "./_generated/server"
+import { mutation, query, internalMutation } from "./_generated/server"
 import { v } from "convex/values"
 
 /**
  * Create a new notification
  * Called internally by other mutations (reactions, comments, follows, etc.)
+ * This is an internalMutation — not callable from the client directly.
  */
-export const createNotification = mutation({
+export const createNotification = internalMutation({
   args: {
     recipientId: v.id("users"),
     actorId: v.id("users"),
@@ -27,6 +28,11 @@ export const createNotification = mutation({
     message: v.string(),
   },
   handler: async (ctx, args) => {
+    // Validate message length
+    if (args.message.length > 500) {
+      throw new Error("Notification message too long (max 500 characters)")
+    }
+
     // Don't create notification if actor and recipient are the same
     if (args.recipientId === args.actorId) {
       return null
@@ -99,7 +105,7 @@ export const getNotifications = query({
 
     const userId = user._id
 
-    const limit = args.limit || 20
+    const limit = Math.min(args.limit || 20, 100)
     const startIndex = args.cursor ? parseInt(args.cursor) : 0
 
     // Get notifications for the user

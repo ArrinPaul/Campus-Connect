@@ -158,7 +158,7 @@ export const getRankedFeed = query({
       .unique()
     if (!user) throw new Error("User not found")
 
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
     const now = Date.now()
 
     // 1. Fetch recent posts (up to 7 days — anything older scores ~0 anyway)
@@ -292,7 +292,7 @@ export const getChronologicalFeed = query({
       .unique()
     if (!user) throw new Error("User not found")
 
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
 
     // Get following list
     const followingList = await ctx.db
@@ -394,7 +394,7 @@ export const getTrendingFeed = query({
       .unique()
     if (!user) throw new Error("User not found")
 
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
     const now = Date.now()
 
     // Trending = posts from last 48 hours, sorted by engagement

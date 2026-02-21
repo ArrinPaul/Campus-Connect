@@ -2,7 +2,7 @@
 // Handles push notifications and background sync
 
 /// <reference lib="webworker" />
-declare const self: ServiceWorkerGlobalScope
+// @ts-nocheck
 
 const CACHE_NAME = "campus-connect-v1"
 const OFFLINE_URL = "/offline"
@@ -31,13 +31,7 @@ self.addEventListener("activate", (event) => {
 
 // ── Push ─────────────────────────────────────
 self.addEventListener("push", (event) => {
-  let payload: {
-    title?: string
-    body?: string
-    icon?: string
-    url?: string
-    badge?: string
-  } = {}
+  let payload = {}
 
   try {
     payload = event.data?.json() ?? {}
@@ -46,7 +40,7 @@ self.addEventListener("push", (event) => {
   }
 
   const title = payload.title ?? "Campus Connect"
-  const options: NotificationOptions = {
+  const options = {
     body: payload.body ?? "You have a new notification",
     icon: payload.icon ?? "/icons/icon-192x192.png",
     badge: payload.badge ?? "/icons/badge-72x72.png",

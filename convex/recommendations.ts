@@ -108,7 +108,7 @@ export const getRecommendedPosts = query({
       .unique()
     if (!user) throw new Error("User not found")
 
-    const limit = args.limit ?? 10
+    const limit = Math.min(args.limit ?? 10, 50)
     const now = Date.now()
 
     // 1. Gather viewer context: hashtags they've interacted with + authors they interact with
@@ -271,7 +271,7 @@ export const getSimilarPosts = query({
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) throw new Error("Unauthorized")
 
-    const limit = args.limit ?? 5
+    const limit = Math.min(args.limit ?? 5, 50)
 
     // 1. Get users who reacted to this post
     const postReactions = await ctx.db
@@ -356,7 +356,7 @@ export const getTrendingInSkill = query({
       .unique()
     if (!user) throw new Error("User not found")
 
-    const limit = args.limit ?? 10
+    const limit = Math.min(args.limit ?? 10, 50)
     const now = Date.now()
 
     // Determine skill(s) to search for
@@ -448,7 +448,7 @@ export const getPopularInUniversity = query({
       .unique()
     if (!user) throw new Error("User not found")
 
-    const limit = args.limit ?? 10
+    const limit = Math.min(args.limit ?? 10, 50)
     const now = Date.now()
 
     const targetUniversity = (args.university ?? user.university ?? "").toLowerCase()

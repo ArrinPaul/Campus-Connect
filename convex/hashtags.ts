@@ -1,5 +1,5 @@
 import { v } from "convex/values"
-import { mutation, query } from "./_generated/server"
+import { mutation, query, internalMutation } from "./_generated/server"
 import { Id } from "./_generated/dataModel"
 
 /**
@@ -85,7 +85,7 @@ export const getTrending = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const limit = args.limit || 10
+    const limit = Math.min(args.limit || 10, 50)
     const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000
 
     // Get all hashtags used in the last 24h
@@ -118,7 +118,7 @@ export const getPostsByHashtag = query({
     cursor: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const limit = args.limit || 20
+    const limit = Math.min(args.limit || 20, 100)
     const normalizedTag = normalizeHashtag(args.tag)
 
     // Find the hashtag
@@ -199,7 +199,7 @@ export const searchHashtags = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const limit = args.limit || 5
+    const limit = Math.min(args.limit || 5, 50)
     const searchTerm = normalizeHashtag(args.query)
 
     if (searchTerm.length < 1) {
@@ -222,10 +222,10 @@ export const searchHashtags = query({
 })
 
 /**
- * Mutation: Update trending scores (called by cron job)
+ * Mutation: Update trending scores (internal — called by cron job only)
  * Calculate trending score based on recent activity
  */
-export const updateTrendingScores = mutation({
+export const updateTrendingScores = internalMutation({
   args: {},
   handler: async (ctx) => {
     const now = Date.now()

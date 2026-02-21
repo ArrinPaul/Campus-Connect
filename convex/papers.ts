@@ -63,6 +63,7 @@ export const uploadPaper = mutation({
 
     // Link additional platform users as co-authors
     if (args.linkedUserIds) {
+      if (args.linkedUserIds.length > 20) throw new Error("Maximum 20 co-authors allowed")
       for (const uid of args.linkedUserIds) {
         if (uid !== user._id) {
           await ctx.db.insert("paperAuthors", { paperId, userId: uid })
@@ -168,7 +169,7 @@ export const getPaper = query({
       .collect()
     const linkedAuthors = await Promise.all(
       authorLinks.map(async (link: any) => {
-        const u = await ctx.db.get(link.userId)
+        const u = await ctx.db.get(link.userId) as any
         return u ? { _id: u._id, name: u.name, profilePicture: u.profilePicture, username: u.username } : null
       })
     )
@@ -193,7 +194,7 @@ export const searchPapers = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
     const allPapers = await ctx.db.query("papers").order("desc").collect()
 
     let filtered = allPapers
@@ -279,7 +280,7 @@ export const getUserPapers = query({
 export const getCollaborationOpportunities = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, args) => {
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
     const allPapers = await ctx.db.query("papers").order("desc").collect()
 
     const collabPapers = allPapers

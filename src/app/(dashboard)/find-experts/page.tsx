@@ -27,7 +27,7 @@ export default function FindExpertsPage() {
     isLoaded && isSignedIn && skills.length > 0
       ? {
           skills,
-          experienceLevel: experienceLevel || undefined,
+          experienceLevel: (experienceLevel || undefined) as "Beginner" | "Intermediate" | "Advanced" | "Expert" | undefined,
         }
       : "skip"
   )
@@ -147,7 +147,7 @@ export default function FindExpertsPage() {
             <UserCardSkeleton key={i} />
           ))}
         </div>
-      ) : results.length === 0 ? (
+      ) : results.items.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 py-16 dark:border-gray-600 dark:bg-gray-800/50">
           <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
             No experts found
@@ -159,12 +159,12 @@ export default function FindExpertsPage() {
       ) : (
         <div className="space-y-4">
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Found {results.length} expert{results.length !== 1 ? "s" : ""}
+            Found {results.items.length} expert{results.items.length !== 1 ? "s" : ""}
           </p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {results.map((expert) => (
-              <div key={expert._id} className="relative">
-                <UserCard user={expert} />
+            {results.items.map((expert: any) => (
+              <div key={expert.user._id} className="relative">
+                <UserCard user={expert.user} />
                 {/* Overlay with match details */}
                 <div className="absolute bottom-2 left-2 right-2 flex flex-wrap gap-1">
                   {expert.matchedSkills.map((skill: string) => (

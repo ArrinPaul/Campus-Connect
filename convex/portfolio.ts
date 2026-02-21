@@ -37,6 +37,7 @@ export const addProject = mutation({
     if (args.description.length > 3000) throw new Error("Description must not exceed 3000 characters")
     if (args.techStack.length > 20) throw new Error("Maximum 20 technologies allowed")
     if (args.links.length > 10) throw new Error("Maximum 10 links allowed")
+    if (args.screenshots && args.screenshots.length > 10) throw new Error("Maximum 10 screenshots allowed")
     if (args.endDate && args.startDate && args.endDate < args.startDate) {
       throw new Error("End date must be after start date")
     }
@@ -90,7 +91,10 @@ export const updateProject = mutation({
       if (args.links.length > 10) throw new Error("Maximum 10 links allowed")
       updates.links = args.links.filter(Boolean)
     }
-    if (args.screenshots !== undefined) updates.screenshots = args.screenshots
+    if (args.screenshots !== undefined) {
+      if (args.screenshots.length > 10) throw new Error("Maximum 10 screenshots allowed")
+      updates.screenshots = args.screenshots
+    }
     if (args.startDate !== undefined) updates.startDate = args.startDate
     if (args.endDate !== undefined) updates.endDate = args.endDate
 

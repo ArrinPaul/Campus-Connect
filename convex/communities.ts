@@ -275,8 +275,16 @@ export const updateCommunity = mutation({
     }
 
     const updates: Record<string, any> = {}
-    if (args.name !== undefined) updates.name = args.name.trim()
-    if (args.description !== undefined) updates.description = args.description.trim()
+    if (args.name !== undefined) {
+      const name = args.name.trim()
+      if (!name) throw new Error("Community name is required")
+      if (name.length > 100) throw new Error("Community name too long (max 100 characters)")
+      updates.name = name
+    }
+    if (args.description !== undefined) {
+      if (args.description.length > 2000) throw new Error("Description too long (max 2000 characters)")
+      updates.description = args.description.trim()
+    }
     if (args.type !== undefined) updates.type = args.type
     if (args.category !== undefined) {
       if (!VALID_CATEGORIES.includes(args.category)) {
@@ -284,7 +292,13 @@ export const updateCommunity = mutation({
       }
       updates.category = args.category
     }
-    if (args.rules !== undefined) updates.rules = args.rules
+    if (args.rules !== undefined) {
+      if (args.rules.length > 20) throw new Error("Too many rules (max 20)")
+      for (const rule of args.rules) {
+        if (rule.length > 500) throw new Error("Rule too long (max 500 characters)")
+      }
+      updates.rules = args.rules
+    }
     if (args.avatar !== undefined) updates.avatar = args.avatar
     if (args.banner !== undefined) updates.banner = args.banner
 
@@ -602,7 +616,7 @@ export const getCommunityMembers = query({
           username: user.username,
           role: m.role,
           joinedAt: m.joinedAt,
-          profileImage: user.profileImage,
+          profilePicture: user.profilePicture,
         }
       })
     )
@@ -649,7 +663,7 @@ export const getCommunityPosts = query({
                 _id: author._id,
                 name: author.name,
                 username: author.username,
-                profileImage: author.profileImage,
+                profilePicture: author.profilePicture,
               }
             : null,
         }

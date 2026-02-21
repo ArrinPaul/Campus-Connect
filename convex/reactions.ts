@@ -1,7 +1,7 @@
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import { Doc, Id } from "./_generated/dataModel"
-import { api } from "./_generated/api"
+import { api, internal } from "./_generated/api"
 
 // Reaction types
 export const reactionTypes = ["like", "love", "laugh", "wow", "sad", "scholarly"] as const
@@ -99,7 +99,7 @@ export const addReaction = mutation({
           scholarly: "🎓",
         }[args.type]
 
-        await ctx.scheduler.runAfter(0, api.notifications.createNotification, {
+        await ctx.scheduler.runAfter(0, internal.notifications.createNotification, {
           recipientId: authorId,
           actorId: user._id,
           type: "reaction" as const,

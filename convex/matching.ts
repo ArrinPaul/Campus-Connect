@@ -128,7 +128,7 @@ export const findExperts = query({
     if (args.skills.length === 0)
       return { items: [], totalCount: 0 }
 
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
     const querySkillsLower = args.skills.map((s) => s.toLowerCase())
 
     // Find users whose skills intersect with the query skills
@@ -212,7 +212,7 @@ export const findStudyPartners = query({
     if (currentUser.skills.length === 0)
       return { items: [], totalCount: 0 }
 
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
 
     const allUsers = await ctx.db.query("users").take(1000)
     const candidates = allUsers.filter((u) => {
@@ -286,7 +286,7 @@ export const findMentors = query({
     if (currentUser.skills.length === 0)
       return { items: [], totalCount: 0 }
 
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
     const viewerLevel = experienceLevelValue(currentUser.experienceLevel)
     const viewerSkillsLower = currentUser.skills.map((s) => s.toLowerCase())
 

@@ -1,6 +1,6 @@
 import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
-import { api } from "./_generated/api"
+import { api, internal } from "./_generated/api"
 
 /**
  * Follow a user
@@ -68,7 +68,7 @@ export const followUser = mutation({
     })
 
     // Create notification for the followed user
-    await ctx.scheduler.runAfter(0, api.notifications.createNotification, {
+    await ctx.scheduler.runAfter(0, internal.notifications.createNotification, {
       recipientId: args.userId,
       actorId: currentUser._id,
       type: "follow" as const,

@@ -107,7 +107,7 @@ export default function EventDetailPage() {
     )
   }
 
-  const typeConfig = EVENT_TYPE_CONFIG[event.eventType]
+  const typeConfig = EVENT_TYPE_CONFIG[event.eventType as keyof typeof EVENT_TYPE_CONFIG]
   const TypeIcon = typeConfig.icon
   const isPast = event.startDate < Date.now()
   const isFull = event.maxAttendees !== undefined && event.attendeeCount >= event.maxAttendees && event.viewerRsvp !== "going"

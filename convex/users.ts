@@ -325,7 +325,7 @@ export const searchUsersByUsername = query({
     }
 
     const queryLower = args.query.toLowerCase()
-    const limit = args.limit || 5 // Default to 5 suggestions
+    const limit = Math.min(args.limit || 5, 50) // Default to 5 suggestions
 
     // Get all users and filter by username or name
     let users = await ctx.db.query("users").collect()

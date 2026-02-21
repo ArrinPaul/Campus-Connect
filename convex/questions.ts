@@ -171,6 +171,25 @@ export const vote = mutation({
   handler: async (ctx, args) => {
     const user = await getAuthUser(ctx)
 
+    // Validate targetId is a real document of the expected type
+    let target: any
+    if (args.targetType === "question") {
+      target = await ctx.db.get(args.targetId as any)
+      if (!target || target._id.toString() !== args.targetId) {
+        throw new Error("Question not found")
+      }
+    } else {
+      target = await ctx.db.get(args.targetId as any)
+      if (!target || target._id.toString() !== args.targetId) {
+        throw new Error("Answer not found")
+      }
+    }
+
+    // Verify the document has vote fields (belongs to questions/answers table)
+    if (typeof target.upvotes !== "number" || typeof target.downvotes !== "number") {
+      throw new Error("Invalid target document")
+    }
+
     // Check if user already voted on this target
     const existing = await ctx.db
       .query("questionVotes")
@@ -178,10 +197,6 @@ export const vote = mutation({
         q.eq("userId", user._id).eq("targetId", args.targetId)
       )
       .unique()
-
-    // Get the target document
-    const target = await ctx.db.get(args.targetId as any)
-    if (!target) throw new Error("Target not found")
 
     if (existing) {
       if (existing.voteType === args.voteType) {
@@ -245,7 +260,7 @@ export const getQuestions = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
     let questions = await ctx.db.query("questions").order("desc").collect()
 
     // Tag filter
@@ -368,6 +383,10 @@ export const getQuestion = query({
 export const incrementViewCount = mutation({
   args: { questionId: v.id("questions") },
   handler: async (ctx, args) => {
+    // Require auth to prevent unauthenticated view count manipulation
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) return
+
     const question = await ctx.db.get(args.questionId)
     if (!question) return
     await ctx.db.patch(args.questionId, { viewCount: question.viewCount + 1 })

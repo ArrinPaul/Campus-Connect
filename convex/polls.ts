@@ -49,6 +49,17 @@ export const createPoll = mutation({
       if (trimmed.length > 100) throw new Error("Poll option must not exceed 100 characters")
     }
 
+    // Validate question length
+    if (args.question && args.question.trim().length > 500) {
+      throw new Error("Poll question must not exceed 500 characters")
+    }
+
+    // Validate durationHours range
+    if (args.durationHours != null) {
+      if (args.durationHours <= 0) throw new Error("Duration must be positive")
+      if (args.durationHours > 720) throw new Error("Duration must not exceed 30 days (720 hours)")
+    }
+
     const now = Date.now()
     const endsAt = args.durationHours != null
       ? now + args.durationHours * 3_600_000

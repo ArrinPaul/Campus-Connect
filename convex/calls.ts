@@ -324,7 +324,16 @@ export const getCallHistory = query({
     const currentUser = await getCurrentUser(ctx)
     if (!currentUser) return []
 
-    const limit = args.limit || 20
+    const limit = Math.min(args.limit || 20, 100)
+
+    // Verify user is a participant in this conversation
+    const membership = await ctx.db
+      .query("conversationParticipants")
+      .withIndex("by_user_conversation", (q: any) =>
+        q.eq("userId", currentUser._id).eq("conversationId", args.conversationId)
+      )
+      .unique()
+    if (!membership) return []
 
     const calls = await ctx.db
       .query("calls")
@@ -362,6 +371,15 @@ export const getActiveCall = query({
   handler: async (ctx, args) => {
     const currentUser = await getCurrentUser(ctx)
     if (!currentUser) return null
+
+    // Verify user is a participant in this conversation
+    const membership = await ctx.db
+      .query("conversationParticipants")
+      .withIndex("by_user_conversation", (q: any) =>
+        q.eq("userId", currentUser._id).eq("conversationId", args.conversationId)
+      )
+      .unique()
+    if (!membership) return null
 
     const calls = await ctx.db
       .query("calls")

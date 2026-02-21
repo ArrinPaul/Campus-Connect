@@ -268,7 +268,7 @@ export const searchJobs = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
     const allJobs = await ctx.db.query("jobs").order("desc").collect()
 
     const now = Date.now()
@@ -333,7 +333,7 @@ export const getJobApplications = query({
 
     return Promise.all(
       apps.map(async (app: any) => {
-        const applicant = await ctx.db.get(app.userId)
+        const applicant = await ctx.db.get(app.userId) as any
         return {
           ...app,
           applicant: applicant
@@ -372,7 +372,7 @@ export const getUserApplications = query({
 
     return Promise.all(
       apps.map(async (app: any) => {
-        const job = await ctx.db.get(app.jobId)
+        const job = await ctx.db.get(app.jobId) as any
         return {
           ...app,
           job: job

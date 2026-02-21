@@ -104,6 +104,10 @@ export const rateResource = mutation({
 export const downloadResource = mutation({
   args: { resourceId: v.id("resources") },
   handler: async (ctx, args) => {
+    // Require auth to prevent unauthenticated download count inflation
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) throw new Error("Unauthorized")
+
     const resource = await ctx.db.get(args.resourceId)
     if (!resource) throw new Error("Resource not found")
     await ctx.db.patch(args.resourceId, {
@@ -126,7 +130,7 @@ export const getResources = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
 
     let resources
     if (args.course) {

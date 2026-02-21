@@ -108,7 +108,7 @@ export const getConversations = query({
     const currentUser = await getCurrentUser(ctx)
     if (!currentUser) return []
 
-    const limit = args.limit || 50
+    const limit = Math.min(args.limit || 50, 100)
 
     // Get all participant records for the user
     const participantRecords = await ctx.db
@@ -473,6 +473,7 @@ export const createGroup = mutation({
 
     if (!args.name.trim()) throw new Error("Group name is required")
     if (args.name.length > 100) throw new Error("Group name too long (max 100 characters)")
+    if (args.description && args.description.length > 1000) throw new Error("Description too long (max 1000 characters)")
     if (args.memberIds.length === 0) throw new Error("At least one member is required")
     if (args.memberIds.length > 255) throw new Error("Maximum 256 members per group")
 
@@ -788,7 +789,10 @@ export const updateGroupInfo = mutation({
       if (args.name.length > 100) throw new Error("Group name too long (max 100 characters)")
       updates.name = args.name.trim()
     }
-    if (args.description !== undefined) updates.description = args.description.trim()
+    if (args.description !== undefined) {
+      if (args.description.length > 1000) throw new Error("Description too long (max 1000 characters)")
+      updates.description = args.description.trim()
+    }
     if (args.avatar !== undefined) updates.avatar = args.avatar
 
     if (Object.keys(updates).length > 0) {

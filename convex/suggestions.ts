@@ -446,7 +446,7 @@ export const getSuggestions = query({
       .unique()
     if (!user) throw new Error("User not found")
 
-    const limit = args.limit ?? 20
+    const limit = Math.min(args.limit ?? 20, 100)
 
     const suggestions = await ctx.db
       .query("suggestions")

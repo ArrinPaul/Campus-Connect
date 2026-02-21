@@ -1,7 +1,7 @@
 import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
 import { sanitizeText, sanitizeMarkdown } from "./sanitize"
-import { api } from "./_generated/api"
+import { api, internal } from "./_generated/api"
 import { extractMentions } from "./mentionUtils"
 
 /**
@@ -198,7 +198,7 @@ export const createComment = mutation({
 
     // Create notification for post author (if not commenting on own post)
     if (post.authorId !== user._id) {
-      await ctx.scheduler.runAfter(0, api.notifications.createNotification, {
+      await ctx.scheduler.runAfter(0, internal.notifications.createNotification, {
         recipientId: post.authorId,
         actorId: user._id,
         type: "comment" as const,
@@ -228,7 +228,7 @@ export const createComment = mutation({
 
       // Schedule notification if user found and not self-mention
       if (resolvedUser && resolvedUser._id !== user._id) {
-        await ctx.scheduler.runAfter(0, api.notifications.createNotification, {
+        await ctx.scheduler.runAfter(0, internal.notifications.createNotification, {
           recipientId: resolvedUser._id,
           actorId: user._id,
           type: "mention" as const,

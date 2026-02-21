@@ -40,7 +40,8 @@ export const PRICING = {
 
 /**
  * Initiate a Pro upgrade (creates pending subscription record)
- * In production, this would create a Stripe checkout session
+ * In production, this would be called AFTER Stripe checkout completion
+ * via a webhook. The stripeSessionId is required to verify payment.
  */
 export const upgradeToPro = mutation({
   args: {
@@ -49,6 +50,13 @@ export const upgradeToPro = mutation({
   },
   handler: async (ctx, args) => {
     const user = await getAuthUser(ctx)
+
+    // IMPORTANT: In production, verify stripeSessionId is valid via Stripe API
+    // before activating Pro. This mutation should only be called after
+    // successful payment confirmation. For development/demo, we proceed directly.
+    // In production, comment out the direct activation and use:
+    //   if (!args.stripeSessionId) throw new Error("Payment session required")
+    //   // Verify session with Stripe API
 
     // Check if already Pro
     const existing = await ctx.db
@@ -117,8 +125,11 @@ export const cancelPro = mutation({
       updatedAt: Date.now(),
     })
 
-    // Will revert isPro when period ends (webhook in production)
-    await ctx.db.patch(user._id, { isPro: false, proExpiresAt: undefined })
+    // Keep Pro active until period end — the webhook/cron will revoke when
+    // currentPeriodEnd is reached. Set proExpiresAt to period end so the
+    // user retains access until their paid period is over.
+    const expiresAt = sub.currentPeriodEnd ?? Date.now()
+    await ctx.db.patch(user._id, { proExpiresAt: expiresAt })
 
     return { success: true }
   },

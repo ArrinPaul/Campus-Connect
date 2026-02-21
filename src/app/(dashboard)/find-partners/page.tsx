@@ -130,7 +130,7 @@ export default function FindPartnersPage() {
                 <UserCardSkeleton key={i} />
               ))}
             </div>
-          ) : studyPartners.length === 0 ? (
+          ) : studyPartners.items.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 py-16 dark:border-gray-600 dark:bg-gray-800/50">
               <Users className="mb-3 h-10 w-10 text-gray-400" />
               <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -143,12 +143,12 @@ export default function FindPartnersPage() {
           ) : (
             <div className="space-y-4">
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {studyPartners.length} potential partner{studyPartners.length !== 1 ? "s" : ""} found
+                {studyPartners.items.length} potential partner{studyPartners.items.length !== 1 ? "s" : ""} found
               </p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {studyPartners.map((partner) => (
-                  <div key={partner._id} className="relative">
-                    <UserCard user={partner} />
+                {studyPartners.items.map((partner: any) => (
+                  <div key={partner.user._id} className="relative">
+                    <UserCard user={partner.user} />
                     <div className="mt-1 space-y-1 px-1">
                       {partner.complementarySkills.length > 0 && (
                         <div>
@@ -211,7 +211,7 @@ export default function FindPartnersPage() {
                 <UserCardSkeleton key={i} />
               ))}
             </div>
-          ) : mentors.length === 0 ? (
+          ) : mentors.items.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 py-16 dark:border-gray-600 dark:bg-gray-800/50">
               <BookOpen className="mb-3 h-10 w-10 text-gray-400" />
               <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -224,19 +224,19 @@ export default function FindPartnersPage() {
           ) : (
             <div className="space-y-4">
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {mentors.length} mentor{mentors.length !== 1 ? "s" : ""} found
+                {mentors.items.length} mentor{mentors.items.length !== 1 ? "s" : ""} found
               </p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {mentors.map((mentor) => (
-                  <div key={mentor._id} className="relative">
-                    <UserCard user={mentor} />
-                    {mentor.matchedSkills.length > 0 && (
+                {mentors.items.map((mentor: any) => (
+                  <div key={mentor.user._id} className="relative">
+                    <UserCard user={mentor.user} />
+                    {mentor.sharedSkills.length > 0 && (
                       <div className="mt-1 px-1">
                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                           Can mentor you in:
                         </p>
                         <div className="flex flex-wrap gap-1">
-                          {mentor.matchedSkills.slice(0, 4).map((skill: string) => (
+                          {mentor.sharedSkills.slice(0, 4).map((skill: string) => (
                             <span
                               key={skill}
                               className="inline-flex items-center gap-0.5 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900 dark:text-amber-200"
@@ -245,9 +245,9 @@ export default function FindPartnersPage() {
                               {skill}
                             </span>
                           ))}
-                          {mentor.matchedSkills.length > 4 && (
+                          {mentor.sharedSkills.length > 4 && (
                             <span className="text-xs text-gray-400">
-                              +{mentor.matchedSkills.length - 4} more
+                              +{mentor.sharedSkills.length - 4} more
                             </span>
                           )}
                         </div>

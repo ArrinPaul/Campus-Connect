@@ -7,6 +7,7 @@
 
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
+import { internal } from "./_generated/api"
 
 /**
  * Helper: get current authenticated user from identity
@@ -110,7 +111,7 @@ export const sendMessage = mutation({
       if (p.isMuted) continue
 
       // Create a notification via scheduler
-      await ctx.scheduler.runAfter(0, "notifications:createNotification" as any, {
+      await ctx.scheduler.runAfter(0, internal.notifications.createNotification, {
         recipientId: p.userId,
         actorId: currentUser._id,
         type: "mention" as const, // Using "mention" type for DM notifications
@@ -142,7 +143,7 @@ export const getMessages = query({
     const participant = await verifyParticipant(ctx, currentUser._id, args.conversationId)
     if (!participant) return { messages: [], cursor: null }
 
-    const limit = args.limit || 50
+    const limit = Math.min(args.limit || 50, 200)
 
     let messagesQuery = ctx.db
       .query("messages")
@@ -419,7 +420,7 @@ export const searchMessages = query({
     if (!args.searchQuery.trim()) return []
 
     const query = args.searchQuery.toLowerCase()
-    const limit = args.limit || 20
+    const limit = Math.min(args.limit || 20, 100)
 
     const allMessages = await ctx.db
       .query("messages")

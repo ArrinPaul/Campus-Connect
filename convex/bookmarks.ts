@@ -23,7 +23,10 @@ export const addBookmark = mutation({
     if (!user) {
       throw new Error("User not found")
     }
-
+    // Validate collection name length
+    if (args.collectionName && args.collectionName.length > 100) {
+      throw new Error("Collection name too long (max 100 characters)")
+    }
     // Verify post exists
     const post = await ctx.db.get(args.postId)
     if (!post) {
@@ -119,7 +122,7 @@ export const getBookmarks = query({
       return { bookmarks: [], cursor: null }
     }
 
-    const limit = args.limit || 20
+    const limit = Math.min(args.limit || 20, 100)
 
     // Query bookmarks
     let bookmarksQuery = ctx.db
