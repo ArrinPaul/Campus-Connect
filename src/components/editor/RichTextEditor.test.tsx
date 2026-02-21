@@ -3,7 +3,7 @@ import { RichTextEditor, CompactRichTextEditor } from "./RichTextEditor"
 
 // ── Mock TipTap internals ──────────────────────────────────────────────────────
 
-const mockCommands = {
+const mockCommands: Record<string, jest.Mock> = {
   toggleBold: jest.fn(() => mockCommands),
   toggleItalic: jest.fn(() => mockCommands),
   toggleStrike: jest.fn(() => mockCommands),

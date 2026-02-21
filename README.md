@@ -29,7 +29,3 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
 - **Tailwind CSS** - Styling
 - **Clerk** - Authentication
 - **Convex** - Real-time database
-
-## Documentation
-
-See `.kiro/specs/campus-connect-foundation/` for detailed requirements, design, and implementation tasks.

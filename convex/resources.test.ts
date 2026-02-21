@@ -12,7 +12,7 @@ function validateResourceTitle(title: string) {
   return title.trim()
 }
 
-function validateDescription(desc: string) {
+function validateResourceDescription(desc: string) {
   if (desc.length > 3000) throw new Error("Description must not exceed 3000 characters")
   return desc.trim()
 }
@@ -147,11 +147,11 @@ describe("Resources: Title Validation", () => {
 
 describe("Resources: Description Validation", () => {
   test("rejects description > 3000 chars", () => {
-    expect(() => validateDescription("D".repeat(3001))).toThrow("Description must not exceed 3000 characters")
+    expect(() => validateResourceDescription("D".repeat(3001))).toThrow("Description must not exceed 3000 characters")
   })
 
   test("accepts 3000 char description", () => {
-    expect(validateDescription("D".repeat(3000))).toHaveLength(3000)
+    expect(validateResourceDescription("D".repeat(3000))).toHaveLength(3000)
   })
 })
 

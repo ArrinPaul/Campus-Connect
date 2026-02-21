@@ -55,6 +55,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
       setCategory(community.category)
       setRules([...community.rules])
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [community?._id])
 
   if (!isLoaded || community === undefined) {

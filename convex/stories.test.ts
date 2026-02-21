@@ -91,8 +91,8 @@ describe("createStory logic", () => {
     const ctx = {
       auth: { getUserIdentity: async () => ({ subject: "clerk_abc" }) },
       db: {
-        query: () => ({
-          withIndex: () => ({ unique: async () => makeUser() }),
+        query: (..._args: any[]) => ({
+          withIndex: (..._args: any[]) => ({ unique: async () => makeUser() }),
         }),
         insert: insertMock,
       },
@@ -101,7 +101,7 @@ describe("createStory logic", () => {
 
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) throw new Error("Not authenticated")
-    const user = await ctx.db.query("users").withIndex("by_clerkId", null).unique()
+    const user = await ctx.db.query("users").withIndex().unique()
     await ctx.db.insert("stories", {
       authorId: user._id,
       content: args.content,

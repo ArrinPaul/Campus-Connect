@@ -8,6 +8,7 @@ import {
   Briefcase, MapPin, Clock, DollarSign, Users, Building2, Globe,
   ArrowLeft, Trash2, Send, X, CheckCircle
 } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 
@@ -120,9 +121,11 @@ export default function JobDetailPage() {
         {/* Posted by */}
         {job.poster && (
           <div className="flex items-center gap-2 mt-4 pt-4 border-t">
-            <img
+            <Image
               src={job.poster.profilePicture || "/placeholder-avatar.png"}
               alt=""
+              width={32}
+              height={32}
               className="w-8 h-8 rounded-full"
             />
             <div>
@@ -285,9 +288,11 @@ function ApplicationsList({ jobId }: { jobId: Id<"jobs"> }) {
       {(apps as any[]).map((app: any) => (
         <div key={app._id} className="border rounded-lg p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img
+            <Image
               src={app.applicant?.profilePicture || "/placeholder-avatar.png"}
               alt=""
+              width={40}
+              height={40}
               className="w-10 h-10 rounded-full"
             />
             <div>

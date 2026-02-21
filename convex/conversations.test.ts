@@ -16,8 +16,8 @@ describe("Conversations", () => {
     })
 
     it("should allow conversations between different users", () => {
-      const currentUserId = "user1"
-      const otherUserId = "user2"
+      const currentUserId: string = "user1"
+      const otherUserId: string = "user2"
       const isSelf = currentUserId === otherUserId
 
       expect(isSelf).toBe(false)
@@ -417,7 +417,7 @@ describe("Group Chat", () => {
 
   describe("removeGroupMember", () => {
     it("should only allow admin/owner to remove members", () => {
-      const callerRole = "member"
+      const callerRole: string = "member"
       const canRemove = callerRole === "owner" || callerRole === "admin"
 
       expect(canRemove).toBe(false)
@@ -431,8 +431,8 @@ describe("Group Chat", () => {
     })
 
     it("should only allow owner to remove admins", () => {
-      const targetRole = "admin"
-      const callerRole = "admin"
+      const targetRole: string = "admin"
+      const callerRole: string = "admin"
       const canRemove =
         targetRole !== "admin" || callerRole === "owner"
 
@@ -440,8 +440,8 @@ describe("Group Chat", () => {
     })
 
     it("should allow owner to remove admins", () => {
-      const targetRole = "admin"
-      const callerRole = "owner"
+      const targetRole: string = "admin"
+      const callerRole: string = "owner"
       const canRemove =
         targetRole !== "admin" || callerRole === "owner"
 
@@ -573,7 +573,7 @@ describe("Group Chat", () => {
 
   describe("promoteToAdmin", () => {
     it("should only allow owner to promote", () => {
-      const callerRole = "admin"
+      const callerRole: string = "admin"
       const canPromote = callerRole === "owner"
 
       expect(canPromote).toBe(false)
@@ -618,7 +618,7 @@ describe("Group Chat", () => {
     })
 
     it("should only demote admins", () => {
-      const targetRole = "member"
+      const targetRole: string = "member"
       const isAdmin = targetRole === "admin"
 
       expect(isAdmin).toBe(false)
@@ -634,14 +634,14 @@ describe("Group Chat", () => {
 
   describe("pinMessage", () => {
     it("should only allow admin/owner to pin", () => {
-      const callerRole = "member"
+      const callerRole: string = "member"
       const canPin = callerRole === "owner" || callerRole === "admin"
 
       expect(canPin).toBe(false)
     })
 
     it("should only allow pinning in groups", () => {
-      const conversationType = "direct"
+      const conversationType: string = "direct"
       const canPin = conversationType === "group"
 
       expect(canPin).toBe(false)

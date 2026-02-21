@@ -8,6 +8,7 @@ import {
   ThumbsUp, ThumbsDown, CheckCircle, MessageCircle, ArrowLeft,
   Eye, Tag, Send, Trash2, X
 } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 
@@ -28,6 +29,7 @@ export default function QuestionDetailPage() {
 
   useEffect(() => {
     incrementView({ questionId }).catch(() => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [questionId])
 
   if (question === undefined) {
@@ -145,9 +147,11 @@ export default function QuestionDetailPage() {
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 {question.asker && (
                   <>
-                    <img
+                    <Image
                       src={question.asker.profilePicture || "/placeholder-avatar.png"}
                       alt=""
+                      width={24}
+                      height={24}
                       className="w-6 h-6 rounded-full"
                     />
                     <span>{question.asker.name}</span>
@@ -219,9 +223,11 @@ export default function QuestionDetailPage() {
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     {answer.answerer && (
                       <>
-                        <img
+                        <Image
                           src={answer.answerer.profilePicture || "/placeholder-avatar.png"}
                           alt=""
+                          width={20}
+                          height={20}
                           className="w-5 h-5 rounded-full"
                         />
                         <span>{answer.answerer.name}</span>

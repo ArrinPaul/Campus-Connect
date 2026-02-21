@@ -5,6 +5,7 @@ import { api } from "@/convex/_generated/api"
 import { useState } from "react"
 import Link from "next/link"
 import { CreateListingModal } from "@/components/marketplace/CreateListingModal"
+import Image from "next/image"
 
 const CATEGORIES = [
   { key: "all", label: "All" },
@@ -30,11 +31,12 @@ function ListingCard({ listing }: { listing: any }) {
       className="group rounded-xl border bg-card hover:shadow-md transition-shadow overflow-hidden flex flex-col"
     >
       {listing.images?.[0] ? (
-        <div className="aspect-[4/3] overflow-hidden bg-muted">
-          <img
+        <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+          <Image
             src={listing.images[0]}
             alt={listing.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            fill={true}
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
         </div>
       ) : (

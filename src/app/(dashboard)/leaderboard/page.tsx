@@ -7,6 +7,7 @@ import {
   Trophy, Medal, Star, Crown, Search, Users, TrendingUp
 } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 export default function LeaderboardPage() {
   const [period, setPeriod] = useState<"weekly" | "monthly" | "all">("all")
@@ -141,9 +142,11 @@ export default function LeaderboardPage() {
               <div className="w-8 flex justify-center">{getRankIcon(user.rank)}</div>
 
               {/* Avatar */}
-              <img
+              <Image
                 src={user.profilePicture || "/placeholder-avatar.png"}
                 alt=""
+                width={40}
+                height={40}
                 className="w-10 h-10 rounded-full"
               />
 

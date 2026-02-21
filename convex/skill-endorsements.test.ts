@@ -28,15 +28,15 @@ describe("Skill Endorsements", () => {
 
   describe("endorsement validation", () => {
     it("should prevent self-endorsement", () => {
-      const currentUserId = "user1"
-      const targetUserId = "user1"
+      const currentUserId: string = "user1"
+      const targetUserId: string = "user1"
       const isSelfEndorsement = currentUserId === targetUserId
       expect(isSelfEndorsement).toBe(true)
     })
 
     it("should allow endorsing other users", () => {
-      const currentUserId = "user1"
-      const targetUserId = "user2"
+      const currentUserId: string = "user1"
+      const targetUserId: string = "user2"
       const isSelfEndorsement = currentUserId === targetUserId
       expect(isSelfEndorsement).toBe(false)
     })

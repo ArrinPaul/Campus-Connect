@@ -123,15 +123,15 @@ describe("Voice & Video Calls", () => {
     })
 
     it("should mark participant as left on hang up", () => {
-      const participants = [
-        { userId: "user1", status: "connected" as const, leftAt: undefined as number | undefined },
-        { userId: "user2", status: "connected" as const, leftAt: undefined as number | undefined },
+      const participants: Array<{ userId: string; status: string; leftAt: number | undefined }> = [
+        { userId: "user1", status: "connected", leftAt: undefined },
+        { userId: "user2", status: "connected", leftAt: undefined },
       ]
 
       const now = 5000
       const index = participants.findIndex((p) => p.userId === "user1")
       const updated = [...participants]
-      updated[index] = { ...updated[index], leftAt: now, status: "left" as const }
+      updated[index] = { ...updated[index], leftAt: now, status: "left" }
 
       expect(updated[0].status).toBe("left")
       expect(updated[0].leftAt).toBe(5000)

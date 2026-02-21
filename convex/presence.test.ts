@@ -96,7 +96,7 @@ describe("Presence & Activity Status", () => {
     })
 
     it("should not change status when DND", () => {
-      const currentStatus = "dnd"
+      const currentStatus: string = "dnd"
       const updates: any = { lastSeenAt: Date.now(), updatedAt: Date.now() }
 
       if (!currentStatus || currentStatus === "away") {
@@ -107,7 +107,7 @@ describe("Presence & Activity Status", () => {
     })
 
     it("should not change status when invisible", () => {
-      const currentStatus = "invisible"
+      const currentStatus: string = "invisible"
       const updates: any = { lastSeenAt: Date.now(), updatedAt: Date.now() }
 
       if (!currentStatus || currentStatus === "away") {
@@ -118,7 +118,7 @@ describe("Presence & Activity Status", () => {
     })
 
     it("should keep existing online status unchanged", () => {
-      const currentStatus = "online"
+      const currentStatus: string = "online"
       const updates: any = { lastSeenAt: Date.now(), updatedAt: Date.now() }
 
       if (!currentStatus || currentStatus === "away") {

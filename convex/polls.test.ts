@@ -7,7 +7,7 @@
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
-function makeUser(overrides: Record<string, unknown> = {}) {
+function makePollUser(overrides: Record<string, unknown> = {}) {
   return {
     _id: "user_001",
     clerkId: "clerk_001",
@@ -217,7 +217,7 @@ describe("deletePoll logic", () => {
     await expect(
       (async () => {
         const poll = makePoll({ authorId: "user_other" })
-        const user = makeUser({ _id: "user_001" })
+        const user = makePollUser({ _id: "user_001" })
         if (poll.authorId !== user._id) throw new Error("Forbidden")
       })()
     ).rejects.toThrow("Forbidden")
@@ -225,7 +225,7 @@ describe("deletePoll logic", () => {
 
   it("should allow deletion by the poll author", () => {
     const poll = makePoll({ authorId: "user_001" })
-    const user = makeUser({ _id: "user_001" })
+    const user = makePollUser({ _id: "user_001" })
     expect(() => {
       if (poll.authorId !== user._id) throw new Error("Forbidden")
     }).not.toThrow()
@@ -269,7 +269,7 @@ describe("getUserVote logic", () => {
   })
 
   it("should return null when user has not voted", () => {
-    const vote = undefined
+    const vote = undefined as { optionId: string } | undefined
     expect(vote?.optionId ?? null).toBeNull()
   })
 

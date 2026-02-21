@@ -7,6 +7,7 @@ import { api } from "@/convex/_generated/api"
 import { CommunityInfoSidebar } from "@/components/communities/CommunityInfoSidebar"
 import { Users, Globe, Lock, EyeOff, FileText, Info, Settings } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 type Tab = "posts" | "about" | "members"
 
@@ -136,12 +137,13 @@ export default function CommunityPage({ params }: CommunityPageProps) {
       {/* Community Header */}
       <div className="-mt-8 ml-4 flex items-end gap-4 sm:-mt-12 sm:ml-6">
         <div className="relative">
-          <div className="flex h-16 w-16 items-center justify-center rounded-xl border-4 border-white bg-gradient-to-br from-blue-400 to-purple-500 text-2xl font-bold text-white dark:border-gray-900 sm:h-24 sm:w-24 sm:text-4xl">
+          <div className="relative flex h-16 w-16 items-center justify-center rounded-xl border-4 border-white bg-gradient-to-br from-blue-400 to-purple-500 text-2xl font-bold text-white dark:border-gray-900 sm:h-24 sm:w-24 sm:text-4xl">
             {community.avatar ? (
-              <img
+              <Image
                 src={community.avatar}
                 alt={community.name}
-                className="h-full w-full rounded-xl object-cover"
+                fill={true}
+                className="rounded-xl object-cover"
               />
             ) : (
               community.name.charAt(0).toUpperCase()

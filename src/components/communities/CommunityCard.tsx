@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
@@ -95,9 +96,11 @@ export function CommunityCard({
         <div className="flex items-start gap-3">
           <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-purple-500 text-xl font-bold text-primary-foreground select-none">
             {community.avatar ? (
-              <img
+              <Image
                 src={community.avatar}
                 alt={community.name}
+                width={48}
+                height={48}
                 className="h-12 w-12 rounded-full object-cover"
               />
             ) : (

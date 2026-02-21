@@ -1,6 +1,6 @@
 "use client"
 
-import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react"
+import { useEditor, EditorContent } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import Link from "@tiptap/extension-link"
 import Placeholder from "@tiptap/extension-placeholder"
@@ -181,7 +181,7 @@ export function RichTextEditor({
     if (!editor) return
     const currentMd = tiptapHtmlToMarkdown(editor.getHTML())
     if (currentMd !== value) {
-      editor.commands.setContent(markdownToTiptapHtml(value), false)
+      editor.commands.setContent(markdownToTiptapHtml(value), { emitUpdate: false })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value])
@@ -197,7 +197,7 @@ export function RichTextEditor({
       if (!editor) return
       setShowLinkDialog(false)
       if (!url) {
-        editor.chain().focus().extendMarkToLink().unsetLink().run()
+        editor.chain().focus().unsetLink().run()
         return
       }
       editor.chain().focus().setLink({ href: url }).run()
@@ -367,42 +367,6 @@ export function RichTextEditor({
         </div>
       )}
 
-      {/* ── Bubble menu (shows on text selection) ────────────────────────── */}
-      <BubbleMenu
-        editor={editor}
-        tippyOptions={{ duration: 100 }}
-        className="flex items-center gap-0.5 rounded-lg border border-border bg-card px-1 py-0.5 shadow-lg"
-      >
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          active={editor.isActive("bold")}
-          title="Bold"
-        >
-          <Bold className="h-3 w-3" />
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          active={editor.isActive("italic")}
-          title="Italic"
-        >
-          <Italic className="h-3 w-3" />
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleCode().run()}
-          active={editor.isActive("code")}
-          title="Code"
-        >
-          <Code className="h-3 w-3" />
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => setShowLinkDialog(true)}
-          active={editor.isActive("link")}
-          title="Link"
-        >
-          <LinkIcon className="h-3 w-3" />
-        </ToolbarButton>
-      </BubbleMenu>
-
       {/* ── Editor / Preview area ─────────────────────────────────────────── */}
       {previewMode ? (
         <div className="p-3" style={{ minHeight }}>
@@ -489,7 +453,7 @@ export function CompactRichTextEditor({
     if (!editor) return
     const currentMd = tiptapHtmlToMarkdown(editor.getHTML())
     if (currentMd !== value) {
-      editor.commands.setContent(markdownToTiptapHtml(value), false)
+      editor.commands.setContent(markdownToTiptapHtml(value), { emitUpdate: false })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value])

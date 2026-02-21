@@ -18,7 +18,7 @@ function validateCompany(company: string) {
   return company.trim()
 }
 
-function validateDescription(desc: string) {
+function validateJobDescription(desc: string) {
   if (desc.length > 5000) throw new Error("Description must not exceed 5000 characters")
   return desc.trim()
 }
@@ -223,14 +223,14 @@ describe("Jobs: Company Validation", () => {
 
 describe("Jobs: Description Validation", () => {
   test("rejects description exceeding 5000 chars", () => {
-    expect(() => validateDescription("D".repeat(5001))).toThrow(
+    expect(() => validateJobDescription("D".repeat(5001))).toThrow(
       "Description must not exceed 5000 characters"
     )
   })
 
   test("accepts 5000 char description", () => {
     const d = "D".repeat(5000)
-    expect(validateDescription(d)).toBe(d)
+    expect(validateJobDescription(d)).toBe(d)
   })
 })
 

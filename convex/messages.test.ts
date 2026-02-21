@@ -227,8 +227,8 @@ describe("Messages", () => {
     })
 
     it("should only allow sender to delete for everyone", () => {
-      const messageSenderId = "user1"
-      const currentUserId = "user2"
+      const messageSenderId: string = "user1"
+      const currentUserId: string = "user2"
       const canDeleteForEveryone = messageSenderId === currentUserId
 
       expect(canDeleteForEveryone).toBe(false)
@@ -330,8 +330,8 @@ describe("Messages", () => {
 
   describe("editMessage", () => {
     it("should only allow sender to edit", () => {
-      const messageSenderId = "user1"
-      const currentUserId = "user2"
+      const messageSenderId: string = "user1"
+      const currentUserId: string = "user2"
       const canEdit = messageSenderId === currentUserId
 
       expect(canEdit).toBe(false)
@@ -526,7 +526,7 @@ describe("Messages", () => {
 
     it("should generate correct DM notification message", () => {
       const senderName = "Alice"
-      const conversationType = "direct"
+      const conversationType: string = "direct"
       const groupName = undefined
 
       const message =

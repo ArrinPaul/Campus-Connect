@@ -16,7 +16,9 @@ jest.mock("../../../../convex/_generated/api", () => ({
 }))
 
 const mockUseMutation = useMutation as jest.MockedFunction<typeof useMutation>
-const mockCreateRepost = jest.fn()
+const mockCreateRepost = Object.assign(jest.fn(), {
+  withOptimisticUpdate: jest.fn().mockReturnThis(),
+})
 
 const mockPost = {
   _id: "post123" as any,

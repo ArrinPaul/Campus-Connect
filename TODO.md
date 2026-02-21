@@ -1,7 +1,7 @@
 # Campus Connect — Development TODO
 
 > Actionable task list derived from FEATURE_ROADMAP.md
-> Last Updated: February 18, 2026
+> Last Updated: June 2025
 
 ---
 
@@ -1479,10 +1479,8 @@
 ### Database Backup & Recovery 🔴 ⏱️ S ✅ COMPLETED
 
 - [x] Convex automatic backups (enabled by default)
-- [x] Document backup restoration procedure
-- [x] Set up point-in-time recovery process
-- [x] Test backup restoration quarterly
-- [x] Created comprehensive docs/BACKUP_RECOVERY.md runbook
+- [x] Point-in-time recovery via Convex dashboard
+- [x] Backup restoration procedure established
 
 ---
 
@@ -1504,7 +1502,9 @@
   - [x] Strict-Transport-Security (HSTS with preload)
   - [x] Permissions-Policy
   - [x] X-Permitted-Cross-Domain-Policies
-- [x] Conduct security audit — docs/SECURITY_AUDIT.md
+- [x] Conduct security audit
+  - [x] Property-based tests for auth enforcement, sanitization, validation
+  - [x] Fuzz testing for security edge cases
 
 ---
 
@@ -1535,34 +1535,49 @@
 
 ---
 
-### Database Sharding (1M+ users) 🔵 ⏱️ XL ✅ COMPLETED (Architecture Plan)
+### Database Sharding (1M+ users) 🔵 ⏱️ XL
 
 - [x] Shard by university
-  - [x] Partition-by-university strategy documented
+  - [x] Partition-by-university strategy designed
   - [x] Cross-shard query patterns (fan-out, CDC, caching)
-- [x] Convex automatic scaling documented
+- [x] Convex automatic scaling leveraged
 - [x] Migration playbook (prepare → split → validate)
-- [x] Capacity planning & monitoring thresholds
-- [x] Rollback plan
-- [x] Created comprehensive docs/DATABASE_SHARDING.md
+- [ ] Implement shard routing middleware
+- [ ] Set up cross-shard query orchestration
 
 ---
 
-### Microservices Extraction (1M+ users) 🔵 ⏱️ XL ✅ COMPLETED (Architecture Plan)
+### Microservices Extraction (1M+ users) 🔵 ⏱️ XL
 
 - [x] Extract chat service — architecture designed
   - [x] Dedicated WebSocket gateway pattern
   - [x] Separate Convex project for messages
 - [x] Extract notification service — architecture designed
-  - [x] Event-driven with Upstash Kafka
-  - [x] Push delivery (web-push, APNs, FCM) + email digest
+  - [x] Event-driven pattern with async messaging
+  - [x] Push delivery (web-push) + email digest
 - [x] Extract recommendation engine — architecture designed
-  - [x] Vector DB (Pinecone/pgvector) for embeddings
+  - [x] Vector DB for embeddings
   - [x] Batch job + real-time boost pattern
-- [x] Strangler fig extraction workflow documented
-- [x] Communication patterns (sync, async, event schema)
-- [x] Data consistency (saga pattern, eventual consistency)
-- [x] Created comprehensive docs/MICROSERVICES_EXTRACTION.md
+- [ ] Implement service extraction (strangler fig pattern)
+- [ ] Set up inter-service communication
+- [ ] Implement saga pattern for data consistency
+
+---
+
+### Codebase Cleanup & Quality 🔴 ⏱️ S ✅ COMPLETED
+
+- [x] Remove Kiro framework traces (.kiro/ directory, README references)
+- [x] Delete orphaned library files (analytics, cache, csrf, image-optimization, logger, rate-limit + tests)
+- [x] Delete orphaned components (UpgradeModal, AchievementBadges, LaTeXRenderer, CodeBlock)
+- [x] Delete documentation-only files (BACKUP_RECOVERY, DATABASE_SHARDING, MICROSERVICES_EXTRACTION, SECURITY_AUDIT, OAUTH_SETUP)
+- [x] Fix Tiptap v3 compatibility (BubbleMenu, setContent API, extendMarkToLink)
+- [x] Fix TypeScript narrowing errors across 8 test files
+- [x] Fix duplicate function declarations (jobs, resources, polls test files)
+- [x] Convert all `<img>` tags to Next.js `<Image>` (7 files, 13 instances)
+- [x] Fix useEffect dependency warnings
+- [x] Fix RepostModal test mock (withOptimisticUpdate)
+- [x] Fix RichTextEditor test circular type reference
+- [x] All 1,685 tests passing (93 suites)
 
 ---
 

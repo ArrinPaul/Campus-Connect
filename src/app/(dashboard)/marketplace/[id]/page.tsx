@@ -5,6 +5,7 @@ import { api } from "@/convex/_generated/api"
 import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 
 const CONDITION_LABELS: Record<string, string> = {
   new: "New",
@@ -69,12 +70,13 @@ export default function ListingDetailPage() {
       <div className="grid md:grid-cols-2 gap-8">
         {/* Image gallery */}
         <div className="space-y-3">
-          <div className="aspect-square rounded-xl overflow-hidden bg-muted">
+          <div className="relative aspect-square rounded-xl overflow-hidden bg-muted">
             {images.length > 0 ? (
-              <img
+              <Image
                 src={images[activeImage]}
                 alt={listing.title}
-                className="w-full h-full object-cover"
+                fill={true}
+                className="object-cover"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-muted-foreground text-6xl">
@@ -88,11 +90,11 @@ export default function ListingDetailPage() {
                 <button
                   key={i}
                   onClick={() => setActiveImage(i)}
-                  className={`h-16 w-16 rounded-lg overflow-hidden border-2 transition-colors ${
+                  className={`relative h-16 w-16 rounded-lg overflow-hidden border-2 transition-colors ${
                     activeImage === i ? "border-primary" : "border-transparent"
                   }`}
                 >
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                  <Image src={img} alt="" fill={true} className="object-cover" />
                 </button>
               ))}
             </div>
@@ -134,9 +136,11 @@ export default function ListingDetailPage() {
           {listing.seller && (
             <div className="rounded-xl border p-3 flex items-center gap-3">
               {listing.seller.avatarUrl ? (
-                <img
+                <Image
                   src={listing.seller.avatarUrl}
                   alt={listing.seller.name}
+                  width={40}
+                  height={40}
                   className="h-10 w-10 rounded-full object-cover"
                 />
               ) : (
