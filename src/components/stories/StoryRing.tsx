@@ -77,7 +77,7 @@ export function StoryRing({
       <div className={avatarContainerClass} style={{ width: 68, height: 68 }}>
         {/* White gap between ring and avatar */}
         <div className="rounded-full bg-card p-[2px]">
-          <div className="relative h-14 w-14 rounded-full overflow-hidden bg-muted bg-muted">
+          <div className="relative h-14 w-14 rounded-full overflow-hidden bg-muted">
             {user.profilePicture ? (
               <Image
                 src={user.profilePicture}

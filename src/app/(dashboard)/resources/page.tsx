@@ -93,7 +93,7 @@ export default function ResourcesPage() {
         </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
-          {resources.map((resource: any) => (
+          {resources.map((resource) => (
             <div key={resource._id} className="bg-card border rounded-xl p-5 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-2">
                 <h3 className="text-lg font-semibold">{resource.title}</h3>

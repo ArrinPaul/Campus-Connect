@@ -9,6 +9,9 @@ import { InfiniteScrollTrigger } from "./InfiniteScrollTrigger"
 import { VirtualizedFeed } from "./VirtualizedFeed"
 import { Repeat2 } from "lucide-react"
 import type { FeedType } from "@/app/(dashboard)/feed/page"
+import type { FunctionReturnType } from "convex/server"
+
+type ConvexFeedItem = NonNullable<FunctionReturnType<typeof api.posts.getUnifiedFeed>>["items"][number]
 
 interface FeedContainerProps {
   feedType?: FeedType
@@ -16,7 +19,7 @@ interface FeedContainerProps {
 
 export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
   const { isLoaded, isSignedIn } = useUser()
-  const [allItems, setAllItems] = useState<any[]>([])
+  const [allItems, setAllItems] = useState<ConvexFeedItem[]>([])
   const [cursor, setCursor] = useState<string | null>(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const hasInitializedRef = useRef(false)
@@ -35,11 +38,11 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
     feedType === "following" ? queryArgs : "skip"
   )
   const forYouData = useQuery(
-    api.feedRanking.getRankedFeed,
+    api.feed_ranking.getRankedFeed,
     feedType === "for-you" ? queryArgs : "skip"
   )
   const trendingData = useQuery(
-    api.feedRanking.getTrendingFeed,
+    api.feed_ranking.getTrendingFeed,
     feedType === "trending" ? queryArgs : "skip"
   )
 
@@ -49,11 +52,11 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
     feedType === "following" ? moreQueryArgs : "skip"
   )
   const moreForYouData = useQuery(
-    api.feedRanking.getRankedFeed,
+    api.feed_ranking.getRankedFeed,
     feedType === "for-you" ? moreQueryArgs : "skip"
   )
   const moreTrendingData = useQuery(
-    api.feedRanking.getTrendingFeed,
+    api.feed_ranking.getTrendingFeed,
     feedType === "trending" ? moreQueryArgs : "skip"
   )
 
@@ -94,8 +97,8 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
     } else if (!isLoadingMore) {
       // Handle real-time updates for the initial batch
       setAllItems((prev) => {
-        const existingIds = new Set(prev.map((item: any) => item._id))
-        const newItems = feedData.items.filter((item: any) => !existingIds.has(item._id))
+        const existingIds = new Set(prev.map((item) => item._id))
+        const newItems = feedData.items.filter((item) => !existingIds.has(item._id))
         return [...newItems, ...prev]
       })
       setCursor(feedData.nextCursor)
@@ -124,15 +127,15 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
       {[...Array(3)].map((_, i) => (
         <div key={i} className="animate-pulse rounded-lg bg-card p-4 shadow-elevation-1 sm:p-6">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="h-8 w-8 rounded-full bg-muted bg-muted sm:h-10 sm:w-10" />
+            <div className="h-8 w-8 rounded-full bg-muted sm:h-10 sm:w-10" />
             <div className="flex-1 space-y-2">
-              <div className="h-3 w-24 rounded bg-muted bg-muted sm:h-4 sm:w-32" />
-              <div className="h-2 w-16 rounded bg-muted bg-muted sm:h-3 sm:w-24" />
+              <div className="h-3 w-24 rounded bg-muted sm:h-4 sm:w-32" />
+              <div className="h-2 w-16 rounded bg-muted sm:h-3 sm:w-24" />
             </div>
           </div>
           <div className="mt-3 space-y-2 sm:mt-4">
-            <div className="h-3 w-full rounded bg-muted bg-muted sm:h-4" />
-            <div className="h-3 w-3/4 rounded bg-muted bg-muted sm:h-4" />
+            <div className="h-3 w-full rounded bg-muted sm:h-4" />
+            <div className="h-3 w-3/4 rounded bg-muted sm:h-4" />
           </div>
         </div>
       ))}

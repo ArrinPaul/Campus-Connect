@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
-import { validateSkill } from "../../../lib/validations"
+import { validateSkill } from "@/lib/validations"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 
 interface SkillsManagerProps {

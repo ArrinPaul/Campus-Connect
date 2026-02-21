@@ -19,6 +19,7 @@ import { LinkPreviewCard } from "@/components/posts/LinkPreviewCard"
 import { PollCard } from "@/components/posts/PollCard"
 import { createLogger } from "@/lib/logger"
 import { toast } from "sonner"
+import type { ReactionCounts } from "@/types"
 
 const log = createLogger("PostCard")
 
@@ -38,6 +39,7 @@ interface Post {
   shareCount: number
   createdAt: number
   updatedAt: number
+  reactionCounts?: ReactionCounts
   mediaUrls?: string[]
   mediaType?: "image" | "video" | "file" | "link"
   mediaFileNames?: string[]

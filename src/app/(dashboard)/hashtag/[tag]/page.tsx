@@ -6,7 +6,7 @@ import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { PostCard } from "@/components/posts/PostCard"
 import { Loader2, Hash } from "lucide-react"
-import { getHashtagDisplay } from "../../../../../lib/hashtag-utils"
+import { getHashtagDisplay } from "@/lib/hashtag-utils"
 
 export default function HashtagPage() {
   const params = useParams()

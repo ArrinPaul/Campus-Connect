@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { TrendingUp, Hash } from "lucide-react"
-import { getHashtagDisplay } from "../../../lib/hashtag-utils"
+import { getHashtagDisplay } from "@/lib/hashtag-utils"
 
 interface TrendingHashtagsProps {
   limit?: number

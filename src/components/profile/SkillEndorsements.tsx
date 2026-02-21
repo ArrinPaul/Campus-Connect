@@ -15,12 +15,12 @@ export function SkillEndorsements({
   userId,
   isOwnProfile,
 }: SkillEndorsementsProps) {
-  const endorsements = useQuery(api.skillEndorsements.getEndorsements, {
+  const endorsements = useQuery(api.skill_endorsements.getEndorsements, {
     userId,
   })
-  const endorseSkill = useMutation(api.skillEndorsements.endorseSkill)
+  const endorseSkill = useMutation(api.skill_endorsements.endorseSkill)
   const removeEndorsement = useMutation(
-    api.skillEndorsements.removeEndorsement
+    api.skill_endorsements.removeEndorsement
   )
 
   const [loadingSkill, setLoadingSkill] = useState<string | null>(null)
@@ -32,7 +32,7 @@ export function SkillEndorsements({
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="h-10 animate-pulse rounded-lg bg-muted bg-muted"
+            className="h-10 animate-pulse rounded-lg bg-muted"
           />
         ))}
       </div>

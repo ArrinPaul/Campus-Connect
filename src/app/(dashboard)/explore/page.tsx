@@ -8,8 +8,10 @@ import { PostCard } from "@/components/posts/PostCard"
 import { RecommendedPosts, TrendingInSkill, PopularInUniversity } from "@/components/feed/RecommendedPosts"
 import { SuggestedUsers } from "@/components/discover/SuggestedUsers"
 import { Sparkles, TrendingUp, GraduationCap, Compass, RefreshCw } from "lucide-react"
+import type { FunctionReturnType } from "convex/server"
 
 type ExploreTab = "for-you" | "trending-skills" | "university"
+type RecommendedItem = NonNullable<FunctionReturnType<typeof api.recommendations.getRecommendedPosts>>["items"][number]
 
 export default function ExplorePage() {
   const { isLoaded, isSignedIn } = useUser()
@@ -35,7 +37,7 @@ export default function ExplorePage() {
   ]
 
   // Determine posts to display based on active tab
-  let posts: any[] = []
+  let posts: RecommendedItem[] = []
   let isLoading = false
   let emptyMessage = ""
 
@@ -124,7 +126,7 @@ export default function ExplorePage() {
           ) : (
             // Post list
             <div className="space-y-4">
-              {posts.map((item: any) => {
+              {posts.map((item) => {
                 const post = item.post
                 if (!post || !post.author) return null
                 return (

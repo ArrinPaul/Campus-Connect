@@ -146,7 +146,7 @@ export default function FindPartnersPage() {
                 {studyPartners.items.length} potential partner{studyPartners.items.length !== 1 ? "s" : ""} found
               </p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {studyPartners.items.map((partner: any) => (
+                {studyPartners.items.map((partner) => (
                   <div key={partner.user._id} className="relative">
                     <UserCard user={partner.user} />
                     <div className="mt-1 space-y-1 px-1">
@@ -227,7 +227,7 @@ export default function FindPartnersPage() {
                 {mentors.items.length} mentor{mentors.items.length !== 1 ? "s" : ""} found
               </p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {mentors.items.map((mentor: any) => (
+                {mentors.items.map((mentor) => (
                   <div key={mentor.user._id} className="relative">
                     <UserCard user={mentor.user} />
                     {mentor.sharedSkills.length > 0 && (

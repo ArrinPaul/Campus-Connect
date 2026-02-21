@@ -97,7 +97,7 @@ export function MentionAutocomplete({
             onMouseEnter={() => setSelectedIndex(index)}
             className={`w-full px-4 py-2 flex items-center gap-3 hover:bg-accent transition-colors ${
               index === selectedIndex
-                ? "bg-muted bg-muted"
+                ? "bg-muted"
                 : "bg-transparent"
             }`}
           >

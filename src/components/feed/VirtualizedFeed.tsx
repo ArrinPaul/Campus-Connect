@@ -5,9 +5,13 @@ import { useVirtualizer } from "@tanstack/react-virtual"
 import { PostCard } from "@/components/posts/PostCard"
 import { InfiniteScrollTrigger } from "./InfiniteScrollTrigger"
 import { Repeat2 } from "lucide-react"
+import { api } from "@/convex/_generated/api"
+import type { FunctionReturnType } from "convex/server"
+
+type ConvexFeedItem = NonNullable<FunctionReturnType<typeof api.posts.getUnifiedFeed>>["items"][number]
 
 interface VirtualizedFeedProps {
-  items: any[]
+  items: ConvexFeedItem[]
   hasMore: boolean
   isLoadingMore: boolean
   onLoadMore: () => void

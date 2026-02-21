@@ -15,7 +15,7 @@ export const MENTION_REGEX = /@([a-zA-Z0-9_]+)/g;
  * Extract all unique mentions from text content
  * @param content - The text to extract mentions from
  * @returns Array of unique usernames (without @ symbol)
- * 
+ *
  * @example
  * extractMentions("Hey @john and @jane!")
  * // Returns: ["john", "jane"]
@@ -42,10 +42,10 @@ export function extractMentions(content: string): string[] {
 /**
  * Parse content with mentions, converting them to an array of segments
  * Used for rendering mentions as clickable links in the UI
- * 
+ *
  * @param content - The text to parse
  * @returns Array of segments with type and content
- * 
+ *
  * @example
  * parseMentions("Hey @john how are you?")
  * // Returns: [
@@ -115,7 +115,7 @@ export function parseMentions(content: string): ParsedSegment[] {
  * Check if a username is valid for mentions
  * @param username - The username to validate (without @ symbol)
  * @returns True if valid, false otherwise
- * 
+ *
  * @example
  * isValidMention("john_doe123") // true
  * isValidMention("john doe") // false
@@ -134,7 +134,7 @@ export function isValidMention(username: string): boolean {
  * Get the display text for a mention
  * @param username - The username (without @ symbol)
  * @returns The display text with @ symbol
- * 
+ *
  * @example
  * getMentionDisplay("john") // "@john"
  */

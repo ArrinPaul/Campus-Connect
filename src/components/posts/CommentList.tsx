@@ -8,7 +8,7 @@ import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import { CommentSkeleton } from "@/components/ui/loading-skeleton"
-import { parseMentions } from "../../../lib/mention-utils"
+import { parseMentions } from "@/lib/mention-utils"
 import { ChevronDown, ChevronUp, MessageSquare, ArrowRight } from "lucide-react"
 import dynamic from "next/dynamic"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
@@ -132,8 +132,7 @@ export function CommentList({
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to post reply"
       setReplyError(errorMessage)
-      toast.error(errorMessage
-      setReplyError(err instanceof Error ? err.message : "Failed to post reply")
+      toast.error(errorMessage)
     } finally {
       setIsSubmittingReply(false)
     }
@@ -197,7 +196,7 @@ export function CommentList({
 
           {/* Comment body */}
           <div className="flex-1 min-w-0">
-            <div className="rounded-lg bg-muted bg-muted px-3 py-2">
+            <div className="rounded-lg bg-muted px-3 py-2">
               <div className="flex items-center justify-between gap-2 flex-wrap">
                 <p className="text-sm font-semibold text-foreground">
                   {comment.author?.name || "Unknown User"}

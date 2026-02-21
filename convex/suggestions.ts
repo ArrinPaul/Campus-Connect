@@ -1,6 +1,7 @@
 import { v } from "convex/values"
 import { query, mutation, internalMutation } from "./_generated/server"
 import { Id, Doc } from "./_generated/dataModel"
+import { jaccardSimilarity } from "./math-utils"
 
 // ────────────────────────────────────────────
 // Scoring weights (Phase 4.1 spec)
@@ -19,16 +20,6 @@ const MAX_SUGGESTIONS_PER_USER = 20
 // ────────────────────────────────────────────
 // Helpers
 // ────────────────────────────────────────────
-
-/** Jaccard similarity between two string arrays */
-function jaccardSimilarity(a: string[], b: string[]): number {
-  if (a.length === 0 && b.length === 0) return 0
-  const setA = new Set(a.map((s) => s.toLowerCase()))
-  const setB = new Set(b.map((s) => s.toLowerCase()))
-  const intersection = [...setA].filter((x) => setB.has(x)).length
-  const union = new Set([...setA, ...setB]).size
-  return union === 0 ? 0 : intersection / union
-}
 
 /**
  * Skill complementarity: how many skills does candidateUser have that
@@ -159,7 +150,7 @@ export const computeSuggestionsForUser = internalMutation({
 
     // Also count interactions from the candidate on any of my content
     // Interaction score normaliser (max raw ≈ 20)
-    const maxInteraction = Math.max(1, ...interactorCounts.values())
+    const maxInteraction = Math.max(1, ...Array.from(interactorCounts.values()))
 
     // 5. Score each candidate
     const scored: Array<{
@@ -168,7 +159,7 @@ export const computeSuggestionsForUser = internalMutation({
       reasons: string[]
     }> = []
 
-    for (const [candidateIdStr, { mutualCount }] of candidateScores) {
+    for (const [candidateIdStr, { mutualCount }] of Array.from(candidateScores.entries())) {
       const candidateId = candidateIdStr as Id<"users">
       const candidate = await ctx.db.get(candidateId)
       if (!candidate) continue
@@ -356,11 +347,11 @@ async function computeSuggestionsForUserInline(
       interactorCounts.set(c.authorId as string, (interactorCounts.get(c.authorId as string) ?? 0) + 2)
     }
   }
-  const maxInteraction = Math.max(1, ...interactorCounts.values())
+  const maxInteraction = Math.max(1, ...Array.from(interactorCounts.values()))
 
   // Score
   const scored: Array<{ candidateId: Id<"users">; score: number; reasons: string[] }> = []
-  for (const [cidStr, { mutualCount }] of candidateScores) {
+  for (const [cidStr, { mutualCount }] of Array.from(candidateScores.entries())) {
     const candidate = await ctx.db.get(cidStr as Id<"users">)
     if (!candidate) continue
 

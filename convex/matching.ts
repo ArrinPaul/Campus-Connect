@@ -1,5 +1,6 @@
 import { v } from "convex/values"
 import { query } from "./_generated/server"
+import { jaccardSimilarity } from "./math-utils"
 
 // ────────────────────────────────────────────
 // Skill-Based Matching (Phase 4.5)
@@ -14,15 +15,7 @@ import { query } from "./_generated/server"
  * Returns value in [0, 1]. 0 = no overlap, 1 = identical.
  */
 export function skillOverlap(a: string[], b: string[]): number {
-  const setA = new Set(a.map((s) => s.toLowerCase()))
-  const setB = new Set(b.map((s) => s.toLowerCase()))
-  if (setA.size === 0 && setB.size === 0) return 0
-  let intersection = 0
-  for (const s of setA) {
-    if (setB.has(s)) intersection++
-  }
-  const union = new Set([...setA, ...setB]).size
-  return union === 0 ? 0 : intersection / union
+  return jaccardSimilarity(a, b)
 }
 
 /**
@@ -35,7 +28,7 @@ export function complementarity(a: string[], b: string[]): number {
   const setB = new Set(b.map((s) => s.toLowerCase()))
   if (setB.size === 0) return 0
   let uniqueToB = 0
-  for (const s of setB) {
+  for (const s of Array.from(setB)) {
     if (!setA.has(s)) uniqueToB++
   }
   return uniqueToB / setB.size

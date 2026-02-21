@@ -104,7 +104,7 @@ export default function QandAPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {questions.map((q: any) => (
+          {questions.map((q) => (
             <Link
               key={q._id}
               href={`/q-and-a/${q._id}`}

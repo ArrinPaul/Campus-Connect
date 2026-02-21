@@ -164,7 +164,9 @@ export default function PaperDetailPage() {
         <div className="mb-5 rounded-xl border border-border bg-card p-4">
           <p className="text-xs text-muted-foreground mb-2">Authors on Platform</p>
           <div className="flex flex-wrap gap-2">
-            {paper.linkedAuthors.map((author: any) => (
+            {paper.linkedAuthors.map((author) => {
+              if (!author) return null
+              return (
               <Link
                 key={author._id}
                 href={`/profile/${author._id}`}
@@ -179,7 +181,8 @@ export default function PaperDetailPage() {
                 )}
                 <span className="text-foreground">{author.name}</span>
               </Link>
-            ))}
+              )
+            })}
           </div>
         </div>
       )}

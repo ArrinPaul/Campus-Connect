@@ -41,8 +41,8 @@ export function relevanceScore(viewerSkills: string[], authorSkills: string[]): 
   if (viewerSkills.length === 0 && authorSkills.length === 0) return 0
   const setA = new Set(viewerSkills.map((s) => s.toLowerCase()))
   const setB = new Set(authorSkills.map((s) => s.toLowerCase()))
-  const intersection = [...setA].filter((x) => setB.has(x)).length
-  const union = new Set([...setA, ...setB]).size
+  const intersection = Array.from(setA).filter((x) => setB.has(x)).length
+  const union = new Set(Array.from(setA).concat(Array.from(setB))).size
   return union === 0 ? 0 : intersection / union
 }
 

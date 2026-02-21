@@ -162,7 +162,7 @@ export default function FindExpertsPage() {
             Found {results.items.length} expert{results.items.length !== 1 ? "s" : ""}
           </p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {results.items.map((expert: any) => (
+            {results.items.map((expert) => (
               <div key={expert.user._id} className="relative">
                 <UserCard user={expert.user} />
                 {/* Overlay with match details */}

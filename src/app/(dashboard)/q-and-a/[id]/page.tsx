@@ -176,7 +176,7 @@ export default function QuestionDetailPage() {
         </h2>
 
         <div className="space-y-4">
-          {question.answers.map((answer: any) => (
+          {question.answers.map((answer) => (
             <div
               key={answer._id}
               className={`bg-white border rounded-xl p-5 ${

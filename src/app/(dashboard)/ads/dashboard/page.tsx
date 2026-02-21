@@ -4,12 +4,13 @@ import { useQuery, useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { useState } from "react"
 import Link from "next/link"
+import { Id } from "@/convex/_generated/dataModel"
 
 function StatusBadge({ status }: { status: string }) {
   const colors: Record<string, string> = {
     active: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-400",
     paused: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-400",
-    expired: "bg-muted text-muted-foreground bg-card text-muted-foreground",
+    expired: "bg-muted text-muted-foreground",
   }
   return (
     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors[status] ?? colors.expired}`}>
@@ -24,7 +25,7 @@ export default function AdsDashboardPage() {
   const updateAd = useMutation(api.ads.updateAd)
   const [deleting, setDeleting] = useState<string | null>(null)
 
-  const handleDelete = async (adId: any) => {
+  const handleDelete = async (adId: Id<"ads">) => {
     if (!confirm("Delete this ad? This cannot be undone.")) return
     setDeleting(adId)
     try {
@@ -34,13 +35,13 @@ export default function AdsDashboardPage() {
     }
   }
 
-  const handleToggle = async (adId: any, currentStatus: string) => {
+  const handleToggle = async (adId: Id<"ads">, currentStatus: string) => {
     const newStatus = currentStatus === "active" ? "paused" : "active"
     await updateAd({ adId, status: newStatus as "active" | "paused" })
   }
 
-  const totalImpressions = analytics?.reduce((s: number, a: any) => s + a.impressions, 0) ?? 0
-  const totalClicks = analytics?.reduce((s: number, a: any) => s + a.clicks, 0) ?? 0
+  const totalImpressions = analytics?.reduce((s: number, a) => s + a.impressions, 0) ?? 0
+  const totalClicks = analytics?.reduce((s: number, a) => s + a.clicks, 0) ?? 0
   const avgCtr =
     totalImpressions > 0
       ? Math.round((totalClicks / totalImpressions) * 10000) / 100
@@ -98,7 +99,7 @@ export default function AdsDashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {analytics.map((ad: any) => (
+              {analytics.map((ad) => (
                 <tr key={ad.adId.toString()} className="hover:bg-muted/20 transition-colors">
                   <td className="px-4 py-3 font-medium max-w-[200px] truncate">{ad.title}</td>
                   <td className="px-4 py-3">

@@ -6,7 +6,6 @@ import { api } from "@/convex/_generated/api"
 import { X, Image as ImageIcon, Type, Check, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import imageCompression from "browser-image-compression"
-import imageCompression from "browser-image-compression"
 
 // Preset background colours for text stories
 const BG_PRESETS = [

@@ -122,7 +122,7 @@ export default function JobsPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {jobs.map((job: any) => (
+          {jobs.map((job) => (
             <Link
               key={job._id}
               href={`/jobs/${job._id}`}

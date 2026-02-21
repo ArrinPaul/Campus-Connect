@@ -239,6 +239,7 @@ describe("Responsive Component Behavior", () => {
         content: "Test post",
         likeCount: 0,
         commentCount: 0,
+        shareCount: 0,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       }
@@ -276,6 +277,7 @@ describe("Responsive Component Behavior", () => {
         content: "Test",
         likeCount: 0,
         commentCount: 0,
+        shareCount: 0,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       }

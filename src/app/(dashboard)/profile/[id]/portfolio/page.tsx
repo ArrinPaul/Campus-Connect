@@ -10,9 +10,14 @@ import Link from "next/link"
 import {
   ArrowLeft, Plus, X, ExternalLink, Calendar, Award,
   BookOpen, GraduationCap, FileText, Trash2, Code,
+  type LucideIcon,
 } from "lucide-react"
+import type { FunctionReturnType } from "convex/server"
 
-const TIMELINE_ICONS: Record<string, any> = {
+type PortfolioProject = NonNullable<FunctionReturnType<typeof api.portfolio.getProjects>>[number]
+type TimelineEntry = NonNullable<FunctionReturnType<typeof api.portfolio.getTimeline>>[number]
+
+const TIMELINE_ICONS: Record<string, LucideIcon> = {
   course: GraduationCap,
   certification: Award,
   publication: FileText,
@@ -115,7 +120,7 @@ export default function PortfolioPage() {
 
 // ─── Projects Tab ───────────────────────────────────────────────
 
-function ProjectsTab({ projects, isOwner }: { projects: any[] | undefined; isOwner: boolean }) {
+function ProjectsTab({ projects, isOwner }: { projects: PortfolioProject[] | undefined; isOwner: boolean }) {
   const deleteProject = useMutation(api.portfolio.deleteProject)
 
   if (projects === undefined) {
@@ -142,7 +147,7 @@ function ProjectsTab({ projects, isOwner }: { projects: any[] | undefined; isOwn
 
   return (
     <div className="space-y-4">
-      {projects.map((project: any) => (
+      {projects.map((project) => (
         <div
           key={project._id}
           className="rounded-xl border border-border bg-card p-5"
@@ -205,7 +210,7 @@ function ProjectsTab({ projects, isOwner }: { projects: any[] | undefined; isOwn
 
 // ─── Timeline Tab ───────────────────────────────────────────────
 
-function TimelineTab({ timeline, isOwner }: { timeline: any[] | undefined; isOwner: boolean }) {
+function TimelineTab({ timeline, isOwner }: { timeline: TimelineEntry[] | undefined; isOwner: boolean }) {
   const deleteItem = useMutation(api.portfolio.deleteTimelineItem)
 
   if (timeline === undefined) {

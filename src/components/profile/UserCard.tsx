@@ -59,7 +59,7 @@ export const UserCard = memo(function UserCard({ user }: UserCardProps) {
               {user.skills.slice(0, 5).map((skill) => (
                 <span
                   key={skill}
-                  className="text-xs rounded-full bg-muted bg-muted px-2 py-0.5 text-foreground"
+                  className="text-xs rounded-full bg-muted px-2 py-0.5 text-foreground"
                 >
                   {skill}
                 </span>

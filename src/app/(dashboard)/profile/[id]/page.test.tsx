@@ -21,8 +21,8 @@ describe("ProfilePage Logic", () => {
   })
 
   it("should determine if viewing other user profile correctly", () => {
-    const currentUserId = "user1"
-    const profileUserId = "user2"
+    const currentUserId: string = "user1"
+    const profileUserId: string = "user2"
     
     const isOwnProfile = currentUserId === profileUserId
     

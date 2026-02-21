@@ -1,6 +1,7 @@
 import { v } from "convex/values"
 import { query } from "./_generated/server"
 import { Id, Doc } from "./_generated/dataModel"
+import { jaccardSimilarity } from "./math-utils"
 
 // ────────────────────────────────────────────
 // Content Recommendation Engine (Phase 4.3)
@@ -13,12 +14,7 @@ import { Id, Doc } from "./_generated/dataModel"
  * Returns value in [0, 1].
  */
 export function topicAffinity(viewerHashtags: string[], postHashtags: string[]): number {
-  if (viewerHashtags.length === 0 && postHashtags.length === 0) return 0
-  const setA = new Set(viewerHashtags)
-  const setB = new Set(postHashtags)
-  const intersection = [...setA].filter((x) => setB.has(x)).length
-  const union = new Set([...setA, ...setB]).size
-  return union === 0 ? 0 : intersection / union
+  return jaccardSimilarity(viewerHashtags, postHashtags)
 }
 
 /**
@@ -174,7 +170,7 @@ export const getRecommendedPosts = query({
       }
     }
 
-    const viewerHashtags = [...viewerHashtagSet]
+    const viewerHashtags = Array.from(viewerHashtagSet)
 
     // 2. Candidate pool: recent posts NOT authored by viewer and NOT already reacted to
     const cutoff = now - 14 * 24 * 60 * 60 * 1000 // 14 days
@@ -281,7 +277,7 @@ export const getSimilarPosts = query({
       )
       .take(100)
 
-    const reactorIds = [...new Set(postReactions.map((r) => r.userId))]
+    const reactorIds = Array.from(new Set(postReactions.map((r) => r.userId)))
 
     if (reactorIds.length === 0) {
       return { items: [], hasMore: false }
@@ -310,7 +306,7 @@ export const getSimilarPosts = query({
     }
 
     // 3. Sort by co-reaction frequency
-    const sorted = [...coReactedPostCounts.entries()]
+    const sorted = Array.from(coReactedPostCounts.entries())
       .sort((a, b) => b[1] - a[1])
       .slice(0, limit)
 
@@ -419,7 +415,7 @@ export const getTrendingInSkill = query({
     valid.sort((a, b) => b.score - a.score)
 
     const items = valid.slice(0, limit)
-    const skills = [...new Set(items.flatMap((i) => i.matchingSkills))]
+    const skills = Array.from(new Set(items.flatMap((i) => i.matchingSkills)))
 
     return {
       items: items.map(({ score, matchingSkills, ...rest }) => rest),

@@ -201,7 +201,7 @@ export function RepostModal({ post, isOpen, onClose, onSuccess }: RepostModalPro
             <button
               onClick={handlePlainRepost}
               disabled={isSubmitting}
-              className="px-4 py-2 text-sm font-medium text-foreground bg-muted bg-muted hover:bg-muted dark:hover:bg-muted rounded-md transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="px-4 py-2 text-sm font-medium text-foreground bg-muted hover:bg-muted dark:hover:bg-muted rounded-md transition-colors disabled:opacity-50 flex items-center gap-2"
             >
               {isSubmitting && !quoteContent && <ButtonLoadingSpinner />}
               Repost

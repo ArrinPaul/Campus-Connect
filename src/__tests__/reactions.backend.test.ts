@@ -84,14 +84,17 @@ describe("removeReaction logic", () => {
   })
 })
 
+type ReactionCounts = { like: number; love: number; laugh: number; wow: number; sad: number; scholarly: number }
+type ReactionRecord = { _id: string; userId: string; targetId: string; targetType: string; type: keyof ReactionCounts; createdAt: number }
+
 describe("getReactions logic", () => {
   it("should return reaction counts grouped by type", () => {
-    const reactions = [
-      makeReaction({ _id: "r1", type: "like" }),
-      makeReaction({ _id: "r2", userId: "user_002", type: "love" }),
-      makeReaction({ _id: "r3", userId: "user_003", type: "like" }),
+    const reactions: ReactionRecord[] = [
+      makeReaction({ _id: "r1", type: "like" }) as ReactionRecord,
+      makeReaction({ _id: "r2", userId: "user_002", type: "love" }) as ReactionRecord,
+      makeReaction({ _id: "r3", userId: "user_003", type: "like" }) as ReactionRecord,
     ]
-    const counts = { like: 0, love: 0, laugh: 0, wow: 0, sad: 0, scholarly: 0 }
+    const counts: ReactionCounts = { like: 0, love: 0, laugh: 0, wow: 0, sad: 0, scholarly: 0 }
     reactions.forEach((r) => { counts[r.type]++ })
     const total = Object.values(counts).reduce((s, c) => s + c, 0)
     const topReactions = Object.entries(counts).filter(([,c]) => c > 0).sort((a,b) => b[1]-a[1]).slice(0,3)
@@ -102,8 +105,8 @@ describe("getReactions logic", () => {
   })
 
   it("should return zero counts when no reactions exist", () => {
-    const reactions = []
-    const counts = { like: 0, love: 0, laugh: 0, wow: 0, sad: 0, scholarly: 0 }
+    const reactions: ReactionRecord[] = []
+    const counts: ReactionCounts = { like: 0, love: 0, laugh: 0, wow: 0, sad: 0, scholarly: 0 }
     reactions.forEach((r) => { counts[r.type]++ })
     expect(Object.values(counts).reduce((s,c) => s+c, 0)).toBe(0)
   })
@@ -123,8 +126,8 @@ describe("getUserReaction logic", () => {
   })
 
   it("should return null when user has not reacted", () => {
-    const reaction = null
-    expect(reaction ? reaction.type : null).toBeNull()
+    const reaction: ReactionRecord | null = (null as ReactionRecord | null)
+    expect(reaction !== null ? reaction.type : null).toBeNull()
   })
 
   it("should return the reaction type when user has reacted", () => {
@@ -148,11 +151,11 @@ describe("reaction type validation", () => {
 
 describe("updateReactionCounts logic", () => {
   it("should correctly compute totals from all reaction types", () => {
-    const reactions = [
-      makeReaction({ type: "like" }), makeReaction({ _id: "r2", type: "like" }),
-      makeReaction({ _id: "r3", type: "love" }), makeReaction({ _id: "r4", type: "scholarly" }),
+    const reactions: ReactionRecord[] = [
+      makeReaction({ type: "like" }) as ReactionRecord, makeReaction({ _id: "r2", type: "like" }) as ReactionRecord,
+      makeReaction({ _id: "r3", type: "love" }) as ReactionRecord, makeReaction({ _id: "r4", type: "scholarly" }) as ReactionRecord,
     ]
-    const counts = { like: 0, love: 0, laugh: 0, wow: 0, sad: 0, scholarly: 0 }
+    const counts: ReactionCounts = { like: 0, love: 0, laugh: 0, wow: 0, sad: 0, scholarly: 0 }
     reactions.forEach((r) => { counts[r.type]++ })
     const total = Object.values(counts).reduce((s,c) => s+c, 0)
     expect(total).toBe(4)

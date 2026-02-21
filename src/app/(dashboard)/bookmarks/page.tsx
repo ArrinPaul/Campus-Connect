@@ -8,11 +8,14 @@ import { PostCard } from "@/components/posts/PostCard"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Loader2, Bookmark } from "lucide-react"
 import { Id } from "@/convex/_generated/dataModel"
+import type { FunctionReturnType } from "convex/server"
+
+type ConvexBookmarkItem = NonNullable<FunctionReturnType<typeof api.bookmarks.getBookmarks>>["bookmarks"][number]
 
 export default function BookmarksPage() {
   const { isLoaded, isSignedIn } = useUser()
   const [selectedCollection, setSelectedCollection] = useState<string>("All")
-  const [allBookmarks, setAllBookmarks] = useState<any[]>([])
+  const [allBookmarks, setAllBookmarks] = useState<ConvexBookmarkItem[]>([])
   const [paginationCursor, setPaginationCursor] = useState<string | undefined>(undefined)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const hasInitializedRef = useRef(false)

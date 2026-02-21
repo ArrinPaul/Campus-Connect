@@ -128,8 +128,7 @@ describe("InfiniteScrollTrigger", () => {
     )
 
     // Simulate intersection
-    if (observerCallback) {
-      observerCallback(
+    observerCallback!(
         [
           {
             isIntersecting: true,
@@ -143,7 +142,6 @@ describe("InfiniteScrollTrigger", () => {
         ],
         {} as IntersectionObserver
       )
-    }
 
     expect(mockOnTrigger).toHaveBeenCalled()
   })
@@ -173,8 +171,7 @@ describe("InfiniteScrollTrigger", () => {
     )
 
     // Simulate no intersection
-    if (observerCallback) {
-      observerCallback(
+    observerCallback!(
         [
           {
             isIntersecting: false,
@@ -188,7 +185,6 @@ describe("InfiniteScrollTrigger", () => {
         ],
         {} as IntersectionObserver
       )
-    }
 
     expect(mockOnTrigger).not.toHaveBeenCalled()
   })

@@ -27,18 +27,18 @@ export function RecommendedPosts({ limit = 3, title = "Posts you might like" }: 
     return (
       <div className="rounded-lg border border-border bg-card p-4">
         <div className="flex items-center justify-between mb-3">
-          <div className="h-5 w-40 rounded bg-muted bg-muted animate-pulse" />
+          <div className="h-5 w-40 rounded bg-muted animate-pulse" />
         </div>
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="rounded-lg border border-border border-border p-3">
+            <div key={i} className="rounded-lg border border-border p-3">
               <div className="flex items-center gap-2 mb-2">
-                <div className="h-6 w-6 rounded-full bg-muted bg-muted animate-pulse" />
-                <div className="h-4 w-20 rounded bg-muted bg-muted animate-pulse" />
+                <div className="h-6 w-6 rounded-full bg-muted animate-pulse" />
+                <div className="h-4 w-20 rounded bg-muted animate-pulse" />
               </div>
               <div className="space-y-1">
-                <div className="h-3 w-full rounded bg-muted bg-muted animate-pulse" />
-                <div className="h-3 w-3/4 rounded bg-muted bg-muted animate-pulse" />
+                <div className="h-3 w-full rounded bg-muted animate-pulse" />
+                <div className="h-3 w-3/4 rounded bg-muted animate-pulse" />
               </div>
             </div>
           ))}
@@ -96,14 +96,14 @@ export function RecommendedPosts({ limit = 3, title = "Posts you might like" }: 
               post.reactionCounts.laugh +
               post.reactionCounts.wow +
               post.reactionCounts.sad +
-              (post.reactionCounts as any).scholarly
+              post.reactionCounts.scholarly
             : post.likeCount
 
           return (
             <Link
               key={item._id}
               href={`/post/${item._id}`}
-              className="block rounded-lg border border-border border-border p-3 transition-colors hover:bg-accent/50"
+              className="block rounded-lg border border-border p-3 transition-colors hover:bg-accent/50"
             >
               {/* Author row */}
               <div className="flex items-center gap-2 mb-1.5">
@@ -172,10 +172,10 @@ export function TrendingInSkill({ skill, limit = 5 }: TrendingInSkillProps) {
   if (trending === undefined || trending === null) {
     return (
       <div className="rounded-lg border border-border bg-card p-4">
-        <div className="h-5 w-36 rounded bg-muted bg-muted animate-pulse mb-3" />
+        <div className="h-5 w-36 rounded bg-muted animate-pulse mb-3" />
         <div className="space-y-2">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-12 rounded bg-muted bg-muted animate-pulse" />
+            <div key={i} className="h-12 rounded bg-muted animate-pulse" />
           ))}
         </div>
       </div>
@@ -220,9 +220,9 @@ export function TrendingInSkill({ skill, limit = 5 }: TrendingInSkillProps) {
               <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                 <Heart className="h-3 w-3" />
                 {(post.reactionCounts
-                  ? (post.reactionCounts as any).like +
-                    (post.reactionCounts as any).love +
-                    (post.reactionCounts as any).laugh
+                  ? post.reactionCounts.like +
+                    post.reactionCounts.love +
+                    post.reactionCounts.laugh
                   : post.likeCount) || 0}
               </div>
             </Link>
@@ -248,10 +248,10 @@ export function PopularInUniversity({ limit = 5 }: PopularInUniversityProps) {
   if (popular === undefined || popular === null) {
     return (
       <div className="rounded-lg border border-border bg-card p-4">
-        <div className="h-5 w-36 rounded bg-muted bg-muted animate-pulse mb-3" />
+        <div className="h-5 w-36 rounded bg-muted animate-pulse mb-3" />
         <div className="space-y-2">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-12 rounded bg-muted bg-muted animate-pulse" />
+            <div key={i} className="h-12 rounded bg-muted animate-pulse" />
           ))}
         </div>
       </div>

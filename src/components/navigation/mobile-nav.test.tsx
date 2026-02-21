@@ -114,7 +114,7 @@ describe("MobileNav", () => {
   })
 
   it("should display all navigation links", async () => {
-    render(<MobileNav currentUserId="test-user-id" />)
+    render(<MobileNav currentUserId={"test-user-id" as any} />)
     
     const menuButton = screen.getByLabelText("Toggle navigation menu")
     fireEvent.click(menuButton)
@@ -180,7 +180,7 @@ describe("MobileNav", () => {
   })
 
   it("should have minimum touch target size for all interactive elements", async () => {
-    const { container } = render(<MobileNav currentUserId="test-user-id" />)
+    const { container } = render(<MobileNav currentUserId={"test-user-id" as any} />)
     
     const menuButton = screen.getByLabelText("Toggle navigation menu")
     fireEvent.click(menuButton)

@@ -97,19 +97,47 @@ Tailwind CSS defaults provide sufficient contrast ratios:
 - ✅ Color blindness simulation: Interface remains usable
 - ✅ 200% zoom: Layout remains functional
 
+## Additional Components Implemented ✅
+
+The following items from the original "Remaining Items" list have since been implemented:
+
+### 7. Skip Link ✅
+**`src/components/accessibility/SkipLink.tsx`**
+- ✅ Visually hidden by default (`sr-only`), revealed on keyboard focus
+- ✅ Jumps to `#main-content` anchor — bypasses entire navigation
+- ✅ Placed as the very first element in `<body>` via `layout.tsx`
+- ✅ WCAG 2.4.1 (Bypass Blocks) compliant
+
+### 8. Live Regions ✅
+**`src/components/accessibility/LiveRegion.tsx`**
+- ✅ `LiveRegionProvider` context exposes `announce(message, politeness)` hook
+- ✅ Supports `polite` and `assertive` announcements via `aria-live`
+- ✅ Used globally via `layout.tsx` wrapper
+- ✅ WCAG 4.1.3 (Status Messages) compliant
+
+### 9. Keyboard Shortcuts Modal ✅
+**`src/components/accessibility/KeyboardShortcutsModal.tsx`**
+- ✅ Full modal listing all available keyboard shortcuts
+- ✅ Toggled by pressing `?` key anywhere in the app
+- ✅ Grouped by feature: Navigation, Posts, Messages, Feed
+- ✅ Uses Radix UI `Dialog` for built-in focus trapping and ARIA
+
+### 10. Focus Trap for Modals ✅
+- ✅ All dialogs/modals use Radix UI primitives which provide automatic focus trapping
+- ✅ `Dialog`, `AlertDialog`, `DropdownMenu`, `Select` all trap focus correctly
+- ✅ Escape key closes all modal layers (Radix UI built-in)
+
+---
+
 ## Remaining Items (Future Phases)
 
 ### Low Priority
-- [ ] Add skip link to main content (minor improvement for large navigation)
-- [ ] Add live regions for dynamic content updates (notifications, messages)
-- [ ] Add reduced motion preferences support
-- [ ] Add high contrast mode
+- [ ] Add reduced motion preferences support (`prefers-reduced-motion` media query for animations)
+- [ ] Add high contrast mode (`prefers-contrast: more` media query)
 
 ### Enhancement Opportunities
-- [ ] Add more comprehensive ARIA landmarks (complementary, region, etc.)
-- [ ] Add aria-live regions for real-time updates
-- [ ] Add keyboard shortcuts help modal
-- [ ] Add focus trap for modals (Radix UI handles this, but can be enhanced)
+- [ ] Add more comprehensive ARIA landmarks (`role="complementary"`, `role="region"` with labels)
+- [ ] Expand `LiveRegion` usage — hook into notification toasts and message receipt events
 
 ## Compliance Status
 
@@ -117,9 +145,11 @@ Tailwind CSS defaults provide sufficient contrast ratios:
 - ✅ **1.1.1 Non-text Content**: All images have alt text
 - ✅ **1.4.3 Contrast (Minimum)**: All text meets 4.5:1 ratio
 - ✅ **2.1.1 Keyboard**: All functionality available via keyboard
+- ✅ **2.4.1 Bypass Blocks**: Skip link implemented (`SkipLink.tsx`)
 - ✅ **2.4.7 Focus Visible**: Focus indicators present
 - ✅ **3.3.2 Labels or Instructions**: All form inputs labeled
 - ✅ **4.1.2 Name, Role, Value**: All UI components have accessible names
+- ✅ **4.1.3 Status Messages**: Live regions implemented (`LiveRegion.tsx`)
 
 ### Section 508
 - ✅ Compliant with all relevant provisions
@@ -200,7 +230,19 @@ Use conditional labels for state changes:
 
 ✅ **Phase 1 Accessibility Implementation Complete**
 
-All critical accessibility issues identified in the production audit have been resolved. The application now meets WCAG 2.1 Level AA standards and provides an excellent experience for users with disabilities.
+All critical and scheduled accessibility issues have been resolved. The application meets WCAG 2.1 Level AA standards and provides an excellent experience for users with disabilities.
+
+**Implemented (10 items):**
+1. Icon Button ARIA Labels — 15 labels across 5 components
+2. Keyboard Navigation — fully compliant (Radix UI + custom shortcuts)
+3. Image Alt Text — all images covered
+4. Color Contrast — all text/backgrounds passing
+5. Form Labels — all inputs labeled
+6. Focus Indicators — visible focus rings throughout
+7. Skip Link — `SkipLink.tsx` in layout
+8. Live Regions — `LiveRegion.tsx` context provider
+9. Keyboard Shortcuts Modal — `KeyboardShortcutsModal.tsx`
+10. Focus Trap for Modals — via Radix UI primitives
 
 **Impact:**
 - Screen reader users can navigate all features

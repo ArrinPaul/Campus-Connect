@@ -131,7 +131,7 @@ export default function LeaderboardPage() {
         </div>
       ) : (
         <div className="space-y-2">
-          {leaderboard.map((user: any) => (
+          {leaderboard.map((user) => (
             <div
               key={user._id}
               className={`bg-card border rounded-xl p-4 flex items-center gap-4 hover:shadow-sm transition-shadow ${

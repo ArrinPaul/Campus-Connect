@@ -127,7 +127,7 @@ export default function ResearchPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {displayPapers.map((paper: any) => (
+          {displayPapers.map((paper) => (
             <Link
               key={paper._id}
               href={`/research/${paper._id}`}

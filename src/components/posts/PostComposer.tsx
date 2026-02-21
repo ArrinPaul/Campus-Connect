@@ -530,9 +530,9 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
               ))}
             </ul>
             <div className="px-4 py-2 text-xs text-muted-foreground border-t border-border">
-              <kbd className="px-1 py-0.5 rounded bg-muted bg-muted">↑</kbd>
-              <kbd className="ml-1 px-1 py-0.5 rounded bg-muted bg-muted">↓</kbd> to navigate,
-              <kbd className="ml-1 px-1 py-0.5 rounded bg-muted bg-muted">Enter</kbd> to select
+              <kbd className="px-1 py-0.5 rounded bg-muted">↑</kbd>
+              <kbd className="ml-1 px-1 py-0.5 rounded bg-muted">↓</kbd> to navigate,
+              <kbd className="ml-1 px-1 py-0.5 rounded bg-muted">Enter</kbd> to select
             </div>
           </div>
         )}
@@ -776,7 +776,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
             <span>Uploading…</span>
             <span>{uploadProgress}%</span>
           </div>
-          <div className="h-1.5 w-full rounded-full bg-muted bg-muted overflow-hidden">
+          <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
             <div
               className="h-full rounded-full bg-primary transition-all duration-300"
               style={{ width: `${uploadProgress}%` }}
@@ -791,7 +791,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
           <button
             type="button"
             onClick={() => { setLinkPreviewData(null); setDetectedLink(null) }}
-            className="absolute -top-1 -right-1 z-10 rounded-full bg-muted bg-muted p-0.5 hover:bg-muted dark:hover:bg-muted"
+            className="absolute -top-1 -right-1 z-10 rounded-full bg-muted p-0.5 hover:bg-muted dark:hover:bg-muted"
             aria-label="Remove link preview"
           >
             <X className="h-3.5 w-3.5 text-muted-foreground" />

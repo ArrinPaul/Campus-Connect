@@ -9,7 +9,7 @@ import {
   validateUniversity,
   validateRole,
   validateExperienceLevel,
-} from "../../../lib/validations"
+} from "@/lib/validations"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 
 interface ProfileFormProps {
@@ -219,7 +219,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
                 className="h-20 w-20 rounded-full object-cover"
               />
             ) : (
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted bg-muted text-2xl font-bold text-muted-foreground">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted text-2xl font-bold text-muted-foreground">
                 ?
               </div>
             )}

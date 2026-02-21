@@ -247,7 +247,7 @@ describe('Edge cases and integration', () => {
       '"@john"',
       'Hello@john', // This will still match
     ]
-    
+
     contexts.forEach(text => {
       const mentions = extractMentions(text)
       expect(mentions).toContain('john')
@@ -257,7 +257,7 @@ describe('Edge cases and integration', () => {
   it('should parse complex content correctly', () => {
     const content = 'Meeting with @alice and @bob about #project!\n@charlie will join later.'
     const segments = parseMentions(content)
-    
+
     // Should have mentions for alice, bob, charlie
     const mentionSegments = segments.filter(s => s.type === 'mention')
     expect(mentionSegments).toHaveLength(3)

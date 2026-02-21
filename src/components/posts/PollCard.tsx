@@ -42,11 +42,11 @@ export function PollCard({ pollId }: PollCardProps) {
     // Loading skeleton
     return (
       <div className="rounded-xl border border-border bg-muted/50 p-4 space-y-2 animate-pulse">
-        <div className="h-4 w-1/3 rounded bg-muted bg-muted" />
+        <div className="h-4 w-1/3 rounded bg-muted" />
         {[1, 2, 3].map((n) => (
-          <div key={n} className="h-9 rounded-lg bg-muted bg-muted" />
+          <div key={n} className="h-9 rounded-lg bg-muted" />
         ))}
-        <div className="h-3 w-1/4 rounded bg-muted bg-muted" />
+        <div className="h-3 w-1/4 rounded bg-muted" />
       </div>
     )
   }
@@ -89,7 +89,7 @@ export function PollCard({ pollId }: PollCardProps) {
           )}
         </div>
         {isExpired ? (
-          <span className="inline-flex items-center gap-1 rounded-full bg-muted bg-muted px-2 py-0.5 text-xs font-semibold text-muted-foreground">
+          <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-semibold text-muted-foreground">
             Final Results
           </span>
         ) : poll.endsAt ? (
@@ -130,7 +130,7 @@ export function PollCard({ pollId }: PollCardProps) {
                   className={`absolute inset-y-0 left-0 transition-all duration-500 ${
                     isSelected
                       ? "bg-primary/10 dark:bg-blue-900/40"
-                      : "bg-muted bg-muted/60"
+                      : "bg-muted/60"
                   }`}
                   style={{ width: `${percentage}%` }}
                   aria-hidden="true"

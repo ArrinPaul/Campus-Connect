@@ -254,7 +254,7 @@ export async function checkRateLimitRedis(
   ip: string,
   routeType: RouteType = "default",
 ): Promise<RateLimitResult> {
-  const limiters = getUpstashLimiters()
+  const limiters = await getUpstashLimiters()
   const { success, limit, remaining, reset } = await limiters[routeType].limit(ip)
   return {
     allowed: success,

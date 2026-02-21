@@ -4,7 +4,8 @@ import { useState } from "react"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
-import dynamic from "next/dynamic"import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
+import dynamic from "next/dynamic"
+import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 import { toast } from "sonner"
 
 // Lazy load the heavy Tiptap editor
