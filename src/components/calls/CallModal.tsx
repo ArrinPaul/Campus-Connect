@@ -149,7 +149,7 @@ export function CallModal({
 
   // Connected participants
   const connectedParticipants = activeCall?.participants?.filter(
-    (p: any) => p.status === "connected"
+    (p) => p.status === "connected"
   ) || []
 
   return (

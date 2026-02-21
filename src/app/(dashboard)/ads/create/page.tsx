@@ -53,8 +53,8 @@ export default function CreateAdPage() {
         expiresAt,
       })
       router.push("/ads/dashboard")
-    } catch (e: any) {
-      setError(e.message ?? "Failed to create ad.")
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to create ad.")
     } finally {
       setLoading(false)
     }

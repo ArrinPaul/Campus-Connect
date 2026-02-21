@@ -6,6 +6,9 @@ import { useState } from "react"
 import Link from "next/link"
 import { CreateListingModal } from "@/components/marketplace/CreateListingModal"
 import Image from "next/image"
+import type { FunctionReturnType } from "convex/server"
+
+type ListingItem = NonNullable<FunctionReturnType<typeof api.marketplace.getListings>>[number]
 
 const CATEGORIES = [
   { key: "all", label: "All" },
@@ -24,7 +27,7 @@ const CONDITION_LABELS: Record<string, string> = {
   poor: "Poor",
 }
 
-function ListingCard({ listing }: { listing: any }) {
+function ListingCard({ listing }: { listing: ListingItem }) {
   return (
     <Link
       href={`/marketplace/${listing._id}`}

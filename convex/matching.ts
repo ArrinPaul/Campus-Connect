@@ -1,6 +1,6 @@
 import { v } from "convex/values"
 import { query } from "./_generated/server"
-import { jaccardSimilarity } from "./math-utils"
+import { jaccardSimilarity } from "./math_utils"
 
 // ────────────────────────────────────────────
 // Skill-Based Matching (Phase 4.5)

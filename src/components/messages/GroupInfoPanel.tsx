@@ -80,8 +80,8 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
         description: editDescription.trim(),
       })
       setEditingInfo(false)
-    } catch (err: any) {
-      alert(err.message)
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Unknown error")
     }
   }
 
@@ -89,8 +89,8 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
     try {
       await addGroupMember({ conversationId, userId })
       setAddMemberSearch("")
-    } catch (err: any) {
-      alert(err.message)
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Unknown error")
     }
   }
 
@@ -98,24 +98,24 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
     if (!confirm("Remove this member from the group?")) return
     try {
       await removeGroupMember({ conversationId, userId })
-    } catch (err: any) {
-      alert(err.message)
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Unknown error")
     }
   }
 
   const handlePromote = async (userId: Id<"users">) => {
     try {
       await promoteToAdmin({ conversationId, userId })
-    } catch (err: any) {
-      alert(err.message)
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Unknown error")
     }
   }
 
   const handleDemote = async (userId: Id<"users">) => {
     try {
       await demoteFromAdmin({ conversationId, userId })
-    } catch (err: any) {
-      alert(err.message)
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Unknown error")
     }
   }
 
@@ -124,8 +124,8 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
     try {
       await leaveGroup({ conversationId })
       onClose()
-    } catch (err: any) {
-      alert(err.message)
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Unknown error")
     }
   }
 

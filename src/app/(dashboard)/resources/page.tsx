@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "../../../../convex/_generated/api"
+import { Id } from "../../../../convex/_generated/dataModel"
 import {
   BookOpen, Search, Star, Download, Upload, Plus, X, Filter
 } from "lucide-react"
@@ -20,7 +21,7 @@ export default function ResourcesPage() {
   const downloadResource = useMutation(api.resources.downloadResource)
   const rateResource = useMutation(api.resources.rateResource)
 
-  const handleDownload = async (resourceId: any, fileUrl?: string) => {
+  const handleDownload = async (resourceId: Id<"resources">, fileUrl?: string) => {
     await downloadResource({ resourceId })
     if (fileUrl) window.open(fileUrl, "_blank")
   }
@@ -185,8 +186,8 @@ function UploadResourceModal({ onClose }: { onClose: () => void }) {
         fileUrl: form.fileUrl || undefined,
       })
       onClose()
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Unknown error")
     } finally {
       setLoading(false)
     }

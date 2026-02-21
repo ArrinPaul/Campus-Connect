@@ -11,6 +11,9 @@ import {
   validateExperienceLevel,
 } from "@/lib/validations"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
+import { createLogger } from "@/lib/logger"
+
+const log = createLogger("ProfileForm")
 
 interface ProfileFormProps {
   initialData?: {
@@ -91,7 +94,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
         }
         reader.readAsDataURL(compressed)
       } catch (err) {
-        console.error("Image compression failed:", err)
+        log.error("Image compression failed, using original", err instanceof Error ? err : new Error(String(err)))
         // Fallback to original file
         setSelectedImage(file)
         setErrors({ ...errors, image: "" })

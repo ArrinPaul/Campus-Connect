@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { useMutation, useQuery, useAction } from "convex/react"
 import { api } from "@/convex/_generated/api"
+import { Id } from "@/convex/_generated/dataModel"
 import dynamic from "next/dynamic"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 import { MentionAutocomplete } from "./MentionAutocomplete"
@@ -400,15 +401,15 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
             storageIds.push(storageId)
 
             setUploadProgress(Math.round(((i + 1) / attachedFiles.length) * 100))
-          } catch (err: any) {
+          } catch (err: unknown) {
             setIsUploading(false)
-            throw new Error(`Failed to upload ${file.name}: ${err.message}`)
+            throw new Error(`Failed to upload ${file.name}: ${err instanceof Error ? err.message : "Unknown error"}`)
           }
         }
 
         // 3. Resolve all storage IDs to public URLs
         const resolvedUrls = await resolveStorageUrls({
-          storageIds: storageIds as any,
+          storageIds: storageIds as Id<"_storage">[],
         })
 
         mediaUrls = resolvedUrls.filter((u): u is string => u !== null)
@@ -426,13 +427,13 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
         mediaType: finalMediaType,
         mediaFileNames,
         linkPreview: linkPreviewData ?? undefined,
-        ...(pollId ? { pollId: pollId as any } : {}),
+        ...(pollId ? { pollId: pollId as Id<"polls"> } : {}),
       })
       postId = createdPost?._id as string | undefined
 
       // Link poll to post (set two-way reference)
       if (pollId && postId) {
-        await linkPollToPost({ pollId: pollId as any, postId: postId as any })
+        await linkPollToPost({ pollId: pollId as Id<"polls">, postId: postId as Id<"posts"> })
       }
 
       // Clear form after successful post

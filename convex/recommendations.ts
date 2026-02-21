@@ -1,7 +1,7 @@
 import { v } from "convex/values"
 import { query } from "./_generated/server"
 import { Id, Doc } from "./_generated/dataModel"
-import { jaccardSimilarity } from "./math-utils"
+import { jaccardSimilarity } from "./math_utils"
 
 // ────────────────────────────────────────────
 // Content Recommendation Engine (Phase 4.3)

@@ -21,7 +21,7 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
 
   const handleRoleChange = (role: string) => {
     const newRole = role === "" ? undefined : (role as "Student" | "Research Scholar" | "Faculty")
-    setSelectedRole(role as any)
+    setSelectedRole(role as "Student" | "Research Scholar" | "Faculty" | "")
     
     onFilterChange({
       role: newRole,

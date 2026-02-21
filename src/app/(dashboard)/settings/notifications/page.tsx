@@ -20,7 +20,7 @@ export default function NotificationSettingsPage() {
 
   useEffect(() => {
     if (prefs) {
-      setEmailFrequency(prefs.emailDigestFrequency as any)
+      setEmailFrequency(prefs.emailDigestFrequency as "daily" | "weekly" | "never")
       setEmailNotifications(prefs.emailNotifications)
     }
   }, [prefs])
@@ -40,8 +40,8 @@ export default function NotificationSettingsPage() {
     try {
       await updateEmailPrefs({ emailDigestFrequency: emailFrequency, emailNotifications })
       setMessage("Email preferences saved.")
-    } catch (e: any) {
-      setMessage(e.message ?? "Failed to save.")
+    } catch (e: unknown) {
+      setMessage(e instanceof Error ? e.message : "Failed to save.")
     } finally {
       setSaving(false)
     }
@@ -80,13 +80,13 @@ export default function NotificationSettingsPage() {
       const json = sub.toJSON()
       await subscribeToPush({
         endpoint: sub.endpoint,
-        p256dh: (json.keys as any)?.p256dh ?? "",
-        auth: (json.keys as any)?.auth ?? "",
+        p256dh: (json.keys as Record<string, string>)?.p256dh ?? "",
+        auth: (json.keys as Record<string, string>)?.auth ?? "",
       })
       setPushEnabled(true)
       setMessage("Push notifications enabled!")
-    } catch (e: any) {
-      setMessage(e.message ?? "Failed to enable push notifications.")
+    } catch (e: unknown) {
+      setMessage(e instanceof Error ? e.message : "Failed to enable push notifications.")
     }
   }
 

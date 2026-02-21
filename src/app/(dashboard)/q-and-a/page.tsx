@@ -186,8 +186,8 @@ function AskQuestionModal({ onClose }: { onClose: () => void }) {
         tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
       })
       onClose()
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Unknown error")
     } finally {
       setLoading(false)
     }

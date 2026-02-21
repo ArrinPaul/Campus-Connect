@@ -141,7 +141,7 @@ export default function EventsPage() {
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
-          {currentEvents.map((event: any) => (
+          {currentEvents.map((event) => (
             <EventCard key={event._id} event={event} />
           ))}
         </div>

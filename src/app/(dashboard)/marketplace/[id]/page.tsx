@@ -7,6 +7,7 @@ import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { ListingDetailSkeleton } from "@/components/ui/loading-skeleton"
+import { Id } from "@/convex/_generated/dataModel"
 
 const CONDITION_LABELS: Record<string, string> = {
   new: "New",
@@ -19,7 +20,7 @@ const CONDITION_LABELS: Record<string, string> = {
 export default function ListingDetailPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
-  const listing = useQuery(api.marketplace.getListing, { listingId: id as any })
+  const listing = useQuery(api.marketplace.getListing, { listingId: id as Id<"listings"> })
   const markAsSold = useMutation(api.marketplace.markAsSold)
   const deleteListing = useMutation(api.marketplace.deleteListing)
   const [activeImage, setActiveImage] = useState(0)
@@ -45,7 +46,7 @@ export default function ListingDetailPage() {
     if (!confirm("Mark this listing as sold?")) return
     setLoading(true)
     try {
-      await markAsSold({ listingId: id as any })
+      await markAsSold({ listingId: id as Id<"listings"> })
     } finally {
       setLoading(false)
     }
@@ -55,7 +56,7 @@ export default function ListingDetailPage() {
     if (!confirm("Delete this listing? This cannot be undone.")) return
     setLoading(true)
     try {
-      await deleteListing({ listingId: id as any })
+      await deleteListing({ listingId: id as Id<"listings"> })
       router.push("/marketplace")
     } finally {
       setLoading(false)

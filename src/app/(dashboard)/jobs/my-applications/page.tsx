@@ -53,7 +53,7 @@ export default function MyApplicationsPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {(applications as any[]).map((app) => (
+          {applications.map((app) => (
             <div key={app._id} className="bg-card border rounded-xl p-5">
               <div className="flex items-center justify-between">
                 <div>

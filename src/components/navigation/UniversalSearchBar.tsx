@@ -168,7 +168,7 @@ export function UniversalSearchBar() {
                     <Users className="h-3.5 w-3.5" />
                     People
                   </div>
-                  {results.users.map((user: any) => (
+                  {results.users.map((user) => (
                     <Link
                       key={user._id}
                       href={`/profile/${user._id}`}
@@ -179,9 +179,9 @@ export function UniversalSearchBar() {
                       className="flex items-center gap-3 px-4 py-2 transition-colors hover:bg-accent"
                     >
                       <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-muted dark:bg-muted">
-                        {user.imageUrl ? (
+                        {user.profilePicture ? (
                           <Image
-                            src={user.imageUrl}
+                            src={user.profilePicture}
                             alt={user.name}
                             fill
                             className="object-cover"
@@ -210,11 +210,11 @@ export function UniversalSearchBar() {
               {/* Posts */}
               {results.posts.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-2 border-t border-border px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground border-border text-muted-foreground">
+                  <div className="flex items-center gap-2 border-t border-border px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     <FileText className="h-3.5 w-3.5" />
                     Posts
                   </div>
-                  {results.posts.map((post: any) => (
+                  {results.posts.map((post) => (
                     <Link
                       key={post._id}
                       href={`/post/${post._id}`}
@@ -229,7 +229,7 @@ export function UniversalSearchBar() {
                         {post.content?.length > 100 ? "..." : ""}
                       </p>
                       <p className="mt-0.5 text-xs text-muted-foreground">
-                        by {post.authorName ?? "Unknown"}
+                        by {post.author?.name ?? "Unknown"}
                       </p>
                     </Link>
                   ))}
@@ -239,11 +239,11 @@ export function UniversalSearchBar() {
               {/* Hashtags */}
               {results.hashtags.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-2 border-t border-border px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground border-border text-muted-foreground">
+                  <div className="flex items-center gap-2 border-t border-border px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     <Hash className="h-3.5 w-3.5" />
                     Hashtags
                   </div>
-                  {results.hashtags.map((tag: any) => (
+                  {results.hashtags.map((tag) => (
                     <Link
                       key={tag._id}
                       href={`/search?q=${encodeURIComponent("#" + tag.tag)}`}

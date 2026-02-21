@@ -5,7 +5,10 @@ import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { X, Image as ImageIcon, Type, Check, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { createLogger } from "@/lib/logger"
 import imageCompression from "browser-image-compression"
+
+const log = createLogger("StoryComposer")
 
 // Preset background colours for text stories
 const BG_PRESETS = [
@@ -89,7 +92,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
       if (imagePreview) URL.revokeObjectURL(imagePreview)
       setImagePreview(URL.createObjectURL(compressed))
     } catch (err) {
-      console.error("Image compression failed:", err)
+      log.error("Image compression failed, using original", err instanceof Error ? err : new Error(String(err)))
       // Fallback to original file if compression fails
       setImageFile(file)
       if (imagePreview) URL.revokeObjectURL(imagePreview)

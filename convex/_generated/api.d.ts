@@ -25,6 +25,7 @@ import type * as jobs from "../jobs.js";
 import type * as logger from "../logger.js";
 import type * as marketplace from "../marketplace.js";
 import type * as matching from "../matching.js";
+import type * as math_utils from "../math_utils.js";
 import type * as media from "../media.js";
 import type * as mentionUtils from "../mentionUtils.js";
 import type * as messages from "../messages.js";
@@ -74,6 +75,7 @@ declare const fullApi: ApiFromModules<{
   logger: typeof logger;
   marketplace: typeof marketplace;
   matching: typeof matching;
+  math_utils: typeof math_utils;
   media: typeof media;
   mentionUtils: typeof mentionUtils;
   messages: typeof messages;

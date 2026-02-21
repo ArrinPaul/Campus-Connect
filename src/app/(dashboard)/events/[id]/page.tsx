@@ -270,29 +270,32 @@ export default function EventDetailPage() {
             Attendees ({attendees.length})
           </h2>
           <div className="flex flex-wrap gap-2">
-            {attendees.slice(0, 12).map((attendee: any) => (
+            {attendees.slice(0, 12).map((attendee) => {
+              if (!attendee) return null
+              return (
               <Link
                 key={attendee._id}
                 href={`/profile/${attendee._id}`}
-                title={attendee.name}
+                title={"name" in attendee ? (attendee as { name: string }).name : ""}
                 className="group"
               >
                 <div className="relative h-8 w-8">
-                  {attendee.profilePicture ? (
+                  {"profilePicture" in attendee && (attendee as { profilePicture?: string }).profilePicture ? (
                     <Image
-                      src={attendee.profilePicture}
-                      alt={attendee.name}
+                      src={(attendee as { profilePicture: string }).profilePicture}
+                      alt={"name" in attendee ? (attendee as { name: string }).name : ""}
                       fill
                       className="rounded-full object-cover ring-2 ring-white dark:ring-gray-800 group-hover:ring-blue-300"
                     />
                   ) : (
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-white ring-2 ring-white dark:ring-gray-800 group-hover:ring-blue-300">
-                      {attendee.name.charAt(0)}
+                      {"name" in attendee ? (attendee as { name: string }).name.charAt(0) : "?"}
                     </div>
                   )}
                 </div>
               </Link>
-            ))}
+              )
+            })}
             {attendees.length > 12 && (
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs text-muted-foreground">
                 +{attendees.length - 12}

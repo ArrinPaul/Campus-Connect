@@ -70,8 +70,8 @@ export default function QuestionDetailPage() {
     try {
       await answerMutation({ questionId, content: answerContent })
       setAnswerContent("")
-    } catch (e: any) {
-      setAnswerError(e.message)
+    } catch (e: unknown) {
+      setAnswerError(e instanceof Error ? e.message : "Unknown error")
     } finally {
       setAnswerLoading(false)
     }

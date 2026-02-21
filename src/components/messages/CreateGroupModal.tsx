@@ -78,8 +78,8 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
         memberIds: selectedMembers.map((m) => m._id),
       })
       onCreated(conversationId)
-    } catch (err: any) {
-      setError(err.message || "Failed to create group")
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to create group")
     } finally {
       setIsCreating(false)
     }

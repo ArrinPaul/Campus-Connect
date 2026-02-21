@@ -21,6 +21,12 @@ import {
 } from "lucide-react"
 import { PostCard } from "@/components/posts/PostCard"
 import { UserCard } from "@/components/profile/UserCard"
+import type { FunctionReturnType } from "convex/server"
+
+type UniversalSearchResult = FunctionReturnType<typeof api.search.universalSearch>
+type PostSearchResult = FunctionReturnType<typeof api.search.searchPosts>
+type UserSearchResult = FunctionReturnType<typeof api.search.searchUsersEnhanced>
+type HashtagSearchResult = FunctionReturnType<typeof api.search.searchHashtags>
 
 type SearchTab = "all" | "users" | "posts" | "hashtags"
 
@@ -368,7 +374,7 @@ function UniversalResults({
   query,
   onTabSwitch,
 }: {
-  results: any
+  results: UniversalSearchResult | undefined | null
   query: string
   onTabSwitch: (tab: SearchTab) => void
 }) {
@@ -403,7 +409,7 @@ function UniversalResults({
             </button>
           </div>
           <div className="space-y-2">
-            {results.users.map((user: any) => (
+            {results.users.map((user) => (
               <Link
                 key={user._id}
                 href={`/profile/${user.username || user._id}`}
@@ -454,7 +460,7 @@ function UniversalResults({
             </button>
           </div>
           <div className="space-y-2">
-            {results.posts.map((post: any) => (
+            {results.posts.map((post) => (
               <Link
                 key={post._id}
                 href={`/post/${post._id}`}
@@ -520,7 +526,7 @@ function UniversalResults({
             </button>
           </div>
           <div className="flex flex-wrap gap-2">
-            {results.hashtags.map((hashtag: any) => (
+            {results.hashtags.map((hashtag) => (
               <Link
                 key={hashtag._id}
                 href={`/hashtag/${hashtag.tag}`}
@@ -540,7 +546,7 @@ function UniversalResults({
   )
 }
 
-function PostSearchResults({ results, query }: { results: any; query: string }) {
+function PostSearchResults({ results, query }: { results: PostSearchResult | undefined | null; query: string }) {
   if (results === undefined || results === null) return <SearchSkeleton />
   if (results.items.length === 0) return <EmptyResults query={query} />
 
@@ -549,7 +555,7 @@ function PostSearchResults({ results, query }: { results: any; query: string }) 
       <p className="text-xs text-muted-foreground">
         {results.items.length} result{results.items.length !== 1 ? "s" : ""}
       </p>
-      {results.items.map((item: any) => {
+      {results.items.map((item) => {
         if (!item.post || !item.post.author) return null
         return (
           <PostCard
@@ -568,7 +574,7 @@ function PostSearchResults({ results, query }: { results: any; query: string }) 
   )
 }
 
-function UserSearchResults({ results, query }: { results: any; query: string }) {
+function UserSearchResults({ results, query }: { results: UserSearchResult | undefined | null; query: string }) {
   if (results === undefined || results === null) return <SearchSkeleton />
   if (results.items.length === 0) return <EmptyResults query={query} />
 
@@ -577,7 +583,7 @@ function UserSearchResults({ results, query }: { results: any; query: string }) 
       <p className="text-xs text-muted-foreground">
         {results.totalCount} result{results.totalCount !== 1 ? "s" : ""}
       </p>
-      {results.items.map((user: any) => (
+      {results.items.map((user) => (
         <UserCard key={user._id} user={user} />
       ))}
       {results.hasMore && (
@@ -589,7 +595,7 @@ function UserSearchResults({ results, query }: { results: any; query: string }) 
   )
 }
 
-function HashtagSearchResults({ results, query }: { results: any; query: string }) {
+function HashtagSearchResults({ results, query }: { results: HashtagSearchResult | undefined | null; query: string }) {
   if (results === undefined || results === null) return <SearchSkeleton />
   if (results.items.length === 0) return <EmptyResults query={query} />
 
@@ -598,7 +604,7 @@ function HashtagSearchResults({ results, query }: { results: any; query: string 
       <p className="text-xs text-muted-foreground">
         {results.items.length} result{results.items.length !== 1 ? "s" : ""}
       </p>
-      {results.items.map((hashtag: any) => (
+      {results.items.map((hashtag) => (
         <Link
           key={hashtag._id}
           href={`/hashtag/${hashtag.tag}`}

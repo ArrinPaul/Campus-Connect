@@ -9,6 +9,7 @@ import { X, Trash2, ChevronLeft, ChevronRight, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { createLogger } from "@/lib/logger"
+import { Id } from "@/convex/_generated/dataModel"
 
 const log = createLogger("stories/page")
 
@@ -47,7 +48,7 @@ export default function StoriesPage() {
   // View story when it becomes current
   useEffect(() => {
     if (currentStory && !currentStory.viewed) {
-      viewStory({ storyId: currentStory._id as any }).catch(() => {})
+      viewStory({ storyId: currentStory._id as Id<"stories"> }).catch(() => {})
     }
     setProgress(0)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -169,7 +170,7 @@ export default function StoriesPage() {
     if (!currentStory) return
     if (!confirm("Delete this story?")) return
     try {
-      await deleteStory({ storyId: currentStory._id as any })
+      await deleteStory({ storyId: currentStory._id as Id<"stories"> })
       advanceStory()
     } catch (err) {
       log.error("Failed to delete story", err)

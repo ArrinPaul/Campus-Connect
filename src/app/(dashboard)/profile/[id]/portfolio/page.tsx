@@ -237,7 +237,7 @@ function TimelineTab({ timeline, isOwner }: { timeline: TimelineEntry[] | undefi
 
   return (
     <div className="relative pl-6 border-l-2 border-border space-y-6">
-      {timeline.map((item: any) => {
+      {timeline.map((item) => {
         const Icon = TIMELINE_ICONS[item.type] || BookOpen
         const colorClass = TIMELINE_COLORS[item.type] || "bg-gray-100 text-gray-600"
         return (

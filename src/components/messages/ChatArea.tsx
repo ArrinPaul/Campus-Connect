@@ -10,6 +10,10 @@ import { TypingIndicator } from "@/components/messages/TypingIndicator"
 import { GroupInfoPanel } from "@/components/messages/GroupInfoPanel"
 import { OnlineStatusDot } from "@/components/ui/OnlineStatusDot"
 import { CallModal } from "@/components/calls/CallModal"
+import { createLogger } from "@/lib/logger"
+
+const log = createLogger("ChatArea")
+
 import {
   ArrowLeft,
   Phone,
@@ -132,7 +136,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
     ? conversation.participants?.find((p) => !isCurrentParticipant(p))
     : null
 
-  function isCurrentParticipant(p: any) {
+  function isCurrentParticipant(p: NonNullable<typeof conversation>["participants"][number]) {
     // The participant with no "isOwn" equivalent — we'll check via a comparison
     // In getConversation, participants include everyone. We need the current user's ID.
     // We'll identify the "other" user by checking if they appear in the "participants" list that aren't the first one.
@@ -236,7 +240,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
                   setActiveCallType("audio")
                   setActiveCallId(result.callId)
                 } catch (e) {
-                  // Silently handle error (e.g., already in a call)
+                  log.error("Failed to start audio call", e instanceof Error ? e : new Error(String(e)))
                 }
               }}
               className="p-2 rounded-lg text-muted-foreground hover:text-success hover:bg-green-50 text-muted-foreground dark:hover:text-green-400 dark:hover:bg-green-900/20 transition-colors"
@@ -256,10 +260,10 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
                   setActiveCallType("video")
                   setActiveCallId(result.callId)
                 } catch (e) {
-                  // Silently handle error
+                  log.error("Failed to start video call", e instanceof Error ? e : new Error(String(e)))
                 }
               }}
-              className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+              className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
               title="Video call"
               aria-label="Start video call"
             >

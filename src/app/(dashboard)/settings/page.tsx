@@ -152,7 +152,7 @@ export default function SettingsPage() {
           Set your presence status and custom message
         </p>
         <StatusSelector
-          currentStatus={(currentUser?.status as any) || "online"}
+          currentStatus={currentUser?.status ?? "online"}
           currentCustomStatus={currentUser?.customStatus || ""}
         />
       </div>

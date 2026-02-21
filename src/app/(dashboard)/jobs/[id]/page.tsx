@@ -218,8 +218,8 @@ function ApplyModal({ jobId, onClose }: { jobId: Id<"jobs">; onClose: () => void
         coverLetter: coverLetter || undefined,
       })
       onClose()
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Unknown error")
     } finally {
       setLoading(false)
     }
@@ -270,7 +270,7 @@ function ApplicationsList({ jobId }: { jobId: Id<"jobs"> }) {
   if (apps === undefined)
     return <p className="text-gray-400 text-sm mt-3">Loading...</p>
 
-  if ("error" in (apps as any))
+  if (!Array.isArray(apps))
     return <p className="text-red-400 text-sm mt-3">Only the poster can view applications.</p>
 
   if (apps.length === 0)
@@ -285,7 +285,7 @@ function ApplicationsList({ jobId }: { jobId: Id<"jobs"> }) {
 
   return (
     <div className="mt-4 space-y-3">
-      {(apps as any[]).map((app: any) => (
+      {apps.map((app) => (
         <div key={app._id} className="border rounded-lg p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Image

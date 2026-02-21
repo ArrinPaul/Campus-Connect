@@ -50,8 +50,8 @@ export function CreateListingModal({ onClose }: CreateListingModalProps) {
         university: form.university || undefined,
       })
       onClose()
-    } catch (e: any) {
-      setError(e.message ?? "Failed to create listing.")
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to create listing.")
     } finally {
       setLoading(false)
     }

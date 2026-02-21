@@ -1,7 +1,7 @@
 import { v } from "convex/values"
 import { query, mutation, internalMutation } from "./_generated/server"
 import { Id, Doc } from "./_generated/dataModel"
-import { jaccardSimilarity } from "./math-utils"
+import { jaccardSimilarity } from "./math_utils"
 
 // ────────────────────────────────────────────
 // Scoring weights (Phase 4.1 spec)

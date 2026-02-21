@@ -18,8 +18,8 @@ export default function BillingPage() {
     try {
       await upgradeToPro({ plan: selectedPlan })
       setMessage("Successfully upgraded to Pro!")
-    } catch (e: any) {
-      setMessage(e.message ?? "Something went wrong.")
+    } catch (e: unknown) {
+      setMessage(e instanceof Error ? e.message : "Something went wrong.")
     } finally {
       setLoading(false)
     }
@@ -32,8 +32,8 @@ export default function BillingPage() {
     try {
       await cancelPro({})
       setMessage("Your subscription has been cancelled.")
-    } catch (e: any) {
-      setMessage(e.message ?? "Something went wrong.")
+    } catch (e: unknown) {
+      setMessage(e instanceof Error ? e.message : "Something went wrong.")
     } finally {
       setLoading(false)
     }
