@@ -12,5 +12,20 @@ Sentry.init({
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
 
+  // Filter out noisy/irrelevant errors
+  beforeSend(event, hint) {
+    // Don't send events in development
+    if (process.env.NODE_ENV === "development") {
+      return null
+    }
+
+    // Ignore 404 errors
+    if (event.message?.includes("404") || event.message?.includes("Not Found")) {
+      return null
+    }
+
+    return event
+  },
+
   environment: process.env.NODE_ENV || "development",
 })

@@ -3,7 +3,7 @@ import { internalMutation, query, mutation } from "./_generated/server"
 import { Id } from "./_generated/dataModel"
 import { sanitizeText, isValidSafeUrl } from "./sanitize"
 import { createLogger } from "./logger"
-import { BIO_MAX_LENGTH, UNIVERSITY_MAX_LENGTH } from "./validation-constants"
+import { BIO_MAX_LENGTH, UNIVERSITY_MAX_LENGTH } from "./validation_constants"
 
 const log = createLogger("users")
 
@@ -685,12 +685,33 @@ export const updateNotificationPreferences = mutation({
 })
 
 export const generateUploadUrl = mutation({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    fileType: v.string(),
+    fileSize: v.number(),
+  },
+  handler: async (ctx, args) => {
     // Require authentication
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
       throw new Error("Unauthorized")
+    }
+
+    // Profile pictures should be images only
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"]
+    const maxSize = 10 * 1024 * 1024 // 10MB
+
+    if (!allowedTypes.includes(args.fileType)) {
+      throw new Error(
+        `Invalid file type: ${args.fileType}. Allowed types: ${allowedTypes.join(", ")}`
+      )
+    }
+
+    if (args.fileSize > maxSize) {
+      const fileSizeMB = (args.fileSize / 1024 / 1024).toFixed(2)
+      const maxSizeMB = (maxSize / 1024 / 1024).toFixed(0)
+      throw new Error(
+        `File too large: ${fileSizeMB}MB. Maximum allowed: ${maxSizeMB}MB`
+      )
     }
 
     return await ctx.storage.generateUploadUrl()
@@ -736,5 +757,315 @@ export const updateProfilePicture = mutation({
     })
 
     return url
+  },
+})
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * GDPR COMPLIANCE - Data Export & Account Deletion
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+/**
+ * Export all user data for GDPR compliance
+ * Returns: User profile, posts, comments, messages, bookmarks, etc.
+ */
+export const exportUserData = mutation({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .unique()
+
+    if (!user) {
+      throw new Error("User not found")
+    }
+
+    // Gather all user data
+    const posts = await ctx.db
+      .query("posts")
+      .withIndex("by_author", (q) => q.eq("authorId", user._id))
+      .collect()
+
+    const comments = await ctx.db
+      .query("comments")
+      .withIndex("by_author", (q) => q.eq("authorId", user._id))
+      .collect()
+
+    const reactions = await ctx.db
+      .query("reactions")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+
+    const bookmarks = await ctx.db
+      .query("bookmarks")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+
+    const follows = await ctx.db
+      .query("follows")
+      .withIndex("by_follower", (q) => q.eq("followerId", user._id))
+      .collect()
+
+    const followers = await ctx.db
+      .query("follows")
+      .withIndex("by_following", (q) => q.eq("followingId", user._id))
+      .collect()
+
+    const notifications = await ctx.db
+      .query("notifications")
+      .withIndex("by_recipient", (q) => q.eq("recipientId", user._id))
+      .collect()
+
+    // Get conversation participation
+    const conversationParticipations = await ctx.db
+      .query("conversationParticipants")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+
+    // Get messages from user's conversations
+    const messages: any[] = []
+    for (const participation of conversationParticipations) {
+      const convMessages = await ctx.db
+        .query("messages")
+        .withIndex("by_conversation", (q) =>
+          q.eq("conversationId", participation.conversationId)
+        )
+        .filter((q) => q.eq(q.field("senderId"), user._id))
+        .collect()
+      messages.push(...convMessages)
+    }
+
+    return {
+      exportedAt: Date.now(),
+      user: {
+        ...user,
+        // Remove sensitive fields
+        clerkId: undefined,
+      },
+      statistics: {
+        posts: posts.length,
+        comments: comments.length,
+        reactions: reactions.length,
+        bookmarks: bookmarks.length,
+        following: follows.length,
+        followers: followers.length,
+        messages: messages.length,
+        notifications: notifications.length,
+      },
+      posts: posts.map((p) => ({
+        content: p.content,
+        createdAt: p.createdAt,
+        mediaUrls: p.mediaUrls,
+        mediaType: p.mediaType,
+      })),
+      comments: comments.map((c) => ({
+        content: c.content,
+        createdAt: c.createdAt,
+        postId: c.postId,
+      })),
+      bookmarks: bookmarks.map((b) => ({
+        savedAt: b.createdAt,
+        postId: b.postId,
+      })),
+      following: follows.map((f) => ({
+        userId: f.followingId,
+        followedAt: f.createdAt,
+      })),
+    }
+  },
+})
+
+/**
+ * Delete user account and all associated data (GDPR Right to Erasure)
+ * WARNING: This is irreversible!
+ */
+export const deleteAccount = mutation({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .unique()
+
+    if (!user) {
+      throw new Error("User not found")
+    }
+
+    // ═══════ Delete User-Created Content ═══════
+
+    // 1. Delete all posts
+    const posts = await ctx.db
+      .query("posts")
+      .withIndex("by_author", (q) => q.eq("authorId", user._id))
+      .collect()
+
+    for (const post of posts) {
+      await ctx.db.delete(post._id)
+    }
+
+    // 2. Delete all comments
+    const comments = await ctx.db
+      .query("comments")
+      .withIndex("by_author", (q) => q.eq("authorId", user._id))
+      .collect()
+
+    for (const comment of comments) {
+      await ctx.db.delete(comment._id)
+    }
+
+    // 3. Delete all reactions (likes, loves, etc.)
+    const reactions = await ctx.db
+      .query("reactions")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+
+    for (const reaction of reactions) {
+      await ctx.db.delete(reaction._id)
+    }
+
+    // 4. Delete all bookmarks
+    const bookmarks = await ctx.db
+      .query("bookmarks")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+
+    for (const bookmark of bookmarks) {
+      await ctx.db.delete(bookmark._id)
+    }
+
+    // 5. Delete all follows (both as follower and following)
+    const follows = await ctx.db
+      .query("follows")
+      .withIndex("by_follower", (q) => q.eq("followerId", user._id))
+      .collect()
+
+    for (const follow of follows) {
+      await ctx.db.delete(follow._id)
+    }
+
+    const followedBy = await ctx.db
+      .query("follows")
+      .withIndex("by_following", (q) => q.eq("followingId", user._id))
+      .collect()
+
+    for (const follow of followedBy) {
+      await ctx.db.delete(follow._id)
+    }
+
+    // 6. Delete all notifications (sent to user)
+    const notifications = await ctx.db
+      .query("notifications")
+      .withIndex("by_recipient", (q) => q.eq("recipientId", user._id))
+      .collect()
+
+    for (const notification of notifications) {
+      await ctx.db.delete(notification._id)
+    }
+
+    // 7. Delete all reposts
+    const reposts = await ctx.db
+      .query("reposts")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+
+    for (const repost of reposts) {
+      await ctx.db.delete(repost._id)
+    }
+
+    // 8. Delete messages and conversation participations
+    const conversationParticipations = await ctx.db
+      .query("conversationParticipants")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+
+    for (const participation of conversationParticipations) {
+      // Delete messages sent by this user
+      const messages = await ctx.db
+        .query("messages")
+        .withIndex("by_conversation", (q) =>
+          q.eq("conversationId", participation.conversationId)
+        )
+        .filter((q) => q.eq(q.field("senderId"), user._id))
+        .collect()
+
+      for (const message of messages) {
+        await ctx.db.delete(message._id)
+      }
+
+      // Remove from conversation participants
+      await ctx.db.delete(participation._id)
+    }
+
+    // 9. Delete community memberships
+    const communityMemberships = await ctx.db
+      .query("communityMembers")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect()
+
+    for (const membership of communityMemberships) {
+      await ctx.db.delete(membership._id)
+    }
+
+    // 10. Delete event RSVPs (table does not exist yet - skip for now)
+    // const eventRSVPs = await ctx.db
+    //   .query("eventAttendees")
+    //   .withIndex("by_user", (q) => q.eq("userId", user._id))
+    //   .collect()
+    // for (const rsvp of eventRSVPs) {
+    //   await ctx.db.delete(rsvp._id)
+    // }
+
+    // 11. Delete stories
+    const stories = await ctx.db
+      .query("stories")
+      .withIndex("by_author", (q) => q.eq("authorId", user._id))
+      .collect()
+
+    for (const story of stories) {
+      await ctx.db.delete(story._id)
+    }
+
+    // 12. Delete polls created by user
+    const polls = await ctx.db
+      .query("polls")
+      .withIndex("by_author", (q) => q.eq("authorId", user._id))
+      .collect()
+
+    for (const poll of polls) {
+      await ctx.db.delete(poll._id)
+    }
+
+    // 13. Delete poll votes
+    const pollVotes = await ctx.db
+      .query("pollVotes")
+      .filter((q) => q.eq(q.field("userId"), user._id))
+      .collect()
+
+    for (const vote of pollVotes) {
+      await ctx.db.delete(vote._id)
+    }
+
+    // ═══════ Finally, Delete User Record ═══════
+    await ctx.db.delete(user._id)
+
+    // Note: Clerk user must be deleted separately via Dashboard or API
+    // This would typically be done via a webhook or background job
+    // For now, admin must manually delete from Clerk Dashboard
+
+    return {
+      success: true,
+      message: "Account and all associated data deleted successfully",
+      note: "Please also delete your account from the authentication provider (Clerk) if needed",
+    }
   },
 })

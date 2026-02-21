@@ -3,7 +3,7 @@ import { query, mutation } from "./_generated/server"
 import { sanitizeText, sanitizeMarkdown } from "./sanitize"
 import { api, internal } from "./_generated/api"
 import { extractMentions } from "./mentionUtils"
-import { COMMENT_MAX_LENGTH } from "./validation-constants"
+import { COMMENT_MAX_LENGTH } from "./validation_constants"
 
 /**
  * Get all comments for a post (flat list ordered oldest first, includes depth for client-side tree rendering)

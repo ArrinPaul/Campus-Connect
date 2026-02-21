@@ -124,8 +124,11 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
       // Upload profile picture if a new image is selected
       if (selectedImage) {
         try {
-          // Get upload URL from Convex
-          const uploadUrl = await generateUploadUrl()
+          // Get upload URL from Convex with validation
+          const uploadUrl = await generateUploadUrl({
+            fileType: selectedImage.type,
+            fileSize: selectedImage.size,
+          })
 
           // Upload the file
           const result = await fetch(uploadUrl, {

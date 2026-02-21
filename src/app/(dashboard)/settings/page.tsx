@@ -160,7 +160,7 @@ export default function SettingsPage() {
       {/* Privacy Settings */}
       <div className="mb-8 rounded-lg border border-border bg-card p-6">
         <h2 className="text-xl font-semibold text-foreground mb-4">Privacy</h2>
-        <div className="flex items-center justify-between py-3">
+        <div className="flex items-center justify-between py-3 border-b border-border pb-6">
           <div>
             <p className="font-medium text-foreground">Show Online Status</p>
             <p className="text-sm text-muted-foreground">
@@ -171,6 +171,25 @@ export default function SettingsPage() {
             <input type="checkbox" checked={showOnlineStatus} onChange={handleToggleOnlineVisibility} className="sr-only peer" />
             <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer bg-muted peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-border peer-checked:bg-primary"></div>
           </label>
+        </div>
+        <div className="pt-4">
+          <a
+            href="/settings/privacy"
+            className="flex items-center justify-between group hover:bg-muted/50 -mx-4 px-4 py-3 rounded-lg transition-colors"
+          >
+            <div>
+              <p className="font-medium text-foreground group-hover:text-primary transition-colors">Privacy & Data</p>
+              <p className="text-sm text-muted-foreground">Export your data or delete your account</p>
+            </div>
+            <svg
+              className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
         </div>
       </div>
 

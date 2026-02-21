@@ -4,8 +4,8 @@ import { useState } from "react"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
-import dynamic from "next/dynamic"
-import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
+import dynamic from "next/dynamic"import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
+import { toast } from "sonner"
 
 // Lazy load the heavy Tiptap editor
 const CompactRichTextEditor = dynamic(
@@ -63,9 +63,12 @@ export function CommentComposer({
     try {
       await createComment({ postId, content, ...(parentCommentId ? { parentCommentId } : {}) })
       setContent("")
+      toast.success(replyingToName ? "Reply posted" : "Comment posted")
       onCommentAdded?.()
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create comment")
+      const errorMessage = err instanceof Error ? err.message : "Failed to post comment"
+      setError(errorMessage)
+      toast.error(errorMessage)
     } finally {
       setIsSubmitting(false)
     }

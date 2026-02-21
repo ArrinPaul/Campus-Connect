@@ -137,6 +137,30 @@ export const clearStaleTyping = internalMutation({
   },
 })
 
+/**
+ * Delete old typing indicator entries (internal — called by cron)
+ * Removes entries older than 30 seconds to prevent database bloat.
+ */
+export const cleanupTypingIndicators = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now()
+    const cleanupThreshold = 30000 // 30 seconds
+
+    const allIndicators = await ctx.db.query("typingIndicators").collect()
+
+    let deleted = 0
+    for (const indicator of allIndicators) {
+      if (now - indicator.updatedAt > cleanupThreshold) {
+        await ctx.db.delete(indicator._id)
+        deleted++
+      }
+    }
+
+    return { deleted }
+  },
+})
+
 // =============================================
 // Phase 2.3 — Presence & Activity Status
 // =============================================

@@ -19,11 +19,30 @@ Sentry.init({
   ],
 
   // Filter out noisy/irrelevant errors
-  beforeSend(event) {
+  beforeSend(event, hint) {
     // Don't send events in development
     if (process.env.NODE_ENV === "development") {
       return null
     }
+
+    // Ignore 404 errors (not found pages)
+    if (event.message?.includes("404") || event.message?.includes("Not Found")) {
+      return null
+    }
+
+    // Ignore connection errors (network issues)
+    if (event.message?.includes("ECONNREFUSED")) {
+      return null
+    }
+    if (event.message?.includes("ETIMEDOUT")) {
+      return null
+    }
+
+    // Ignore rate limit errors (expected behavior)
+    if (event.message?.includes("Rate limit")) {
+      return null
+    }
+
     return event
   },
 

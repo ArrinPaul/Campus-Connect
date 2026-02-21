@@ -5,7 +5,7 @@ import { internal } from "./_generated/api"
 import { sanitizeText, sanitizeMarkdown, isValidSafeUrl } from "./sanitize"
 import { linkHashtagsToPost } from "./hashtags"
 import { extractMentions } from "./mentionUtils"
-import { POST_MAX_LENGTH } from "./validation-constants"
+import { POST_MAX_LENGTH } from "./validation_constants"
 
 /**
  * Get feed posts with pagination

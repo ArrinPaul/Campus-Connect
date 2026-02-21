@@ -6,7 +6,7 @@ import {
   MAX_SKILLS,
   SKILL_MAX_LENGTH,
   NAME_MAX_LENGTH,
-} from "../convex/validation-constants"
+} from "../convex/validation_constants"
 
 // User profile validation schema
 export const profileSchema = z.object({

@@ -10,7 +10,7 @@ import { mutation, query, MutationCtx, QueryCtx } from "./_generated/server"
 import { internal } from "./_generated/api"
 import { Id } from "./_generated/dataModel"
 import { sanitizeMarkdown, isValidSafeUrl } from "./sanitize"
-import { MESSAGE_MAX_LENGTH } from "./validation-constants"
+import { MESSAGE_MAX_LENGTH } from "./validation_constants"
 
 /**
  * Helper: get current authenticated user from identity

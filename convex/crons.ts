@@ -34,4 +34,15 @@ crons.interval(
   internal.events.sendEventReminders
 )
 
+/**
+ * Clean up stale typing indicators every 5 minutes.
+ * Deletes entries older than 30 seconds to prevent database bloat.
+ * Phase 2.1 — Real-Time Communication / Typing Indicators
+ */
+crons.interval(
+  "cleanup typing indicators",
+  { minutes: 5 },
+  internal.presence.cleanupTypingIndicators
+)
+
 export default crons

@@ -380,21 +380,30 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
           const file = attachedFiles[i]
           fileNames.push(file.name)
 
-          // 1. Get presigned upload URL
-          const uploadUrl = await generateUploadUrl()
+          try {
+            // 1. Get presigned upload URL with validation
+            const uploadUrl = await generateUploadUrl({
+              fileType: file.type,
+              fileSize: file.size,
+              uploadType: attachedType,
+            })
 
-          // 2. Upload file
-          const uploadRes = await fetch(uploadUrl, {
-            method: "POST",
-            body: file,
-            headers: { "Content-Type": file.type },
-          })
-          if (!uploadRes.ok) throw new Error(`Upload failed for ${file.name}`)
+            // 2. Upload file
+            const uploadRes = await fetch(uploadUrl, {
+              method: "POST",
+              body: file,
+              headers: { "Content-Type": file.type },
+            })
+            if (!uploadRes.ok) throw new Error(`Upload failed for ${file.name}`)
 
-          const { storageId } = await uploadRes.json()
-          storageIds.push(storageId)
+            const { storageId } = await uploadRes.json()
+            storageIds.push(storageId)
 
-          setUploadProgress(Math.round(((i + 1) / attachedFiles.length) * 100))
+            setUploadProgress(Math.round(((i + 1) / attachedFiles.length) * 100))
+          } catch (err: any) {
+            setIsUploading(false)
+            throw new Error(`Failed to upload ${file.name}: ${err.message}`)
+          }
         }
 
         // 3. Resolve all storage IDs to public URLs

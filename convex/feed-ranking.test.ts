@@ -9,7 +9,7 @@ import {
   relationshipScore,
   computeFeedScore,
   FEED_WEIGHTS,
-} from "./feed-ranking"
+} from "./feed_ranking"
 
 const HOUR_MS = 1000 * 60 * 60
 

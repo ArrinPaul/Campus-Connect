@@ -100,7 +100,11 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
 
       if (mode === "image" && imageFile) {
         // Upload image to Convex storage
-        const uploadUrl = await generateUploadUrl()
+        const uploadUrl = await generateUploadUrl({
+          fileType: imageFile.type,
+          fileSize: imageFile.size,
+          uploadType: "image",
+        })
         const res = await fetch(uploadUrl, {
           method: "POST",
           body: imageFile,

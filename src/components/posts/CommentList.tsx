@@ -12,6 +12,7 @@ import { parseMentions } from "../../../lib/mention-utils"
 import { ChevronDown, ChevronUp, MessageSquare, ArrowRight } from "lucide-react"
 import dynamic from "next/dynamic"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
+import { toast } from "sonner"
 
 // Lazy load the heavy Tiptap editor
 const CompactRichTextEditor = dynamic(
@@ -105,8 +106,9 @@ export function CommentList({
     try {
       setDeletingId(commentId)
       await deleteComment({ commentId })
-    } catch {
-      // silently fail
+      toast.success("Comment deleted")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete comment")
     } finally {
       setDeletingId(null)
     }
@@ -126,8 +128,11 @@ export function CommentList({
     try {
       await createComment({ postId, content: replyContent, parentCommentId: parentId })
       setReplyContent("")
-      setReplyingTo(null)
+      toast.success("Reply posted")
     } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to post reply"
+      setReplyError(errorMessage)
+      toast.error(errorMessage
       setReplyError(err instanceof Error ? err.message : "Failed to post reply")
     } finally {
       setIsSubmittingReply(false)

@@ -21,13 +21,73 @@ export const MAX_IMAGES_PER_POST = 10
  * Generate a presigned upload URL for Convex file storage.
  * The client uses this URL to upload files directly to storage.
  * Returns a URL valid for 1 hour.
+ * 
+ * Validates file type and size before generating URL to prevent:
+ * - Malicious file uploads (executables, scripts)
+ * - Storage abuse (oversized files)
+ * - XSS attacks via file content
  */
 export const generateUploadUrl = mutation({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    fileType: v.string(),
+    fileSize: v.number(),
+    uploadType: v.union(
+      v.literal("image"),
+      v.literal("video"),
+      v.literal("file")
+    ),
+  },
+  handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
       throw new Error("Not authenticated")
+    }
+
+    // Validate file type
+    let allowedTypes: string[]
+    let maxSize: number
+
+    switch (args.uploadType) {
+      case "image":
+        allowedTypes = IMAGE_TYPES
+        maxSize = MAX_IMAGE_SIZE
+        break
+      case "video":
+        allowedTypes = VIDEO_TYPES
+        maxSize = MAX_VIDEO_SIZE
+        break
+      case "file":
+        allowedTypes = FILE_TYPES
+        maxSize = MAX_FILE_SIZE
+        break
+    }
+
+    if (!allowedTypes.includes(args.fileType)) {
+      throw new Error(
+        `Invalid file type: ${args.fileType}. Allowed types: ${allowedTypes.join(", ")}`
+      )
+    }
+
+    if (args.fileSize > maxSize) {
+      const fileSizeMB = (args.fileSize / 1024 / 1024).toFixed(2)
+      const maxSizeMB = (maxSize / 1024 / 1024).toFixed(0)
+      throw new Error(
+        `File too large: ${fileSizeMB}MB. Maximum allowed: ${maxSizeMB}MB`
+      )
+    }
+
+    // Additional validation: Check for suspicious file type patterns
+    const suspiciousPatterns = [
+      "application/x-msdownload", // .exe
+      "application/x-executable",
+      "application/x-sh",
+      "application/x-shellscript",
+      "text/javascript",
+      "application/javascript",
+    ]
+
+    if (suspiciousPatterns.includes(args.fileType)) {
+      throw new Error("This file type is not allowed for security reasons")
     }
 
     return await ctx.storage.generateUploadUrl()

@@ -8,7 +8,7 @@
 import { mutation, query, internalMutation } from "./_generated/server"
 import { v } from "convex/values"
 import { sanitizeText } from "./sanitize"
-import { NOTIFICATION_MAX_LENGTH } from "./validation-constants"
+import { NOTIFICATION_MAX_LENGTH } from "./validation_constants"
 
 /**
  * Create a new notification
