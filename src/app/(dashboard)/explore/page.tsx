@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useUser } from "@clerk/nextjs"
-import { useQuery } from "convex/react"
+import { useConvexAuth, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { PostCard } from "@/components/posts/PostCard"
 import { RecommendedPosts, TrendingInSkill, PopularInUniversity } from "@/components/feed/RecommendedPosts"
@@ -14,20 +13,20 @@ type ExploreTab = "for-you" | "trending-skills" | "university"
 type RecommendedItem = NonNullable<FunctionReturnType<typeof api.recommendations.getRecommendedPosts>>["items"][number]
 
 export default function ExplorePage() {
-  const { isLoaded, isSignedIn } = useUser()
+  const { isAuthenticated } = useConvexAuth()
   const [activeTab, setActiveTab] = useState<ExploreTab>("for-you")
 
   const recommended = useQuery(
     api.recommendations.getRecommendedPosts,
-    isLoaded && isSignedIn && activeTab === "for-you" ? { limit: 20 } : "skip"
+    isAuthenticated && activeTab === "for-you" ? { limit: 20 } : "skip"
   )
   const trendingSkill = useQuery(
     api.recommendations.getTrendingInSkill,
-    isLoaded && isSignedIn && activeTab === "trending-skills" ? { limit: 20 } : "skip"
+    isAuthenticated && activeTab === "trending-skills" ? { limit: 20 } : "skip"
   )
   const popular = useQuery(
     api.recommendations.getPopularInUniversity,
-    isLoaded && isSignedIn && activeTab === "university" ? { limit: 20 } : "skip"
+    isAuthenticated && activeTab === "university" ? { limit: 20 } : "skip"
   )
 
   const tabs: { id: ExploreTab; label: string; icon: React.ReactNode }[] = [

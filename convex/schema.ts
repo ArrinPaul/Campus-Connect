@@ -63,6 +63,8 @@ export default defineSchema({
     // Phase 7.4 — Email prefs
     emailDigestFrequency: v.optional(v.union(v.literal("daily"), v.literal("weekly"), v.literal("never"))),
     emailNotifications: v.optional(v.boolean()),
+    // Onboarding
+    onboardingComplete: v.optional(v.boolean()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })

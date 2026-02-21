@@ -1,8 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { useQuery, useMutation } from "convex/react"
-import { useUser } from "@clerk/nextjs"
+import { useQuery, useMutation, useConvexAuth } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import Image from "next/image"
 import Link from "next/link"
@@ -20,10 +19,10 @@ interface SuggestedUsersProps {
 }
 
 export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersProps) {
-  const { isLoaded, isSignedIn } = useUser()
+  const { isAuthenticated } = useConvexAuth()
   const suggestions = useQuery(
     api.suggestions.getSuggestions,
-    isLoaded && isSignedIn ? { limit } : "skip"
+    isAuthenticated ? { limit } : "skip"
   )
   const dismissSuggestion = useMutation(api.suggestions.dismissSuggestion)
   const followUser = useMutation(api.follows.followUser)

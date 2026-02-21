@@ -1069,3 +1069,71 @@ export const deleteAccount = mutation({
     }
   },
 })
+
+/**
+ * Mark the authenticated user's onboarding as complete.
+ * Saves name, username, bio, university, role, skills, and interests.
+ */
+export const completeOnboarding = mutation({
+  args: {
+    name: v.string(),
+    username: v.string(),
+    bio: v.optional(v.string()),
+    university: v.optional(v.string()),
+    role: v.union(
+      v.literal("Student"),
+      v.literal("Research Scholar"),
+      v.literal("Faculty")
+    ),
+    skills: v.array(v.string()),
+    researchInterests: v.optional(v.array(v.string())),
+    profilePicture: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) throw new Error("Unauthorized")
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .first()
+    if (!user) throw new Error("User not found")
+
+    await ctx.db.patch(user._id, {
+      name: sanitizeText(args.name),
+      username: sanitizeText(args.username),
+      bio: args.bio ? sanitizeText(args.bio) : undefined,
+      university: args.university ? sanitizeText(args.university) : undefined,
+      role: args.role,
+      skills: args.skills,
+      researchInterests: args.researchInterests,
+      profilePicture: args.profilePicture ?? user.profilePicture,
+      onboardingComplete: true,
+      updatedAt: Date.now(),
+    })
+
+    return { success: true }
+  },
+})
+
+/**
+ * Check if the current user has completed onboarding.
+ * Returns null when unauthenticated.
+ */
+export const getOnboardingStatus = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) return null
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .first()
+
+    return {
+      complete: user?.onboardingComplete ?? false,
+      userId: user?._id ?? null,
+    }
+  },
+})

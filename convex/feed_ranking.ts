@@ -150,7 +150,7 @@ export const getRankedFeed = query({
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity()
-    if (!identity) throw new Error("Unauthorized")
+    if (!identity) return { items: [], nextCursor: null, hasMore: false }
 
     const user = await ctx.db
       .query("users")
@@ -284,7 +284,7 @@ export const getChronologicalFeed = query({
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity()
-    if (!identity) throw new Error("Unauthorized")
+    if (!identity) return { items: [], nextCursor: null, hasMore: false }
 
     const user = await ctx.db
       .query("users")
@@ -386,7 +386,7 @@ export const getTrendingFeed = query({
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity()
-    if (!identity) throw new Error("Unauthorized")
+    if (!identity) return { items: [], nextCursor: null, hasMore: false }
 
     const user = await ctx.db
       .query("users")

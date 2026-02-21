@@ -1,7 +1,10 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
 import { useUser } from "@clerk/nextjs"
+import { useRouter } from "next/navigation"
+import { useQuery } from "convex/react"
+import { api } from "@/../convex/_generated/api"
 import { PostComposer } from "@/components/posts/PostComposer"
 import { FeedContainer } from "@/components/feed/FeedContainer"
 import { ErrorBoundary } from "@/components/error-boundary"
@@ -10,14 +13,31 @@ import { StoryRow } from "@/components/stories/StoryRow"
 import { SuggestedUsers } from "@/components/discover/SuggestedUsers"
 import { RecommendedPosts, TrendingInSkill } from "@/components/feed/RecommendedPosts"
 import { cn } from "@/lib/utils"
+import { Sparkles, Users, TrendingUp, PenLine } from "lucide-react"
 
 export type FeedType = "for-you" | "following" | "trending"
 
 const FEED_STORAGE_KEY = "campus-connect-feed-type"
 
+const FEED_TABS = [
+  { key: "for-you" as const,  label: "For You",   icon: Sparkles  },
+  { key: "following" as const, label: "Following", icon: Users     },
+  { key: "trending" as const,  label: "Trending",  icon: TrendingUp },
+] as const
+
 export default function FeedPage() {
-  const { isLoaded, isSignedIn } = useUser()
+  const { isLoaded, isSignedIn, user } = useUser()
+  const router = useRouter()
   const [feedType, setFeedType] = useState<FeedType>("for-you")
+
+  const onboardingStatus = useQuery(api.users.getOnboardingStatus)
+
+  // Redirect new users to complete onboarding first
+  useEffect(() => {
+    if (onboardingStatus !== undefined && onboardingStatus !== null && !onboardingStatus.complete) {
+      router.replace("/onboarding")
+    }
+  }, [onboardingStatus, router])
 
   useEffect(() => {
     const saved = localStorage.getItem(FEED_STORAGE_KEY) as FeedType | null
@@ -35,8 +55,8 @@ export default function FeedPage() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
-          <p className="text-sm text-muted-foreground">Loading feed…</p>
+          <div className="h-9 w-9 animate-spin rounded-full border-[3px] border-border border-t-primary" />
+          <p className="text-sm text-muted-foreground">Loading your feed…</p>
         </div>
       </div>
     )
@@ -46,55 +66,77 @@ export default function FeedPage() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-foreground">Not Authenticated</h2>
-          <p className="mt-2 text-muted-foreground">Please sign in to view the feed.</p>
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl brand-gradient mb-4">
+            <Sparkles className="h-8 w-8 text-white" />
+          </div>
+          <h2 className="text-xl font-bold text-foreground font-display">Sign in to see your feed</h2>
+          <p className="mt-2 text-muted-foreground text-sm">Connect with peers · Discover research · Grow your network</p>
         </div>
       </div>
     )
   }
 
+  const firstName = user?.firstName ?? "there"
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Main Feed */}
-        <div className="lg:col-span-8 space-y-5">
-          {/* Story Row */}
+
+        {/* ── Main column ── */}
+        <div className="lg:col-span-8 space-y-4">
+
+          {/* Stories */}
           <ErrorBoundary>
-            <div className="card-elevated px-3 py-2">
+            <div className="rounded-2xl border border-border bg-card shadow-elevation-1 px-4 py-3 overflow-hidden">
               <StoryRow />
             </div>
           </ErrorBoundary>
 
-          {/* Post Composer */}
+          {/* Composer card */}
           <ErrorBoundary>
-            <div className="card-elevated p-5">
-              <h2 className="mb-3 text-sm font-semibold text-foreground">
-                Create a Post
-              </h2>
-              <PostComposer />
+            <div className="rounded-2xl border border-border bg-card shadow-elevation-1 overflow-hidden">
+              {/* gradient header strip */}
+              <div className="h-1 w-full brand-gradient" />
+              <div className="p-5">
+                <div className="flex items-center gap-3 mb-4">
+                  {user?.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={user.imageUrl} alt={firstName} className="h-9 w-9 rounded-full object-cover story-ring" />
+                  ) : (
+                    <div className="h-9 w-9 rounded-full brand-gradient flex items-center justify-center text-white text-sm font-bold shrink-0">
+                      {firstName[0].toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-[13px] font-semibold text-foreground">Hey {firstName} 👋</p>
+                    <p className="text-[12px] text-muted-foreground flex items-center gap-1">
+                      <PenLine className="h-3 w-3" /> Share what&apos;s on your mind
+                    </p>
+                  </div>
+                </div>
+                <PostComposer />
+              </div>
             </div>
           </ErrorBoundary>
 
-          {/* Feed Tabs */}
-          <div className="card-elevated p-1 flex">
-            {(
-              [
-                { key: "for-you", label: "For You" },
-                { key: "following", label: "Following" },
-                { key: "trending", label: "Trending" },
-              ] as const
-            ).map(({ key, label }) => (
+          {/* Feed tabs */}
+          <div className="rounded-2xl border border-border bg-card shadow-elevation-1 p-1.5 flex gap-1">
+            {FEED_TABS.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
                 onClick={() => handleFeedTypeChange(key)}
                 className={cn(
-                  "flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
+                  "relative flex-1 flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-semibold transition-all duration-200",
                   feedType === key
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                    ? "text-white shadow-glow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                 )}
               >
-                {label}
+                {feedType === key && (
+                  <span className="absolute inset-0 rounded-xl btn-gradient opacity-100" aria-hidden />
+                )}
+                <Icon className="relative h-3.5 w-3.5" />
+                <span className="relative">{label}</span>
               </button>
             ))}
           </div>
@@ -105,23 +147,44 @@ export default function FeedPage() {
           </ErrorBoundary>
         </div>
 
-        {/* Sidebar */}
+        {/* ── Right sidebar ── */}
         <aside className="hidden lg:block lg:col-span-4">
-          <div className="sticky top-20 space-y-5">
-            <ErrorBoundary>
-              <TrendingHashtags limit={10} />
-            </ErrorBoundary>
-            <ErrorBoundary>
-              <SuggestedUsers limit={3} showSeeAll />
-            </ErrorBoundary>
-            <ErrorBoundary>
-              <RecommendedPosts limit={3} />
-            </ErrorBoundary>
-            <ErrorBoundary>
-              <TrendingInSkill limit={5} />
-            </ErrorBoundary>
+          <div className="sticky top-[76px] space-y-4">
+
+            {/* Trending hashtags */}
+            <div className="rounded-2xl border border-border bg-card shadow-elevation-1 overflow-hidden">
+              <div className="h-[3px] w-full brand-gradient" />
+              <ErrorBoundary>
+                <TrendingHashtags limit={10} />
+              </ErrorBoundary>
+            </div>
+
+            {/* Suggested users */}
+            <div className="rounded-2xl border border-border bg-card shadow-elevation-1 overflow-hidden">
+              <div className="h-[3px] w-full bg-gradient-to-r from-violet-500 to-purple-500" />
+              <ErrorBoundary>
+                <SuggestedUsers limit={3} showSeeAll />
+              </ErrorBoundary>
+            </div>
+
+            {/* Recommended posts */}
+            <div className="rounded-2xl border border-border bg-card shadow-elevation-1 overflow-hidden">
+              <div className="h-[3px] w-full bg-gradient-to-r from-blue-500 to-cyan-500" />
+              <ErrorBoundary>
+                <RecommendedPosts limit={3} />
+              </ErrorBoundary>
+            </div>
+
+            {/* Trending in skill */}
+            <div className="rounded-2xl border border-border bg-card shadow-elevation-1 overflow-hidden">
+              <div className="h-[3px] w-full bg-gradient-to-r from-emerald-500 to-teal-500" />
+              <ErrorBoundary>
+                <TrendingInSkill limit={5} />
+              </ErrorBoundary>
+            </div>
           </div>
         </aside>
+
       </div>
     </div>
   )

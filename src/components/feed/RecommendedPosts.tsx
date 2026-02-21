@@ -1,7 +1,6 @@
 "use client"
 
-import { useQuery } from "convex/react"
-import { useUser } from "@clerk/nextjs"
+import { useQuery, useConvexAuth } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import Image from "next/image"
 import Link from "next/link"
@@ -16,10 +15,10 @@ interface RecommendedPostsProps {
 }
 
 export function RecommendedPosts({ limit = 3, title = "Posts you might like" }: RecommendedPostsProps) {
-  const { isLoaded, isSignedIn } = useUser()
+  const { isAuthenticated } = useConvexAuth()
   const recommended = useQuery(
     api.recommendations.getRecommendedPosts,
-    isLoaded && isSignedIn ? { limit } : "skip"
+    isAuthenticated ? { limit } : "skip"
   )
 
   // Loading skeleton
@@ -163,10 +162,10 @@ interface TrendingInSkillProps {
 }
 
 export function TrendingInSkill({ skill, limit = 5 }: TrendingInSkillProps) {
-  const { isLoaded, isSignedIn } = useUser()
+  const { isAuthenticated } = useConvexAuth()
   const trending = useQuery(
     api.recommendations.getTrendingInSkill,
-    isLoaded && isSignedIn ? { skill, limit } : "skip"
+    isAuthenticated ? { skill, limit } : "skip"
   )
 
   if (trending === undefined || trending === null) {
@@ -239,10 +238,10 @@ interface PopularInUniversityProps {
 }
 
 export function PopularInUniversity({ limit = 5 }: PopularInUniversityProps) {
-  const { isLoaded, isSignedIn } = useUser()
+  const { isAuthenticated } = useConvexAuth()
   const popular = useQuery(
     api.recommendations.getPopularInUniversity,
-    isLoaded && isSignedIn ? { limit } : "skip"
+    isAuthenticated ? { limit } : "skip"
   )
 
   if (popular === undefined || popular === null) {

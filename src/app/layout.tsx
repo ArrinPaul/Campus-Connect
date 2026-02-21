@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Inter } from "next/font/google"
+import { DM_Sans, Bricolage_Grotesque } from "next/font/google"
 import { ClerkProvider } from "@clerk/nextjs"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
@@ -12,10 +12,18 @@ import { SkipLink } from "@/components/accessibility/SkipLink"
 import { Toaster } from "sonner"
 import "./globals.css"
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-dm-sans",
+  weight: ["300", "400", "500", "600", "700"],
+})
+
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-bricolage",
+  weight: ["400", "500", "600", "700", "800"],
 })
 
 export const metadata: Metadata = {
@@ -68,29 +76,29 @@ export default function RootLayout({
     <ClerkProvider
       appearance={{
         variables: {
-          colorPrimary: "hsl(239 84% 67%)",
+          colorPrimary: "#DD2A7B",
           colorBackground: "hsl(0 0% 100%)",
-          colorText: "hsl(224 71% 4%)",
+          colorText: "hsl(220 25% 10%)",
           colorInputBackground: "hsl(0 0% 100%)",
-          colorInputText: "hsl(224 71% 4%)",
-          borderRadius: "0.625rem",
-          fontFamily: "Inter, system-ui, sans-serif",
+          colorInputText: "hsl(220 25% 10%)",
+          borderRadius: "0.75rem",
+          fontFamily: "'DM Sans', system-ui, sans-serif",
         },
         elements: {
           formButtonPrimary:
-            "bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm transition-all duration-200 active:scale-[0.98]",
-          card: "shadow-elevation-2 border border-border rounded-xl",
+            "bg-gradient-to-r from-[#F58529] via-[#DD2A7B] to-[#515BD4] text-white font-semibold shadow-sm transition-all duration-200 active:scale-[0.98] hover:opacity-90",
+          card: "shadow-elevation-2 border border-border rounded-2xl",
           headerTitle: "text-xl font-semibold tracking-tight",
           headerSubtitle: "text-muted-foreground text-sm",
           socialButtonsBlockButton:
-            "border border-border hover:bg-accent transition-colors duration-150 rounded-lg",
+            "border border-border hover:bg-accent transition-colors duration-150 rounded-xl",
           formFieldLabel: "text-foreground font-medium text-sm",
           footerActionLink: "text-primary hover:text-primary/80",
           internal: "font-sans",
         },
       }}
     >
-      <html lang="en" suppressHydrationWarning className={inter.variable}>
+      <html lang="en" suppressHydrationWarning className={`${dmSans.variable} ${bricolage.variable}`}>
         <body className="font-sans antialiased">
           {/* Skip link — must be the absolute first focusable element */}
           <SkipLink />

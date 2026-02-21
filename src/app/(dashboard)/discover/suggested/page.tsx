@@ -1,8 +1,8 @@
 "use client"
 
 import { useCallback, useState } from "react"
+import { useQuery, useMutation, useConvexAuth } from "convex/react"
 import { useUser } from "@clerk/nextjs"
-import { useQuery, useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import Image from "next/image"
 import Link from "next/link"
@@ -14,9 +14,10 @@ const log = createLogger("discover/suggested")
 
 export default function SuggestedUsersPage() {
   const { isLoaded, isSignedIn } = useUser()
+  const { isAuthenticated } = useConvexAuth()
   const suggestions = useQuery(
     api.suggestions.getSuggestions,
-    isLoaded && isSignedIn ? { limit: 20 } : "skip"
+    isAuthenticated ? { limit: 20 } : "skip"
   )
   const dismissSuggestion = useMutation(api.suggestions.dismissSuggestion)
   const followUser = useMutation(api.follows.followUser)

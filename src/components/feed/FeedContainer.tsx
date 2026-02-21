@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react"
 import { useUser } from "@clerk/nextjs"
-import { useQuery } from "convex/react"
+import { useQuery, useConvexAuth } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { PostCard } from "@/components/posts/PostCard"
 import { InfiniteScrollTrigger } from "./InfiniteScrollTrigger"
@@ -19,6 +19,7 @@ interface FeedContainerProps {
 
 export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
   const { isLoaded, isSignedIn } = useUser()
+  const { isAuthenticated } = useConvexAuth()
   const [allItems, setAllItems] = useState<ConvexFeedItem[]>([])
   const [cursor, setCursor] = useState<string | null>(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
@@ -26,9 +27,9 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
   const prevFeedTypeRef = useRef(feedType)
 
   // Determine which query to use based on feedType
-  const queryArgs = isLoaded && isSignedIn ? { limit: 20 } : "skip" as const
+  const queryArgs = isAuthenticated ? { limit: 20 } : "skip" as const
   const moreQueryArgs =
-    isLoaded && isSignedIn && cursor && isLoadingMore
+    isAuthenticated && cursor && isLoadingMore
       ? { limit: 20, cursor }
       : ("skip" as const)
 

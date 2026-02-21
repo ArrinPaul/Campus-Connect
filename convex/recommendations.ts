@@ -96,7 +96,7 @@ export const getRecommendedPosts = query({
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity()
-    if (!identity) throw new Error("Unauthorized")
+    if (!identity) return { items: [], nextCursor: null, hasMore: false }
 
     const user = await ctx.db
       .query("users")
@@ -265,7 +265,7 @@ export const getSimilarPosts = query({
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity()
-    if (!identity) throw new Error("Unauthorized")
+    if (!identity) return { items: [], hasMore: false }
 
     const limit = Math.min(args.limit ?? 5, 50)
 
@@ -344,7 +344,7 @@ export const getTrendingInSkill = query({
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity()
-    if (!identity) throw new Error("Unauthorized")
+    if (!identity) return { items: [], skills: [], hasMore: false }
 
     const user = await ctx.db
       .query("users")
@@ -436,7 +436,7 @@ export const getPopularInUniversity = query({
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity()
-    if (!identity) throw new Error("Unauthorized")
+    if (!identity) return { items: [], university: "", hasMore: false }
 
     const user = await ctx.db
       .query("users")

@@ -135,6 +135,7 @@ export function RichTextEditor({
   const [showLinkDialog, setShowLinkDialog] = useState(false)
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         // Disable the default hardBreak behaviour — Shift+Enter adds <br>
@@ -410,6 +411,7 @@ export function CompactRichTextEditor({
   disabled = false,
 }: Omit<RichTextEditorProps, "compact" | "minHeight">) {
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: false,

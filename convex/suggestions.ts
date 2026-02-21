@@ -429,7 +429,7 @@ export const getSuggestions = query({
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity()
-    if (!identity) throw new Error("Unauthorized")
+    if (!identity) return []
 
     const user = await ctx.db
       .query("users")
