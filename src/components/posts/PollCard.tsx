@@ -41,12 +41,12 @@ export function PollCard({ pollId }: PollCardProps) {
   if (poll === undefined) {
     // Loading skeleton
     return (
-      <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-4 space-y-2 animate-pulse">
-        <div className="h-4 w-1/3 rounded bg-gray-200 dark:bg-gray-700" />
+      <div className="rounded-xl border border-border bg-muted/50 p-4 space-y-2 animate-pulse">
+        <div className="h-4 w-1/3 rounded bg-muted bg-muted" />
         {[1, 2, 3].map((n) => (
-          <div key={n} className="h-9 rounded-lg bg-gray-200 dark:bg-gray-700" />
+          <div key={n} className="h-9 rounded-lg bg-muted bg-muted" />
         ))}
-        <div className="h-3 w-1/4 rounded bg-gray-200 dark:bg-gray-700" />
+        <div className="h-3 w-1/4 rounded bg-muted bg-muted" />
       </div>
     )
   }
@@ -75,25 +75,25 @@ export function PollCard({ pollId }: PollCardProps) {
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-4 space-y-3">
+    <div className="rounded-xl border border-border bg-muted/50 p-4 space-y-3">
       {/* Header */}
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
+        <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
           <BarChart2 className="h-3.5 w-3.5" />
           <span>Poll</span>
           {poll.isAnonymous && (
-            <span className="flex items-center gap-0.5 ml-1 text-gray-400 dark:text-gray-500">
+            <span className="flex items-center gap-0.5 ml-1 text-muted-foreground">
               <Lock className="h-3 w-3" />
               Anonymous
             </span>
           )}
         </div>
         {isExpired ? (
-          <span className="inline-flex items-center gap-1 rounded-full bg-gray-200 dark:bg-gray-700 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:text-gray-300">
+          <span className="inline-flex items-center gap-1 rounded-full bg-muted bg-muted px-2 py-0.5 text-xs font-semibold text-muted-foreground">
             Final Results
           </span>
         ) : poll.endsAt ? (
-          <span className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
+          <span className="flex items-center gap-1 text-xs text-muted-foreground">
             <Clock className="h-3 w-3" />
             {formatTimeRemaining(poll.endsAt)}
           </span>
@@ -102,7 +102,7 @@ export function PollCard({ pollId }: PollCardProps) {
 
       {/* Optional question */}
       {poll.question && (
-        <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{poll.question}</p>
+        <p className="text-sm font-medium text-foreground">{poll.question}</p>
       )}
 
       {/* Options */}
@@ -121,16 +121,16 @@ export function PollCard({ pollId }: PollCardProps) {
                 key={option.id}
                 className={`relative overflow-hidden rounded-lg border transition-colors ${
                   isSelected
-                    ? "border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                    : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                    ? "border-blue-400 dark:border-blue-500 bg-primary/10 dark:bg-blue-900/20"
+                    : "border-border bg-card"
                 }`}
               >
                 {/* Progress fill */}
                 <div
                   className={`absolute inset-y-0 left-0 transition-all duration-500 ${
                     isSelected
-                      ? "bg-blue-100 dark:bg-blue-900/40"
-                      : "bg-gray-100 dark:bg-gray-700/60"
+                      ? "bg-primary/10 dark:bg-blue-900/40"
+                      : "bg-muted bg-muted/60"
                   }`}
                   style={{ width: `${percentage}%` }}
                   aria-hidden="true"
@@ -139,19 +139,19 @@ export function PollCard({ pollId }: PollCardProps) {
                 <div className="relative flex items-center justify-between px-3 py-2.5 gap-2">
                   <div className="flex items-center gap-2 min-w-0">
                     {isSelected && (
-                      <CheckCircle2 className="h-4 w-4 text-blue-500 dark:text-blue-400 shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
                     )}
                     <span
                       className={`text-sm truncate ${
                         isWinner
-                          ? "font-semibold text-gray-900 dark:text-gray-50"
-                          : "text-gray-700 dark:text-gray-300"
+                          ? "font-semibold text-foreground dark:text-foreground"
+                          : "text-foreground"
                       }`}
                     >
                       {option.text}
                     </span>
                   </div>
-                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400 shrink-0">
+                  <span className="text-xs font-medium text-muted-foreground shrink-0">
                     {percentage}%
                   </span>
                 </div>
@@ -166,7 +166,7 @@ export function PollCard({ pollId }: PollCardProps) {
               type="button"
               onClick={() => handleVote(option.id)}
               disabled={isVoting}
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2.5 text-left text-sm text-gray-700 dark:text-gray-300 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 disabled:opacity-60 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-left text-sm text-foreground hover:border-primary hover:border-primary hover:bg-primary/10 hover:bg-primary/10 disabled:opacity-60 transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
             >
               {option.text}
             </button>
@@ -175,7 +175,7 @@ export function PollCard({ pollId }: PollCardProps) {
       </div>
 
       {/* Footer: total votes */}
-      <p className="text-xs text-gray-400 dark:text-gray-500">
+      <p className="text-xs text-muted-foreground">
         {formatVoteCount(poll.totalVotes)} vote{poll.totalVotes !== 1 ? "s" : ""}
         {!showResults && !isExpired && (
           <span className="ml-1">· Vote to see results</span>

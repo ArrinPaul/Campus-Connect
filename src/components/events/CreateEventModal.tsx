@@ -72,15 +72,15 @@ export function CreateEventModal({ onClose, communityId }: CreateEventModalProps
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-lg rounded-2xl bg-white dark:bg-gray-800 shadow-2xl overflow-y-auto max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/20 backdrop-blur-sm p-4">
+      <div className="w-full max-w-lg rounded-2xl bg-card shadow-2xl overflow-y-auto max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <div className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Create Event</h2>
+            <Calendar className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-semibold text-foreground">Create Event</h2>
           </div>
-          <button onClick={onClose} className="rounded-full p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+          <button onClick={onClose} className="rounded-full p-1 text-muted-foreground hover:text-muted-foreground hover:text-foreground">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -89,8 +89,8 @@ export function CreateEventModal({ onClose, communityId }: CreateEventModalProps
         <form onSubmit={handleSubmit} className="px-6 py-4 space-y-5">
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Event Title <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium text-foreground mb-1">
+              Event Title <span className="text-destructive">*</span>
             </label>
             <input
               type="text"
@@ -98,13 +98,13 @@ export function CreateEventModal({ onClose, communityId }: CreateEventModalProps
               onChange={(e) => setTitle(e.target.value)}
               maxLength={200}
               placeholder="e.g. Weekly Study Group — Algorithms"
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-border bg-card bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground dark:placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Description
             </label>
             <textarea
@@ -113,13 +113,13 @@ export function CreateEventModal({ onClose, communityId }: CreateEventModalProps
               rows={3}
               maxLength={5000}
               placeholder="What's this event about?"
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+              className="w-full rounded-lg border border-border bg-card bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground dark:placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring resize-none"
             />
           </div>
 
           {/* Event type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Event Type
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -130,8 +130,8 @@ export function CreateEventModal({ onClose, communityId }: CreateEventModalProps
                   onClick={() => setEventType(value)}
                   className={`flex flex-col items-center gap-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
                     eventType === value
-                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                      : "border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500"
+                      ? "border-blue-500 bg-primary/10 dark:bg-blue-900/20 text-primary"
+                      : "border-border text-muted-foreground hover:border-border hover:border-border"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -144,25 +144,25 @@ export function CreateEventModal({ onClose, communityId }: CreateEventModalProps
           {/* Date/time */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Start <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Start <span className="text-destructive">*</span>
               </label>
               <input
                 type="datetime-local"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-border bg-card bg-muted px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                End <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                End <span className="text-destructive">*</span>
               </label>
               <input
                 type="datetime-local"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-border bg-card bg-muted px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
           </div>
@@ -170,7 +170,7 @@ export function CreateEventModal({ onClose, communityId }: CreateEventModalProps
           {/* Location */}
           {(eventType === "in_person" || eventType === "hybrid") && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Location
               </label>
               <input
@@ -178,7 +178,7 @@ export function CreateEventModal({ onClose, communityId }: CreateEventModalProps
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Building / Room / Address"
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-border bg-card bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground dark:placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
           )}
@@ -186,7 +186,7 @@ export function CreateEventModal({ onClose, communityId }: CreateEventModalProps
           {/* Virtual link */}
           {(eventType === "virtual" || eventType === "hybrid") && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Meeting Link
               </label>
               <input
@@ -194,15 +194,15 @@ export function CreateEventModal({ onClose, communityId }: CreateEventModalProps
                 value={virtualLink}
                 onChange={(e) => setVirtualLink(e.target.value)}
                 placeholder="https://meet.google.com/..."
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-border bg-card bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground dark:placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
           )}
 
           {/* Max attendees */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Max Attendees <span className="text-xs text-gray-400">(optional)</span>
+            <label className="block text-sm font-medium text-foreground mb-1">
+              Max Attendees <span className="text-xs text-muted-foreground">(optional)</span>
             </label>
             <input
               type="number"
@@ -210,29 +210,29 @@ export function CreateEventModal({ onClose, communityId }: CreateEventModalProps
               onChange={(e) => setMaxAttendees(e.target.value)}
               min={1}
               placeholder="Leave empty for unlimited"
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-border bg-card bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground dark:placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
             />
           </div>
 
           {error && (
-            <p className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-3 py-2 text-sm text-red-600 dark:text-red-400">
+            <p className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-3 py-2 text-sm text-destructive dark:text-red-400">
               {error}
             </p>
           )}
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-1 border-t border-gray-100 dark:border-gray-700">
+          <div className="flex justify-end gap-3 pt-1 border-t border-border border-border">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="rounded-lg border border-border px-4 py-2 text-sm text-muted-foreground hover:bg-accent"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              className="rounded-lg bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
             >
               {isSubmitting ? "Creating…" : "Create Event"}
             </button>

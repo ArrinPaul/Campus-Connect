@@ -25,11 +25,9 @@ describe("SignInPage", () => {
   it("should have proper styling classes for layout", () => {
     const { container } = render(<SignInPage />)
 
-    // Check for gradient background
-    const gradientDiv = container.querySelector(
-      ".bg-gradient-to-br.from-blue-50.to-indigo-100"
-    )
-    expect(gradientDiv).toBeInTheDocument()
+    // Check for background class
+    const bgDiv = container.querySelector(".bg-background")
+    expect(bgDiv).toBeInTheDocument()
 
     // Check for centered layout
     const flexContainer = container.querySelector(

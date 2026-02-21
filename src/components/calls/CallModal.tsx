@@ -153,12 +153,12 @@ export function CallModal({
   ) || []
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/95 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-sm">
       <div className="relative flex h-full w-full max-w-4xl flex-col items-center justify-between py-12 px-6">
         {/* Close button */}
         <button
           onClick={callState === "ended" ? onClose : handleEndCall}
-          className="absolute right-4 top-4 rounded-full p-2 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+          className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground hover:bg-card hover:text-primary-foreground transition-colors"
           aria-label="Close"
         >
           <X className="h-6 w-6" />
@@ -174,7 +174,7 @@ export function CallModal({
                 alt={callerName}
                 className={`h-28 w-28 rounded-full object-cover ${
                   callState === "ringing" || callState === "connecting"
-                    ? "animate-pulse ring-4 ring-blue-500/50"
+                    ? "animate-pulse ring-4 ring-ring/50"
                     : callState === "active"
                     ? "ring-4 ring-green-500/50"
                     : "ring-4 ring-gray-500/50"
@@ -182,9 +182,9 @@ export function CallModal({
               />
             ) : (
               <div
-                className={`flex h-28 w-28 items-center justify-center rounded-full bg-blue-600 text-4xl font-bold text-white ${
+                className={`flex h-28 w-28 items-center justify-center rounded-full bg-primary text-4xl font-bold text-primary-foreground ${
                   callState === "ringing" || callState === "connecting"
-                    ? "animate-pulse ring-4 ring-blue-500/50"
+                    ? "animate-pulse ring-4 ring-ring/50"
                     : callState === "active"
                     ? "ring-4 ring-green-500/50"
                     : "ring-4 ring-gray-500/50"
@@ -195,9 +195,9 @@ export function CallModal({
             )}
 
             {/* Call type badge */}
-            <div className="absolute -bottom-1 -right-1 rounded-full bg-gray-800 p-2">
+            <div className="absolute -bottom-1 -right-1 rounded-full bg-card p-2">
               {callType === "video" ? (
-                <Video className="h-4 w-4 text-blue-400" />
+                <Video className="h-4 w-4 text-primary" />
               ) : (
                 <Phone className="h-4 w-4 text-green-400" />
               )}
@@ -205,10 +205,10 @@ export function CallModal({
           </div>
 
           {/* Name */}
-          <h2 className="text-2xl font-bold text-white">{callerName}</h2>
+          <h2 className="text-2xl font-bold text-primary-foreground">{callerName}</h2>
 
           {/* Status text */}
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-muted-foreground">
             {callState === "ringing" && isIncoming && "Incoming call..."}
             {callState === "ringing" && !isIncoming && "Calling..."}
             {callState === "connecting" && "Connecting..."}
@@ -218,7 +218,7 @@ export function CallModal({
 
           {/* Connected participants count */}
           {callState === "active" && connectedParticipants.length > 0 && (
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Users className="h-4 w-4" />
               <span>{connectedParticipants.length} connected</span>
             </div>
@@ -230,18 +230,18 @@ export function CallModal({
           <div className="flex flex-1 items-center justify-center w-full max-w-2xl my-8">
             <div className="flex w-full gap-4">
               {/* Remote video placeholder */}
-              <div className="flex-1 aspect-video rounded-2xl bg-gray-800 flex items-center justify-center border border-gray-700">
-                <div className="text-center text-gray-500">
+              <div className="flex-1 aspect-video rounded-2xl bg-card flex items-center justify-center border border-border">
+                <div className="text-center text-muted-foreground">
                   <Video className="h-12 w-12 mx-auto mb-2 opacity-50" />
                   <p className="text-sm">Remote video</p>
-                  <p className="text-xs text-gray-600 mt-1">WebRTC integration required</p>
+                  <p className="text-xs text-muted-foreground mt-1">WebRTC integration required</p>
                 </div>
               </div>
 
               {/* Local video (picture-in-picture style) */}
               {!isVideoOff && (
-                <div className="w-32 aspect-video rounded-xl bg-gray-700 flex items-center justify-center border border-gray-600 self-end">
-                  <p className="text-xs text-gray-500">You</p>
+                <div className="w-32 aspect-video rounded-xl bg-muted flex items-center justify-center border border-border self-end">
+                  <p className="text-xs text-muted-foreground">You</p>
                 </div>
               )}
             </div>
@@ -255,7 +255,7 @@ export function CallModal({
             <>
               <button
                 onClick={handleReject}
-                className="flex h-16 w-16 items-center justify-center rounded-full bg-red-600 text-white shadow-lg shadow-red-600/30 hover:bg-red-700 transition-colors"
+                className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive text-primary-foreground shadow-lg shadow-red-600/30 hover:bg-red-700 transition-colors"
                 aria-label="Reject call"
               >
                 <PhoneOff className="h-7 w-7" />
@@ -263,7 +263,7 @@ export function CallModal({
 
               <button
                 onClick={handleAccept}
-                className="flex h-16 w-16 items-center justify-center rounded-full bg-green-600 text-white shadow-lg shadow-green-600/30 hover:bg-green-700 transition-colors animate-pulse"
+                className="flex h-16 w-16 items-center justify-center rounded-full bg-success text-primary-foreground shadow-lg shadow-green-600/30 hover:bg-green-700 transition-colors animate-pulse"
                 aria-label="Accept call"
               >
                 <Phone className="h-7 w-7" />
@@ -279,8 +279,8 @@ export function CallModal({
                 onClick={toggleMute}
                 className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${
                   isMuted
-                    ? "bg-red-600/20 text-red-400 hover:bg-red-600/30"
-                    : "bg-gray-700 text-white hover:bg-gray-600"
+                    ? "bg-destructive/20 text-red-400 hover:bg-destructive/30"
+                    : "bg-muted text-primary-foreground hover:bg-muted"
                 }`}
                 aria-label={isMuted ? "Unmute" : "Mute"}
               >
@@ -293,8 +293,8 @@ export function CallModal({
                   onClick={toggleVideo}
                   className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${
                     isVideoOff
-                      ? "bg-red-600/20 text-red-400 hover:bg-red-600/30"
-                      : "bg-gray-700 text-white hover:bg-gray-600"
+                      ? "bg-destructive/20 text-red-400 hover:bg-destructive/30"
+                      : "bg-muted text-primary-foreground hover:bg-muted"
                   }`}
                   aria-label={isVideoOff ? "Turn on video" : "Turn off video"}
                 >
@@ -308,8 +308,8 @@ export function CallModal({
                   onClick={toggleScreenShare}
                   className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${
                     isScreenSharing
-                      ? "bg-blue-600/20 text-blue-400 hover:bg-blue-600/30"
-                      : "bg-gray-700 text-white hover:bg-gray-600"
+                      ? "bg-primary/20 text-primary hover:bg-primary/30"
+                      : "bg-muted text-primary-foreground hover:bg-muted"
                   }`}
                   aria-label={isScreenSharing ? "Stop sharing" : "Share screen"}
                 >
@@ -320,7 +320,7 @@ export function CallModal({
               {/* End call */}
               <button
                 onClick={handleEndCall}
-                className="flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-white shadow-lg shadow-red-600/30 hover:bg-red-700 transition-colors"
+                className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive text-primary-foreground shadow-lg shadow-red-600/30 hover:bg-red-700 transition-colors"
                 aria-label="End call"
               >
                 <PhoneOff className="h-6 w-6" />
@@ -330,7 +330,7 @@ export function CallModal({
 
           {/* Ended state */}
           {callState === "ended" && (
-            <p className="text-gray-400 text-sm">
+            <p className="text-muted-foreground text-sm">
               {callDuration > 0
                 ? `Call lasted ${formatDuration(callDuration)}`
                 : "Call ended"}

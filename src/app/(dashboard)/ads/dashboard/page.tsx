@@ -9,7 +9,7 @@ function StatusBadge({ status }: { status: string }) {
   const colors: Record<string, string> = {
     active: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-400",
     paused: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-400",
-    expired: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
+    expired: "bg-muted text-muted-foreground bg-card text-muted-foreground",
   }
   return (
     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors[status] ?? colors.expired}`}>
@@ -118,7 +118,7 @@ export default function AdsDashboardPage() {
                     <button
                       onClick={() => handleDelete(ad.adId)}
                       disabled={deleting === ad.adId.toString()}
-                      className="text-xs px-2 py-1 rounded border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50 transition-colors"
+                      className="text-xs px-2 py-1 rounded border border-red-200 text-destructive hover:bg-red-50 disabled:opacity-50 transition-colors"
                     >
                       {deleting === ad.adId.toString() ? "…" : "Delete"}
                     </button>

@@ -119,7 +119,7 @@ export function UniversalSearchBar() {
   return (
     <div ref={containerRef} className="relative w-full max-w-md">
       <form onSubmit={handleSubmit} className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
           ref={inputRef}
           type="text"
@@ -128,7 +128,7 @@ export function UniversalSearchBar() {
           onFocus={() => setIsFocused(true)}
           placeholder="Search... (Ctrl+K)"
           aria-label="Search"
-          className="h-9 w-full rounded-full border border-gray-300 bg-gray-100 pl-9 pr-8 text-sm text-gray-900 placeholder-gray-500 transition-colors focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:bg-gray-600"
+          className="h-9 w-full rounded-full border border-border bg-muted pl-9 pr-8 text-sm text-foreground placeholder:text-muted-foreground transition-colors focus:border-ring focus:bg-card focus:outline-none focus:ring-1 focus:ring-ring border-border bg-muted text-foreground dark:placeholder:text-muted-foreground dark:focus:border-blue-400 dark:focus:bg-muted"
         />
         {query && (
           <button
@@ -138,7 +138,7 @@ export function UniversalSearchBar() {
               setDebouncedQuery("")
               inputRef.current?.focus()
             }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground"
             aria-label="Clear search"
           >
             <X className="h-3.5 w-3.5" />
@@ -148,10 +148,10 @@ export function UniversalSearchBar() {
 
       {/* Dropdown */}
       {showDropdown && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-[70vh] overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
+        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-[70vh] overflow-y-auto rounded-lg border border-border bg-card shadow-lg border-border bg-card">
           {/* Searching state */}
           {debouncedQuery.length >= 2 && !results && (
-            <div className="flex items-center gap-2 px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-2 px-4 py-3 text-sm text-muted-foreground">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
               Searching...
             </div>
@@ -163,7 +163,7 @@ export function UniversalSearchBar() {
               {/* Users */}
               {results.users.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-2 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center gap-2 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     <Users className="h-3.5 w-3.5" />
                     People
                   </div>
@@ -175,9 +175,9 @@ export function UniversalSearchBar() {
                         saveSearch(query.trim())
                         setIsFocused(false)
                       }}
-                      className="flex items-center gap-3 px-4 py-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="flex items-center gap-3 px-4 py-2 transition-colors hover:bg-accent"
                     >
-                      <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-600">
+                      <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-muted dark:bg-muted">
                         {user.imageUrl ? (
                           <Image
                             src={user.imageUrl}
@@ -186,17 +186,17 @@ export function UniversalSearchBar() {
                             className="object-cover"
                           />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center text-xs font-bold text-gray-500 dark:text-gray-400">
+                          <div className="flex h-full w-full items-center justify-center text-xs font-bold text-muted-foreground">
                             {user.name?.[0]?.toUpperCase() ?? "?"}
                           </div>
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
+                        <p className="truncate text-sm font-medium text-foreground">
                           {user.name}
                         </p>
                         {user.username && (
-                          <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+                          <p className="truncate text-xs text-muted-foreground">
                             @{user.username}
                           </p>
                         )}
@@ -209,7 +209,7 @@ export function UniversalSearchBar() {
               {/* Posts */}
               {results.posts.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-2 border-t border-gray-100 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                  <div className="flex items-center gap-2 border-t border-border px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground border-border text-muted-foreground">
                     <FileText className="h-3.5 w-3.5" />
                     Posts
                   </div>
@@ -221,13 +221,13 @@ export function UniversalSearchBar() {
                         saveSearch(query.trim())
                         setIsFocused(false)
                       }}
-                      className="block px-4 py-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="block px-4 py-2 transition-colors hover:bg-accent"
                     >
-                      <p className="truncate text-sm text-gray-900 dark:text-gray-100">
+                      <p className="truncate text-sm text-foreground">
                         {post.content?.slice(0, 100)}
                         {post.content?.length > 100 ? "..." : ""}
                       </p>
-                      <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                      <p className="mt-0.5 text-xs text-muted-foreground">
                         by {post.authorName ?? "Unknown"}
                       </p>
                     </Link>
@@ -238,7 +238,7 @@ export function UniversalSearchBar() {
               {/* Hashtags */}
               {results.hashtags.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-2 border-t border-gray-100 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                  <div className="flex items-center gap-2 border-t border-border px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground border-border text-muted-foreground">
                     <Hash className="h-3.5 w-3.5" />
                     Hashtags
                   </div>
@@ -250,12 +250,12 @@ export function UniversalSearchBar() {
                         saveSearch("#" + tag.tag)
                         setIsFocused(false)
                       }}
-                      className="flex items-center justify-between px-4 py-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="flex items-center justify-between px-4 py-2 transition-colors hover:bg-accent"
                     >
-                      <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                      <span className="text-sm font-medium text-primary">
                         #{tag.tag}
                       </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                      <span className="text-xs text-muted-foreground">
                         {tag.postCount ?? 0} posts
                       </span>
                     </Link>
@@ -270,7 +270,7 @@ export function UniversalSearchBar() {
                   saveSearch(query.trim())
                   setIsFocused(false)
                 }}
-                className="flex items-center justify-center gap-1 border-t border-gray-100 px-4 py-2.5 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50 dark:border-gray-700 dark:text-blue-400 dark:hover:bg-gray-700"
+                className="flex items-center justify-center gap-1 border-t border-border px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/10 border-border text-primary hover:bg-accent"
               >
                 See all results
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -280,7 +280,7 @@ export function UniversalSearchBar() {
 
           {/* No results */}
           {debouncedQuery.length >= 2 && results && !hasResults && (
-            <div className="px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="px-4 py-6 text-center text-sm text-muted-foreground">
               <Search className="mx-auto mb-2 h-6 w-6 opacity-40" />
               No results for &quot;{debouncedQuery}&quot;
             </div>
@@ -290,7 +290,7 @@ export function UniversalSearchBar() {
           {debouncedQuery.length < 2 && recentSearches.length > 0 && (
             <div>
               <div className="flex items-center justify-between px-4 py-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Recent Searches
                 </span>
                 <button
@@ -298,7 +298,7 @@ export function UniversalSearchBar() {
                     setRecentSearches([])
                     localStorage.removeItem(RECENT_SEARCHES_KEY)
                   }}
-                  className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  className="text-xs text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground"
                 >
                   Clear all
                 </button>
@@ -307,9 +307,9 @@ export function UniversalSearchBar() {
                 <button
                   key={i}
                   onClick={() => handleRecentClick(s)}
-                  className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
+                  className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-foreground transition-colors hover:bg-muted/50 text-muted-foreground hover:bg-accent"
                 >
-                  <Search className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                  <Search className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                   <span className="truncate">{s}</span>
                 </button>
               ))}

@@ -37,8 +37,8 @@ export default function PaperDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <FileText className="mb-3 h-12 w-12 text-gray-300 dark:text-gray-600" />
-        <p className="text-gray-500 dark:text-gray-400">Paper not found</p>
-        <Link href="/research" className="mt-3 text-sm text-blue-600 hover:underline">← Back to Research Hub</Link>
+        <p className="text-muted-foreground">Paper not found</p>
+        <Link href="/research" className="mt-3 text-sm text-primary hover:underline">← Back to Research Hub</Link>
       </div>
     )
   }
@@ -65,23 +65,23 @@ export default function PaperDetailPage() {
       </Link>
 
       {/* Title */}
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 leading-tight mb-2">
+      <h1 className="text-2xl font-bold text-foreground leading-tight mb-2">
         {paper.title}
       </h1>
 
       {/* Authors */}
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+      <p className="text-sm text-muted-foreground mb-4">
         {paper.authors.join(", ")}
       </p>
 
       {/* Meta badges */}
-      <div className="flex flex-wrap items-center gap-3 mb-5 text-xs text-gray-500 dark:text-gray-400">
+      <div className="flex flex-wrap items-center gap-3 mb-5 text-xs text-muted-foreground">
         {paper.doi && (
           <a
             href={`https://doi.org/${paper.doi}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+            className="flex items-center gap-1 text-primary hover:underline"
           >
             <ExternalLink className="h-3 w-3" />
             DOI: {paper.doi}
@@ -96,7 +96,7 @@ export default function PaperDetailPage() {
           {new Date(paper.createdAt).toLocaleDateString()}
         </span>
         {paper.lookingForCollaborators && (
-          <span className="flex items-center gap-1 text-green-600 dark:text-green-400 font-medium">
+          <span className="flex items-center gap-1 text-success dark:text-green-400 font-medium">
             <Users className="h-3 w-3" />
             Looking for Collaborators
           </span>
@@ -109,7 +109,7 @@ export default function PaperDetailPage() {
           {paper.tags.map((tag: string) => (
             <span
               key={tag}
-              className="rounded-full bg-blue-50 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs text-blue-600 dark:text-blue-400"
+              className="rounded-full bg-blue-50 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs text-primary"
             >
               <Tag className="inline h-3 w-3 mr-0.5" />
               {tag}
@@ -119,9 +119,9 @@ export default function PaperDetailPage() {
       )}
 
       {/* Abstract */}
-      <div className="mb-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
-        <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">Abstract</h2>
-        <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+      <div className="mb-5 rounded-xl border border-border bg-card p-5">
+        <h2 className="text-sm font-semibold text-foreground mb-2">Abstract</h2>
+        <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
           {paper.abstract}
         </p>
       </div>
@@ -132,7 +132,7 @@ export default function PaperDetailPage() {
           href={paper.pdfUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mb-5 flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-blue-600 dark:text-blue-400 hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
+          className="mb-5 flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm text-primary hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
         >
           <Download className="h-4 w-4" />
           Download PDF
@@ -142,17 +142,17 @@ export default function PaperDetailPage() {
 
       {/* Uploaded by */}
       {paper.uploader && (
-        <div className="mb-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Uploaded by</p>
-          <Link href={`/profile/${paper.uploader._id}`} className="flex items-center gap-2 hover:text-blue-600">
+        <div className="mb-5 rounded-xl border border-border bg-card p-4">
+          <p className="text-xs text-muted-foreground mb-2">Uploaded by</p>
+          <Link href={`/profile/${paper.uploader._id}`} className="flex items-center gap-2 hover:text-primary">
             {paper.uploader.profilePicture ? (
               <Image src={paper.uploader.profilePicture} alt="" width={28} height={28} className="rounded-full" />
             ) : (
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
                 {paper.uploader.name.charAt(0)}
               </div>
             )}
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <span className="text-sm font-medium text-foreground">
               {paper.uploader.name}
             </span>
           </Link>
@@ -161,8 +161,8 @@ export default function PaperDetailPage() {
 
       {/* Linked platform authors */}
       {paper.linkedAuthors && paper.linkedAuthors.length > 0 && (
-        <div className="mb-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Authors on Platform</p>
+        <div className="mb-5 rounded-xl border border-border bg-card p-4">
+          <p className="text-xs text-muted-foreground mb-2">Authors on Platform</p>
           <div className="flex flex-wrap gap-2">
             {paper.linkedAuthors.map((author: any) => (
               <Link
@@ -173,11 +173,11 @@ export default function PaperDetailPage() {
                 {author.profilePicture ? (
                   <Image src={author.profilePicture} alt="" width={20} height={20} className="rounded-full" />
                 ) : (
-                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[8px] font-bold text-white">
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[8px] font-bold text-white">
                     {author.name.charAt(0)}
                   </div>
                 )}
-                <span className="text-gray-700 dark:text-gray-300">{author.name}</span>
+                <span className="text-foreground">{author.name}</span>
               </Link>
             ))}
           </div>
@@ -189,7 +189,7 @@ export default function PaperDetailPage() {
         <button
           onClick={handleDelete}
           disabled={deleting}
-          className="flex items-center gap-2 text-sm text-red-500 hover:text-red-700 disabled:opacity-50"
+          className="flex items-center gap-2 text-sm text-destructive hover:text-red-700 disabled:opacity-50"
         >
           <Trash2 className="h-4 w-4" />
           {deleting ? "Deleting..." : "Delete Paper"}

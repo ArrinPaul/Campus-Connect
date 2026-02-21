@@ -86,7 +86,7 @@ export function MentionAutocomplete({
 
   return (
     <div
-      className="absolute z-50 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden"
+      className="absolute z-50 w-64 bg-card border border-border rounded-lg shadow-lg overflow-hidden"
       style={position ? { top: position.top, left: position.left } : undefined}
     >
       <div className="py-1">
@@ -95,9 +95,9 @@ export function MentionAutocomplete({
             key={user._id}
             onClick={() => onSelect(user.username)}
             onMouseEnter={() => setSelectedIndex(index)}
-            className={`w-full px-4 py-2 flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+            className={`w-full px-4 py-2 flex items-center gap-3 hover:bg-accent transition-colors ${
               index === selectedIndex
-                ? "bg-gray-100 dark:bg-gray-700"
+                ? "bg-muted bg-muted"
                 : "bg-transparent"
             }`}
           >
@@ -108,15 +108,15 @@ export function MentionAutocomplete({
                 className="w-8 h-8 rounded-full object-cover"
               />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-                <User className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+              <div className="w-8 h-8 rounded-full bg-muted dark:bg-muted flex items-center justify-center">
+                <User className="w-4 h-4 text-muted-foreground" />
               </div>
             )}
             <div className="flex-1 text-left">
-              <div className="font-medium text-gray-900 dark:text-white text-sm">
+              <div className="font-medium text-foreground text-sm">
                 {user.name}
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-xs text-muted-foreground">
                 @{user.username}
               </div>
             </div>

@@ -36,7 +36,7 @@ export default function JobDetailPage() {
       <div className="max-w-4xl mx-auto p-6 text-center py-20">
         <Briefcase className="w-12 h-12 mx-auto mb-3 text-gray-300" />
         <p className="text-lg text-gray-500">Job not found</p>
-        <Link href="/jobs" className="text-blue-600 hover:underline text-sm mt-2 inline-block">
+        <Link href="/jobs" className="text-primary hover:underline text-sm mt-2 inline-block">
           Back to Jobs
         </Link>
       </div>
@@ -109,7 +109,7 @@ export default function JobDetailPage() {
           <div className="flex gap-2">
             <button
               onClick={handleDelete}
-              className="p-2 text-gray-400 hover:text-red-500"
+              className="p-2 text-gray-400 hover:text-destructive"
               title="Delete job"
             >
               <Trash2 className="w-5 h-5" />
@@ -164,7 +164,7 @@ export default function JobDetailPage() {
       {!job.isExpired && (
         <div className="bg-white border rounded-xl p-6 text-center">
           {job.viewerApplication ? (
-            <div className="flex items-center justify-center gap-2 text-green-600">
+            <div className="flex items-center justify-center gap-2 text-success">
               <CheckCircle className="w-5 h-5" />
               <span className="font-medium">
                 You applied — Status:{" "}
@@ -174,7 +174,7 @@ export default function JobDetailPage() {
           ) : (
             <button
               onClick={() => setShowApplyModal(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 font-medium"
             >
               <Send className="w-4 h-4" /> Easy Apply
             </button>
@@ -186,7 +186,7 @@ export default function JobDetailPage() {
       <div className="bg-white border rounded-xl p-6">
         <button
           onClick={() => setShowApplications(!showApplications)}
-          className="text-blue-600 hover:underline text-sm font-medium"
+          className="text-primary hover:underline text-sm font-medium"
         >
           {showApplications ? "Hide Applications" : "View Applications (Poster Only)"}
         </button>
@@ -245,12 +245,12 @@ function ApplyModal({ jobId, onClose }: { jobId: Id<"jobs">; onClose: () => void
             <p className="text-xs text-gray-400 mt-1">{coverLetter.length}/3000</p>
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && <p className="text-destructive text-sm">{error}</p>}
 
           <button
             onClick={handleApply}
             disabled={loading}
-            className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            className="w-full py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"
           >
             {loading ? "Submitting..." : "Submit Application"}
           </button>

@@ -59,7 +59,7 @@ export function CreateListingModal({ onClose }: CreateListingModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/20 backdrop-blur-sm backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="w-full max-w-lg rounded-2xl bg-background shadow-2xl border p-6 max-h-[90vh] overflow-y-auto">
@@ -155,7 +155,7 @@ export function CreateListingModal({ onClose }: CreateListingModalProps) {
             </div>
           </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
 
           <div className="flex gap-3 pt-1">
             <button

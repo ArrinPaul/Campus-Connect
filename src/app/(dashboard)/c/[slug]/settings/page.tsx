@@ -60,7 +60,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
   if (!isLoaded || community === undefined) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
       </div>
     )
   }
@@ -81,12 +81,12 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-muted-foreground">
             You don&apos;t have permission to access community settings.
           </p>
           <Link
             href={`/c/${params.slug}`}
-            className="mt-3 inline-block text-blue-600 hover:underline"
+            className="mt-3 inline-block text-primary hover:underline"
           >
             Back to community
           </Link>
@@ -156,7 +156,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
         Back to {community.name}
       </Link>
 
-      <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+      <h1 className="mb-6 text-2xl font-bold text-foreground flex items-center gap-2">
         <Settings className="h-6 w-6" />
         Community Settings
       </h1>
@@ -164,13 +164,13 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
       <div className="space-y-6">
         {/* General Settings */}
         <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-          <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <h2 className="mb-4 text-lg font-semibold text-foreground">
             General
           </h2>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Community Name
               </label>
               <input
@@ -178,25 +178,25 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 maxLength={100}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Description
               </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Category
                 </label>
                 <select
@@ -213,7 +213,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Community Type
                 </label>
                 <select
@@ -234,7 +234,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
 
         {/* Rules */}
         <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-          <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <h2 className="mb-4 text-lg font-semibold text-foreground">
             Community Rules
           </h2>
 
@@ -244,12 +244,12 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
                 <span className="flex-shrink-0 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700 dark:bg-blue-900 dark:text-blue-300">
                   {i + 1}
                 </span>
-                <span className="flex-1 text-sm text-gray-700 dark:text-gray-300">
+                <span className="flex-1 text-sm text-foreground">
                   {rule}
                 </span>
                 <button
                   onClick={() => removeRule(i)}
-                  className="text-gray-400 hover:text-red-500"
+                  className="text-gray-400 hover:text-destructive"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -274,7 +274,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
             <button
               onClick={addRule}
               disabled={!newRule.trim()}
-              className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50 transition-colors"
             >
               <Plus className="h-4 w-4" />
             </button>
@@ -283,9 +283,9 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
 
         {/* Save Button */}
         <div className="flex items-center justify-between">
-          {saveError && <p className="text-sm text-red-500">{saveError}</p>}
+          {saveError && <p className="text-sm text-destructive">{saveError}</p>}
           {saveSuccess && (
-            <p className="text-sm text-green-600 dark:text-green-400">
+            <p className="text-sm text-success dark:text-green-400">
               Settings saved!
             </p>
           )}
@@ -293,7 +293,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="rounded-lg bg-primary px-6 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50 transition-colors"
           >
             {isSaving ? "Saving..." : "Save Changes"}
           </button>
@@ -305,14 +305,14 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
             <h2 className="mb-2 text-lg font-semibold text-red-700 dark:text-red-400">
               Danger Zone
             </h2>
-            <p className="mb-4 text-sm text-red-600 dark:text-red-400">
+            <p className="mb-4 text-sm text-destructive dark:text-red-400">
               Deleting a community is permanent and cannot be undone. All
               members will be removed.
             </p>
             <button
               onClick={handleDelete}
               disabled={isDeleting}
-              className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+              className="inline-flex items-center gap-2 rounded-lg bg-destructive px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
             >
               <Trash2 className="h-4 w-4" />
               {isDeleting ? "Deleting..." : "Delete Community"}

@@ -1,15 +1,55 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import { ClerkProvider } from "@clerk/nextjs"
 import { ConvexClientProvider } from "@/components/providers/convex-provider"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import "./globals.css"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+})
 
 export const metadata: Metadata = {
-  title: "Campus Connect",
-  description: "Connect. Collaborate. Create.",
+  title: {
+    default: "Campus Connect",
+    template: "%s | Campus Connect",
+  },
+  description:
+    "The all-in-one academic platform for students and researchers. Connect, collaborate, and accelerate your academic journey.",
+  keywords: [
+    "campus",
+    "connect",
+    "academic",
+    "collaboration",
+    "research",
+    "students",
+  ],
+  authors: [{ name: "Campus Connect" }],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "Campus Connect",
+    title: "Campus Connect — Academic Collaboration Platform",
+    description:
+      "Connect with peers, collaborate on research, and accelerate your academic career.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Campus Connect",
+    description:
+      "The all-in-one academic platform for students and researchers.",
+  },
+}
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fafafa" },
+    { media: "(prefers-color-scheme: dark)", color: "#030712" },
+  ],
+  width: "device-width",
+  initialScale: 1,
 }
 
 export default function RootLayout({
@@ -21,25 +61,30 @@ export default function RootLayout({
     <ClerkProvider
       appearance={{
         variables: {
-          colorPrimary: "#2563eb",
-          colorBackground: "#ffffff",
-          colorText: "#1f2937",
-          colorInputBackground: "#ffffff",
-          colorInputText: "#1f2937",
+          colorPrimary: "hsl(239 84% 67%)",
+          colorBackground: "hsl(0 0% 100%)",
+          colorText: "hsl(224 71% 4%)",
+          colorInputBackground: "hsl(0 0% 100%)",
+          colorInputText: "hsl(224 71% 4%)",
+          borderRadius: "0.625rem",
+          fontFamily: "Inter, system-ui, sans-serif",
         },
         elements: {
-          formButtonPrimary: "bg-blue-600 hover:bg-blue-700 text-white",
-          card: "shadow-lg",
-          headerTitle: "text-2xl font-bold",
-          headerSubtitle: "text-gray-600",
-          socialButtonsBlockButton: "border border-gray-300 hover:bg-gray-50",
-          formFieldLabel: "text-gray-700 font-medium",
-          footerActionLink: "text-blue-600 hover:text-blue-700",
+          formButtonPrimary:
+            "bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm transition-all duration-200 active:scale-[0.98]",
+          card: "shadow-elevation-2 border border-border rounded-xl",
+          headerTitle: "text-xl font-semibold tracking-tight",
+          headerSubtitle: "text-muted-foreground text-sm",
+          socialButtonsBlockButton:
+            "border border-border hover:bg-accent transition-colors duration-150 rounded-lg",
+          formFieldLabel: "text-foreground font-medium text-sm",
+          footerActionLink: "text-primary hover:text-primary/80",
+          internal: "font-sans",
         },
       }}
     >
-      <html lang="en" suppressHydrationWarning>
-        <body className={inter.className}>
+      <html lang="en" suppressHydrationWarning className={inter.variable}>
+        <body className="font-sans antialiased">
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

@@ -19,8 +19,8 @@ const TIMELINE_ICONS: Record<string, any> = {
   award: Award,
 }
 const TIMELINE_COLORS: Record<string, string> = {
-  course: "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400",
-  certification: "bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400",
+  course: "bg-blue-100 dark:bg-blue-900/40 text-primary",
+  certification: "bg-green-100 dark:bg-green-900/40 text-success dark:text-green-400",
   publication: "bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400",
   award: "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-400",
 }
@@ -52,13 +52,13 @@ export default function PortfolioPage() {
       </Link>
 
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Portfolio</h1>
+        <h1 className="text-2xl font-bold text-foreground">Portfolio</h1>
         {isOwner && (
           <div className="flex gap-2">
             {tab === "projects" && (
               <button
                 onClick={() => setShowProjectModal(true)}
-                className="flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                className="flex items-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90"
               >
                 <Plus className="h-4 w-4" /> Add Project
               </button>
@@ -66,7 +66,7 @@ export default function PortfolioPage() {
             {tab === "timeline" && (
               <button
                 onClick={() => setShowTimelineModal(true)}
-                className="flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                className="flex items-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90"
               >
                 <Plus className="h-4 w-4" /> Add Milestone
               </button>
@@ -76,15 +76,15 @@ export default function PortfolioPage() {
       </div>
 
       {/* Tabs */}
-      <div className="mb-5 flex gap-1 rounded-lg bg-gray-100 dark:bg-gray-800 p-1">
+      <div className="mb-5 flex gap-1 rounded-lg bg-muted p-1">
         {(["projects", "timeline", "activity"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`flex-1 rounded-md px-3 py-2 text-sm font-medium capitalize transition-colors ${
               tab === t
-                ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm"
-                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             {t}
@@ -122,7 +122,7 @@ function ProjectsTab({ projects, isOwner }: { projects: any[] | undefined; isOwn
     return (
       <div className="space-y-3">
         {[1, 2].map((i) => (
-          <div key={i} className="animate-pulse rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
+          <div key={i} className="animate-pulse rounded-xl border border-border bg-card p-5">
             <div className="h-5 w-2/3 rounded bg-gray-200 dark:bg-gray-700 mb-2" />
             <div className="h-3 w-full rounded bg-gray-200 dark:bg-gray-700" />
           </div>
@@ -135,7 +135,7 @@ function ProjectsTab({ projects, isOwner }: { projects: any[] | undefined; isOwn
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <Code className="mb-3 h-12 w-12 text-gray-300 dark:text-gray-600" />
-        <p className="text-gray-500 dark:text-gray-400">No projects yet</p>
+        <p className="text-muted-foreground">No projects yet</p>
       </div>
     )
   }
@@ -145,20 +145,20 @@ function ProjectsTab({ projects, isOwner }: { projects: any[] | undefined; isOwn
       {projects.map((project: any) => (
         <div
           key={project._id}
-          className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5"
+          className="rounded-xl border border-border bg-card p-5"
         >
           <div className="flex items-start justify-between gap-3">
-            <h3 className="font-semibold text-gray-900 dark:text-gray-100">{project.title}</h3>
+            <h3 className="font-semibold text-foreground">{project.title}</h3>
             {isOwner && (
               <button
                 onClick={() => deleteProject({ projectId: project._id })}
-                className="text-gray-400 hover:text-red-500"
+                className="text-gray-400 hover:text-destructive"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
             )}
           </div>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-3">
+          <p className="mt-1 text-sm text-muted-foreground line-clamp-3">
             {project.description}
           </p>
           {project.techStack.length > 0 && (
@@ -166,7 +166,7 @@ function ProjectsTab({ projects, isOwner }: { projects: any[] | undefined; isOwn
               {project.techStack.map((tech: string) => (
                 <span
                   key={tech}
-                  className="rounded-full bg-gray-100 dark:bg-gray-700 px-2 py-0.5 text-xs text-gray-600 dark:text-gray-300"
+                  className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
                 >
                   {tech}
                 </span>
@@ -181,7 +181,7 @@ function ProjectsTab({ projects, isOwner }: { projects: any[] | undefined; isOwn
                   href={link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                  className="flex items-center gap-1 text-xs text-primary hover:underline"
                 >
                   <ExternalLink className="h-3 w-3" />
                   {new URL(link).hostname}
@@ -190,7 +190,7 @@ function ProjectsTab({ projects, isOwner }: { projects: any[] | undefined; isOwn
             </div>
           )}
           {(project.startDate || project.endDate) && (
-            <p className="mt-2 text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
+            <p className="mt-2 text-xs text-muted-foreground flex items-center gap-1">
               <Calendar className="h-3 w-3" />
               {project.startDate ? new Date(project.startDate).toLocaleDateString() : ""}
               {project.startDate && project.endDate ? " — " : ""}
@@ -225,13 +225,13 @@ function TimelineTab({ timeline, isOwner }: { timeline: any[] | undefined; isOwn
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <Calendar className="mb-3 h-12 w-12 text-gray-300 dark:text-gray-600" />
-        <p className="text-gray-500 dark:text-gray-400">No milestones yet</p>
+        <p className="text-muted-foreground">No milestones yet</p>
       </div>
     )
   }
 
   return (
-    <div className="relative pl-6 border-l-2 border-gray-200 dark:border-gray-700 space-y-6">
+    <div className="relative pl-6 border-l-2 border-border space-y-6">
       {timeline.map((item: any) => {
         const Icon = TIMELINE_ICONS[item.type] || BookOpen
         const colorClass = TIMELINE_COLORS[item.type] || "bg-gray-100 text-gray-600"
@@ -243,24 +243,24 @@ function TimelineTab({ timeline, isOwner }: { timeline: any[] | undefined; isOwn
             <div className="ml-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <h4 className="font-medium text-gray-900 dark:text-gray-100">{item.title}</h4>
+                  <h4 className="font-medium text-foreground">{item.title}</h4>
                   {item.institution && (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{item.institution}</p>
+                    <p className="text-sm text-muted-foreground">{item.institution}</p>
                   )}
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     {new Date(item.date).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
                   </p>
                 </div>
                 {isOwner && (
                   <button
                     onClick={() => deleteItem({ itemId: item._id })}
-                    className="text-gray-400 hover:text-red-500"
+                    className="text-gray-400 hover:text-destructive"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
                 )}
               </div>
-              <span className="mt-1 inline-block rounded-full bg-gray-100 dark:bg-gray-700 px-2 py-0.5 text-xs capitalize text-gray-500 dark:text-gray-400">
+              <span className="mt-1 inline-block rounded-full bg-muted px-2 py-0.5 text-xs capitalize text-muted-foreground">
                 {item.type}
               </span>
             </div>
@@ -296,10 +296,10 @@ function ContributionHeatmap({ data }: { data: Record<string, number> | undefine
     : 0
 
   const getColor = (count: number) => {
-    if (count === 0) return "bg-gray-100 dark:bg-gray-800"
+    if (count === 0) return "bg-muted"
     if (count <= 2) return "bg-green-200 dark:bg-green-900"
     if (count <= 5) return "bg-green-400 dark:bg-green-700"
-    if (count <= 10) return "bg-green-600 dark:bg-green-500"
+    if (count <= 10) return "bg-success dark:bg-success"
     return "bg-green-800 dark:bg-green-400"
   }
 
@@ -312,11 +312,11 @@ function ContributionHeatmap({ data }: { data: Record<string, number> | undefine
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
-      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">
+    <div className="rounded-xl border border-border bg-card p-5">
+      <h3 className="text-sm font-semibold text-foreground mb-1">
         Activity Heatmap
       </h3>
-      <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+      <p className="text-xs text-muted-foreground mb-4">
         {totalContributions} contributions in the last year
       </p>
       <div className="flex gap-[3px] overflow-x-auto pb-2">
@@ -332,7 +332,7 @@ function ContributionHeatmap({ data }: { data: Record<string, number> | undefine
           </div>
         ))}
       </div>
-      <div className="mt-3 flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
+      <div className="mt-3 flex items-center gap-1 text-xs text-muted-foreground">
         Less
         {[0, 2, 5, 10, 15].map((n) => (
           <div key={n} className={`h-[11px] w-[11px] rounded-[2px] ${getColor(n)}`} />
@@ -375,24 +375,24 @@ function AddProjectModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-lg rounded-xl bg-white dark:bg-gray-800 p-6 shadow-xl">
+      <div className="w-full max-w-lg rounded-xl bg-card p-6 shadow-xl">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">Add Project</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"><X className="h-5 w-5" /></button>
+          <h2 className="text-lg font-bold text-foreground">Add Project</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-foreground"><X className="h-5 w-5" /></button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-3">
           <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Project title *" required maxLength={200}
-            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none" />
+            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-blue-500 focus:outline-none" />
           <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description *" required maxLength={3000} rows={3}
-            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none resize-none" />
+            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-blue-500 focus:outline-none resize-none" />
           <input value={techStack} onChange={(e) => setTechStack(e.target.value)} placeholder="Tech stack (comma-separated)"
-            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none" />
+            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-blue-500 focus:outline-none" />
           <input value={links} onChange={(e) => setLinks(e.target.value)} placeholder="Links (comma-separated)"
-            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none" />
-          {error && <p className="text-sm text-red-600">{error}</p>}
+            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-blue-500 focus:outline-none" />
+          {error && <p className="text-sm text-destructive">{error}</p>}
           <div className="flex justify-end gap-2 pt-2">
-            <button type="button" onClick={onClose} className="rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
-            <button type="submit" disabled={loading || !title.trim()} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50">{loading ? "Adding..." : "Add Project"}</button>
+            <button type="button" onClick={onClose} className="rounded-lg border border-border px-4 py-2 text-sm text-muted-foreground hover:bg-accent">Cancel</button>
+            <button type="submit" disabled={loading || !title.trim()} className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50">{loading ? "Adding..." : "Add Project"}</button>
           </div>
         </form>
       </div>
@@ -432,30 +432,30 @@ function AddTimelineModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-lg rounded-xl bg-white dark:bg-gray-800 p-6 shadow-xl">
+      <div className="w-full max-w-lg rounded-xl bg-card p-6 shadow-xl">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">Add Milestone</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"><X className="h-5 w-5" /></button>
+          <h2 className="text-lg font-bold text-foreground">Add Milestone</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-foreground"><X className="h-5 w-5" /></button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid grid-cols-4 gap-1">
             {(["course", "certification", "publication", "award"] as const).map((t) => (
               <button key={t} type="button" onClick={() => setType(t)}
-                className={`rounded-lg px-2 py-2 text-xs font-medium capitalize transition-colors ${type === t ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"}`}>
+                className={`rounded-lg px-2 py-2 text-xs font-medium capitalize transition-colors ${type === t ? "bg-primary text-white" : "bg-muted text-muted-foreground"}`}>
                 {t}
               </button>
             ))}
           </div>
           <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title *" required maxLength={200}
-            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none" />
+            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-blue-500 focus:outline-none" />
           <input value={institution} onChange={(e) => setInstitution(e.target.value)} placeholder="Institution (optional)" maxLength={200}
-            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none" />
+            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-blue-500 focus:outline-none" />
           <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required
-            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none" />
-          {error && <p className="text-sm text-red-600">{error}</p>}
+            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-blue-500 focus:outline-none" />
+          {error && <p className="text-sm text-destructive">{error}</p>}
           <div className="flex justify-end gap-2 pt-2">
-            <button type="button" onClick={onClose} className="rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
-            <button type="submit" disabled={loading || !title.trim() || !date} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50">{loading ? "Adding..." : "Add Milestone"}</button>
+            <button type="button" onClick={onClose} className="rounded-lg border border-border px-4 py-2 text-sm text-muted-foreground hover:bg-accent">Cancel</button>
+            <button type="submit" disabled={loading || !title.trim() || !date} className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50">{loading ? "Adding..." : "Add Milestone"}</button>
           </div>
         </form>
       </div>

@@ -68,7 +68,7 @@ export default function BillingPage() {
             <button
               onClick={handleCancel}
               disabled={loading}
-              className="mt-2 text-sm text-red-600 hover:underline disabled:opacity-50"
+              className="mt-2 text-sm text-destructive hover:underline disabled:opacity-50"
             >
               {loading ? "Processing…" : "Cancel subscription"}
             </button>
@@ -81,7 +81,7 @@ export default function BillingPage() {
       )}
 
       {message && (
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-200">
+        <div className="rounded-lg border border-blue-200 bg-primary/10 p-3 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-200">
           {message}
         </div>
       )}

@@ -75,7 +75,7 @@ export default function SuggestedUsersPage() {
   if (!isLoaded) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
       </div>
     )
   }
@@ -84,10 +84,10 @@ export default function SuggestedUsersPage() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          <h2 className="text-xl font-semibold text-foreground">
             Not Authenticated
           </h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-muted-foreground">
             Please sign in to see suggestions.
           </p>
         </div>
@@ -102,16 +102,16 @@ export default function SuggestedUsersPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/discover"
-            className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="rounded-lg p-2 text-muted-foreground hover:bg-accent transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
-            <h1 className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl">
-              <Sparkles className="h-5 w-5 text-yellow-500" />
+            <h1 className="flex items-center gap-2 text-xl font-bold text-foreground sm:text-2xl">
+              <Sparkles className="h-5 w-5 text-warning" />
               Suggested for You
             </h1>
-            <p className="mt-0.5 text-sm text-gray-600 dark:text-gray-400">
+            <p className="mt-0.5 text-sm text-muted-foreground">
               People you may want to connect with
             </p>
           </div>
@@ -120,7 +120,7 @@ export default function SuggestedUsersPage() {
         <button
           onClick={handleRefresh}
           disabled={isRefreshing}
-          className="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors disabled:opacity-50"
         >
           <RefreshCw
             className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
@@ -136,36 +136,36 @@ export default function SuggestedUsersPage() {
           {[...Array(6)].map((_, i) => (
             <div
               key={i}
-              className="flex items-start gap-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 animate-pulse"
+              className="flex items-start gap-4 rounded-lg border border-border bg-card p-4 animate-pulse"
             >
-              <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700" />
+              <div className="h-12 w-12 rounded-full bg-muted bg-muted" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 w-32 rounded bg-gray-200 dark:bg-gray-700" />
-                <div className="h-3 w-48 rounded bg-gray-200 dark:bg-gray-700" />
+                <div className="h-4 w-32 rounded bg-muted bg-muted" />
+                <div className="h-3 w-48 rounded bg-muted bg-muted" />
                 <div className="flex gap-2">
-                  <div className="h-6 w-16 rounded-full bg-gray-200 dark:bg-gray-700" />
-                  <div className="h-6 w-20 rounded-full bg-gray-200 dark:bg-gray-700" />
+                  <div className="h-6 w-16 rounded-full bg-muted bg-muted" />
+                  <div className="h-6 w-20 rounded-full bg-muted bg-muted" />
                 </div>
               </div>
-              <div className="h-8 w-20 rounded bg-gray-200 dark:bg-gray-700" />
+              <div className="h-8 w-20 rounded bg-muted bg-muted" />
             </div>
           ))}
         </div>
       ) : suggestions.length === 0 ? (
         // Empty state
-        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-12 text-center">
-          <Sparkles className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
-          <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-gray-100">
+        <div className="rounded-lg border border-border bg-card p-12 text-center">
+          <Sparkles className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-medium text-foreground">
             No suggestions yet
           </h3>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-2 text-sm text-muted-foreground">
             Follow some users, add skills to your profile, and check back later
             for personalized suggestions.
           </p>
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
+            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
           >
             <RefreshCw
               className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
@@ -184,7 +184,7 @@ export default function SuggestedUsersPage() {
             return (
               <div
                 key={suggestion._id}
-                className={`group relative flex items-start gap-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 transition-all hover:shadow-md dark:hover:shadow-gray-900/50 ${
+                className={`group relative flex items-start gap-4 rounded-lg border border-border bg-card p-4 transition-all hover:shadow-md dark:hover:shadow-gray-900/50 ${
                   isDismissingThis ? "opacity-50 scale-95" : ""
                 }`}
               >
@@ -203,7 +203,7 @@ export default function SuggestedUsersPage() {
                         className="rounded-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-lg font-bold text-white">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
                         {user.name.charAt(0).toUpperCase()}
                       </div>
                     )}
@@ -215,12 +215,12 @@ export default function SuggestedUsersPage() {
                   <div className="flex items-center gap-2">
                     <Link
                       href={`/profile/${user._id}`}
-                      className="text-sm font-semibold text-gray-900 dark:text-gray-100 hover:underline truncate sm:text-base"
+                      className="text-sm font-semibold text-foreground hover:underline truncate sm:text-base"
                     >
                       {user.name}
                     </Link>
                     {user.username && (
-                      <span className="text-xs text-gray-500 dark:text-gray-400 hidden sm:inline">
+                      <span className="text-xs text-muted-foreground hidden sm:inline">
                         @{user.username}
                       </span>
                     )}
@@ -228,11 +228,11 @@ export default function SuggestedUsersPage() {
 
                   {/* Role & university */}
                   <div className="mt-0.5 flex flex-wrap items-center gap-2">
-                    <span className="text-xs rounded-full bg-blue-100 dark:bg-blue-900 px-2 py-0.5 font-medium text-blue-800 dark:text-blue-200">
+                    <span className="text-xs rounded-full bg-primary/10 dark:bg-blue-900 px-2 py-0.5 font-medium text-blue-800 dark:text-blue-200">
                       {user.role}
                     </span>
                     {user.university && (
-                      <span className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                      <span className="text-xs text-muted-foreground truncate">
                         {user.university}
                       </span>
                     )}
@@ -257,13 +257,13 @@ export default function SuggestedUsersPage() {
                       {user.skills.slice(0, 4).map((skill) => (
                         <span
                           key={skill}
-                          className="text-xs rounded-full bg-gray-100 dark:bg-gray-700 px-2 py-0.5 text-gray-700 dark:text-gray-300"
+                          className="text-xs rounded-full bg-muted px-2 py-0.5 text-foreground"
                         >
                           {skill}
                         </span>
                       ))}
                       {user.skills.length > 4 && (
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-muted-foreground">
                           +{user.skills.length - 4} more
                         </span>
                       )}
@@ -276,7 +276,7 @@ export default function SuggestedUsersPage() {
                   <button
                     onClick={() => handleDismiss(suggestion._id)}
                     disabled={isDismissingThis}
-                    className="rounded p-1 text-gray-400 opacity-0 group-hover:opacity-100 hover:text-gray-600 dark:hover:text-gray-300 transition-all"
+                    className="rounded p-1 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-foreground transition-all"
                     title="Dismiss suggestion"
                   >
                     <X className="h-4 w-4" />
@@ -285,14 +285,14 @@ export default function SuggestedUsersPage() {
                   <button
                     onClick={() => handleFollow(user._id, suggestion._id)}
                     disabled={isFollowingUser}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-blue-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition-colors disabled:opacity-50 sm:text-sm"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 sm:text-sm"
                   >
                     <UserPlus className="h-3.5 w-3.5" />
                     {isFollowingUser ? "Following..." : "Follow"}
                   </button>
 
                   {/* Score for debugging — hidden in production */}
-                  <span className="text-[10px] text-gray-400 dark:text-gray-500">
+                  <span className="text-[10px] text-muted-foreground">
                     Score: {(suggestion.score * 100).toFixed(0)}%
                   </span>
                 </div>

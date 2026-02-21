@@ -183,7 +183,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Profile Picture Upload */}
       <div>
-        <label htmlFor="profilePicture" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="profilePicture" className="block text-sm font-medium text-foreground">
           Profile Picture
         </label>
         <div className="mt-2 flex items-center gap-4">
@@ -196,7 +196,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
                 className="h-20 w-20 rounded-full object-cover"
               />
             ) : (
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 text-2xl font-bold text-gray-600 dark:text-gray-300">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted bg-muted text-2xl font-bold text-muted-foreground">
                 ?
               </div>
             )}
@@ -215,23 +215,23 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
               Choose Image
             </button>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-muted-foreground">
               Max 5MB. Supported formats: JPG, PNG, GIF
             </p>
           </div>
         </div>
         {errors.image && (
-          <p className="mt-1 text-sm text-red-600">{errors.image}</p>
+          <p className="mt-1 text-sm text-destructive">{errors.image}</p>
         )}
       </div>
 
       {/* Bio */}
       <div>
-        <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="bio" className="block text-sm font-medium text-foreground">
           Bio
         </label>
         <textarea
@@ -240,12 +240,12 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
           onChange={(e) => setBio(e.target.value)}
           rows={4}
           maxLength={500}
-          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
           placeholder="Tell us about yourself..."
         />
         <div className="mt-1 flex justify-between text-sm">
-          <span className="text-red-600 dark:text-red-400">{errors.bio}</span>
-          <span className="text-gray-500 dark:text-gray-400">{bio.length}/500</span>
+          <span className="text-destructive dark:text-red-400">{errors.bio}</span>
+          <span className="text-muted-foreground">{bio.length}/500</span>
         </div>
       </div>
 
@@ -253,7 +253,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
       <div>
         <label
           htmlFor="university"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="block text-sm font-medium text-foreground"
         >
           University
         </label>
@@ -263,18 +263,18 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
           value={university}
           onChange={(e) => setUniversity(e.target.value)}
           maxLength={200}
-          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
           placeholder="Your university name"
         />
         <div className="mt-1 flex justify-between text-sm">
-          <span className="text-red-600 dark:text-red-400">{errors.university}</span>
-          <span className="text-gray-500 dark:text-gray-400">{university.length}/200</span>
+          <span className="text-destructive dark:text-red-400">{errors.university}</span>
+          <span className="text-muted-foreground">{university.length}/200</span>
         </div>
       </div>
 
       {/* Role */}
       <div>
-        <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="role" className="block text-sm font-medium text-foreground">
           Role
         </label>
         <select
@@ -283,14 +283,14 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
           onChange={(e) =>
             setRole(e.target.value as "Student" | "Research Scholar" | "Faculty")
           }
-          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
         >
           <option value="Student">Student</option>
           <option value="Research Scholar">Research Scholar</option>
           <option value="Faculty">Faculty</option>
         </select>
         {errors.role && (
-          <p className="mt-1 text-sm text-red-600">{errors.role}</p>
+          <p className="mt-1 text-sm text-destructive">{errors.role}</p>
         )}
       </div>
 
@@ -298,7 +298,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
       <div>
         <label
           htmlFor="experienceLevel"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="block text-sm font-medium text-foreground"
         >
           Experience Level
         </label>
@@ -310,7 +310,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
               e.target.value as "Beginner" | "Intermediate" | "Advanced" | "Expert"
             )
           }
-          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
         >
           <option value="Beginner">Beginner</option>
           <option value="Intermediate">Intermediate</option>
@@ -318,18 +318,18 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
           <option value="Expert">Expert</option>
         </select>
         {errors.experienceLevel && (
-          <p className="mt-1 text-sm text-red-600">{errors.experienceLevel}</p>
+          <p className="mt-1 text-sm text-destructive">{errors.experienceLevel}</p>
         )}
       </div>
 
       {/* Social Links */}
       <div className="space-y-4">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Social Links</h3>
+        <h3 className="text-sm font-medium text-foreground">Social Links</h3>
 
         <div>
           <label
             htmlFor="github"
-            className="block text-sm font-medium text-gray-600 dark:text-gray-400"
+            className="block text-sm font-medium text-muted-foreground"
           >
             GitHub
           </label>
@@ -338,7 +338,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
             id="github"
             value={github}
             onChange={(e) => setGithub(e.target.value)}
-            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
             placeholder="https://github.com/username"
           />
         </div>
@@ -346,7 +346,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
         <div>
           <label
             htmlFor="linkedin"
-            className="block text-sm font-medium text-gray-600 dark:text-gray-400"
+            className="block text-sm font-medium text-muted-foreground"
           >
             LinkedIn
           </label>
@@ -355,7 +355,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
             id="linkedin"
             value={linkedin}
             onChange={(e) => setLinkedin(e.target.value)}
-            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
             placeholder="https://linkedin.com/in/username"
           />
         </div>
@@ -363,7 +363,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
         <div>
           <label
             htmlFor="twitter"
-            className="block text-sm font-medium text-gray-600 dark:text-gray-400"
+            className="block text-sm font-medium text-muted-foreground"
           >
             Twitter
           </label>
@@ -372,7 +372,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
             id="twitter"
             value={twitter}
             onChange={(e) => setTwitter(e.target.value)}
-            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
             placeholder="https://twitter.com/username"
           />
         </div>
@@ -380,7 +380,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
         <div>
           <label
             htmlFor="website"
-            className="block text-sm font-medium text-gray-600 dark:text-gray-400"
+            className="block text-sm font-medium text-muted-foreground"
           >
             Website
           </label>
@@ -389,7 +389,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
             id="website"
             value={website}
             onChange={(e) => setWebsite(e.target.value)}
-            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
             placeholder="https://yourwebsite.com"
           />
         </div>
@@ -398,15 +398,15 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
       {/* Submit Button */}
       <div>
         {errors.submit && (
-          <p className="mb-2 text-sm text-red-600">{errors.submit}</p>
+          <p className="mb-2 text-sm text-destructive">{errors.submit}</p>
         )}
         {successMessage && (
-          <p className="mb-2 text-sm text-green-600">{successMessage}</p>
+          <p className="mb-2 text-sm text-success">{successMessage}</p>
         )}
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full rounded-md bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {isSubmitting && <ButtonLoadingSpinner />}
           {isSubmitting ? "Saving..." : "Save Profile"}

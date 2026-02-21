@@ -101,7 +101,7 @@ export default function QuestionDetailPage() {
             <button
               onClick={() => handleVote(questionId, "question", "down")}
               className={`p-1 rounded hover:bg-orange-50 ${
-                question.viewerVotes[questionId] === "down" ? "text-red-500" : "text-gray-400"
+                question.viewerVotes[questionId] === "down" ? "text-destructive" : "text-gray-400"
               }`}
             >
               <ThumbsDown className="w-5 h-5" />
@@ -112,7 +112,7 @@ export default function QuestionDetailPage() {
           <div className="flex-1">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold">{question.title}</h1>
-              <button onClick={handleDelete} className="text-gray-400 hover:text-red-500">
+              <button onClick={handleDelete} className="text-gray-400 hover:text-destructive">
                 <Trash2 className="w-5 h-5" />
               </button>
             </div>
@@ -191,18 +191,18 @@ export default function QuestionDetailPage() {
                   <button
                     onClick={() => handleVote(answer._id, "answer", "down")}
                     className={`p-1 rounded hover:bg-orange-50 ${
-                      question.viewerVotes[answer._id] === "down" ? "text-red-500" : "text-gray-400"
+                      question.viewerVotes[answer._id] === "down" ? "text-destructive" : "text-gray-400"
                     }`}
                   >
                     <ThumbsDown className="w-4 h-4" />
                   </button>
 
                   {answer.isAccepted ? (
-                    <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
+                    <CheckCircle className="w-5 h-5 text-success mt-1" />
                   ) : (
                     <button
                       onClick={() => acceptAnswerMutation({ answerId: answer._id })}
-                      className="text-gray-300 hover:text-green-500 mt-1"
+                      className="text-gray-300 hover:text-success mt-1"
                       title="Accept this answer"
                     >
                       <CheckCircle className="w-5 h-5" />
@@ -253,7 +253,7 @@ export default function QuestionDetailPage() {
           placeholder="Write your answer..."
           className="w-full border rounded-lg px-3 py-2 text-sm mb-3"
         />
-        {answerError && <p className="text-red-500 text-sm mb-2">{answerError}</p>}
+        {answerError && <p className="text-destructive text-sm mb-2">{answerError}</p>}
         <button
           onClick={handleAnswer}
           disabled={answerLoading || !answerContent.trim()}

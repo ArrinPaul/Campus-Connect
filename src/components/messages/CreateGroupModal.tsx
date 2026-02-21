@@ -94,16 +94,16 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
       .slice(0, 2)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-lg mx-4 bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-h-[85vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/20 backdrop-blur-sm">
+      <div className="w-full max-w-lg mx-4 bg-card rounded-xl shadow-2xl max-h-[85vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <h2 className="text-lg font-bold text-foreground">
             Create Group
           </h2>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-gray-700"
+            className="p-1 rounded-lg text-muted-foreground hover:text-muted-foreground hover:bg-muted dark:hover:text-muted-foreground hover:bg-accent"
           >
             <X className="h-5 w-5" />
           </button>
@@ -113,7 +113,7 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {/* Group Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Group Name *
             </label>
             <input
@@ -122,13 +122,13 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
               onChange={(e) => setGroupName(e.target.value)}
               placeholder="Enter group name..."
               maxLength={100}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring border-border bg-muted text-foreground"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Description (optional)
             </label>
             <textarea
@@ -136,21 +136,21 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What is this group about?"
               rows={2}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white resize-none"
+              className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring border-border bg-muted text-foreground resize-none"
             />
           </div>
 
           {/* Selected Members */}
           {selectedMembers.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Members ({selectedMembers.length})
               </label>
               <div className="flex flex-wrap gap-2">
                 {selectedMembers.map((member) => (
                   <div
                     key={member._id}
-                    className="flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-full pl-1.5 pr-2 py-1"
+                    className="flex items-center gap-1.5 bg-primary/10 dark:bg-blue-900/20 text-primary dark:text-blue-300 rounded-full pl-1.5 pr-2 py-1"
                   >
                     {member.profilePicture ? (
                       <img
@@ -166,7 +166,7 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
                     <span className="text-xs font-medium">{member.name}</span>
                     <button
                       onClick={() => removeMember(member._id)}
-                      className="text-blue-400 hover:text-blue-600"
+                      className="text-primary hover:text-primary"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -178,27 +178,27 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
 
           {/* Add Members Search */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Add Members
             </label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by name or username..."
-                className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring border-border bg-muted text-foreground"
               />
             </div>
 
             {/* Search Results */}
             {searchQuery.trim().length >= 2 && (
-              <div className="mt-2 border border-gray-200 dark:border-gray-600 rounded-lg max-h-48 overflow-y-auto">
+              <div className="mt-2 border border-border rounded-lg max-h-48 overflow-y-auto">
                 {!searchResults ? (
-                  <div className="p-3 text-sm text-gray-400">Searching...</div>
+                  <div className="p-3 text-sm text-muted-foreground">Searching...</div>
                 ) : filteredResults.length === 0 ? (
-                  <div className="p-3 text-sm text-gray-400">No users found</div>
+                  <div className="p-3 text-sm text-muted-foreground">No users found</div>
                 ) : (
                   filteredResults.map((user) => {
                     const isSelected = selectedMembers.some(
@@ -215,7 +215,7 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
                             profilePicture: user.profilePicture,
                           })
                         }
-                        className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 text-left"
+                        className="w-full flex items-center gap-3 p-3 hover:bg-accent text-left"
                       >
                         {user.profilePicture ? (
                           <img
@@ -224,22 +224,22 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
                             className="h-8 w-8 rounded-full object-cover"
                           />
                         ) : (
-                          <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300">
+                          <div className="h-8 w-8 rounded-full bg-muted dark:bg-muted flex items-center justify-center text-xs font-medium text-muted-foreground">
                             {getInitials(user.name)}
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          <p className="text-sm font-medium text-foreground truncate">
                             {user.name}
                           </p>
                           {user.username && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                            <p className="text-xs text-muted-foreground">
                               @{user.username}
                             </p>
                           )}
                         </div>
                         {isSelected && (
-                          <Check className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                          <Check className="h-4 w-4 text-primary flex-shrink-0" />
                         )}
                       </button>
                     )
@@ -251,22 +251,22 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
 
           {/* Error */}
           {error && (
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            <p className="text-sm text-destructive dark:text-red-400">{error}</p>
           )}
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-end gap-3 p-4 border-t border-border">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+            className="px-4 py-2 text-sm font-medium text-foreground hover:text-foreground rounded-lg hover:bg-muted text-muted-foreground hover:bg-accent"
           >
             Cancel
           </button>
           <button
             onClick={handleCreate}
             disabled={isCreating || !groupName.trim() || selectedMembers.length === 0}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Users className="h-4 w-4" />
             {isCreating ? "Creating..." : "Create Group"}

@@ -49,7 +49,7 @@ export default function AchievementBadges({ userId }: { userId: Id<"users"> }) {
     return (
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
         {Array.from({ length: 8 }, (_, i) => (
-          <div key={i} className="animate-pulse bg-gray-100 rounded-xl h-28" />
+          <div key={i} className="animate-pulse bg-muted rounded-xl h-28" />
         ))}
       </div>
     )
@@ -65,7 +65,7 @@ export default function AchievementBadges({ userId }: { userId: Id<"users"> }) {
           <Award className="w-5 h-5 text-yellow-500" />
           Achievements
         </h3>
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-muted-foreground">
           {earnedCount}/{total} unlocked
         </span>
       </div>
@@ -76,15 +76,15 @@ export default function AchievementBadges({ userId }: { userId: Id<"users"> }) {
             key={achievement.badge}
             className={`relative rounded-xl p-3 text-center transition-transform hover:scale-105 ${
               achievement.earned
-                ? "bg-white border-2 border-yellow-200 shadow-sm"
-                : "bg-gray-50 border border-gray-200 opacity-50"
+                ? "bg-card border-2 border-yellow-200 shadow-sm"
+                : "bg-muted/50 border border-border opacity-50"
             }`}
           >
             <div
               className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-2 ${
                 achievement.earned
-                  ? `bg-gradient-to-br ${badgeColors[achievement.badge] || "from-gray-400 to-gray-600"} text-white`
-                  : "bg-gray-200 text-gray-400"
+                  ? `bg-gradient-to-br ${badgeColors[achievement.badge] || "from-gray-400 to-gray-600"} text-primary-foreground`
+                  : "bg-muted text-muted-foreground"
               }`}
             >
               {achievement.earned
@@ -93,12 +93,12 @@ export default function AchievementBadges({ userId }: { userId: Id<"users"> }) {
             </div>
 
             <p className="text-xs font-semibold truncate">{achievement.name}</p>
-            <p className="text-[10px] text-gray-500 line-clamp-2 mt-0.5">
+            <p className="text-[10px] text-muted-foreground line-clamp-2 mt-0.5">
               {achievement.description}
             </p>
 
             {achievement.earned && achievement.earnedAt && (
-              <p className="text-[9px] text-gray-400 mt-1">
+              <p className="text-[9px] text-muted-foreground mt-1">
                 {new Date(achievement.earnedAt).toLocaleDateString()}
               </p>
             )}

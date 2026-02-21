@@ -187,7 +187,7 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
   }
 
   return (
-    <div className="rounded-lg bg-white dark:bg-gray-800 p-4 shadow dark:shadow-gray-900/50 sm:p-6">
+    <div className="rounded-lg bg-card p-4 shadow-elevation-1 sm:p-6">
       {/* Author Info */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2 sm:gap-3">
@@ -202,7 +202,7 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
                 className="rounded-full object-cover"
               />
             ) : (
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white sm:h-10 sm:w-10 sm:text-sm">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground sm:h-10 sm:w-10 sm:text-sm">
                 {author.name.charAt(0).toUpperCase()}
               </div>
             )}
@@ -210,8 +210,8 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
 
           {/* Name and Timestamp */}
           <div>
-            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 sm:text-base">{author.name}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">{formatTimestamp(post.createdAt)}</p>
+            <p className="text-sm font-semibold text-foreground sm:text-base">{author.name}</p>
+            <p className="text-xs text-muted-foreground sm:text-sm">{formatTimestamp(post.createdAt)}</p>
           </div>
         </div>
 
@@ -220,7 +220,7 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
           <button
             onClick={handleDelete}
             disabled={isDeleting}
-            className="text-xs text-red-600 hover:text-red-800 disabled:opacity-50 sm:text-sm"
+            className="text-xs text-destructive hover:text-red-800 disabled:opacity-50 sm:text-sm"
             aria-label="Delete post"
             style={{ minWidth: "44px", minHeight: "44px" }}
           >
@@ -233,7 +233,7 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
       <div className="mt-3 sm:mt-4">
         <PostContent
           content={post.content}
-          className="text-sm text-gray-800 dark:text-gray-200 sm:text-base"
+          className="text-sm text-foreground sm:text-base"
         />
       </div>
 
@@ -264,7 +264,7 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
       )}
 
       {/* Engagement Stats and Actions */}
-      <div className="mt-3 flex items-center gap-4 border-t dark:border-gray-700 pt-3 sm:mt-4 sm:gap-6 sm:pt-4">
+      <div className="mt-3 flex items-center gap-4 border-t border-border pt-3 sm:mt-4 sm:gap-6 sm:pt-4">
         {/* Reaction Picker */}
         {currentUser && (
           <ReactionPicker
@@ -283,7 +283,7 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
         {/* Comment Toggle Button */}
         <button
           onClick={() => setShowComments(!showComments)}
-          className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 sm:gap-2"
+          className="flex items-center gap-1.5 text-muted-foreground hover:text-primary sm:gap-2"
           aria-label={showComments ? "Hide comments" : "Show comments"}
           style={{ minWidth: "44px", minHeight: "44px" }}
         >
@@ -308,7 +308,7 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
         <div className="relative" ref={shareDropdownRef}>
           <button
             onClick={() => setShowShareDropdown(!showShareDropdown)}
-            className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 sm:gap-2"
+            className="flex items-center gap-1.5 text-muted-foreground hover:text-success dark:hover:text-green-400 sm:gap-2"
             aria-label="Share post"
             style={{ minWidth: "44px", minHeight: "44px" }}
           >
@@ -320,19 +320,19 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
 
           {/* Share Dropdown Menu */}
           {showShareDropdown && (
-            <div className="absolute top-full mt-2 left-0 z-50 w-48 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-lg overflow-hidden">
+            <div className="absolute top-full mt-2 left-0 z-50 w-48 bg-card border border-border rounded-lg shadow-lg overflow-hidden">
               {currentUser && !isOwnPost && (
                 <>
                   <button
                     onClick={handleDirectRepost}
-                    className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3"
+                    className="w-full px-4 py-3 text-left text-sm hover:bg-accent flex items-center gap-3"
                   >
                     <Repeat2 className="w-4 h-4" />
                     <span>Repost</span>
                   </button>
                   <button
                     onClick={handleQuotePost}
-                    className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 border-t dark:border-gray-700"
+                    className="w-full px-4 py-3 text-left text-sm hover:bg-accent flex items-center gap-3 border-t border-border"
                   >
                     <Repeat2 className="w-4 h-4" />
                     <span>Quote Post</span>
@@ -341,7 +341,7 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
               )}
               <button
                 onClick={handleCopyLink}
-                className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 border-t dark:border-gray-700"
+                className="w-full px-4 py-3 text-left text-sm hover:bg-accent flex items-center gap-3 border-t border-border"
               >
                 <Copy className="w-4 h-4" />
                 <span>Copy Link</span>
@@ -349,7 +349,7 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
               {typeof window !== 'undefined' && 'share' in navigator && (
                 <button
                   onClick={handleWebShare}
-                  className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 border-t dark:border-gray-700"
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-accent flex items-center gap-3 border-t border-border"
                 >
                   <Share2 className="w-4 h-4" />
                   <span>Share via...</span>
@@ -361,7 +361,7 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
 
         {/* Share Success Message */}
         {shareSuccess && (
-          <div className="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+          <div className="fixed bottom-4 right-4 bg-success text-primary-foreground px-4 py-2 rounded-lg shadow-lg z-50">
             {shareSuccess}
           </div>
         )}
@@ -394,7 +394,7 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
       />
 
       {/* Inline Comments Section */}
-      <div className="mt-3 border-t dark:border-gray-700 pt-3 sm:mt-4 sm:pt-4 space-y-4">
+      <div className="mt-3 border-t border-border pt-3 sm:mt-4 sm:pt-4 space-y-4">
         <CommentList postId={post._id} comments={comments} isLoading={comments === undefined} />
         <CommentComposer postId={post._id} />
       </div>

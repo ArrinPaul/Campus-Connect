@@ -37,14 +37,14 @@ const TYPE_LABELS = {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Academic: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
+  Academic: "bg-primary/10 text-primary dark:bg-blue-900 dark:text-blue-300",
   Research: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300",
   Social: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
   Sports: "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300",
   Clubs: "bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300",
   Technology: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900 dark:text-cyan-300",
   Arts: "bg-rose-100 text-rose-700 dark:bg-rose-900 dark:text-rose-300",
-  Other: "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300",
+  Other: "bg-muted text-foreground bg-muted text-muted-foreground",
 }
 
 export function CommunityCard({
@@ -90,10 +90,10 @@ export function CommunityCard({
 
   return (
     <Link href={`/c/${community.slug}`} className="block">
-      <div className="group flex flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:border-blue-300 hover:shadow dark:border-gray-700 dark:bg-gray-800 dark:hover:border-blue-600">
+      <div className="group flex flex-col rounded-xl border border-border bg-card p-4 shadow-sm transition hover:border-primary/50 hover:shadow border-border bg-card dark:hover:border-blue-600">
         {/* Avatar + Name Row */}
         <div className="flex items-start gap-3">
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-purple-500 text-xl font-bold text-white select-none">
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-purple-500 text-xl font-bold text-primary-foreground select-none">
             {community.avatar ? (
               <img
                 src={community.avatar}
@@ -105,7 +105,7 @@ export function CommunityCard({
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="truncate font-semibold text-gray-900 group-hover:text-blue-600 dark:text-gray-100 dark:group-hover:text-blue-400">
+            <h3 className="truncate font-semibold text-foreground group-hover:text-primary text-foreground dark:group-hover:text-primary">
               {community.name}
             </h3>
             <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
@@ -116,7 +116,7 @@ export function CommunityCard({
               >
                 {community.category}
               </span>
-              <span className="inline-flex items-center gap-0.5 text-xs text-gray-500 dark:text-gray-400">
+              <span className="inline-flex items-center gap-0.5 text-xs text-muted-foreground">
                 <TypeIcon className="h-3 w-3" />
                 {TYPE_LABELS[community.type]}
               </span>
@@ -125,13 +125,13 @@ export function CommunityCard({
         </div>
 
         {/* Description */}
-        <p className="mt-3 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
+        <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">
           {community.description}
         </p>
 
         {/* Footer */}
         <div className="mt-3 flex items-center justify-between">
-          <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+          <span className="flex items-center gap-1 text-sm text-muted-foreground">
             <Users className="h-3.5 w-3.5" />
             {community.memberCount.toLocaleString()} member
             {community.memberCount !== 1 ? "s" : ""}
@@ -143,7 +143,7 @@ export function CommunityCard({
                 <button
                   onClick={handleLeave}
                   disabled={isLoading}
-                  className="rounded-full border border-gray-300 px-3 py-1 text-xs font-medium text-gray-600 hover:border-red-400 hover:text-red-600 disabled:opacity-50 transition-colors dark:border-gray-600 dark:text-gray-300"
+                  className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground hover:border-red-400 hover:text-destructive disabled:opacity-50 transition-colors border-border text-muted-foreground"
                 >
                   {isLoading ? "..." : "Leave"}
                 </button>
@@ -155,7 +155,7 @@ export function CommunityCard({
                 <button
                   onClick={handleJoin}
                   disabled={isLoading}
-                  className="rounded-full bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  className="rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
                 >
                   {isLoading
                     ? "..."
@@ -169,7 +169,7 @@ export function CommunityCard({
         </div>
 
         {error && (
-          <p className="mt-1 text-xs text-red-500">{error}</p>
+          <p className="mt-1 text-xs text-destructive">{error}</p>
         )}
       </div>
     </Link>

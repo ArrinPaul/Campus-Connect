@@ -68,14 +68,14 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
   const hasActiveFilters = selectedRole !== "" || selectedSkills.length > 0
 
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+    <div className="rounded-lg border border-border bg-card p-4">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Filters</h3>
+        <h3 className="text-lg font-semibold text-foreground">Filters</h3>
         {hasActiveFilters && (
           <button
             type="button"
             onClick={handleClearFilters}
-            className="text-sm text-blue-600 hover:text-blue-800"
+            className="text-sm text-primary hover:text-primary"
             aria-label="Clear all filters"
           >
             Clear all
@@ -87,7 +87,7 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
       <div className="mb-4">
         <label
           htmlFor="role-filter"
-          className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="mb-2 block text-sm font-medium text-foreground"
         >
           Role
         </label>
@@ -95,7 +95,7 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
           id="role-filter"
           value={selectedRole}
           onChange={(e) => handleRoleChange(e.target.value)}
-          className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
           aria-label="Filter by role"
         >
           <option value="">All Roles</option>
@@ -109,7 +109,7 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
       <div>
         <label
           htmlFor="skills-filter"
-          className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="mb-2 block text-sm font-medium text-foreground"
         >
           Skills
         </label>
@@ -128,14 +128,14 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
               }
             }}
             placeholder="Add skill..."
-            className="block flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="block flex-1 rounded-md border border-border bg-card px-3 py-2 text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
             aria-label="Add skill filter"
           />
           <button
             type="button"
             onClick={handleAddSkill}
             disabled={!skillInput.trim()}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-muted"
             aria-label="Add skill"
           >
             Add
@@ -148,13 +148,13 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
             {selectedSkills.map((skill) => (
               <div
                 key={skill}
-                className="flex items-center gap-1 rounded-full bg-blue-100 dark:bg-blue-900 px-3 py-1 text-sm text-blue-800 dark:text-blue-200"
+                className="flex items-center gap-1 rounded-full bg-primary/10 dark:bg-blue-900 px-3 py-1 text-sm text-primary dark:text-blue-200"
               >
                 <span>{skill}</span>
                 <button
                   type="button"
                   onClick={() => handleRemoveSkill(skill)}
-                  className="text-blue-600 hover:text-blue-800"
+                  className="text-primary hover:text-primary"
                   aria-label={`Remove ${skill} filter`}
                 >
                   <X className="h-4 w-4" />

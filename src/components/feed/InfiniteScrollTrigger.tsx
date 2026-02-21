@@ -62,11 +62,11 @@ export function InfiniteScrollTrigger({
     <div ref={triggerRef} className="py-8 text-center">
       {isLoading ? (
         <div className="flex items-center justify-center gap-2">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
-          <span className="text-sm text-gray-500">Loading more posts...</span>
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-border border-t-primary" />
+          <span className="text-sm text-muted-foreground">Loading more posts...</span>
         </div>
       ) : (
-        <div className="text-sm text-gray-400">Scroll for more</div>
+        <div className="text-sm text-muted-foreground">Scroll for more</div>
       )}
     </div>
   )

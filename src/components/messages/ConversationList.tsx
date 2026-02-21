@@ -98,14 +98,14 @@ export function ConversationList({
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-xl font-bold text-foreground">
             Messages
           </h2>
           <button
             onClick={onCreateGroup}
-            className="p-2 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-muted text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
             title="Create group"
           >
             <Users className="h-5 w-5" />
@@ -114,13 +114,13 @@ export function ConversationList({
 
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search conversations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+            className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-border bg-muted/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent border-border bg-muted text-foreground dark:placeholder:text-muted-foreground"
           />
         </div>
       </div>
@@ -129,14 +129,14 @@ export function ConversationList({
       <div className="flex-1 overflow-y-auto">
         {filteredConversations.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-            <MessageSquare className="h-12 w-12 text-gray-300 dark:text-gray-600 mb-3" />
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <MessageSquare className="h-12 w-12 text-muted-foreground dark:text-muted-foreground mb-3" />
+            <p className="text-sm text-muted-foreground">
               {searchQuery
                 ? "No conversations match your search"
                 : "No conversations yet"}
             </p>
             {!searchQuery && (
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Visit a user&apos;s profile to start a conversation
               </p>
             )}
@@ -151,9 +151,9 @@ export function ConversationList({
               <button
                 key={conv._id}
                 onClick={() => onSelectConversation(conv._id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-accent ${
                   isSelected
-                    ? "bg-blue-50 dark:bg-blue-900/20 border-l-2 border-blue-500"
+                    ? "bg-primary/10 dark:bg-blue-900/20 border-l-2 border-blue-500"
                     : "border-l-2 border-transparent"
                 }`}
               >
@@ -170,7 +170,7 @@ export function ConversationList({
                       className={`h-12 w-12 rounded-full flex items-center justify-center text-sm font-medium ${
                         conv.type === "group"
                           ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
-                          : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                          : "bg-primary/10 text-primary dark:bg-blue-900/30 dark:text-blue-300"
                       }`}
                     >
                       {conv.type === "group" ? (
@@ -192,7 +192,7 @@ export function ConversationList({
 
                   {/* Unread badge */}
                   {conv.unreadCount > 0 && !conv.isMuted && (
-                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">
+                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
                       {conv.unreadCount > 99 ? "99+" : conv.unreadCount}
                     </span>
                   )}
@@ -204,14 +204,14 @@ export function ConversationList({
                     <span
                       className={`text-sm truncate ${
                         conv.unreadCount > 0
-                          ? "font-semibold text-gray-900 dark:text-white"
-                          : "font-medium text-gray-700 dark:text-gray-300"
+                          ? "font-semibold text-foreground"
+                          : "font-medium text-foreground"
                       }`}
                     >
                       {displayName}
                     </span>
                     {conv.lastMessageAt && (
-                      <span className="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0 ml-2">
+                      <span className="text-xs text-muted-foreground flex-shrink-0 ml-2">
                         {formatTime(conv.lastMessageAt)}
                       </span>
                     )}
@@ -221,8 +221,8 @@ export function ConversationList({
                     <p
                       className={`text-xs truncate mt-0.5 ${
                         conv.unreadCount > 0
-                          ? "text-gray-700 dark:text-gray-300 font-medium"
-                          : "text-gray-500 dark:text-gray-400"
+                          ? "text-foreground font-medium"
+                          : "text-muted-foreground"
                       }`}
                     >
                       {conv.lastMessagePreview}
@@ -231,7 +231,7 @@ export function ConversationList({
 
                   {/* Group member count */}
                   {conv.type === "group" && (
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       {conv.otherUsers.length + 1} members
                     </p>
                   )}
@@ -239,7 +239,7 @@ export function ConversationList({
 
                 {/* Muted indicator */}
                 {conv.isMuted && (
-                  <span className="text-xs text-gray-400" title="Muted">
+                  <span className="text-xs text-muted-foreground" title="Muted">
                     🔇
                   </span>
                 )}

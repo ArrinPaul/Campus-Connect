@@ -38,11 +38,11 @@ export default function FindPartnersPage() {
     <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-8 lg:px-8">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl flex items-center gap-2">
-          <Users className="h-7 w-7 text-blue-500" />
+        <h1 className="text-2xl font-bold text-foreground sm:text-3xl flex items-center gap-2">
+          <Users className="h-7 w-7 text-primary" />
           Find Partners
         </h1>
-        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 sm:mt-2 sm:text-base">
+        <p className="mt-1 text-sm text-muted-foreground sm:mt-2 sm:text-base">
           Connect with collaborators and mentors based on your skill profile
         </p>
       </div>
@@ -60,7 +60,7 @@ export default function FindPartnersPage() {
             </p>
             <button
               onClick={() => setActiveTab("mentors")}
-              className="mt-2 inline-flex items-center gap-1 rounded-lg bg-amber-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-700 transition-colors"
+              className="mt-2 inline-flex items-center gap-1 rounded-lg bg-amber-600 px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-amber-700 transition-colors"
             >
               <GraduationCap className="h-3.5 w-3.5" />
               Find a Mentor
@@ -70,14 +70,14 @@ export default function FindPartnersPage() {
       )}
 
       {/* Tabs */}
-      <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="mb-6 border-b border-border">
         <nav className="-mb-px flex gap-6">
           <button
             onClick={() => setActiveTab("partners")}
             className={`flex items-center gap-2 border-b-2 pb-3 text-sm font-medium transition-colors ${
               activeTab === "partners"
-                ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
-                : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-gray-200"
+                ? "border-primary text-primary dark:border-blue-400 text-primary"
+                : "border-transparent text-muted-foreground hover:border-border hover:text-foreground text-muted-foreground dark:hover:border-border hover:text-foreground"
             }`}
           >
             <Zap className="h-4 w-4" />
@@ -87,8 +87,8 @@ export default function FindPartnersPage() {
             onClick={() => setActiveTab("mentors")}
             className={`flex items-center gap-2 border-b-2 pb-3 text-sm font-medium transition-colors ${
               activeTab === "mentors"
-                ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
-                : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-gray-200"
+                ? "border-primary text-primary dark:border-blue-400 text-primary"
+                : "border-transparent text-muted-foreground hover:border-border hover:text-foreground text-muted-foreground dark:hover:border-border hover:text-foreground"
             }`}
           >
             <GraduationCap className="h-4 w-4" />
@@ -100,23 +100,23 @@ export default function FindPartnersPage() {
       {/* Study Partners Tab */}
       {activeTab === "partners" && (
         <div>
-          <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mb-4 text-sm text-muted-foreground">
             Users with complementary skills who can help broaden your knowledge
           </p>
 
           {!currentUser?.skills?.length && currentUser !== undefined && (
-            <div className="mb-6 flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
-              <Star className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+            <div className="mb-6 flex items-start gap-3 rounded-xl border border-blue-200 bg-primary/10 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+              <Star className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
               <div>
                 <p className="text-sm font-medium text-blue-800 dark:text-blue-300">
                   Add skills to your profile
                 </p>
-                <p className="mt-0.5 text-sm text-blue-700 dark:text-blue-400">
+                <p className="mt-0.5 text-sm text-primary text-primary">
                   Matches are based on your skills. Add some to see relevant study partners.
                 </p>
                 <Link
                   href={`/profile/${currentUser?._id}`}
-                  className="mt-2 inline-block text-sm font-medium text-blue-700 underline hover:no-underline dark:text-blue-400"
+                  className="mt-2 inline-block text-sm font-medium text-primary underline hover:no-underline text-primary"
                 >
                   Edit Profile →
                 </Link>
@@ -131,18 +131,18 @@ export default function FindPartnersPage() {
               ))}
             </div>
           ) : studyPartners.items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 py-16 dark:border-gray-600 dark:bg-gray-800/50">
-              <Users className="mb-3 h-10 w-10 text-gray-400" />
-              <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
+            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/50 py-16 border-border bg-card/50">
+              <Users className="mb-3 h-10 w-10 text-muted-foreground" />
+              <p className="text-lg font-medium text-foreground">
                 No study partners found yet
               </p>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Add skills to your profile or follow more users to find partners
               </p>
             </div>
           ) : (
             <div className="space-y-4">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-muted-foreground">
                 {studyPartners.items.length} potential partner{studyPartners.items.length !== 1 ? "s" : ""} found
               </p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -152,7 +152,7 @@ export default function FindPartnersPage() {
                     <div className="mt-1 space-y-1 px-1">
                       {partner.complementarySkills.length > 0 && (
                         <div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                          <p className="text-xs text-muted-foreground mb-1">
                             Can teach you:
                           </p>
                           <div className="flex flex-wrap gap-1">
@@ -165,7 +165,7 @@ export default function FindPartnersPage() {
                               </span>
                             ))}
                             {partner.complementarySkills.length > 3 && (
-                              <span className="text-xs text-gray-400">
+                              <span className="text-xs text-muted-foreground">
                                 +{partner.complementarySkills.length - 3} more
                               </span>
                             )}
@@ -174,7 +174,7 @@ export default function FindPartnersPage() {
                       )}
                       {partner.sharedSkills.length > 0 && (
                         <div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                          <p className="text-xs text-muted-foreground mb-1">
                             Shared skills:
                           </p>
                           <div className="flex flex-wrap gap-1">
@@ -201,7 +201,7 @@ export default function FindPartnersPage() {
       {/* Mentors Tab */}
       {activeTab === "mentors" && (
         <div>
-          <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mb-4 text-sm text-muted-foreground">
             Experienced users in your field who can guide your learning
           </p>
 
@@ -212,18 +212,18 @@ export default function FindPartnersPage() {
               ))}
             </div>
           ) : mentors.items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 py-16 dark:border-gray-600 dark:bg-gray-800/50">
-              <BookOpen className="mb-3 h-10 w-10 text-gray-400" />
-              <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
+            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/50 py-16 border-border bg-card/50">
+              <BookOpen className="mb-3 h-10 w-10 text-muted-foreground" />
+              <p className="text-lg font-medium text-foreground">
                 No mentors found
               </p>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Add skills to your profile to find mentors in your areas of interest
               </p>
             </div>
           ) : (
             <div className="space-y-4">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-muted-foreground">
                 {mentors.items.length} mentor{mentors.items.length !== 1 ? "s" : ""} found
               </p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -232,7 +232,7 @@ export default function FindPartnersPage() {
                     <UserCard user={mentor.user} />
                     {mentor.sharedSkills.length > 0 && (
                       <div className="mt-1 px-1">
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        <p className="text-xs text-muted-foreground mb-1">
                           Can mentor you in:
                         </p>
                         <div className="flex flex-wrap gap-1">
@@ -246,7 +246,7 @@ export default function FindPartnersPage() {
                             </span>
                           ))}
                           {mentor.sharedSkills.length > 4 && (
-                            <span className="text-xs text-gray-400">
+                            <span className="text-xs text-muted-foreground">
                               +{mentor.sharedSkills.length - 4} more
                             </span>
                           )}

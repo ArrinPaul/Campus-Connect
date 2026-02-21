@@ -100,7 +100,7 @@ export function MediaGallery({
               />
               {isOverlayCell && remainingCount > 0 && (
                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                  <span className="text-white text-2xl font-bold">+{remainingCount}</span>
+                  <span className="text-primary-foreground text-2xl font-bold">+{remainingCount}</span>
                 </div>
               )}
               <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors" />
@@ -169,7 +169,7 @@ export function ImageLightbox({
       {/* Close button */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 z-10 rounded-full bg-white/10 p-2 text-white hover:bg-white/20 transition-colors"
+        className="absolute top-4 right-4 z-10 rounded-full bg-card/10 p-2 text-primary-foreground hover:bg-card/20 transition-colors"
         aria-label="Close lightbox"
       >
         <X className="h-5 w-5" />
@@ -178,7 +178,7 @@ export function ImageLightbox({
       {/* Zoom toggle */}
       <button
         onClick={() => setZoomed((z) => !z)}
-        className="absolute top-4 right-16 z-10 rounded-full bg-white/10 p-2 text-white hover:bg-white/20 transition-colors"
+        className="absolute top-4 right-16 z-10 rounded-full bg-card/10 p-2 text-primary-foreground hover:bg-card/20 transition-colors"
         aria-label={zoomed ? "Zoom out" : "Zoom in"}
       >
         <ZoomIn className="h-5 w-5" />
@@ -188,7 +188,7 @@ export function ImageLightbox({
       {images.length > 1 && (
         <button
           onClick={goToPrev}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 rounded-full bg-white/10 p-3 text-white hover:bg-white/20 transition-colors"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 rounded-full bg-card/10 p-3 text-primary-foreground hover:bg-card/20 transition-colors"
           aria-label="Previous image"
         >
           <ChevronLeft className="h-6 w-6" />
@@ -231,7 +231,7 @@ export function ImageLightbox({
       {images.length > 1 && (
         <button
           onClick={goToNext}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 rounded-full bg-white/10 p-3 text-white hover:bg-white/20 transition-colors"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 rounded-full bg-card/10 p-3 text-primary-foreground hover:bg-card/20 transition-colors"
           aria-label="Next image"
         >
           <ChevronRight className="h-6 w-6" />
@@ -248,14 +248,14 @@ export function ImageLightbox({
                 onClick={() => setCurrentIndex(i)}
                 className={cn(
                   "w-2 h-2 rounded-full transition-colors",
-                  i === currentIndex ? "bg-white" : "bg-white/40"
+                  i === currentIndex ? "bg-card" : "bg-card/40"
                 )}
                 aria-label={`Go to image ${i + 1}`}
               />
             ))}
           </div>
         )}
-        <span className="text-white/70 text-xs px-2">{currentName}</span>
+        <span className="text-primary-foreground/70 text-xs px-2">{currentName}</span>
       </div>
     </div>
   )

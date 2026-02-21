@@ -151,11 +151,11 @@ describe('MentionAutocomplete', () => {
       const janeButton = screen.getByText('Jane Smith').closest('button')!
       
       // Initially should not be highlighted
-      expect(janeButton).not.toHaveClass('bg-gray-100')
+      expect(janeButton).not.toHaveClass('bg-muted')
       
       // Hover should highlight
       fireEvent.mouseEnter(janeButton)
-      expect(janeButton).toHaveClass('bg-gray-100')
+      expect(janeButton).toHaveClass('bg-muted')
     })
 
     it('should select different users', () => {
@@ -179,14 +179,14 @@ describe('MentionAutocomplete', () => {
       
       // First user should be selected by default
       const firstButton = screen.getByText('John Doe').closest('button')!
-      expect(firstButton).toHaveClass('bg-gray-100')
+      expect(firstButton).toHaveClass('bg-muted')
       
       // Press ArrowDown
       fireEvent.keyDown(document, { key: 'ArrowDown' })
       
       await waitFor(() => {
         const secondButton = screen.getByText('Jane Smith').closest('button')!
-        expect(secondButton).toHaveClass('bg-gray-100')
+        expect(secondButton).toHaveClass('bg-muted')
       })
     })
 
@@ -202,7 +202,7 @@ describe('MentionAutocomplete', () => {
       
       await waitFor(() => {
         const secondButton = screen.getByText('Jane Smith').closest('button')!
-        expect(secondButton).toHaveClass('bg-gray-100')
+        expect(secondButton).toHaveClass('bg-muted')
       })
     })
 
@@ -213,7 +213,7 @@ describe('MentionAutocomplete', () => {
       fireEvent.keyDown(document, { key: 'ArrowUp' })
       
       const lastButton = screen.getByText('Bob Wilson').closest('button')!
-      expect(lastButton).toHaveClass('bg-gray-100')
+      expect(lastButton).toHaveClass('bg-muted')
     })
 
     it('should wrap around when navigating down from last item', () => {
@@ -224,13 +224,13 @@ describe('MentionAutocomplete', () => {
       fireEvent.keyDown(document, { key: 'ArrowDown' })
       
       const lastButton = screen.getByText('Bob Wilson').closest('button')!
-      expect(lastButton).toHaveClass('bg-gray-100')
+      expect(lastButton).toHaveClass('bg-muted')
       
       // Navigate down from last item - should wrap to first
       fireEvent.keyDown(document, { key: 'ArrowDown' })
       
       const firstButton = screen.getByText('John Doe').closest('button')!
-      expect(firstButton).toHaveClass('bg-gray-100')
+      expect(firstButton).toHaveClass('bg-muted')
     })
 
     it('should select user with Enter key', () => {
@@ -259,12 +259,12 @@ describe('MentionAutocomplete', () => {
       // ArrowDown navigates to second item
       fireEvent.keyDown(document, { key: 'ArrowDown' })
       const secondButton = screen.getByText('Jane Smith').closest('button')!
-      expect(secondButton).toHaveClass('bg-gray-100')
+      expect(secondButton).toHaveClass('bg-muted')
       
       // ArrowUp navigates back to first item
       fireEvent.keyDown(document, { key: 'ArrowUp' })
       const firstButton = screen.getByText('John Doe').closest('button')!
-      expect(firstButton).toHaveClass('bg-gray-100')
+      expect(firstButton).toHaveClass('bg-muted')
     })
 
     it('should select item with Enter key', () => {
@@ -284,7 +284,7 @@ describe('MentionAutocomplete', () => {
       fireEvent.keyDown(document, { key: 'ArrowDown' })
       
       const secondButton = screen.getByText('Jane Smith').closest('button')!
-      expect(secondButton).toHaveClass('bg-gray-100')
+      expect(secondButton).toHaveClass('bg-muted')
       
       // Change query (re-render with new query)
       mockUseQuery.mockReturnValue(mockUsers.slice(0, 1))
@@ -300,7 +300,7 @@ describe('MentionAutocomplete', () => {
       
       // Selection should reset to first item
       const firstButton = screen.getByText('John Doe').closest('button')!
-      expect(firstButton).toHaveClass('bg-gray-100')
+      expect(firstButton).toHaveClass('bg-muted')
     })
   })
 
@@ -316,7 +316,7 @@ describe('MentionAutocomplete', () => {
       renderComponent()
       
       const button = screen.getByText('John Doe').closest('button')!
-      expect(button).toHaveClass('hover:bg-gray-100')
+      expect(button).toHaveClass('hover:bg-accent')
     })
   })
 })

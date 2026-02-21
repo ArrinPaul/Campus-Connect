@@ -80,14 +80,14 @@ export default function HashtagPage() {
 
   if (!tag) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-background">
         <div className="max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-center py-12 gap-4">
             <Hash className="w-16 h-16 text-gray-400" />
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+            <h2 className="text-xl font-semibold text-foreground">
               Invalid hashtag
             </h2>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-muted-foreground">
               Please provide a valid hashtag
             </p>
           </div>
@@ -97,20 +97,20 @@ export default function HashtagPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 text-white">
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary text-white">
               <Hash className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
                 {getHashtagDisplay(tag)}
               </h1>
               {hashtag && (
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <p className="mt-1 text-sm text-muted-foreground">
                   {hashtag.postCount.toLocaleString()} {hashtag.postCount === 1 ? "post" : "posts"}
                 </p>
               )}
@@ -121,7 +121,7 @@ export default function HashtagPage() {
         {/* Loading State */}
         {isLoading && (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         )}
 
@@ -131,13 +131,13 @@ export default function HashtagPage() {
             <div className="relative">
               <Hash className="w-20 h-20 text-gray-300 dark:text-gray-600" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-12 h-12 border-2 border-gray-300 dark:border-gray-600 rounded-full opacity-50" />
+                <div className="w-12 h-12 border-2 border-border rounded-full opacity-50" />
               </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <h3 className="text-lg font-semibold text-foreground">
               No posts found
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 text-center max-w-md">
+            <p className="text-muted-foreground text-center max-w-md">
               Be the first to post with {getHashtagDisplay(tag)}!
             </p>
           </div>
@@ -180,7 +180,7 @@ export default function HashtagPage() {
             <button
               onClick={handleLoadMore}
               disabled={isLoadingMore}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-2"
             >
               {isLoadingMore && <Loader2 className="w-4 h-4 animate-spin" />}
               {isLoadingMore ? "Loading..." : "Load More"}

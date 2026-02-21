@@ -118,7 +118,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
   if (!conversation) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="animate-pulse text-gray-400">Loading...</div>
+        <div className="animate-pulse text-muted-foreground">Loading...</div>
       </div>
     )
   }
@@ -152,11 +152,11 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Chat Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card flex-shrink-0">
         {/* Back button (mobile) */}
         <button
           onClick={onBack}
-          className="md:hidden p-1 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700"
+          className="md:hidden p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted text-muted-foreground hover:text-foreground hover:bg-accent"
           aria-label="Back to conversations"
         >
           <ArrowLeft className="h-5 w-5" />
@@ -175,7 +175,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
               className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-medium ${
                 isGroup
                   ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
-                  : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                  : "bg-primary/10 text-primary dark:bg-blue-900/30 dark:text-blue-300"
               }`}
             >
               {isGroup ? (
@@ -201,16 +201,16 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
 
         {/* Name + status */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+          <h3 className="text-sm font-semibold text-foreground truncate">
             {displayName}
           </h3>
           {isGroup ? (
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-muted-foreground">
               {memberCount} members
             </p>
           ) : (
             <div className="flex items-center gap-2">
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 {otherParticipant?.username
                   ? `@${otherParticipant.username}`
                   : ""}
@@ -239,7 +239,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
                   // Silently handle error (e.g., already in a call)
                 }
               }}
-              className="p-2 rounded-lg text-gray-500 hover:text-green-600 hover:bg-green-50 dark:text-gray-400 dark:hover:text-green-400 dark:hover:bg-green-900/20 transition-colors"
+              className="p-2 rounded-lg text-muted-foreground hover:text-success hover:bg-green-50 text-muted-foreground dark:hover:text-green-400 dark:hover:bg-green-900/20 transition-colors"
               title="Audio call"
             >
               <Phone className="h-4 w-4" />
@@ -258,7 +258,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
                   // Silently handle error
                 }
               }}
-              className="p-2 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 transition-colors"
+              className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
               title="Video call"
             >
               <Video className="h-4 w-4" />
@@ -270,7 +270,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
               setShowSearch(!showSearch)
               setSearchQuery("")
             }}
-            className="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700"
+            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted text-muted-foreground hover:text-foreground hover:bg-accent"
             title="Search messages"
           >
           <Search className="h-4 w-4" />
@@ -279,7 +279,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
           {isGroup && (
             <button
               onClick={() => setShowGroupInfo(!showGroupInfo)}
-              className="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700"
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted text-muted-foreground hover:text-foreground hover:bg-accent"
               title="Group info"
             >
               <Info className="h-4 w-4" />
@@ -290,7 +290,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
           <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700"
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted text-muted-foreground hover:text-foreground hover:bg-accent"
             >
               <MoreVertical className="h-4 w-4" />
             </button>
@@ -301,10 +301,10 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
                   className="fixed inset-0 z-10"
                   onClick={() => setShowMenu(false)}
                 />
-                <div className="absolute right-0 top-full mt-1 w-48 rounded-lg bg-white dark:bg-gray-700 shadow-lg border border-gray-200 dark:border-gray-600 z-20 py-1">
+                <div className="absolute right-0 top-full mt-1 w-48 rounded-lg bg-card bg-muted shadow-lg border border-border z-20 py-1">
                   <button
                     onClick={handleMute}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
+                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground text-foreground hover:bg-muted/50 dark:hover:bg-muted"
                   >
                     {conversation.isMuted ? (
                       <>
@@ -318,7 +318,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
                   </button>
                   <button
                     onClick={handleDelete}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-600"
+                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-destructive dark:text-red-400 hover:bg-muted/50 dark:hover:bg-muted"
                   >
                     <Trash2 className="h-4 w-4" /> Delete conversation
                   </button>
@@ -331,14 +331,14 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
 
       {/* Search bar (expandable) */}
       {showSearch && (
-        <div className="flex items-center gap-2 px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-          <Search className="h-4 w-4 text-gray-400 flex-shrink-0" />
+        <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-muted/50">
+          <Search className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           <input
             type="text"
             placeholder="Search in conversation..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 text-sm bg-transparent text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none"
+            className="flex-1 text-sm bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none"
             autoFocus
           />
           <button
@@ -346,7 +346,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
               setShowSearch(false)
               setSearchQuery("")
             }}
-            className="p-1 rounded text-gray-400 hover:text-gray-600"
+            className="p-1 rounded text-muted-foreground hover:text-muted-foreground"
           >
             <X className="h-4 w-4" />
           </button>
@@ -355,17 +355,17 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
 
       {/* Search results */}
       {showSearch && searchQuery.trim() && searchResults && (
-        <div className="border-b border-gray-200 dark:border-gray-700 max-h-48 overflow-y-auto bg-gray-50 dark:bg-gray-800/50">
+        <div className="border-b border-border max-h-48 overflow-y-auto bg-muted/50">
           {searchResults.length === 0 ? (
-            <p className="text-sm text-gray-500 px-4 py-3">No results found</p>
+            <p className="text-sm text-muted-foreground px-4 py-3">No results found</p>
           ) : (
             searchResults.map((result) => (
               <div
                 key={result._id}
-                className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                className="px-4 py-2 hover:bg-accent cursor-pointer"
               >
-                <p className="text-xs text-gray-500">{result.senderName}</p>
-                <p className="text-sm text-gray-900 dark:text-white truncate">
+                <p className="text-xs text-muted-foreground">{result.senderName}</p>
+                <p className="text-sm text-foreground truncate">
                   {result.content}
                 </p>
               </div>
@@ -381,7 +381,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
       >
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <div className="text-center text-gray-400">
+            <div className="text-center text-muted-foreground">
               <p className="text-sm">No messages yet</p>
               <p className="text-xs mt-1">Send a message to start the conversation</p>
             </div>
@@ -391,7 +391,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
             {/* Load more button */}
             {messagesData?.cursor && (
               <div className="text-center py-2">
-                <button className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400">
+                <button className="text-xs text-primary hover:text-primary text-primary">
                   Load earlier messages
                 </button>
               </div>

@@ -60,6 +60,11 @@ jest.mock("next/link", () => {
   return MockLink
 })
 
+// Mock next/navigation
+jest.mock("next/navigation", () => ({
+  usePathname: jest.fn(() => "/feed"),
+}))
+
 // Mock Convex
 jest.mock("convex/react", () => ({
   useQuery: jest.fn(() => ({ _id: "test-user-id" })),
@@ -84,8 +89,8 @@ describe("DashboardLayout", () => {
       </DashboardLayout>
     )
     
-    const brand = screen.getByText("Campus Connect")
-    expect(brand).toBeInTheDocument()
+    const brands = screen.getAllByText("Campus Connect")
+    expect(brands.length).toBeGreaterThan(0)
   })
 
   it("should render navigation links", () => {

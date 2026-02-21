@@ -32,7 +32,7 @@ export function SkillEndorsements({
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="h-10 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700"
+            className="h-10 animate-pulse rounded-lg bg-muted bg-muted"
           />
         ))}
       </div>
@@ -41,7 +41,7 @@ export function SkillEndorsements({
 
   if (endorsements.skills.length === 0) {
     return (
-      <p className="text-sm text-gray-500 dark:text-gray-400">
+      <p className="text-sm text-muted-foreground">
         No skills added yet
       </p>
     )
@@ -66,20 +66,20 @@ export function SkillEndorsements({
   return (
     <div className="space-y-2">
       {error && (
-        <p className="text-xs text-red-500 mb-2">{error}</p>
+        <p className="text-xs text-destructive mb-2">{error}</p>
       )}
       {endorsements.skills.map((skill) => (
         <div
           key={skill.name}
-          className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2 dark:border-gray-700 dark:bg-gray-800"
+          className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2 border-border bg-card"
         >
           <div className="flex items-center gap-2 min-w-0">
-            <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-sm font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+            <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-sm font-medium text-primary dark:bg-blue-900 dark:text-blue-200">
               {skill.name}
             </span>
             {skill.count > 0 && (
               <span
-                className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400"
+                className="flex items-center gap-1 text-xs text-muted-foreground"
                 title={
                   skill.topEndorsers.length > 0
                     ? `Endorsed by ${skill.topEndorsers.join(", ")}${skill.count > skill.topEndorsers.length ? ` and ${skill.count - skill.topEndorsers.length} others` : ""}`
@@ -89,7 +89,7 @@ export function SkillEndorsements({
                 <Award className="h-3.5 w-3.5 text-amber-500" />
                 {skill.count}
                 {skill.topEndorsers.length > 0 && (
-                  <span className="hidden sm:inline text-gray-400 dark:text-gray-500 truncate max-w-[120px]">
+                  <span className="hidden sm:inline text-muted-foreground truncate max-w-[120px]">
                     by {skill.topEndorsers[0]}
                     {skill.count > 1
                       ? ` +${skill.count - 1}`
@@ -109,8 +109,8 @@ export function SkillEndorsements({
               disabled={loadingSkill === skill.name}
               className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                 skill.endorsedByViewer
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "border border-gray-300 text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "border border-border text-muted-foreground hover:bg-muted border-border text-muted-foreground hover:bg-accent"
               } disabled:opacity-50`}
               title={
                 skill.endorsedByViewer

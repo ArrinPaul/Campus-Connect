@@ -54,7 +54,7 @@ export function StoryRing({
     hasStories && hasUnseen
       ? "bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500"
       : hasStories
-      ? "bg-gray-300 dark:bg-gray-600"
+      ? "bg-muted dark:bg-muted"
       : "bg-transparent"
   )
 
@@ -76,8 +76,8 @@ export function StoryRing({
     >
       <div className={avatarContainerClass} style={{ width: 68, height: 68 }}>
         {/* White gap between ring and avatar */}
-        <div className="rounded-full bg-white dark:bg-gray-900 p-[2px]">
-          <div className="relative h-14 w-14 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+        <div className="rounded-full bg-card p-[2px]">
+          <div className="relative h-14 w-14 rounded-full overflow-hidden bg-muted bg-muted">
             {user.profilePicture ? (
               <Image
                 src={user.profilePicture}
@@ -87,7 +87,7 @@ export function StoryRing({
                 className="object-cover"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-blue-600 text-white text-xl font-bold">
+              <div className="flex h-full w-full items-center justify-center bg-primary text-primary-foreground text-xl font-bold">
                 {user.name.charAt(0).toUpperCase()}
               </div>
             )}
@@ -96,14 +96,14 @@ export function StoryRing({
 
         {/* "+" overlay for own ring (create story) */}
         {isOwn && (
-          <div className="absolute bottom-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 ring-2 ring-white dark:ring-gray-900">
-            <Plus className="h-3 w-3 text-white" strokeWidth={3} />
+          <div className="absolute bottom-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-primary ring-2 ring-white dark:ring-gray-900">
+            <Plus className="h-3 w-3 text-primary-foreground" strokeWidth={3} />
           </div>
         )}
       </div>
 
       {/* Label */}
-      <span className="max-w-[72px] truncate text-[11px] text-gray-700 dark:text-gray-300 text-center">
+      <span className="max-w-[72px] truncate text-[11px] text-foreground text-center">
         {isOwn ? "Your Story" : displayName}
       </span>
     </button>
@@ -181,12 +181,12 @@ function AddStoryButton({ onClick }: { onClick: () => void }) {
       aria-label="Add to story"
     >
       <div
-        className="relative flex items-center justify-center rounded-full border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800"
+        className="relative flex items-center justify-center rounded-full border-2 border-dashed border-border bg-muted"
         style={{ width: 68, height: 68 }}
       >
-        <Plus className="h-6 w-6 text-blue-500" />
+        <Plus className="h-6 w-6 text-primary" />
       </div>
-      <span className="max-w-[72px] truncate text-[11px] text-gray-700 dark:text-gray-300 text-center">
+      <span className="max-w-[72px] truncate text-[11px] text-foreground text-center">
         Add Story
       </span>
     </button>

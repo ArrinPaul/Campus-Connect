@@ -86,7 +86,7 @@ export default function BookmarksPage() {
   if (!isLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     )
   }
@@ -94,11 +94,11 @@ export default function BookmarksPage() {
   if (!isSignedIn) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-        <Bookmark className="w-16 h-16 text-gray-400" />
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+        <Bookmark className="w-16 h-16 text-muted-foreground" />
+        <h2 className="text-xl font-semibold text-foreground">
           Sign in to view your bookmarks
         </h2>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-muted-foreground">
           Bookmark posts to save them for later
         </p>
       </div>
@@ -119,15 +119,15 @@ export default function BookmarksPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-2">
             <Bookmark className="w-6 h-6 sm:w-8 sm:h-8" />
             Bookmarks
           </h1>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-1 text-sm text-muted-foreground">
             Posts you&apos;ve saved for later
           </p>
         </div>
@@ -143,7 +143,7 @@ export default function BookmarksPage() {
                   className="whitespace-nowrap"
                 >
                   {collection.name}
-                  <span className="ml-2 text-xs bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-full">
+                  <span className="ml-2 text-xs bg-muted bg-muted px-2 py-0.5 rounded-full">
                     {collection.count}
                   </span>
                 </TabsTrigger>
@@ -155,7 +155,7 @@ export default function BookmarksPage() {
         {/* Loading State */}
         {isLoading && (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         )}
 
@@ -163,15 +163,15 @@ export default function BookmarksPage() {
         {!isLoading && bookmarks.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 gap-4">
             <div className="relative">
-              <Bookmark className="w-20 h-20 text-gray-300 dark:text-gray-600" />
+              <Bookmark className="w-20 h-20 text-muted-foreground dark:text-muted-foreground" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-12 h-12 border-2 border-gray-300 dark:border-gray-600 rounded-full opacity-50" />
+                <div className="w-12 h-12 border-2 border-border rounded-full opacity-50" />
               </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <h3 className="text-lg font-semibold text-foreground">
               No bookmarks yet
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 text-center max-w-md">
+            <p className="text-muted-foreground text-center max-w-md">
               {selectedCollection === "All"
                 ? "Start bookmarking posts to save them for later. Click the bookmark icon on any post."
                 : `No posts in "${selectedCollection}" collection yet.`}
@@ -219,7 +219,7 @@ export default function BookmarksPage() {
             <button
               onClick={handleLoadMore}
               disabled={isLoadingMore}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoadingMore ? (
                 <span className="flex items-center gap-2">

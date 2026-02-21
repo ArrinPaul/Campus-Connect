@@ -28,8 +28,8 @@ jest.mock("@/components/editor/RichTextEditor", () => ({
         <span
           className={
             value.length > maxLength
-              ? "text-red-600 dark:text-red-400"
-              : "text-gray-500 dark:text-gray-400"
+              ? "text-destructive dark:text-red-400"
+              : "text-muted-foreground"
           }
         >
           {value.length}/{maxLength}
@@ -242,7 +242,7 @@ describe("PostComposer", () => {
     fireEvent.change(textarea, { target: { value: longContent } })
 
     const counter = screen.getByText("5001/5000")
-    expect(counter).toHaveClass("text-red-600")
+    expect(counter).toHaveClass("text-destructive")
   })
 
   it("should trim whitespace when validating empty content", async () => {

@@ -93,7 +93,7 @@ describe("NotificationsPage", () => {
     const { container } = render(<NotificationsPage />)
     
     const allTab = screen.getByText("All").closest("button")
-    expect(allTab).toHaveClass("text-blue-600")
+    expect(allTab).toHaveClass("text-primary")
   })
 
   it("should show empty state when no notifications", () => {

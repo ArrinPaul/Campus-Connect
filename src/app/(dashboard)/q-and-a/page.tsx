@@ -29,20 +29,20 @@ export default function QandAPage() {
             <MessageCircle className="w-8 h-8 text-orange-500" />
             Q&amp;A Forum
           </h1>
-          <p className="text-gray-500 mt-1">Ask questions, share knowledge</p>
+          <p className="text-muted-foreground mt-1">Ask questions, share knowledge</p>
         </div>
         <button
           onClick={() => setShowAskModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+          className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-primary-foreground rounded-lg hover:bg-orange-600"
         >
           <Plus className="w-4 h-4" /> Ask Question
         </button>
       </div>
 
       {/* Search & Sort */}
-      <div className="bg-white border rounded-xl p-4 space-y-3">
+      <div className="bg-card border rounded-xl p-4 space-y-3">
         <div className="relative">
-          <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+          <Search className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search questions..."
@@ -59,7 +59,7 @@ export default function QandAPage() {
                 key={s}
                 onClick={() => setSort(s)}
                 className={`px-3 py-1 text-sm rounded-full border ${
-                  sort === s ? "bg-orange-100 text-orange-700 border-orange-300" : "hover:bg-gray-50"
+                  sort === s ? "bg-orange-100 text-orange-700 border-orange-300" : "hover:bg-muted/50"
                 }`}
               >
                 {s.charAt(0).toUpperCase() + s.slice(1)}
@@ -68,7 +68,7 @@ export default function QandAPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Tag className="w-4 h-4 text-gray-400" />
+            <Tag className="w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Filter by tag"
@@ -77,7 +77,7 @@ export default function QandAPage() {
               className="border rounded-lg px-3 py-1 text-sm w-40"
             />
             {tagFilter && (
-              <button onClick={() => setTagFilter("")} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setTagFilter("")} className="text-muted-foreground hover:text-muted-foreground">
                 <X className="w-4 h-4" />
               </button>
             )}
@@ -89,15 +89,15 @@ export default function QandAPage() {
       {!questions ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white border rounded-xl p-5 animate-pulse">
-              <div className="h-5 bg-gray-200 rounded w-2/3 mb-3" />
-              <div className="h-4 bg-gray-200 rounded w-full mb-2" />
-              <div className="h-4 bg-gray-200 rounded w-1/3" />
+            <div key={i} className="bg-card border rounded-xl p-5 animate-pulse">
+              <div className="h-5 bg-muted rounded w-2/3 mb-3" />
+              <div className="h-4 bg-muted rounded w-full mb-2" />
+              <div className="h-4 bg-muted rounded w-1/3" />
             </div>
           ))}
         </div>
       ) : questions.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-muted-foreground">
           <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-30" />
           <p className="text-lg font-medium">No questions found</p>
           <p className="text-sm">Be the first to ask!</p>
@@ -108,7 +108,7 @@ export default function QandAPage() {
             <Link
               key={q._id}
               href={`/q-and-a/${q._id}`}
-              className="block bg-white border rounded-xl p-5 hover:shadow-md transition-shadow"
+              className="block bg-card border rounded-xl p-5 hover:shadow-md transition-shadow"
             >
               <div className="flex gap-4">
                 {/* Vote / Stats Column */}
@@ -117,11 +117,11 @@ export default function QandAPage() {
                     <ThumbsUp className="w-3 h-3" />
                     {q.score}
                   </div>
-                  <div className={`flex items-center gap-1 ${q.answerCount > 0 ? "text-green-600" : "text-gray-400"}`}>
+                  <div className={`flex items-center gap-1 ${q.answerCount > 0 ? "text-success" : "text-muted-foreground"}`}>
                     <MessageCircle className="w-3 h-3" />
                     {q.answerCount}
                   </div>
-                  <div className="flex items-center gap-1 text-gray-400">
+                  <div className="flex items-center gap-1 text-muted-foreground">
                     <Eye className="w-3 h-3" />
                     {q.viewCount}
                   </div>
@@ -132,11 +132,11 @@ export default function QandAPage() {
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="text-lg font-semibold">{q.title}</h3>
                     {q.acceptedAnswerId && (
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-success" />
                     )}
                   </div>
 
-                  <p className="text-gray-600 text-sm line-clamp-1 mb-2">{q.content}</p>
+                  <p className="text-muted-foreground text-sm line-clamp-1 mb-2">{q.content}</p>
 
                   <div className="flex items-center justify-between">
                     <div className="flex flex-wrap gap-1.5">
@@ -147,7 +147,7 @@ export default function QandAPage() {
                       ))}
                     </div>
 
-                    <div className="flex items-center gap-2 text-xs text-gray-400">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       {q.asker && <span>by {q.asker.name}</span>}
                       <span>{new Date(q.createdAt).toLocaleDateString()}</span>
                     </div>
@@ -194,11 +194,11 @@ function AskQuestionModal({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-card rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold">Ask a Question</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -243,15 +243,15 @@ function AskQuestionModal({ onClose }: { onClose: () => void }) {
               placeholder="e.g. algorithms, python, sorting"
               className="w-full border rounded-lg px-3 py-2 text-sm"
             />
-            <p className="text-xs text-gray-400 mt-1">Comma separated, max 10</p>
+            <p className="text-xs text-muted-foreground mt-1">Comma separated, max 10</p>
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && <p className="text-destructive text-sm">{error}</p>}
 
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50"
+            className="w-full py-2 bg-orange-500 text-primary-foreground rounded-lg hover:bg-orange-600 disabled:opacity-50"
           >
             {loading ? "Posting..." : "Post Question"}
           </button>

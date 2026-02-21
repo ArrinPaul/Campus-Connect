@@ -13,6 +13,33 @@ jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
 }))
 
+// Mock framer-motion
+jest.mock("framer-motion", () => ({
+  motion: {
+    div: ({ children, className, style, ...rest }: any) => <div className={className} style={style}>{children}</div>,
+    h1: ({ children, className, style, ...rest }: any) => <h1 className={className} style={style}>{children}</h1>,
+    h2: ({ children, className, style, ...rest }: any) => <h2 className={className} style={style}>{children}</h2>,
+    p: ({ children, className, style, ...rest }: any) => <p className={className} style={style}>{children}</p>,
+    span: ({ children, className, style, ...rest }: any) => <span className={className} style={style}>{children}</span>,
+  },
+  AnimatePresence: ({ children }: any) => children,
+}))
+
+// Mock Next.js Link
+jest.mock("next/link", () => {
+  const MockLink = ({ children, ...props }: any) => <a {...props}>{children}</a>
+  MockLink.displayName = "MockLink"
+  return MockLink
+})
+
+// Mock Button component
+jest.mock("@/components/ui/button", () => ({
+  Button: ({ children, asChild, variant, size, className, ...props }: any) => {
+    if (asChild) return children
+    return <button className={className} {...props}>{children}</button>
+  },
+}))
+
 describe("Landing Page", () => {
   const mockPush = jest.fn()
 
@@ -66,9 +93,11 @@ describe("Landing Page", () => {
 
     render(<Home />)
 
-    expect(screen.getByText("Campus Connect")).toBeInTheDocument()
     expect(
-      screen.getByText(/Connect with students, researchers, and academics/)
+      screen.getByText(/Your Academic Journey/)
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(/Connect with peers, collaborate on research/)
     ).toBeInTheDocument()
   })
 
@@ -80,9 +109,9 @@ describe("Landing Page", () => {
 
     render(<Home />)
 
-    const signUpButton = screen.getByRole("link", { name: /sign up/i })
-    expect(signUpButton).toBeInTheDocument()
-    expect(signUpButton).toHaveAttribute("href", "/sign-up")
+    const signUpLink = screen.getByRole("link", { name: /get started/i })
+    expect(signUpLink).toBeInTheDocument()
+    expect(signUpLink).toHaveAttribute("href", "/sign-up")
   })
 
   it("should display Sign In CTA button with correct link", () => {
@@ -93,9 +122,9 @@ describe("Landing Page", () => {
 
     render(<Home />)
 
-    const signInButton = screen.getByRole("link", { name: /sign in/i })
-    expect(signInButton).toBeInTheDocument()
-    expect(signInButton).toHaveAttribute("href", "/sign-in")
+    const signInLink = screen.getByRole("link", { name: /sign in/i })
+    expect(signInLink).toBeInTheDocument()
+    expect(signInLink).toHaveAttribute("href", "/sign-in")
   })
 
   it("should display features section", () => {
@@ -106,9 +135,9 @@ describe("Landing Page", () => {
 
     render(<Home />)
 
-    expect(screen.getByText("Why Campus Connect?")).toBeInTheDocument()
-    expect(screen.getByText("Connect")).toBeInTheDocument()
-    expect(screen.getByText("Collaborate")).toBeInTheDocument()
-    expect(screen.getByText("Create")).toBeInTheDocument()
+    expect(screen.getByText("Built for Academic Excellence")).toBeInTheDocument()
+    expect(screen.getByText("Smart Networking")).toBeInTheDocument()
+    expect(screen.getByText("Research Collaboration")).toBeInTheDocument()
+    expect(screen.getByText("Hackathons & Events")).toBeInTheDocument()
   })
 })

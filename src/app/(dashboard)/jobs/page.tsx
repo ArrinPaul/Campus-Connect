@@ -27,23 +27,23 @@ export default function JobsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Briefcase className="w-8 h-8 text-blue-600" />
+            <Briefcase className="w-8 h-8 text-primary" />
             Job &amp; Internship Board
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-muted-foreground mt-1">
             Find opportunities or post openings for the community
           </p>
         </div>
         <div className="flex gap-2">
           <Link
             href="/jobs/my-applications"
-            className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-sm"
+            className="px-4 py-2 border rounded-lg hover:bg-muted/50 text-sm"
           >
             My Applications
           </Link>
           <button
             onClick={() => setShowPostModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
           >
             <Plus className="w-4 h-4" /> Post a Job
           </button>
@@ -51,20 +51,20 @@ export default function JobsPage() {
       </div>
 
       {/* Search & Filters */}
-      <div className="bg-white border rounded-xl p-4 space-y-4">
+      <div className="bg-card border rounded-xl p-4 space-y-4">
         <div className="relative">
-          <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+          <Search className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search jobs, companies, skills..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-ring outline-none"
           />
         </div>
 
         <div className="flex flex-wrap gap-3 items-center">
-          <Filter className="w-4 h-4 text-gray-500" />
+          <Filter className="w-4 h-4 text-muted-foreground" />
 
           {/* Type filter */}
           <div className="flex gap-1">
@@ -74,8 +74,8 @@ export default function JobsPage() {
                 onClick={() => setTypeFilter(t)}
                 className={`px-3 py-1 text-sm rounded-full border ${
                   typeFilter === t
-                    ? "bg-blue-100 text-blue-700 border-blue-300"
-                    : "hover:bg-gray-50"
+                    ? "bg-primary/10 text-primary border-blue-300"
+                    : "hover:bg-muted/50"
                 }`}
               >
                 {t === "" ? "All Types" : t === "job" ? "Jobs" : "Internships"}
@@ -92,7 +92,7 @@ export default function JobsPage() {
                 className={`px-3 py-1 text-sm rounded-full border ${
                   remoteFilter === r
                     ? "bg-green-100 text-green-700 border-green-300"
-                    : "hover:bg-gray-50"
+                    : "hover:bg-muted/50"
                 }`}
               >
                 {r === undefined ? "Any Location" : r ? "Remote" : "On-site"}
@@ -106,16 +106,16 @@ export default function JobsPage() {
       {!jobs ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white border rounded-xl p-6 animate-pulse">
-              <div className="h-6 bg-gray-200 rounded w-1/3 mb-3" />
-              <div className="h-4 bg-gray-200 rounded w-1/4 mb-2" />
-              <div className="h-4 bg-gray-200 rounded w-full mb-2" />
-              <div className="h-4 bg-gray-200 rounded w-2/3" />
+            <div key={i} className="bg-card border rounded-xl p-6 animate-pulse">
+              <div className="h-6 bg-muted rounded w-1/3 mb-3" />
+              <div className="h-4 bg-muted rounded w-1/4 mb-2" />
+              <div className="h-4 bg-muted rounded w-full mb-2" />
+              <div className="h-4 bg-muted rounded w-2/3" />
             </div>
           ))}
         </div>
       ) : jobs.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-muted-foreground">
           <Briefcase className="w-12 h-12 mx-auto mb-3 opacity-30" />
           <p className="text-lg font-medium">No jobs found</p>
           <p className="text-sm">Try adjusting your search or filters</p>
@@ -126,7 +126,7 @@ export default function JobsPage() {
             <Link
               key={job._id}
               href={`/jobs/${job._id}`}
-              className="block bg-white border rounded-xl p-6 hover:shadow-md transition-shadow"
+              className="block bg-card border rounded-xl p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -136,7 +136,7 @@ export default function JobsPage() {
                       className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                         job.type === "internship"
                           ? "bg-purple-100 text-purple-700"
-                          : "bg-blue-100 text-blue-700"
+                          : "bg-primary/10 text-primary"
                       }`}
                     >
                       {job.type === "internship" ? "Internship" : "Full-time"}
@@ -149,7 +149,7 @@ export default function JobsPage() {
                     )}
                   </div>
 
-                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                     <span className="flex items-center gap-1">
                       <Building2 className="w-4 h-4" /> {job.company}
                     </span>
@@ -168,19 +168,19 @@ export default function JobsPage() {
                     )}
                   </div>
 
-                  <p className="text-gray-600 text-sm line-clamp-2 mb-3">{job.description}</p>
+                  <p className="text-muted-foreground text-sm line-clamp-2 mb-3">{job.description}</p>
 
                   <div className="flex flex-wrap gap-1.5">
                     {job.skillsRequired.slice(0, 6).map((skill: string) => (
                       <span
                         key={skill}
-                        className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600"
+                        className="px-2 py-0.5 bg-muted rounded text-xs text-muted-foreground"
                       >
                         {skill}
                       </span>
                     ))}
                     {job.skillsRequired.length > 6 && (
-                      <span className="px-2 py-0.5 text-xs text-gray-400">
+                      <span className="px-2 py-0.5 text-xs text-muted-foreground">
                         +{job.skillsRequired.length - 6} more
                       </span>
                     )}
@@ -188,11 +188,11 @@ export default function JobsPage() {
                 </div>
 
                 <div className="text-right ml-4 flex-shrink-0">
-                  <div className="flex items-center gap-1 text-gray-500 text-sm">
+                  <div className="flex items-center gap-1 text-muted-foreground text-sm">
                     <Users className="w-4 h-4" />
                     {job.applicantCount} applicant{job.applicantCount !== 1 ? "s" : ""}
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     {new Date(job.createdAt).toLocaleDateString()}
                   </p>
                 </div>
@@ -257,11 +257,11 @@ function PostJobModal({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto p-4">
-      <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto p-4">
+      <div className="bg-card rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold">Post a Job / Internship</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -296,8 +296,8 @@ function PostJobModal({ onClose }: { onClose: () => void }) {
                   onClick={() => setForm((f) => ({ ...f, type: t }))}
                   className={`px-4 py-2 rounded-lg text-sm border ${
                     form.type === t
-                      ? "bg-blue-100 text-blue-700 border-blue-300"
-                      : "hover:bg-gray-50"
+                      ? "bg-primary/10 text-primary border-blue-300"
+                      : "hover:bg-muted/50"
                   }`}
                 >
                   {t === "job" ? "Full-time Job" : "Internship"}
@@ -369,7 +369,7 @@ function PostJobModal({ onClose }: { onClose: () => void }) {
               placeholder="e.g. React, TypeScript, Node.js"
               className="w-full border rounded-lg px-3 py-2 text-sm"
             />
-            <p className="text-xs text-gray-400 mt-1">Comma separated</p>
+            <p className="text-xs text-muted-foreground mt-1">Comma separated</p>
           </div>
 
           <div>
@@ -383,12 +383,12 @@ function PostJobModal({ onClose }: { onClose: () => void }) {
             />
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && <p className="text-destructive text-sm">{error}</p>}
 
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            className="w-full py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50"
           >
             {loading ? "Posting..." : "Post Job"}
           </button>

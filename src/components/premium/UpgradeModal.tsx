@@ -33,7 +33,7 @@ export function UpgradeModal({ isOpen, onClose, featureName }: UpgradeModalProps
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/20 backdrop-blur-sm backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="w-full max-w-md rounded-2xl bg-background shadow-2xl border p-6 space-y-5">
@@ -89,7 +89,7 @@ export function UpgradeModal({ isOpen, onClose, featureName }: UpgradeModalProps
           ))}
         </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-destructive">{error}</p>}
 
         <button
           onClick={handleUpgrade}

@@ -184,11 +184,11 @@ export default function StoriesPage() {
 
   if (storyGroups.length === 0) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-black text-white">
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-black text-primary-foreground">
         <p className="text-lg">No stories right now</p>
         <Link
           href="/feed"
-          className="rounded-full bg-white/20 px-6 py-2 text-sm font-medium hover:bg-white/30 transition-colors"
+          className="rounded-full bg-card/20 px-6 py-2 text-sm font-medium hover:bg-card/30 transition-colors"
         >
           Back to feed
         </Link>
@@ -211,10 +211,10 @@ export default function StoriesPage() {
         {currentGroup.stories.map((_, i) => (
           <div
             key={i}
-            className="h-0.5 flex-1 rounded-full overflow-hidden bg-white/30"
+            className="h-0.5 flex-1 rounded-full overflow-hidden bg-card/30"
           >
             <div
-              className="h-full bg-white rounded-full transition-none"
+              className="h-full bg-card rounded-full transition-none"
               style={{
                 width:
                   i < storyIndex
@@ -244,7 +244,7 @@ export default function StoriesPage() {
         ) : (
           <div className="flex items-center justify-center p-10 text-center">
             <p
-              className="text-white font-semibold text-2xl leading-snug"
+              className="text-primary-foreground font-semibold text-2xl leading-snug"
               style={{ textShadow: "0 2px 8px rgba(0,0,0,0.4)" }}
             >
               {currentStory.content}
@@ -271,16 +271,16 @@ export default function StoriesPage() {
                 className="object-cover"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-blue-600 text-white text-sm font-bold">
+              <div className="flex h-full w-full items-center justify-center bg-primary text-primary-foreground text-sm font-bold">
                 {currentGroup.author?.name.charAt(0).toUpperCase()}
               </div>
             )}
           </div>
           <div>
-            <p className="text-white text-sm font-semibold leading-tight drop-shadow">
+            <p className="text-primary-foreground text-sm font-semibold leading-tight drop-shadow">
               {currentGroup.author?.name}
             </p>
-            <p className="text-white/70 text-xs">
+            <p className="text-primary-foreground/70 text-xs">
               {formatTimeAgo(currentStory.createdAt)}
             </p>
           </div>
@@ -290,7 +290,7 @@ export default function StoriesPage() {
         <div className="flex items-center gap-2">
           {/* View count (own stories) */}
           {isOwnStory && (
-            <div className="flex items-center gap-1 text-white/80 text-xs">
+            <div className="flex items-center gap-1 text-primary-foreground/80 text-xs">
               <Eye className="h-4 w-4" />
               <span>{currentStory.viewCount}</span>
             </div>
@@ -299,7 +299,7 @@ export default function StoriesPage() {
           {isOwnStory && (
             <button
               onClick={handleDelete}
-              className="rounded-full bg-white/10 p-2 text-white hover:bg-white/20 transition-colors"
+              className="rounded-full bg-card/10 p-2 text-primary-foreground hover:bg-card/20 transition-colors"
               aria-label="Delete story"
             >
               <Trash2 className="h-4 w-4" />
@@ -308,7 +308,7 @@ export default function StoriesPage() {
           {/* Close */}
           <button
             onClick={() => router.push("/feed")}
-            className="rounded-full bg-white/10 p-2 text-white hover:bg-white/20 transition-colors"
+            className="rounded-full bg-card/10 p-2 text-primary-foreground hover:bg-card/20 transition-colors"
             aria-label="Close stories"
           >
             <X className="h-5 w-5" />
@@ -334,7 +334,7 @@ export default function StoriesPage() {
       {groupIndex > 0 && (
         <button
           onClick={goToPrevGroup}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 hidden md:flex rounded-full bg-white/10 p-3 text-white hover:bg-white/20 transition-colors"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 hidden md:flex rounded-full bg-card/10 p-3 text-primary-foreground hover:bg-card/20 transition-colors"
           aria-label="Previous user's stories"
         >
           <ChevronLeft className="h-6 w-6" />
@@ -343,7 +343,7 @@ export default function StoriesPage() {
       {groupIndex < storyGroups.length - 1 && (
         <button
           onClick={goToNextGroup}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 hidden md:flex rounded-full bg-white/10 p-3 text-white hover:bg-white/20 transition-colors"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 hidden md:flex rounded-full bg-card/10 p-3 text-primary-foreground hover:bg-card/20 transition-colors"
           aria-label="Next user's stories"
         >
           <ChevronRight className="h-6 w-6" />

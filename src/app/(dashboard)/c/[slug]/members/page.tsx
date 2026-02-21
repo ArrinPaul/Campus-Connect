@@ -21,9 +21,9 @@ const ROLE_ICONS: Record<string, React.ElementType> = {
 
 const ROLE_COLORS: Record<string, string> = {
   owner: "text-amber-600 dark:text-amber-400",
-  admin: "text-blue-600 dark:text-blue-400",
-  moderator: "text-green-600 dark:text-green-400",
-  member: "text-gray-500 dark:text-gray-400",
+  admin: "text-primary",
+  moderator: "text-success dark:text-green-400",
+  member: "text-muted-foreground",
 }
 
 export default function CommunityMembersPage({ params }: MembersPageProps) {
@@ -100,11 +100,11 @@ export default function CommunityMembersPage({ params }: MembersPageProps) {
       </Link>
 
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-          <Users className="h-6 w-6 text-blue-500" />
+        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+          <Users className="h-6 w-6 text-primary" />
           Members
           {community && (
-            <span className="text-lg font-normal text-gray-500 dark:text-gray-400">
+            <span className="text-lg font-normal text-muted-foreground">
               ({community.memberCount})
             </span>
           )}
@@ -119,7 +119,7 @@ export default function CommunityMembersPage({ params }: MembersPageProps) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search members..."
-          className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
+          className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
         />
       </div>
 
@@ -156,7 +156,7 @@ export default function CommunityMembersPage({ params }: MembersPageProps) {
                     {member.name?.charAt(0) ?? "?"}
                   </div>
                   <div className="min-w-0">
-                    <p className="truncate font-medium text-gray-900 dark:text-gray-100">
+                    <p className="truncate font-medium text-foreground">
                       {member.name}
                     </p>
                     <p className={`flex items-center gap-1 text-xs capitalize ${ROLE_COLORS[member.role]}`}>
@@ -185,7 +185,7 @@ export default function CommunityMembersPage({ params }: MembersPageProps) {
                     </select>
                     <button
                       onClick={() => handleRemove(member.userId as Id<"users">)}
-                      className="rounded border border-red-300 px-2 py-1 text-xs text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
+                      className="rounded border border-red-300 px-2 py-1 text-xs text-destructive hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
                     >
                       Remove
                     </button>
@@ -196,7 +196,7 @@ export default function CommunityMembersPage({ params }: MembersPageProps) {
           })}
 
           {filteredMembers?.length === 0 && (
-            <p className="py-8 text-center text-gray-500 dark:text-gray-400">
+            <p className="py-8 text-center text-muted-foreground">
               No members found
             </p>
           )}

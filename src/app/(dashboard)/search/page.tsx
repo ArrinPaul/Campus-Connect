@@ -133,20 +133,20 @@ export default function SearchPage() {
       {/* Search header */}
       <form onSubmit={handleSubmit} className="mb-4 sm:mb-6">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search users, posts, hashtags…"
-            className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 py-3 pl-10 pr-10 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+            className="w-full rounded-lg border border-border bg-card py-3 pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 focus:outline-none"
             autoFocus
           />
           {query && (
             <button
               type="button"
               onClick={() => setQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               <X className="h-4 w-4" />
             </button>
@@ -156,23 +156,23 @@ export default function SearchPage() {
 
       {/* No query yet — show recent searches */}
       {!query.trim() && (
-        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+        <div className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
-              <Clock className="h-4 w-4 text-gray-400" />
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <Clock className="h-4 w-4 text-muted-foreground" />
               Recent Searches
             </h3>
             {recentSearches.length > 0 && (
               <button
                 onClick={clearRecentSearches}
-                className="text-xs text-red-500 hover:text-red-600"
+                className="text-xs text-destructive hover:text-destructive"
               >
                 Clear all
               </button>
             )}
           </div>
           {recentSearches.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+            <p className="text-sm text-muted-foreground text-center py-4">
               No recent searches
             </p>
           ) : (
@@ -184,9 +184,9 @@ export default function SearchPage() {
                     setQuery(s)
                     saveSearch(s)
                   }}
-                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-foreground hover:bg-accent transition-colors"
                 >
-                  <Clock className="h-3.5 w-3.5 text-gray-400" />
+                  <Clock className="h-3.5 w-3.5 text-muted-foreground" />
                   {s}
                 </button>
               ))}
@@ -200,15 +200,15 @@ export default function SearchPage() {
         <>
           {/* Tab bar */}
           <div className="mb-4 flex items-center gap-2">
-            <div className="flex gap-1 overflow-x-auto rounded-lg bg-gray-100 dark:bg-gray-800 p-1 flex-1">
+            <div className="flex gap-1 overflow-x-auto rounded-lg bg-muted p-1 flex-1">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                     activeTab === tab.id
-                      ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm"
-                      : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {tab.icon}
@@ -223,8 +223,8 @@ export default function SearchPage() {
                 onClick={() => setShowFilters(!showFilters)}
                 className={`flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors border ${
                   showFilters
-                    ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800"
-                    : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    ? "bg-primary/10 dark:bg-blue-900/20 text-primary border-blue-200 dark:border-blue-800"
+                    : "bg-card text-muted-foreground border-border hover:bg-accent"
                 }`}
               >
                 <SlidersHorizontal className="h-4 w-4" />
@@ -235,41 +235,41 @@ export default function SearchPage() {
 
           {/* Filters panel */}
           {showFilters && activeTab === "posts" && (
-            <div className="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-              <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+            <div className="mb-4 rounded-lg border border-border bg-card p-4">
+              <h4 className="text-sm font-semibold text-foreground mb-3">
                 Post Filters
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                  <label className="text-xs text-muted-foreground mb-1 block">
                     Date From
                   </label>
                   <input
                     type="date"
                     value={dateFrom}
                     onChange={(e) => setDateFrom(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100"
+                    className="w-full rounded-md border border-border bg-card px-2 py-1.5 text-sm text-foreground"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                  <label className="text-xs text-muted-foreground mb-1 block">
                     Date To
                   </label>
                   <input
                     type="date"
                     value={dateTo}
                     onChange={(e) => setDateTo(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100"
+                    className="w-full rounded-md border border-border bg-card px-2 py-1.5 text-sm text-foreground"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                  <label className="text-xs text-muted-foreground mb-1 block">
                     Content Type
                   </label>
                   <select
                     value={mediaType}
                     onChange={(e) => setMediaType(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100"
+                    className="w-full rounded-md border border-border bg-card px-2 py-1.5 text-sm text-foreground"
                   >
                     <option value="any">Any</option>
                     <option value="image">Image</option>
@@ -279,7 +279,7 @@ export default function SearchPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                  <label className="text-xs text-muted-foreground mb-1 block">
                     Min Engagement
                   </label>
                   <input
@@ -288,7 +288,7 @@ export default function SearchPage() {
                     value={minEngagement}
                     onChange={(e) => setMinEngagement(e.target.value)}
                     placeholder="0"
-                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100"
+                    className="w-full rounded-md border border-border bg-card px-2 py-1.5 text-sm text-foreground"
                   />
                 </div>
               </div>
@@ -296,19 +296,19 @@ export default function SearchPage() {
           )}
 
           {showFilters && activeTab === "users" && (
-            <div className="mb-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-              <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+            <div className="mb-4 rounded-lg border border-border bg-card p-4">
+              <h4 className="text-sm font-semibold text-foreground mb-3">
                 User Filters
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                  <label className="text-xs text-muted-foreground mb-1 block">
                     Role
                   </label>
                   <select
                     value={userRole}
                     onChange={(e) => setUserRole(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100"
+                    className="w-full rounded-md border border-border bg-card px-2 py-1.5 text-sm text-foreground"
                   >
                     <option value="">Any Role</option>
                     <option value="Student">Student</option>
@@ -317,7 +317,7 @@ export default function SearchPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
+                  <label className="text-xs text-muted-foreground mb-1 block">
                     University
                   </label>
                   <input
@@ -325,7 +325,7 @@ export default function SearchPage() {
                     value={university}
                     onChange={(e) => setUniversity(e.target.value)}
                     placeholder="Filter by university..."
-                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100"
+                    className="w-full rounded-md border border-border bg-card px-2 py-1.5 text-sm text-foreground"
                   />
                 </div>
               </div>
@@ -391,13 +391,13 @@ function UniversalResults({
       {results.users.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
-              <Users className="h-4 w-4 text-blue-500" />
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <Users className="h-4 w-4 text-primary" />
               Users
             </h3>
             <button
               onClick={() => onTabSwitch("users")}
-              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-xs text-primary hover:underline"
             >
               See all results
             </button>
@@ -407,7 +407,7 @@ function UniversalResults({
               <Link
                 key={user._id}
                 href={`/profile/${user.username || user._id}`}
-                className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                className="flex items-center gap-3 rounded-lg border border-border bg-card p-3 hover:bg-accent/50 transition-colors"
               >
                 {user.profilePicture ? (
                   <Image
@@ -418,15 +418,15 @@ function UniversalResults({
                     className="rounded-full"
                   />
                 ) : (
-                  <div className="h-9 w-9 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-sm font-bold text-white">
+                  <div className="h-9 w-9 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-sm font-bold text-primary-foreground">
                     {user.name.charAt(0).toUpperCase()}
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                  <p className="text-sm font-medium text-foreground truncate">
                     <HighlightText text={user.name} query={query} />
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  <p className="text-xs text-muted-foreground truncate">
                     {user.username && `@${user.username} · `}
                     {user.role}
                     {user.university && ` · ${user.university}`}
@@ -442,13 +442,13 @@ function UniversalResults({
       {results.posts.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
-              <FileText className="h-4 w-4 text-green-500" />
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <FileText className="h-4 w-4 text-success" />
               Posts
             </h3>
             <button
               onClick={() => onTabSwitch("posts")}
-              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-xs text-primary hover:underline"
             >
               See all results
             </button>
@@ -458,7 +458,7 @@ function UniversalResults({
               <Link
                 key={post._id}
                 href={`/post/${post._id}`}
-                className="block rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                className="block rounded-lg border border-border bg-card p-3 hover:bg-accent/50 transition-colors"
               >
                 {post.author && (
                   <div className="flex items-center gap-2 mb-1.5">
@@ -471,22 +471,22 @@ function UniversalResults({
                         className="rounded-full"
                       />
                     ) : (
-                      <div className="h-5 w-5 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-[10px] font-bold text-white">
+                      <div className="h-5 w-5 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-[10px] font-bold text-primary-foreground">
                         {post.author.name.charAt(0).toUpperCase()}
                       </div>
                     )}
-                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                    <span className="text-xs font-medium text-foreground">
                       {post.author.name}
                     </span>
-                    <span className="text-[10px] text-gray-400 ml-auto">
+                    <span className="text-[10px] text-muted-foreground ml-auto">
                       {formatTimeAgo(post.createdAt)}
                     </span>
                   </div>
                 )}
-                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                <p className="text-sm text-muted-foreground line-clamp-2">
                   <HighlightText text={post.content} query={query} />
                 </p>
-                <div className="flex items-center gap-3 mt-2 text-[10px] text-gray-400">
+                <div className="flex items-center gap-3 mt-2 text-[10px] text-muted-foreground">
                   {post.likeCount > 0 && (
                     <span className="flex items-center gap-0.5">
                       <Heart className="h-3 w-3" /> {post.likeCount}
@@ -508,13 +508,13 @@ function UniversalResults({
       {results.hashtags.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
               <Hash className="h-4 w-4 text-purple-500" />
               Hashtags
             </h3>
             <button
               onClick={() => onTabSwitch("hashtags")}
-              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-xs text-primary hover:underline"
             >
               See all results
             </button>
@@ -524,11 +524,11 @@ function UniversalResults({
               <Link
                 key={hashtag._id}
                 href={`/hashtag/${hashtag.tag}`}
-                className="inline-flex items-center gap-1 rounded-full bg-blue-50 dark:bg-blue-900/20 px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+                className="inline-flex items-center gap-1 rounded-full bg-primary/10 dark:bg-blue-900/20 px-3 py-1 text-sm text-primary hover:bg-primary/10 dark:hover:bg-blue-900/40 transition-colors"
               >
                 <Hash className="h-3 w-3" />
                 <HighlightText text={hashtag.tag} query={query} />
-                <span className="text-[10px] text-gray-400 ml-1">
+                <span className="text-[10px] text-muted-foreground ml-1">
                   {hashtag.postCount} posts
                 </span>
               </Link>
@@ -546,7 +546,7 @@ function PostSearchResults({ results, query }: { results: any; query: string }) 
 
   return (
     <div className="space-y-4">
-      <p className="text-xs text-gray-500 dark:text-gray-400">
+      <p className="text-xs text-muted-foreground">
         {results.items.length} result{results.items.length !== 1 ? "s" : ""}
       </p>
       {results.items.map((item: any) => {
@@ -560,7 +560,7 @@ function PostSearchResults({ results, query }: { results: any; query: string }) 
         )
       })}
       {results.hasMore && (
-        <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-2">
+        <p className="text-center text-sm text-muted-foreground py-2">
           More results available. Try refining your search.
         </p>
       )}
@@ -574,14 +574,14 @@ function UserSearchResults({ results, query }: { results: any; query: string }) 
 
   return (
     <div className="space-y-3">
-      <p className="text-xs text-gray-500 dark:text-gray-400">
+      <p className="text-xs text-muted-foreground">
         {results.totalCount} result{results.totalCount !== 1 ? "s" : ""}
       </p>
       {results.items.map((user: any) => (
         <UserCard key={user._id} user={user} />
       ))}
       {results.hasMore && (
-        <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-2">
+        <p className="text-center text-sm text-muted-foreground py-2">
           More results available. Try refining your search.
         </p>
       )}
@@ -595,24 +595,24 @@ function HashtagSearchResults({ results, query }: { results: any; query: string 
 
   return (
     <div className="space-y-2">
-      <p className="text-xs text-gray-500 dark:text-gray-400">
+      <p className="text-xs text-muted-foreground">
         {results.items.length} result{results.items.length !== 1 ? "s" : ""}
       </p>
       {results.items.map((hashtag: any) => (
         <Link
           key={hashtag._id}
           href={`/hashtag/${hashtag.tag}`}
-          className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+          className="flex items-center justify-between rounded-lg border border-border bg-card p-3 hover:bg-accent/50 transition-colors"
         >
           <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-900/20">
-              <Hash className="h-5 w-5 text-blue-500" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 dark:bg-blue-900/20">
+              <Hash className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              <p className="text-sm font-medium text-foreground">
                 #<HighlightText text={hashtag.tag} query={query} />
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 {hashtag.postCount} {hashtag.postCount === 1 ? "post" : "posts"}
               </p>
             </div>
@@ -631,18 +631,18 @@ function SearchSkeleton() {
       {[...Array(5)].map((_, i) => (
         <div
           key={i}
-          className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4"
+          className="rounded-lg border border-border bg-card p-4"
         >
           <div className="flex items-center gap-3 mb-3">
-            <div className="h-9 w-9 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            <div className="h-9 w-9 rounded-full bg-muted bg-muted animate-pulse" />
             <div className="flex-1 space-y-1">
-              <div className="h-4 w-24 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
-              <div className="h-3 w-16 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+              <div className="h-4 w-24 rounded bg-muted bg-muted animate-pulse" />
+              <div className="h-3 w-16 rounded bg-muted bg-muted animate-pulse" />
             </div>
           </div>
           <div className="space-y-2">
-            <div className="h-3 w-full rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
-            <div className="h-3 w-2/3 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            <div className="h-3 w-full rounded bg-muted bg-muted animate-pulse" />
+            <div className="h-3 w-2/3 rounded bg-muted bg-muted animate-pulse" />
           </div>
         </div>
       ))}
@@ -652,12 +652,12 @@ function SearchSkeleton() {
 
 function EmptyResults({ query }: { query: string }) {
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8 text-center sm:p-12">
-      <Search className="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600 mb-4" />
-      <p className="text-base font-medium text-gray-900 dark:text-gray-100 sm:text-lg">
+    <div className="rounded-lg border border-border bg-card p-8 text-center sm:p-12">
+      <Search className="mx-auto h-12 w-12 text-muted-foreground dark:text-muted-foreground mb-4" />
+      <p className="text-base font-medium text-foreground sm:text-lg">
         No results for &ldquo;{query}&rdquo;
       </p>
-      <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 sm:mt-2">
+      <p className="mt-1 text-sm text-muted-foreground sm:mt-2">
         Try different keywords or check for typos
       </p>
     </div>

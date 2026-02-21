@@ -14,14 +14,14 @@ import {
 } from "lucide-react"
 
 const EVENT_TYPE_CONFIG = {
-  in_person: { icon: MapPin, label: "In Person", color: "text-green-600 dark:text-green-400" },
-  virtual: { icon: Video, label: "Virtual", color: "text-blue-600 dark:text-blue-400" },
+  in_person: { icon: MapPin, label: "In Person", color: "text-success dark:text-green-400" },
+  virtual: { icon: Video, label: "Virtual", color: "text-primary" },
   hybrid: { icon: Globe, label: "Hybrid", color: "text-purple-600 dark:text-purple-400" },
 }
 
 const RSVP_OPTIONS = [
-  { status: "going" as const, label: "Going", icon: CheckCircle, color: "bg-green-600 hover:bg-green-700 text-white" },
-  { status: "maybe" as const, label: "Maybe", icon: HelpCircle, color: "bg-yellow-500 hover:bg-yellow-600 text-white" },
+  { status: "going" as const, label: "Going", icon: CheckCircle, color: "bg-success hover:bg-green-700 text-white" },
+  { status: "maybe" as const, label: "Maybe", icon: HelpCircle, color: "bg-warning hover:bg-yellow-600 text-white" },
   { status: "not_going" as const, label: "Not Going", icon: XCircle, color: "bg-gray-500 hover:bg-gray-600 text-white" },
 ]
 
@@ -101,8 +101,8 @@ export default function EventDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <Calendar className="mb-3 h-12 w-12 text-gray-300 dark:text-gray-600" />
-        <p className="text-gray-500 dark:text-gray-400">Event not found</p>
-        <Link href="/events" className="mt-3 text-sm text-blue-600 hover:underline">← Back to Events</Link>
+        <p className="text-muted-foreground">Event not found</p>
+        <Link href="/events" className="mt-3 text-sm text-primary hover:underline">← Back to Events</Link>
       </div>
     )
   }
@@ -126,12 +126,12 @@ export default function EventDetailPage() {
       {/* Title + Organizer */}
       <div className="mb-4">
         <div className="flex items-start justify-between gap-3">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
+          <h1 className="text-2xl font-bold text-foreground leading-tight">
             {event.title}
           </h1>
           <button
             onClick={() => navigator.clipboard.writeText(window.location.href)}
-            className="flex-shrink-0 rounded-full border border-gray-200 dark:border-gray-700 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600"
+            className="flex-shrink-0 rounded-full border border-border p-2 text-gray-400 hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
             title="Copy link"
           >
             <Share2 className="h-4 w-4" />
@@ -144,16 +144,16 @@ export default function EventDetailPage() {
               {event.organizer.profilePicture ? (
                 <Image src={event.organizer.profilePicture} alt={event.organizer.name} fill className="rounded-full object-cover" />
               ) : (
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
                   {event.organizer.name.charAt(0)}
                 </div>
               )}
             </div>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-sm text-muted-foreground">
               Organized by{" "}
               <Link
                 href={`/profile/${event.organizer._id}`}
-                className="font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400"
+                className="font-medium text-foreground hover:text-primary dark:hover:text-blue-400"
               >
                 {event.organizer.name}
               </Link>
@@ -163,15 +163,15 @@ export default function EventDetailPage() {
       </div>
 
       {/* Key details card */}
-      <div className="mb-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
+      <div className="mb-5 rounded-xl border border-border bg-card divide-y divide-gray-100 dark:divide-gray-700">
         {/* Date */}
         <div className="flex items-center gap-3 px-4 py-3">
-          <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+          <Calendar className="h-5 w-5 text-primary flex-shrink-0" />
           <div>
-            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{formatDate(event.startDate)}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{formatTime(event.startDate)} – {formatTime(event.endDate)}</p>
+            <p className="text-sm font-medium text-foreground">{formatDate(event.startDate)}</p>
+            <p className="text-xs text-muted-foreground">{formatTime(event.startDate)} – {formatTime(event.endDate)}</p>
           </div>
-          {isPast && <span className="ml-auto text-xs rounded-full bg-gray-100 dark:bg-gray-700 px-2 py-0.5 text-gray-500 dark:text-gray-400">Ended</span>}
+          {isPast && <span className="ml-auto text-xs rounded-full bg-muted px-2 py-0.5 text-muted-foreground">Ended</span>}
         </div>
 
         {/* Type */}
@@ -183,20 +183,20 @@ export default function EventDetailPage() {
         {/* Location */}
         {event.location && (
           <div className="flex items-center gap-3 px-4 py-3">
-            <MapPin className="h-5 w-5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-            <p className="text-sm text-gray-700 dark:text-gray-300">{event.location}</p>
+            <MapPin className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+            <p className="text-sm text-foreground">{event.location}</p>
           </div>
         )}
 
         {/* Virtual link */}
         {event.virtualLink && (
           <div className="flex items-center gap-3 px-4 py-3">
-            <Video className="h-5 w-5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+            <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
             <a
               href={event.virtualLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+              className="text-sm text-primary hover:underline flex items-center gap-1"
             >
               Join Online
               <ExternalLink className="h-3 w-3" />
@@ -206,18 +206,18 @@ export default function EventDetailPage() {
 
         {/* Attendees */}
         <div className="flex items-center gap-3 px-4 py-3">
-          <Users className="h-5 w-5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-          <p className="text-sm text-gray-700 dark:text-gray-300">
+          <Users className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          <p className="text-sm text-foreground">
             <span className="font-medium">{event.attendeeCount}</span> going
-            {event.maxAttendees && <span className="text-gray-400 dark:text-gray-500"> / {event.maxAttendees} max</span>}
+            {event.maxAttendees && <span className="text-muted-foreground"> / {event.maxAttendees} max</span>}
           </p>
         </div>
       </div>
 
       {/* RSVP section */}
       {isSignedIn && !isPast && (
-        <div className="mb-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-          <p className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">Will you attend?</p>
+        <div className="mb-5 rounded-xl border border-border bg-card p-4">
+          <p className="mb-3 text-sm font-medium text-foreground">Will you attend?</p>
           <div className="flex gap-2">
             {RSVP_OPTIONS.map(({ status, label, icon: Icon, color }) => (
               <button
@@ -227,7 +227,7 @@ export default function EventDetailPage() {
                 className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all disabled:opacity-50 ${
                   event.viewerRsvp === status
                     ? `${color} ring-2 ring-offset-2 ring-current`
-                    : "border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500"
+                    : "border border-border text-muted-foreground hover:border-gray-300 dark:hover:border-gray-500"
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -239,24 +239,24 @@ export default function EventDetailPage() {
             <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">This event is at full capacity.</p>
           )}
           {rsvpError && (
-            <p className="mt-2 text-xs text-red-600 dark:text-red-400">{rsvpError}</p>
+            <p className="mt-2 text-xs text-destructive dark:text-red-400">{rsvpError}</p>
           )}
         </div>
       )}
 
       {/* Description */}
-      <div className="mb-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-        <h2 className="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100">About this event</h2>
-        <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{event.description || "No description provided."}</p>
+      <div className="mb-5 rounded-xl border border-border bg-card p-4">
+        <h2 className="mb-2 text-sm font-semibold text-foreground">About this event</h2>
+        <p className="text-sm text-foreground whitespace-pre-wrap">{event.description || "No description provided."}</p>
       </div>
 
       {/* Community link */}
       {event.community && (
-        <div className="mb-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Community</p>
+        <div className="mb-5 rounded-xl border border-border bg-card p-4">
+          <p className="text-xs text-muted-foreground mb-1">Community</p>
           <Link
             href={`/c/${event.community.slug}`}
-            className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+            className="text-sm font-medium text-primary hover:underline"
           >
             {event.community.name}
           </Link>
@@ -265,8 +265,8 @@ export default function EventDetailPage() {
 
       {/* Attendees list */}
       {attendees && attendees.length > 0 && (
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-          <h2 className="mb-3 text-sm font-semibold text-gray-900 dark:text-gray-100">
+        <div className="rounded-xl border border-border bg-card p-4">
+          <h2 className="mb-3 text-sm font-semibold text-foreground">
             Attendees ({attendees.length})
           </h2>
           <div className="flex flex-wrap gap-2">
@@ -286,7 +286,7 @@ export default function EventDetailPage() {
                       className="rounded-full object-cover ring-2 ring-white dark:ring-gray-800 group-hover:ring-blue-300"
                     />
                   ) : (
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white ring-2 ring-white dark:ring-gray-800 group-hover:ring-blue-300">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-white ring-2 ring-white dark:ring-gray-800 group-hover:ring-blue-300">
                       {attendee.name.charAt(0)}
                     </div>
                   )}
@@ -294,7 +294,7 @@ export default function EventDetailPage() {
               </Link>
             ))}
             {attendees.length > 12 && (
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 text-xs text-gray-500 dark:text-gray-400">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs text-muted-foreground">
                 +{attendees.length - 12}
               </div>
             )}
@@ -306,7 +306,7 @@ export default function EventDetailPage() {
       <div className="mt-4">
         <button
           onClick={handleAddToCalendar}
-          className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary dark:hover:text-blue-400"
         >
           <Calendar className="h-4 w-4" />
           Add to Google Calendar

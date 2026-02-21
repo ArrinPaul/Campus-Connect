@@ -172,7 +172,7 @@ export default function ListingDetailPage() {
               <button
                 onClick={handleDelete}
                 disabled={loading}
-                className="flex-1 py-2 rounded-lg border border-red-200 text-red-600 text-sm font-medium hover:bg-red-50 disabled:opacity-50 transition-colors"
+                className="flex-1 py-2 rounded-lg border border-red-200 text-destructive text-sm font-medium hover:bg-red-50 disabled:opacity-50 transition-colors"
               >
                 {loading ? "…" : "Delete"}
               </button>

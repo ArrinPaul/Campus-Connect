@@ -29,8 +29,8 @@ jest.mock("@/components/editor/RichTextEditor", () => ({
         <span
           className={
             value.length > maxLength
-              ? "text-red-600 dark:text-red-400"
-              : "text-gray-500 dark:text-gray-400"
+              ? "text-destructive dark:text-red-400"
+              : "text-muted-foreground"
           }
         >
           {value.length}/{maxLength}
@@ -202,7 +202,7 @@ describe("CommentComposer", () => {
     fireEvent.change(textarea, { target: { value: longComment } })
 
     const counter = screen.getByText("1001/1000")
-    expect(counter).toHaveClass("text-red-600")
+    expect(counter).toHaveClass("text-destructive")
   })
 
   it("should not submit when content is only whitespace", async () => {

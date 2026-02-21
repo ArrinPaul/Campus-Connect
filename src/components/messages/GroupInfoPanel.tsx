@@ -139,7 +139,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
         )
       case "admin":
         return (
-          <span className="flex items-center gap-0.5 text-[10px] font-medium text-blue-600 dark:text-blue-400">
+          <span className="flex items-center gap-0.5 text-[10px] font-medium text-primary">
             <ShieldCheck className="h-3 w-3" /> Admin
           </span>
         )
@@ -165,15 +165,15 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
   )
 
   return (
-    <div className="fixed inset-y-0 right-0 z-40 w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-xl flex flex-col">
+    <div className="fixed inset-y-0 right-0 z-40 w-80 bg-card border-l border-border shadow-xl flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+      <div className="flex items-center justify-between p-4 border-b border-border">
+        <h3 className="text-lg font-bold text-foreground">
           Group Info
         </h3>
         <button
           onClick={onClose}
-          className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-gray-700"
+          className="p-1 rounded-lg text-muted-foreground hover:text-muted-foreground hover:bg-muted dark:hover:text-muted-foreground hover:bg-accent"
         >
           <X className="h-5 w-5" />
         </button>
@@ -181,7 +181,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
 
       <div className="flex-1 overflow-y-auto">
         {/* Group Header */}
-        <div className="p-4 text-center border-b border-gray-200 dark:border-gray-700">
+        <div className="p-4 text-center border-b border-border">
           <div className="mx-auto h-16 w-16 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-3">
             {conversation.avatar ? (
               <img
@@ -202,7 +202,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
                 type="text"
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
-                className="w-full text-center text-sm px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full text-center text-sm px-3 py-1.5 rounded-lg border border-border bg-card bg-muted text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 maxLength={100}
               />
               <textarea
@@ -210,18 +210,18 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
                 onChange={(e) => setEditDescription(e.target.value)}
                 placeholder="Group description..."
                 rows={2}
-                className="w-full text-center text-xs px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full text-center text-xs px-3 py-1.5 rounded-lg border border-border bg-card bg-muted text-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
               />
               <div className="flex gap-2 justify-center">
                 <button
                   onClick={handleEditInfo}
-                  className="px-3 py-1 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
                 >
                   Save
                 </button>
                 <button
                   onClick={() => setEditingInfo(false)}
-                  className="px-3 py-1 text-xs text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="px-3 py-1 text-xs text-muted-foreground rounded-lg hover:bg-accent"
                 >
                   Cancel
                 </button>
@@ -229,21 +229,21 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
             </div>
           ) : (
             <>
-              <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h4 className="text-lg font-semibold text-foreground">
                 {conversation.name}
               </h4>
               {conversation.description && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   {conversation.description}
                 </p>
               )}
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {conversation.participants?.length || 0} members
               </p>
               {isAdmin && (
                 <button
                   onClick={handleEditInfo}
-                  className="mt-2 flex items-center gap-1 mx-auto text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                  className="mt-2 flex items-center gap-1 mx-auto text-xs text-primary hover:text-primary text-primary"
                 >
                   <Edit2 className="h-3 w-3" /> Edit
                 </button>
@@ -253,10 +253,10 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
         </div>
 
         {/* Pinned Messages Section */}
-        <div className="border-b border-gray-200 dark:border-gray-700">
+        <div className="border-b border-border">
           <button
             onClick={() => setShowPinned(!showPinned)}
-            className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+            className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-foreground hover:bg-accent"
           >
             <span className="flex items-center gap-2">
               <Pin className="h-4 w-4" />
@@ -274,12 +274,12 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
               {pinnedMessages.map((msg) => (
                 <div
                   key={msg._id}
-                  className="p-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-sm"
+                  className="p-2 bg-muted/50 bg-muted rounded-lg text-sm"
                 >
-                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                  <p className="text-xs font-medium text-muted-foreground">
                     {msg.senderName}
                   </p>
-                  <p className="text-gray-900 dark:text-white text-xs mt-0.5 line-clamp-2">
+                  <p className="text-foreground text-xs mt-0.5 line-clamp-2">
                     {msg.content}
                   </p>
                 </div>
@@ -289,10 +289,10 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
         </div>
 
         {/* Members Section */}
-        <div className="border-b border-gray-200 dark:border-gray-700">
+        <div className="border-b border-border">
           <button
             onClick={() => setShowMembers(!showMembers)}
-            className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+            className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-foreground hover:bg-accent"
           >
             <span>Members ({conversation.participants?.length || 0})</span>
             {showMembers ? (
@@ -310,32 +310,32 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
                   {showAddMember ? (
                     <div className="space-y-2">
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
                         <input
                           type="text"
                           value={addMemberSearch}
                           onChange={(e) => setAddMemberSearch(e.target.value)}
                           placeholder="Search users..."
-                          className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                          className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring border-border bg-muted text-foreground"
                           autoFocus
                         />
                       </div>
 
                       {addMemberSearch.trim().length >= 2 && filteredSearchResults && (
-                        <div className="max-h-32 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg">
+                        <div className="max-h-32 overflow-y-auto border border-border rounded-lg">
                           {filteredSearchResults.length === 0 ? (
-                            <p className="text-xs text-gray-400 p-2">No users found</p>
+                            <p className="text-xs text-muted-foreground p-2">No users found</p>
                           ) : (
                             filteredSearchResults.map((user) => (
                               <button
                                 key={user._id}
                                 onClick={() => handleAddMember(user._id)}
-                                className="w-full flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 text-left"
+                                className="w-full flex items-center gap-2 p-2 hover:bg-accent text-left"
                               >
-                                <div className="h-6 w-6 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-[8px] font-medium">
+                                <div className="h-6 w-6 rounded-full bg-muted dark:bg-muted flex items-center justify-center text-[8px] font-medium">
                                   {getInitials(user.name)}
                                 </div>
-                                <span className="text-xs text-gray-900 dark:text-white truncate">
+                                <span className="text-xs text-foreground truncate">
                                   {user.name}
                                 </span>
                               </button>
@@ -349,7 +349,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
                           setShowAddMember(false)
                           setAddMemberSearch("")
                         }}
-                        className="text-xs text-gray-500 hover:text-gray-700"
+                        className="text-xs text-muted-foreground hover:text-foreground"
                       >
                         Cancel
                       </button>
@@ -357,7 +357,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
                   ) : (
                     <button
                       onClick={() => setShowAddMember(true)}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 rounded-lg"
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-primary hover:bg-primary/10 text-primary hover:bg-primary/10 rounded-lg"
                     >
                       <UserPlus className="h-3.5 w-3.5" /> Add Member
                     </button>
@@ -369,7 +369,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
               {conversation.participants?.map((member) => (
                 <div
                   key={member._id}
-                  className="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 group"
+                  className="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-accent group"
                 >
                   {member.profilePicture ? (
                     <img
@@ -378,20 +378,20 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
                       className="h-8 w-8 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300">
+                    <div className="h-8 w-8 rounded-full bg-muted dark:bg-muted flex items-center justify-center text-xs font-medium text-muted-foreground">
                       {getInitials(member.name)}
                     </div>
                   )}
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      <span className="text-sm font-medium text-foreground truncate">
                         {member.name}
                       </span>
                       {getRoleBadge(member.role)}
                     </div>
                     {member.username && (
-                      <p className="text-[10px] text-gray-500 dark:text-gray-400">
+                      <p className="text-[10px] text-muted-foreground">
                         @{member.username}
                       </p>
                     )}
@@ -404,7 +404,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
                         <button
                           onClick={() => handlePromote(member._id)}
                           title="Promote to admin"
-                          className="p-1 rounded text-gray-400 hover:text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-600"
+                          className="p-1 rounded text-muted-foreground hover:text-primary hover:bg-muted dark:hover:bg-muted"
                         >
                           <ShieldCheck className="h-3.5 w-3.5" />
                         </button>
@@ -413,7 +413,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
                         <button
                           onClick={() => handleDemote(member._id)}
                           title="Demote from admin"
-                          className="p-1 rounded text-gray-400 hover:text-amber-600 hover:bg-gray-100 dark:hover:bg-gray-600"
+                          className="p-1 rounded text-muted-foreground hover:text-amber-600 hover:bg-muted dark:hover:bg-muted"
                         >
                           <Shield className="h-3.5 w-3.5" />
                         </button>
@@ -421,7 +421,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
                       <button
                         onClick={() => handleRemoveMember(member._id)}
                         title="Remove member"
-                        className="p-1 rounded text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600"
+                        className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-muted dark:hover:bg-muted"
                       >
                         <UserMinus className="h-3.5 w-3.5" />
                       </button>
@@ -437,7 +437,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
         <div className="p-4">
           <button
             onClick={handleLeaveGroup}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-900/30"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-destructive dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-900/30"
           >
             <LogOut className="h-4 w-4" />
             Leave Group

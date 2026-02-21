@@ -105,10 +105,10 @@ export function IncomingCallNotification() {
           key={call._id}
           className="fixed top-4 right-4 z-[90] w-80 animate-in slide-in-from-top-2 fade-in duration-300"
         >
-          <div className="rounded-2xl bg-white dark:bg-gray-800 shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="rounded-2xl bg-card shadow-2xl border border-border overflow-hidden">
             {/* Header strip */}
             <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-2">
-              <p className="text-xs font-medium text-white/80">
+              <p className="text-xs font-medium text-primary-foreground/80">
                 Incoming {call.type === "video" ? "Video" : "Audio"} Call
               </p>
             </div>
@@ -120,19 +120,19 @@ export function IncomingCallNotification() {
                 <img
                   src={call.callerProfilePicture}
                   alt={call.callerName}
-                  className="h-12 w-12 rounded-full object-cover ring-2 ring-blue-500/30 animate-pulse"
+                  className="h-12 w-12 rounded-full object-cover ring-2 ring-ring/30 animate-pulse"
                 />
               ) : (
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-lg font-bold text-white ring-2 ring-blue-500/30 animate-pulse">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground ring-2 ring-ring/30 animate-pulse">
                   {call.callerName.charAt(0).toUpperCase()}
                 </div>
               )}
 
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 dark:text-white truncate">
+                <p className="font-semibold text-foreground truncate">
                   {call.callerName}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                <p className="text-xs text-muted-foreground truncate">
                   {call.conversationName !== call.callerName
                     ? call.conversationName
                     : call.type === "video" ? "Video call" : "Audio call"}
@@ -142,26 +142,26 @@ export function IncomingCallNotification() {
               {/* Call type icon */}
               <div className="flex-shrink-0">
                 {call.type === "video" ? (
-                  <Video className="h-5 w-5 text-blue-500" />
+                  <Video className="h-5 w-5 text-primary" />
                 ) : (
-                  <Phone className="h-5 w-5 text-green-500" />
+                  <Phone className="h-5 w-5 text-success" />
                 )}
               </div>
             </div>
 
             {/* Action buttons */}
-            <div className="flex border-t border-gray-200 dark:border-gray-700">
+            <div className="flex border-t border-border">
               <button
                 onClick={() => handleReject(call._id)}
-                className="flex flex-1 items-center justify-center gap-2 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
+                className="flex flex-1 items-center justify-center gap-2 py-3 text-sm font-medium text-destructive hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
               >
                 <PhoneOff className="h-4 w-4" />
                 Decline
               </button>
-              <div className="w-px bg-gray-200 dark:bg-gray-700" />
+              <div className="w-px bg-muted bg-muted" />
               <button
                 onClick={() => handleAccept(call._id)}
-                className="flex flex-1 items-center justify-center gap-2 py-3 text-sm font-medium text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20 transition-colors"
+                className="flex flex-1 items-center justify-center gap-2 py-3 text-sm font-medium text-success hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20 transition-colors"
               >
                 <Phone className="h-4 w-4" />
                 Accept

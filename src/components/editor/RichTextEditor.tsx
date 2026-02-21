@@ -66,8 +66,8 @@ function ToolbarButton({
       aria-label={title}
       className={`rounded p-1 transition-colors ${
         active
-          ? "bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400"
-          : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+          ? "bg-primary/10 dark:bg-blue-900/50 text-primary"
+          : "text-muted-foreground hover:bg-accent"
       } disabled:opacity-40`}
     >
       {children}
@@ -89,7 +89,7 @@ function LinkDialog({
   const [url, setUrl] = useState(initialUrl ?? "")
 
   return (
-    <div className="flex items-center gap-2 px-2 py-1 bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 shadow-md">
+    <div className="flex items-center gap-2 px-2 py-1 bg-card rounded-lg border border-border shadow-md">
       <input
         autoFocus
         type="url"
@@ -100,19 +100,19 @@ function LinkDialog({
           if (e.key === "Escape") onCancel()
         }}
         placeholder="https://..."
-        className="flex-1 bg-transparent text-sm outline-none min-w-40 text-gray-800 dark:text-gray-100"
+        className="flex-1 bg-transparent text-sm outline-none min-w-40 text-foreground"
       />
       <button
         type="button"
         onClick={() => onConfirm(url)}
-        className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline"
+        className="text-xs font-medium text-primary hover:underline"
       >
         Apply
       </button>
       <button
         type="button"
         onClick={onCancel}
-        className="text-xs text-gray-500 dark:text-gray-400 hover:underline"
+        className="text-xs text-muted-foreground hover:underline"
       >
         Cancel
       </button>
@@ -143,7 +143,7 @@ export function RichTextEditor({
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: "text-blue-600 dark:text-blue-400 underline",
+          class: "text-primary underline",
           rel: "noopener noreferrer",
           target: "_blank",
         },
@@ -167,9 +167,9 @@ export function RichTextEditor({
       attributes: {
         class: [
           "prose prose-sm dark:prose-invert max-w-none p-3 focus:outline-none",
-          "prose-headings:font-semibold prose-a:text-blue-600 dark:prose-a:text-blue-400",
-          "prose-code:rounded prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:px-1 prose-code:text-sm",
-          "prose-pre:bg-gray-900 prose-pre:text-gray-100",
+          "prose-headings:font-semibold prose-a:text-blue-600 dark:prose-a:text-primary",
+          "prose-code:rounded prose-code:bg-muted dark:prose-code:bg-card prose-code:px-1 prose-code:text-sm",
+          "prose-pre:bg-background prose-pre:text-foreground",
         ].join(" "),
         style: `min-height: ${minHeight}`,
       },
@@ -220,12 +220,12 @@ export function RichTextEditor({
       className={`rounded-lg border transition-colors ${
         isOverLimit
           ? "border-red-400 dark:border-red-600"
-          : "border-gray-300 dark:border-gray-700 focus-within:border-blue-400 dark:focus-within:border-blue-600"
-      } bg-white dark:bg-gray-900 overflow-hidden`}
+          : "border-border focus-within:border-blue-400 dark:focus-within:border-blue-600"
+      } bg-card overflow-hidden`}
     >
       {/* ── Toolbar ──────────────────────────────────────────────────────── */}
       {!compact && (
-        <div className="flex flex-wrap items-center gap-0.5 border-b border-gray-200 dark:border-gray-700 px-2 py-1">
+        <div className="flex flex-wrap items-center gap-0.5 border-b border-border px-2 py-1">
           {/* Formatting group */}
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleBold().run()}
@@ -259,7 +259,7 @@ export function RichTextEditor({
             <Code className="h-3.5 w-3.5" />
           </ToolbarButton>
 
-          <div className="mx-1 h-4 border-l border-gray-300 dark:border-gray-600" />
+          <div className="mx-1 h-4 border-l border-border" />
 
           {/* Headings */}
           <ToolbarButton
@@ -286,7 +286,7 @@ export function RichTextEditor({
             <Heading3 className="h-3.5 w-3.5" />
           </ToolbarButton>
 
-          <div className="mx-1 h-4 border-l border-gray-300 dark:border-gray-600" />
+          <div className="mx-1 h-4 border-l border-border" />
 
           {/* Blocks */}
           <ToolbarButton
@@ -358,7 +358,7 @@ export function RichTextEditor({
 
       {/* ── Link dialog ───────────────────────────────────────────────────── */}
       {showLinkDialog && (
-        <div className="border-b border-gray-200 dark:border-gray-700 px-3 py-2">
+        <div className="border-b border-border px-3 py-2">
           <LinkDialog
             onConfirm={handleLinkConfirm}
             onCancel={() => setShowLinkDialog(false)}
@@ -371,7 +371,7 @@ export function RichTextEditor({
       <BubbleMenu
         editor={editor}
         tippyOptions={{ duration: 100 }}
-        className="flex items-center gap-0.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-1 py-0.5 shadow-lg"
+        className="flex items-center gap-0.5 rounded-lg border border-border bg-card px-1 py-0.5 shadow-lg"
       >
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -409,7 +409,7 @@ export function RichTextEditor({
           {value ? (
             <MarkdownRenderer content={value} />
           ) : (
-            <p className="text-gray-400 dark:text-gray-600 text-sm italic">Nothing to preview</p>
+            <p className="text-muted-foreground text-sm italic">Nothing to preview</p>
           )}
         </div>
       ) : (
@@ -419,10 +419,10 @@ export function RichTextEditor({
       {/* ── Footer: char count ───────────────────────────────────────────── */}
       {maxLength != null && (
         <div
-          className={`flex justify-end px-3 py-1 text-xs border-t border-gray-200 dark:border-gray-700 ${
+          className={`flex justify-end px-3 py-1 text-xs border-t border-border ${
             isOverLimit
-              ? "text-red-500 dark:text-red-400"
-              : "text-gray-400 dark:text-gray-500"
+              ? "text-destructive dark:text-red-400"
+              : "text-muted-foreground"
           }`}
         >
           {charCount}/{maxLength}
@@ -459,7 +459,7 @@ export function CompactRichTextEditor({
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: "text-blue-600 dark:text-blue-400 underline",
+          class: "text-primary underline",
           rel: "noopener noreferrer",
           target: "_blank",
         },
@@ -502,10 +502,10 @@ export function CompactRichTextEditor({
   if (!editor) return null
 
   return (
-    <div className="rounded-lg border border-gray-300 dark:border-gray-700 focus-within:border-blue-400 dark:focus-within:border-blue-600 bg-white dark:bg-gray-900 overflow-hidden transition-colors">
+    <div className="rounded-lg border border-border focus-within:border-blue-400 dark:focus-within:border-blue-600 bg-card overflow-hidden transition-colors">
       <EditorContent editor={editor} />
       {maxLength != null && (
-        <div className="flex justify-end px-2 py-0.5 text-xs text-gray-400 dark:text-gray-500 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex justify-end px-2 py-0.5 text-xs text-muted-foreground border-t border-border">
           {editor.storage.characterCount?.characters?.() ?? 0}/{maxLength}
         </div>
       )}

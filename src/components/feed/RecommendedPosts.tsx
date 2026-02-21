@@ -25,20 +25,20 @@ export function RecommendedPosts({ limit = 3, title = "Posts you might like" }: 
   // Loading skeleton
   if (recommended === undefined || recommended === null) {
     return (
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+      <div className="rounded-lg border border-border bg-card p-4">
         <div className="flex items-center justify-between mb-3">
-          <div className="h-5 w-40 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+          <div className="h-5 w-40 rounded bg-muted bg-muted animate-pulse" />
         </div>
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="rounded-lg border border-gray-100 dark:border-gray-700 p-3">
+            <div key={i} className="rounded-lg border border-border border-border p-3">
               <div className="flex items-center gap-2 mb-2">
-                <div className="h-6 w-6 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
-                <div className="h-4 w-20 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                <div className="h-6 w-6 rounded-full bg-muted bg-muted animate-pulse" />
+                <div className="h-4 w-20 rounded bg-muted bg-muted animate-pulse" />
               </div>
               <div className="space-y-1">
-                <div className="h-3 w-full rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
-                <div className="h-3 w-3/4 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                <div className="h-3 w-full rounded bg-muted bg-muted animate-pulse" />
+                <div className="h-3 w-3/4 rounded bg-muted bg-muted animate-pulse" />
               </div>
             </div>
           ))}
@@ -50,12 +50,12 @@ export function RecommendedPosts({ limit = 3, title = "Posts you might like" }: 
   // Empty state
   if (recommended.items.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-        <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+      <div className="rounded-lg border border-border bg-card p-4">
+        <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground mb-3">
           <Sparkles className="h-4 w-4 text-amber-500" />
           {title}
         </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+        <p className="text-sm text-muted-foreground text-center py-4">
           Interact with posts to get personalised recommendations!
         </p>
       </div>
@@ -63,15 +63,15 @@ export function RecommendedPosts({ limit = 3, title = "Posts you might like" }: 
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+    <div className="rounded-lg border border-border bg-card p-4">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
+        <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
           <Sparkles className="h-4 w-4 text-amber-500" />
           {title}
         </h3>
         <Link
           href="/explore"
-          className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+          className="flex items-center gap-1 text-xs text-primary hover:underline"
         >
           Explore
           <ChevronRight className="h-3 w-3" />
@@ -103,7 +103,7 @@ export function RecommendedPosts({ limit = 3, title = "Posts you might like" }: 
             <Link
               key={item._id}
               href={`/post/${item._id}`}
-              className="block rounded-lg border border-gray-100 dark:border-gray-700 p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50"
+              className="block rounded-lg border border-border border-border p-3 transition-colors hover:bg-accent/50"
             >
               {/* Author row */}
               <div className="flex items-center gap-2 mb-1.5">
@@ -116,25 +116,25 @@ export function RecommendedPosts({ limit = 3, title = "Posts you might like" }: 
                     className="rounded-full"
                   />
                 ) : (
-                  <div className="h-5 w-5 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-[10px] font-bold text-white">
+                  <div className="h-5 w-5 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-[10px] font-bold text-primary-foreground">
                     {author.name.charAt(0).toUpperCase()}
                   </div>
                 )}
-                <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">
+                <span className="text-xs font-medium text-foreground truncate">
                   {author.name}
                 </span>
-                <span className="text-[10px] text-gray-400 dark:text-gray-500 ml-auto">
+                <span className="text-[10px] text-muted-foreground ml-auto">
                   {formatTimeAgo(post.createdAt)}
                 </span>
               </div>
 
               {/* Content preview */}
-              <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2">
+              <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                 {truncated}
               </p>
 
               {/* Engagement stats */}
-              <div className="flex items-center gap-3 mt-2 text-[10px] text-gray-400 dark:text-gray-500">
+              <div className="flex items-center gap-3 mt-2 text-[10px] text-muted-foreground">
                 {totalReactions > 0 && (
                   <span className="flex items-center gap-0.5">
                     <Heart className="h-3 w-3" />
@@ -171,11 +171,11 @@ export function TrendingInSkill({ skill, limit = 5 }: TrendingInSkillProps) {
 
   if (trending === undefined || trending === null) {
     return (
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-        <div className="h-5 w-36 rounded bg-gray-200 dark:bg-gray-700 animate-pulse mb-3" />
+      <div className="rounded-lg border border-border bg-card p-4">
+        <div className="h-5 w-36 rounded bg-muted bg-muted animate-pulse mb-3" />
         <div className="space-y-2">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-12 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            <div key={i} className="h-12 rounded bg-muted bg-muted animate-pulse" />
           ))}
         </div>
       </div>
@@ -187,8 +187,8 @@ export function TrendingInSkill({ skill, limit = 5 }: TrendingInSkillProps) {
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-      <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+    <div className="rounded-lg border border-border bg-card p-4">
+      <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground mb-3">
         <TrendingUp className="h-4 w-4 text-orange-500" />
         Trending in {trending.skills.length > 0 ? trending.skills.join(", ") : "your skills"}
       </h3>
@@ -207,17 +207,17 @@ export function TrendingInSkill({ skill, limit = 5 }: TrendingInSkillProps) {
             <Link
               key={item._id}
               href={`/post/${item._id}`}
-              className="flex items-start gap-2 rounded-md p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50"
+              className="flex items-start gap-2 rounded-md p-2 transition-colors hover:bg-accent/50"
             >
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">
+                <p className="text-xs font-medium text-foreground truncate">
                   {author.name}
                 </p>
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 line-clamp-1">
+                <p className="text-[11px] text-muted-foreground line-clamp-1">
                   {truncated}
                 </p>
               </div>
-              <div className="flex items-center gap-1 text-[10px] text-gray-400">
+              <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                 <Heart className="h-3 w-3" />
                 {(post.reactionCounts
                   ? (post.reactionCounts as any).like +
@@ -247,11 +247,11 @@ export function PopularInUniversity({ limit = 5 }: PopularInUniversityProps) {
 
   if (popular === undefined || popular === null) {
     return (
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-        <div className="h-5 w-36 rounded bg-gray-200 dark:bg-gray-700 animate-pulse mb-3" />
+      <div className="rounded-lg border border-border bg-card p-4">
+        <div className="h-5 w-36 rounded bg-muted bg-muted animate-pulse mb-3" />
         <div className="space-y-2">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-12 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            <div key={i} className="h-12 rounded bg-muted bg-muted animate-pulse" />
           ))}
         </div>
       </div>
@@ -263,9 +263,9 @@ export function PopularInUniversity({ limit = 5 }: PopularInUniversityProps) {
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-      <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
-        <TrendingUp className="h-4 w-4 text-blue-500" />
+    <div className="rounded-lg border border-border bg-card p-4">
+      <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground mb-3">
+        <TrendingUp className="h-4 w-4 text-primary" />
         Popular at {popular.university}
       </h3>
       <div className="space-y-2">
@@ -283,17 +283,17 @@ export function PopularInUniversity({ limit = 5 }: PopularInUniversityProps) {
             <Link
               key={item._id}
               href={`/post/${item._id}`}
-              className="flex items-start gap-2 rounded-md p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50"
+              className="flex items-start gap-2 rounded-md p-2 transition-colors hover:bg-accent/50"
             >
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">
+                <p className="text-xs font-medium text-foreground truncate">
                   {author.name}
                 </p>
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 line-clamp-1">
+                <p className="text-[11px] text-muted-foreground line-clamp-1">
                   {truncated}
                 </p>
               </div>
-              <div className="flex items-center gap-1 text-[10px] text-gray-400">
+              <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                 <MessageCircle className="h-3 w-3" />
                 {post.commentCount || 0}
               </div>

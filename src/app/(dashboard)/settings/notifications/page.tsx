@@ -98,7 +98,7 @@ export default function NotificationSettingsPage() {
       </div>
 
       {message && (
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-200">
+        <div className="rounded-lg border border-blue-200 bg-primary/10 p-3 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-200">
           {message}
         </div>
       )}
@@ -113,7 +113,7 @@ export default function NotificationSettingsPage() {
               Receive real-time alerts for messages, mentions, and events
             </p>
             {pushPermission === "denied" && (
-              <p className="text-xs text-red-600 mt-1">
+              <p className="text-xs text-destructive mt-1">
                 Blocked by browser — change in browser settings
               </p>
             )}
@@ -126,7 +126,7 @@ export default function NotificationSettingsPage() {
             }`}
           >
             <span
-              className={`inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
+              className={`inline-block h-4 w-4 rounded-full bg-card shadow-sm transition-transform ${
                 pushEnabled ? "translate-x-6" : "translate-x-1"
               }`}
             />
@@ -152,7 +152,7 @@ export default function NotificationSettingsPage() {
               }`}
             >
               <span
-                className={`inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
+                className={`inline-block h-4 w-4 rounded-full bg-card shadow-sm transition-transform ${
                   emailNotifications ? "translate-x-6" : "translate-x-1"
                 }`}
               />

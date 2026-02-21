@@ -158,7 +158,7 @@ export function CommentList({
     const isAtMaxDepth = depth >= MAX_INDENT_DEPTH
 
     return (
-      <div key={comment._id} style={{ marginLeft: `${indentPx}px` }} className="border-l border-gray-200 dark:border-gray-700 pl-3 mt-3 first:mt-0 first:border-l-0 first:pl-0">
+      <div key={comment._id} style={{ marginLeft: `${indentPx}px` }} className="border-l border-border pl-3 mt-3 first:mt-0 first:border-l-0 first:pl-0">
         <div className="flex gap-3">
           {/* Author Avatar */}
           <div className="relative h-7 w-7 flex-shrink-0">
@@ -170,7 +170,7 @@ export function CommentList({
                 className="rounded-full object-cover"
               />
             ) : (
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
                 {comment.author?.name.charAt(0).toUpperCase() || "?"}
               </div>
             )}
@@ -178,23 +178,23 @@ export function CommentList({
 
           {/* Comment body */}
           <div className="flex-1 min-w-0">
-            <div className="rounded-lg bg-gray-100 dark:bg-gray-700 px-3 py-2">
+            <div className="rounded-lg bg-muted bg-muted px-3 py-2">
               <div className="flex items-center justify-between gap-2 flex-wrap">
-                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                <p className="text-sm font-semibold text-foreground">
                   {comment.author?.name || "Unknown User"}
                 </p>
-                <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                <span className="text-xs text-muted-foreground whitespace-nowrap">
                   {formatTimestamp(comment.createdAt)}
                 </span>
               </div>
-              <p className="mt-1 whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200 break-words">
+              <p className="mt-1 whitespace-pre-wrap text-sm text-foreground break-words">
                 {parseMentions(comment.content).map((segment, index) => {
                   if (segment.type === "mention") {
                     return (
                       <Link
                         key={index}
                         href={`/profile/${segment.content}`}
-                        className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium hover:underline"
+                        className="text-primary hover:text-primary text-primary dark:hover:text-blue-300 font-medium hover:underline"
                         onClick={(e) => e.stopPropagation()}
                       >
                         @{segment.content}
@@ -216,7 +216,7 @@ export function CommentList({
                     setReplyContent("")
                     setReplyError("")
                   }}
-                  className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
+                  className="text-xs text-primary hover:text-primary text-primary dark:hover:text-blue-300 flex items-center gap-1"
                 >
                   <MessageSquare className="h-3 w-3" />
                   Reply
@@ -236,7 +236,7 @@ export function CommentList({
               {replyCount > 0 && (
                 <button
                   onClick={() => toggleCollapse(comment._id)}
-                  className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-1"
+                  className="text-xs text-muted-foreground hover:text-foreground text-muted-foreground hover:text-foreground flex items-center gap-1"
                 >
                   {isCollapsed ? (
                     <>
@@ -256,7 +256,7 @@ export function CommentList({
                 <button
                   onClick={() => handleDelete(comment._id)}
                   disabled={deletingId === comment._id}
-                  className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50"
+                  className="text-xs text-destructive hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50"
                 >
                   {deletingId === comment._id ? "Deleting…" : "Delete"}
                 </button>
@@ -266,14 +266,14 @@ export function CommentList({
             {/* Inline reply composer */}
             {replyingTo === comment._id && (
               <div className="mt-2 space-y-2">
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-muted-foreground">
                   Replying to{" "}
-                  <span className="font-medium text-blue-600 dark:text-blue-400">
+                  <span className="font-medium text-primary">
                     @{comment.author?.name || "user"}
                   </span>{" "}
                   <button
                     onClick={() => { setReplyingTo(null); setReplyContent(""); setReplyError("") }}
-                    className="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    className="ml-1 text-muted-foreground hover:text-muted-foreground hover:text-foreground"
                   >
                     ✕ Cancel
                   </button>
@@ -286,13 +286,13 @@ export function CommentList({
                   disabled={isSubmittingReply}
                 />
                 {replyError && (
-                  <p className="text-xs text-red-600 dark:text-red-400">{replyError}</p>
+                  <p className="text-xs text-destructive dark:text-red-400">{replyError}</p>
                 )}
                 <div className="flex justify-end">
                   <button
                     onClick={() => handleReplySubmit(comment._id)}
                     disabled={isSubmittingReply || !replyContent.trim()}
-                    className="rounded-md bg-blue-600 px-3 py-1.5 text-xs text-white hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1"
+                    className="rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground hover:bg-primary/90 disabled:opacity-50 flex items-center gap-1"
                   >
                     {isSubmittingReply && <ButtonLoadingSpinner />}
                     {isSubmittingReply ? "Posting…" : "Post Reply"}
@@ -328,20 +328,20 @@ export function CommentList({
     <div className="space-y-2">
       {/* Sort header */}
       {comments.length > 0 && onSortChange && (
-        <div className="flex items-center justify-between pb-1 border-b border-gray-200 dark:border-gray-700">
-          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-between pb-1 border-b border-border">
+          <span className="text-xs font-medium text-muted-foreground">
             {comments.length} comment{comments.length !== 1 ? "s" : ""}
           </span>
           <div className="flex items-center gap-1">
-            <span className="text-xs text-gray-400 dark:text-gray-500 mr-1">Sort:</span>
+            <span className="text-xs text-muted-foreground mr-1">Sort:</span>
             {(["best", "new", "old", "controversial"] as SortOption[]).map((opt) => (
               <button
                 key={opt}
                 onClick={() => onSortChange(opt)}
                 className={`text-xs px-2 py-0.5 rounded-full capitalize transition-colors ${
                   sortBy === opt
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-primary text-muted-foreground hover:text-primary"
                 }`}
               >
                 {opt}
@@ -353,7 +353,7 @@ export function CommentList({
 
       {comments.length === 0 ? (
         <div className="py-8 text-center">
-          <p className="text-sm text-gray-500">No comments yet. Be the first to comment!</p>
+          <p className="text-sm text-muted-foreground">No comments yet. Be the first to comment!</p>
         </div>
       ) : (
         <div className="space-y-3">

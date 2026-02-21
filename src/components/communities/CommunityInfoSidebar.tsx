@@ -33,18 +33,18 @@ export function CommunityInfoSidebar({
     <div className="space-y-4">
       {/* Rules Section */}
       {rules.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-          <h3 className="flex items-center gap-2 font-semibold text-gray-900 dark:text-gray-100">
-            <BookOpen className="h-4 w-4 text-blue-500" />
+        <div className="rounded-xl border border-border bg-card p-4 border-border bg-card">
+          <h3 className="flex items-center gap-2 font-semibold text-foreground">
+            <BookOpen className="h-4 w-4 text-primary" />
             Community Rules
           </h3>
           <ol className="mt-3 space-y-2">
             {rules.map((rule, i) => (
               <li key={i} className="flex items-start gap-2 text-sm">
-                <span className="flex-shrink-0 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                <span className="flex-shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary dark:bg-blue-900 dark:text-blue-300">
                   {i + 1}
                 </span>
-                <span className="text-gray-700 dark:text-gray-300">{rule}</span>
+                <span className="text-foreground">{rule}</span>
               </li>
             ))}
           </ol>
@@ -53,9 +53,9 @@ export function CommunityInfoSidebar({
 
       {/* Moderators Section */}
       {mods.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-          <h3 className="flex items-center gap-2 font-semibold text-gray-900 dark:text-gray-100">
-            <ShieldCheck className="h-4 w-4 text-green-500" />
+        <div className="rounded-xl border border-border bg-card p-4 border-border bg-card">
+          <h3 className="flex items-center gap-2 font-semibold text-foreground">
+            <ShieldCheck className="h-4 w-4 text-success" />
             Moderators
           </h3>
           <ul className="mt-3 space-y-2">
@@ -63,12 +63,12 @@ export function CommunityInfoSidebar({
               <li key={mod.userId}>
                 <Link
                   href={`/profile/${mod.username ?? mod.userId}`}
-                  className="flex items-center gap-2 text-sm hover:text-blue-600 dark:hover:text-blue-400"
+                  className="flex items-center gap-2 text-sm hover:text-primary"
                 >
-                  <span className="font-medium text-gray-900 dark:text-gray-100">
+                  <span className="font-medium text-foreground">
                     {mod.name}
                   </span>
-                  <span className="text-xs capitalize text-gray-500 dark:text-gray-400">
+                  <span className="text-xs capitalize text-muted-foreground">
                     ({mod.role})
                   </span>
                 </Link>
@@ -79,7 +79,7 @@ export function CommunityInfoSidebar({
       )}
 
       {/* Meta */}
-      <div className="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+      <div className="rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground border-border bg-card text-muted-foreground">
         <p>
           Created{" "}
           {new Date(createdAt).toLocaleDateString("en-US", {
@@ -92,7 +92,7 @@ export function CommunityInfoSidebar({
 
       {/* Report Link */}
       <div className="text-center">
-        <button className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition-colors">
+        <button className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive dark:text-muted-foreground dark:hover:text-red-400 transition-colors">
           <Flag className="h-3 w-3" />
           Report Community
         </button>

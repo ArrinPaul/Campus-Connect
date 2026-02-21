@@ -101,7 +101,7 @@ const COMPONENTS: Components = {
         {...(isExternal
           ? { target: "_blank", rel: "noopener noreferrer" }
           : {})}
-        className="text-blue-600 dark:text-blue-400 hover:underline break-words"
+        className="text-primary hover:underline break-words"
         {...props}
       >
         {children}
@@ -113,7 +113,7 @@ const COMPONENTS: Components = {
   pre({ children, ...props }) {
     return (
       <pre
-        className="my-3 overflow-x-auto rounded-lg bg-gray-900 p-4 text-sm text-gray-100"
+        className="my-3 overflow-x-auto rounded-lg bg-background p-4 text-sm text-foreground"
         {...props}
       >
         {children}
@@ -133,7 +133,7 @@ const COMPONENTS: Components = {
     }
     return (
       <code
-        className="rounded bg-gray-100 dark:bg-gray-800 px-1 py-0.5 text-sm font-mono text-rose-600 dark:text-rose-400"
+        className="rounded bg-muted bg-card px-1 py-0.5 text-sm font-mono text-rose-600 dark:text-rose-400"
         {...props}
       >
         {children}
@@ -145,7 +145,7 @@ const COMPONENTS: Components = {
   blockquote({ children, ...props }) {
     return (
       <blockquote
-        className="my-3 border-l-4 border-blue-400 dark:border-blue-600 pl-4 italic text-gray-600 dark:text-gray-400"
+        className="my-3 border-l-4 border-blue-400 dark:border-blue-600 pl-4 italic text-muted-foreground"
         {...props}
       >
         {children}
@@ -158,7 +158,7 @@ const COMPONENTS: Components = {
     return (
       <div className="my-3 overflow-x-auto">
         <table
-          className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg text-sm"
+          className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-border rounded-lg text-sm"
           {...props}
         >
           {children}
@@ -169,7 +169,7 @@ const COMPONENTS: Components = {
   th({ children, ...props }) {
     return (
       <th
-        className="bg-gray-50 dark:bg-gray-800 px-4 py-2 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide"
+        className="bg-muted px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide"
         {...props}
       >
         {children}
@@ -179,7 +179,7 @@ const COMPONENTS: Components = {
   td({ children, ...props }) {
     return (
       <td
-        className="border-t border-gray-100 dark:border-gray-800 px-4 py-2 text-gray-800 dark:text-gray-200"
+        className="border-t border-border border-border px-4 py-2 text-foreground"
         {...props}
       >
         {children}
@@ -191,7 +191,7 @@ const COMPONENTS: Components = {
   hr(props) {
     return (
       <hr
-        className="my-4 border-gray-200 dark:border-gray-700"
+        className="my-4 border-border"
         {...props}
       />
     )

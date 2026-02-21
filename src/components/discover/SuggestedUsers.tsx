@@ -82,20 +82,20 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
   // Loading skeleton
   if (suggestions === undefined || suggestions === null) {
     return (
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+      <div className="rounded-lg border border-border bg-card p-4">
         <div className="flex items-center justify-between mb-3">
-          <div className="h-5 w-40 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
-          <div className="h-5 w-5 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+          <div className="h-5 w-40 rounded bg-muted bg-muted animate-pulse" />
+          <div className="h-5 w-5 rounded bg-muted bg-muted animate-pulse" />
         </div>
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+              <div className="h-10 w-10 rounded-full bg-muted bg-muted animate-pulse" />
               <div className="flex-1 space-y-1">
-                <div className="h-4 w-24 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
-                <div className="h-3 w-32 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                <div className="h-4 w-24 rounded bg-muted bg-muted animate-pulse" />
+                <div className="h-3 w-32 rounded bg-muted bg-muted animate-pulse" />
               </div>
-              <div className="h-8 w-16 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+              <div className="h-8 w-16 rounded bg-muted bg-muted animate-pulse" />
             </div>
           ))}
         </div>
@@ -106,22 +106,22 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
   // Empty state
   if (suggestions.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+      <div className="rounded-lg border border-border bg-card p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
             <Sparkles className="h-4 w-4 text-yellow-500" />
             Suggested for you
           </h3>
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="rounded p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors disabled:opacity-50"
+            className="rounded p-1 text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground transition-colors disabled:opacity-50"
             title="Refresh suggestions"
           >
             <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
           </button>
         </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+        <p className="text-sm text-muted-foreground text-center py-4">
           No suggestions yet. Follow some users and check back later!
         </p>
       </div>
@@ -129,17 +129,17 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+    <div className="rounded-lg border border-border bg-card p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
+        <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
           <Sparkles className="h-4 w-4 text-yellow-500" />
           Suggested for you
         </h3>
         <button
           onClick={handleRefresh}
           disabled={isRefreshing}
-          className="rounded p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors disabled:opacity-50"
+          className="rounded p-1 text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground transition-colors disabled:opacity-50"
           title="Refresh suggestions"
         >
           <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
@@ -172,7 +172,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
                       className="rounded-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
                       {user.name.charAt(0).toUpperCase()}
                     </div>
                   )}
@@ -183,14 +183,14 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
               <div className="flex-1 min-w-0">
                 <Link
                   href={`/profile/${user._id}`}
-                  className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:underline truncate block"
+                  className="text-sm font-medium text-foreground hover:underline truncate block"
                 >
                   {user.name}
                 </Link>
 
                 {/* Reasons tooltip */}
                 <div className="mt-0.5" title={suggestion.reasons.join(", ")}>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  <p className="text-xs text-muted-foreground truncate">
                     {suggestion.reasons[0]}
                     {suggestion.reasons.length > 1 &&
                       ` +${suggestion.reasons.length - 1} more`}
@@ -201,7 +201,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
                 <button
                   onClick={() => handleFollow(user._id, suggestion._id)}
                   disabled={isFollowing}
-                  className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
                 >
                   <UserPlus className="h-3 w-3" />
                   {isFollowing ? "Following..." : "Follow"}
@@ -212,7 +212,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
               <button
                 onClick={() => handleDismiss(suggestion._id)}
                 disabled={isDismissingThis}
-                className="flex-shrink-0 rounded p-1 text-gray-400 opacity-0 group-hover:opacity-100 hover:text-gray-600 dark:hover:text-gray-300 transition-all"
+                className="flex-shrink-0 rounded p-1 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-muted-foreground dark:hover:text-muted-foreground transition-all"
                 title="Dismiss suggestion"
               >
                 <X className="h-4 w-4" />
@@ -226,7 +226,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
       {showSeeAll && (
         <Link
           href="/discover/suggested"
-          className="mt-3 flex items-center justify-center gap-1 rounded-lg py-2 text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+          className="mt-3 flex items-center justify-center gap-1 rounded-lg py-2 text-xs font-medium text-primary hover:bg-primary/10 hover:bg-primary/10 transition-colors"
         >
           See all suggestions
           <ChevronRight className="h-3 w-3" />

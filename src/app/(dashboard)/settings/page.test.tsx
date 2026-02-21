@@ -37,7 +37,7 @@ describe("SettingsPage", () => {
     const { container } = render(<SettingsPage />)
 
     // Should show skeleton placeholders (animated bg divs)
-    const skeletonDivs = container.querySelectorAll(".bg-gray-200")
+    const skeletonDivs = container.querySelectorAll(".bg-muted")
     expect(skeletonDivs.length).toBeGreaterThan(0)
   })
 

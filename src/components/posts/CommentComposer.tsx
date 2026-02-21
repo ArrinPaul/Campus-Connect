@@ -60,10 +60,10 @@ export function CommentComposer({
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       {replyingToName && (
-        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>
             Replying to{" "}
-            <span className="font-medium text-blue-600 dark:text-blue-400">
+            <span className="font-medium text-primary">
               @{replyingToName}
             </span>
           </span>
@@ -71,7 +71,7 @@ export function CommentComposer({
             <button
               type="button"
               onClick={onCancel}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              className="text-muted-foreground hover:text-muted-foreground hover:text-foreground"
             >
               ✕ Cancel
             </button>
@@ -88,7 +88,7 @@ export function CommentComposer({
       />
 
       {error && (
-        <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
+        <p className="text-xs text-destructive dark:text-red-400">{error}</p>
       )}
 
       <div className="flex justify-end gap-2">
@@ -96,7 +96,7 @@ export function CommentComposer({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-md border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+            className="rounded-md border border-border px-4 py-2 text-sm text-muted-foreground hover:bg-accent"
           >
             Cancel
           </button>
@@ -104,7 +104,7 @@ export function CommentComposer({
         <button
           type="submit"
           disabled={isSubmitting || content.trim().length === 0}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 flex items-center gap-2"
+          className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 flex items-center gap-2"
         >
           {isSubmitting && <ButtonLoadingSpinner />}
           {isSubmitting ? "Posting..." : replyingToName ? "Post Reply" : "Comment"}

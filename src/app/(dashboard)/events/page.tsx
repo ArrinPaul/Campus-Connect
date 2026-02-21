@@ -12,13 +12,13 @@ type Tab = "upcoming" | "my-events" | "past"
 
 function EventSkeleton() {
   return (
-    <div className="animate-pulse rounded-xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 p-4 space-y-3">
-      <div className="h-4 w-2/3 rounded bg-gray-200 dark:bg-gray-700" />
-      <div className="h-3 w-full rounded bg-gray-200 dark:bg-gray-700" />
-      <div className="h-3 w-3/4 rounded bg-gray-200 dark:bg-gray-700" />
+    <div className="animate-pulse rounded-xl border border-border bg-card border-border bg-card p-4 space-y-3">
+      <div className="h-4 w-2/3 rounded bg-muted bg-muted" />
+      <div className="h-3 w-full rounded bg-muted bg-muted" />
+      <div className="h-3 w-3/4 rounded bg-muted bg-muted" />
       <div className="flex gap-3">
-        <div className="h-3 w-1/4 rounded bg-gray-200 dark:bg-gray-700" />
-        <div className="h-3 w-1/4 rounded bg-gray-200 dark:bg-gray-700" />
+        <div className="h-3 w-1/4 rounded bg-muted bg-muted" />
+        <div className="h-3 w-1/4 rounded bg-muted bg-muted" />
       </div>
     </div>
   )
@@ -65,13 +65,13 @@ export default function EventsPage() {
       {/* Page header */}
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Calendar className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Events</h1>
+          <Calendar className="h-6 w-6 text-primary" />
+          <h1 className="text-xl font-bold text-foreground">Events</h1>
         </div>
         {isSignedIn && (
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >
             <Plus className="h-4 w-4" />
             Create Event
@@ -80,15 +80,15 @@ export default function EventsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="mb-4 flex gap-1 border-b border-gray-200 dark:border-gray-700">
+      <div className="mb-4 flex gap-1 border-b border-border">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`pb-2.5 px-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
               activeTab === tab.id
-                ? "text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-400"
-                : "text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-200"
+                ? "text-primary border-primary"
+                : "text-muted-foreground border-transparent hover:text-foreground"
             }`}
           >
             {tab.label}
@@ -105,8 +105,8 @@ export default function EventsPage() {
               onClick={() => setTypeFilter(type)}
               className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                 typeFilter === type
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted dark:hover:bg-muted"
               }`}
             >
               {type === undefined ? "All Types" : type === "in_person" ? "In Person" : type === "virtual" ? "Virtual" : "Hybrid"}
@@ -122,8 +122,8 @@ export default function EventsPage() {
         </div>
       ) : currentEvents.length === 0 ? (
         <div className="py-16 text-center">
-          <Calendar className="mx-auto mb-3 h-10 w-10 text-gray-300 dark:text-gray-600" />
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+          <Calendar className="mx-auto mb-3 h-10 w-10 text-muted-foreground dark:text-muted-foreground" />
+          <p className="text-sm font-medium text-muted-foreground">
             {activeTab === "upcoming"
               ? "No upcoming events"
               : activeTab === "my-events"
@@ -133,7 +133,7 @@ export default function EventsPage() {
           {activeTab === "upcoming" && isSignedIn && (
             <button
               onClick={() => setShowCreateModal(true)}
-              className="mt-3 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+              className="mt-3 text-sm text-primary hover:underline"
             >
               Create the first event
             </button>

@@ -62,7 +62,7 @@ export default function SettingsPage() {
   if (!isLoaded) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary"></div>
       </div>
     )
   }
@@ -72,8 +72,8 @@ export default function SettingsPage() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Not Authenticated</h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">Please sign in to access settings.</p>
+          <h2 className="text-xl font-semibold text-foreground">Not Authenticated</h2>
+          <p className="mt-2 text-muted-foreground">Please sign in to access settings.</p>
         </div>
       </div>
     )
@@ -82,26 +82,26 @@ export default function SettingsPage() {
   if (currentUser === undefined) {
     return (
       <div className="mx-auto max-w-4xl px-4 py-8">
-        <div className="h-10 w-32 rounded bg-gray-200 dark:bg-gray-700 mb-8" />
+        <div className="h-10 w-32 rounded bg-muted bg-muted mb-8" />
         
-        <div className="mb-8 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
-          <div className="h-7 w-40 rounded bg-gray-200 dark:bg-gray-700 mb-4" />
+        <div className="mb-8 rounded-lg border border-border bg-card p-6">
+          <div className="h-7 w-40 rounded bg-muted bg-muted mb-4" />
           <div className="flex items-center justify-between">
             <div className="space-y-2">
-              <div className="h-5 w-24 rounded bg-gray-200 dark:bg-gray-700" />
-              <div className="h-4 w-48 rounded bg-gray-200 dark:bg-gray-700" />
+              <div className="h-5 w-24 rounded bg-muted bg-muted" />
+              <div className="h-4 w-48 rounded bg-muted bg-muted" />
             </div>
-            <div className="h-10 w-20 rounded bg-gray-200 dark:bg-gray-700" />
+            <div className="h-10 w-20 rounded bg-muted bg-muted" />
           </div>
         </div>
 
-        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
-          <div className="h-7 w-48 rounded bg-gray-200 dark:bg-gray-700 mb-4" />
+        <div className="rounded-lg border border-border bg-card p-6">
+          <div className="h-7 w-48 rounded bg-muted bg-muted mb-4" />
           <div className="space-y-6">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="space-y-2">
-                <div className="h-4 w-24 rounded bg-gray-200 dark:bg-gray-700" />
-                <div className="h-10 w-full rounded bg-gray-200 dark:bg-gray-700" />
+                <div className="h-4 w-24 rounded bg-muted bg-muted" />
+                <div className="h-10 w-full rounded bg-muted bg-muted" />
               </div>
             ))}
           </div>
@@ -114,8 +114,8 @@ export default function SettingsPage() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Not Authenticated</h1>
-          <p className="text-gray-600 dark:text-gray-400">Please sign in to access settings.</p>
+          <h1 className="text-2xl font-bold text-foreground mb-4">Not Authenticated</h1>
+          <p className="text-muted-foreground">Please sign in to access settings.</p>
         </div>
       </div>
     )
@@ -123,24 +123,24 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">Settings</h1>
+      <h1 className="text-3xl font-bold text-foreground mb-8">Settings</h1>
 
       {/* Theme Settings */}
-      <div className="mb-8 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Appearance</h2>
+      <div className="mb-8 rounded-lg border border-border bg-card p-6">
+        <h2 className="text-xl font-semibold text-foreground mb-4">Appearance</h2>
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-medium text-gray-900 dark:text-gray-100">Theme</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Choose your preferred theme</p>
+            <p className="font-medium text-foreground">Theme</p>
+            <p className="text-sm text-muted-foreground">Choose your preferred theme</p>
           </div>
           <ThemeToggle />
         </div>
       </div>
 
       {/* Activity Status Settings */}
-      <div className="mb-8 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Activity Status</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+      <div className="mb-8 rounded-lg border border-border bg-card p-6">
+        <h2 className="text-xl font-semibold text-foreground mb-4">Activity Status</h2>
+        <p className="text-sm text-muted-foreground mb-4">
           Set your presence status and custom message
         </p>
         <StatusSelector
@@ -150,78 +150,78 @@ export default function SettingsPage() {
       </div>
 
       {/* Privacy Settings */}
-      <div className="mb-8 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Privacy</h2>
+      <div className="mb-8 rounded-lg border border-border bg-card p-6">
+        <h2 className="text-xl font-semibold text-foreground mb-4">Privacy</h2>
         <div className="flex items-center justify-between py-3">
           <div>
-            <p className="font-medium text-gray-900 dark:text-gray-100">Show Online Status</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="font-medium text-foreground">Show Online Status</p>
+            <p className="text-sm text-muted-foreground">
               Let others see when you&apos;re online. When off, your status and last seen will be hidden.
             </p>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
             <input type="checkbox" checked={showOnlineStatus} onChange={handleToggleOnlineVisibility} className="sr-only peer" />
-            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+            <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer bg-muted peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-border peer-checked:bg-primary"></div>
           </label>
         </div>
       </div>
 
       {/* Notification Settings */}
-      <div className="mb-8 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Notifications</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+      <div className="mb-8 rounded-lg border border-border bg-card p-6">
+        <h2 className="text-xl font-semibold text-foreground mb-4">Notifications</h2>
+        <p className="text-sm text-muted-foreground mb-6">
           Choose what notifications you want to receive
         </p>
         <div className="space-y-4">
-          <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between py-3 border-b border-border">
             <div>
-              <p className="font-medium text-gray-900 dark:text-gray-100">Reactions</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Get notified when someone reacts to your posts or comments</p>
+              <p className="font-medium text-foreground">Reactions</p>
+              <p className="text-sm text-muted-foreground">Get notified when someone reacts to your posts or comments</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" checked={notifPrefs.reactions} onChange={() => handleToggleNotifPref("reactions")} className="sr-only peer" />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+              <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer bg-muted peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-border peer-checked:bg-primary"></div>
             </label>
           </div>
 
-          <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between py-3 border-b border-border">
             <div>
-              <p className="font-medium text-gray-900 dark:text-gray-100">Comments</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Get notified when someone comments on your posts</p>
+              <p className="font-medium text-foreground">Comments</p>
+              <p className="text-sm text-muted-foreground">Get notified when someone comments on your posts</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" checked={notifPrefs.comments} onChange={() => handleToggleNotifPref("comments")} className="sr-only peer" />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+              <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer bg-muted peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-border peer-checked:bg-primary"></div>
             </label>
           </div>
 
-          <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between py-3 border-b border-border">
             <div>
-              <p className="font-medium text-gray-900 dark:text-gray-100">Mentions</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Get notified when someone mentions you in a post or comment</p>
+              <p className="font-medium text-foreground">Mentions</p>
+              <p className="text-sm text-muted-foreground">Get notified when someone mentions you in a post or comment</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" checked={notifPrefs.mentions} onChange={() => handleToggleNotifPref("mentions")} className="sr-only peer" />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+              <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer bg-muted peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-border peer-checked:bg-primary"></div>
             </label>
           </div>
 
           <div className="flex items-center justify-between py-3">
             <div>
-              <p className="font-medium text-gray-900 dark:text-gray-100">New Followers</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Get notified when someone starts following you</p>
+              <p className="font-medium text-foreground">New Followers</p>
+              <p className="text-sm text-muted-foreground">Get notified when someone starts following you</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" checked={notifPrefs.follows} onChange={() => handleToggleNotifPref("follows")} className="sr-only peer" />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+              <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer bg-muted peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-border peer-checked:bg-primary"></div>
             </label>
           </div>
         </div>
       </div>
 
       {/* Profile Settings */}
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Profile Information</h2>
+      <div className="rounded-lg border border-border bg-card p-6">
+        <h2 className="text-xl font-semibold text-foreground mb-4">Profile Information</h2>
         <ProfileForm initialData={currentUser} />
       </div>
     </div>

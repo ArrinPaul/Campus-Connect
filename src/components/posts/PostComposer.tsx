@@ -442,7 +442,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
       />
 
       <div className="relative" onKeyDown={handleWrapperKeyDown}>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="block text-sm font-medium text-foreground">
           What&apos;s on your mind?
         </label>
 
@@ -459,32 +459,32 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
 
         {/* Hashtag autocomplete dropdown */}
         {showHashtagAutocomplete && hashtagSuggestions && hashtagSuggestions.length > 0 && (
-          <div className="absolute z-10 mt-1 w-64 rounded-md bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700">
+          <div className="absolute z-10 mt-1 w-64 rounded-md bg-card shadow-lg border border-border">
             <ul className="py-1">
               {hashtagSuggestions.map((hashtag, index) => (
                 <li
                   key={hashtag._id}
                   className={`px-4 py-2 cursor-pointer transition-colors ${
                     index === selectedHashtagIndex
-                      ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                      : "text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      ? "bg-primary/10 dark:bg-blue-900/20 text-primary"
+                      : "text-foreground hover:bg-accent"
                   }`}
                   onClick={() => insertHashtag(hashtag.tag)}
                   onMouseEnter={() => setSelectedHashtagIndex(index)}
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-medium">#{hashtag.tag}</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                    <span className="text-xs text-muted-foreground">
                       {hashtag.postCount} {hashtag.postCount === 1 ? "post" : "posts"}
                     </span>
                   </div>
                 </li>
               ))}
             </ul>
-            <div className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700">
-              <kbd className="px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-700">↑</kbd>
-              <kbd className="ml-1 px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-700">↓</kbd> to navigate,
-              <kbd className="ml-1 px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-700">Enter</kbd> to select
+            <div className="px-4 py-2 text-xs text-muted-foreground border-t border-border">
+              <kbd className="px-1 py-0.5 rounded bg-muted bg-muted">↑</kbd>
+              <kbd className="ml-1 px-1 py-0.5 rounded bg-muted bg-muted">↓</kbd> to navigate,
+              <kbd className="ml-1 px-1 py-0.5 rounded bg-muted bg-muted">Enter</kbd> to select
             </div>
           </div>
         )}
@@ -500,12 +500,12 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
         )}
 
         {error && (
-          <p className="mt-1 text-xs text-red-600 dark:text-red-400">{error}</p>
+          <p className="mt-1 text-xs text-destructive dark:text-red-400">{error}</p>
         )}
       </div>
 
       {/* ── Media Toolbar ───────────────────────────────────────────────── */}
-      <div className="flex items-center gap-2 border-t border-gray-200 dark:border-gray-700 pt-2">
+      <div className="flex items-center gap-2 border-t border-border pt-2">
         <button
           type="button"
           onClick={() => {
@@ -516,7 +516,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
             }
           }}
           disabled={!!attachedType && attachedType !== "image"}
-          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors"
+          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent disabled:opacity-40 transition-colors"
           title="Attach images"
         >
           <ImageIcon className="h-4 w-4" />
@@ -533,7 +533,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
             }
           }}
           disabled={!!attachedType && attachedType !== "video"}
-          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors"
+          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent disabled:opacity-40 transition-colors"
           title="Attach video"
         >
           <Video className="h-4 w-4" />
@@ -550,7 +550,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
             }
           }}
           disabled={!!attachedType && attachedType !== "file"}
-          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors"
+          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent disabled:opacity-40 transition-colors"
           title="Attach file"
         >
           <FileText className="h-4 w-4" />
@@ -563,8 +563,8 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
           onClick={() => setShowPollUI((v) => !v)}
           className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
             showPollUI
-              ? "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400"
-              : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+              ? "bg-primary/10 dark:bg-blue-900/40 text-primary"
+              : "text-muted-foreground hover:bg-accent"
           }`}
           title="Add poll"
         >
@@ -573,7 +573,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
         </button>
 
         {isFetchingPreview && (
-          <div className="ml-auto flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+          <div className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground">
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
             <span>Fetching preview…</span>
           </div>
@@ -582,9 +582,9 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
 
       {/* ── Poll Creator ─────────────────────────────────────────────────── */}
       {showPollUI && (
-        <div className="rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30 p-4 space-y-3">
+        <div className="rounded-xl border border-blue-200 dark:border-blue-800 bg-primary/10 dark:bg-blue-950/30 p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-blue-700 dark:text-blue-300 flex items-center gap-1.5">
+            <span className="text-sm font-semibold text-primary dark:text-blue-300 flex items-center gap-1.5">
               <BarChart2 className="h-4 w-4" />
               Create Poll
             </span>
@@ -594,7 +594,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
                 setShowPollUI(false)
                 setPollOptions(["Option 1", "Option 2"])
               }}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              className="text-muted-foreground hover:text-muted-foreground hover:text-foreground"
               aria-label="Remove poll"
             >
               <X className="h-4 w-4" />
@@ -615,13 +615,13 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
                   }}
                   placeholder={`Option ${i + 1}`}
                   maxLength={100}
-                  className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 />
                 {pollOptions.length > 2 && (
                   <button
                     type="button"
                     onClick={() => setPollOptions((prev) => prev.filter((_, idx) => idx !== i))}
-                    className="text-gray-400 hover:text-red-500 transition-colors"
+                    className="text-muted-foreground hover:text-destructive transition-colors"
                     aria-label="Remove option"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -633,7 +633,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
               <button
                 type="button"
                 onClick={() => setPollOptions((prev) => [...prev, ""])}
-                className="flex items-center gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Add option
@@ -644,13 +644,13 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
           {/* Duration & Anonymous */}
           <div className="flex flex-wrap items-center gap-4 pt-1 border-t border-blue-200 dark:border-blue-800">
             <div className="flex items-center gap-2">
-              <label className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">Duration</label>
+              <label className="text-xs text-muted-foreground whitespace-nowrap">Duration</label>
               <select
                 value={pollDuration ?? ""}
                 onChange={(e) =>
                   setPollDuration(e.target.value ? Number(e.target.value) : undefined)
                 }
-                className="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1 text-xs text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="rounded-lg border border-border bg-card px-2 py-1 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <option value="1">1 hour</option>
                 <option value="6">6 hours</option>
@@ -666,9 +666,9 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
                 type="checkbox"
                 checked={pollIsAnonymous}
                 onChange={(e) => setPollIsAnonymous(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
               />
-              <span className="text-xs text-gray-600 dark:text-gray-400">Anonymous votes</span>
+              <span className="text-xs text-muted-foreground">Anonymous votes</span>
             </label>
           </div>
         </div>
@@ -684,7 +684,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
               <button
                 type="button"
                 onClick={() => removeFile(i)}
-                className="absolute top-0.5 right-0.5 rounded-full bg-black/60 p-0.5 text-white hover:bg-black/80"
+                className="absolute top-0.5 right-0.5 rounded-full bg-black/60 p-0.5 text-primary-foreground hover:bg-black/80"
                 aria-label="Remove image"
               >
                 <X className="h-3 w-3" />
@@ -698,20 +698,20 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
       {attachedType !== "image" && attachedFiles.length > 0 && (
         <div className="flex flex-col gap-1">
           {attachedFiles.map((file, i) => (
-            <div key={i} className="flex items-center gap-2 rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-2">
+            <div key={i} className="flex items-center gap-2 rounded-lg bg-muted bg-card px-3 py-2">
               {attachedType === "video" ? (
-                <Video className="h-4 w-4 text-blue-500 shrink-0" />
+                <Video className="h-4 w-4 text-primary shrink-0" />
               ) : (
-                <FileText className="h-4 w-4 text-blue-500 shrink-0" />
+                <FileText className="h-4 w-4 text-primary shrink-0" />
               )}
-              <span className="flex-1 truncate text-sm text-gray-700 dark:text-gray-300">{file.name}</span>
-              <span className="shrink-0 text-xs text-gray-500">
+              <span className="flex-1 truncate text-sm text-foreground">{file.name}</span>
+              <span className="shrink-0 text-xs text-muted-foreground">
                 {(file.size / (1024 * 1024)).toFixed(1)} MB
               </span>
               <button
                 type="button"
                 onClick={() => removeFile(i)}
-                className="shrink-0 text-gray-400 hover:text-red-500 transition-colors"
+                className="shrink-0 text-muted-foreground hover:text-destructive transition-colors"
                 aria-label="Remove file"
               >
                 <X className="h-4 w-4" />
@@ -724,13 +724,13 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
       {/* ── Upload progress ──────────────────────────────────────────────── */}
       {isUploading && (
         <div className="space-y-1">
-          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex justify-between text-xs text-muted-foreground">
             <span>Uploading…</span>
             <span>{uploadProgress}%</span>
           </div>
-          <div className="h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+          <div className="h-1.5 w-full rounded-full bg-muted bg-muted overflow-hidden">
             <div
-              className="h-full rounded-full bg-blue-500 transition-all duration-300"
+              className="h-full rounded-full bg-primary transition-all duration-300"
               style={{ width: `${uploadProgress}%` }}
             />
           </div>
@@ -743,12 +743,12 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
           <button
             type="button"
             onClick={() => { setLinkPreviewData(null); setDetectedLink(null) }}
-            className="absolute -top-1 -right-1 z-10 rounded-full bg-gray-200 dark:bg-gray-700 p-0.5 hover:bg-gray-300 dark:hover:bg-gray-600"
+            className="absolute -top-1 -right-1 z-10 rounded-full bg-muted bg-muted p-0.5 hover:bg-muted dark:hover:bg-muted"
             aria-label="Remove link preview"
           >
-            <X className="h-3.5 w-3.5 text-gray-600 dark:text-gray-300" />
+            <X className="h-3.5 w-3.5 text-muted-foreground" />
           </button>
-          <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mb-1">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
             <LinkIcon className="h-3.5 w-3.5" />
             <span>Link preview</span>
           </div>
@@ -776,7 +776,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
         <button
           type="submit"
           disabled={isSubmitting || isUploading || (content.trim().length === 0 && attachedFiles.length === 0)}
-          className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 sm:text-base flex items-center justify-center gap-2"
+          className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 sm:text-base flex items-center justify-center gap-2"
           style={{ minHeight: "44px" }}
         >
           {(isSubmitting || isUploading) && <ButtonLoadingSpinner />}

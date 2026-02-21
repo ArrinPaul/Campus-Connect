@@ -138,7 +138,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && handleClose()}
     >
-      <div className="relative w-full max-w-sm h-auto bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+      <div className="relative w-full max-w-sm h-auto bg-card rounded-2xl overflow-hidden shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <h2 className="font-semibold text-foreground">Create Story</h2>
@@ -158,7 +158,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
             className={cn(
               "flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors",
               mode === "text"
-                ? "text-blue-600 border-b-2 border-blue-600"
+                ? "text-primary border-b-2 border-blue-600"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -170,7 +170,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
             className={cn(
               "flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors",
               mode === "image"
-                ? "text-blue-600 border-b-2 border-blue-600"
+                ? "text-primary border-b-2 border-blue-600"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -189,7 +189,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
                 style={{ backgroundColor: bgColor }}
               >
                 <p
-                  className="px-3 text-center text-white font-semibold text-base break-words leading-snug"
+                  className="px-3 text-center text-primary-foreground font-semibold text-base break-words leading-snug"
                   style={{ textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}
                 >
                   {text || <span className="opacity-50">Your story text…</span>}
@@ -203,7 +203,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
                 placeholder="Write something…"
                 maxLength={500}
                 rows={3}
-                className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
               />
               <div className="text-right text-xs text-muted-foreground">{text.length}/500</div>
 
@@ -221,7 +221,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
                       aria-label={`Select color ${color}`}
                     >
                       {color === bgColor && (
-                        <Check className="absolute inset-0 m-auto h-4 w-4 text-white drop-shadow" />
+                        <Check className="absolute inset-0 m-auto h-4 w-4 text-primary-foreground drop-shadow" />
                       )}
                     </button>
                   ))}
@@ -253,7 +253,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
                       if (imagePreview) URL.revokeObjectURL(imagePreview)
                       setImagePreview(null)
                     }}
-                    className="absolute top-2 right-2 rounded-full bg-black/60 p-1 text-white hover:bg-black/80"
+                    className="absolute top-2 right-2 rounded-full bg-black/60 p-1 text-primary-foreground hover:bg-black/80"
                     aria-label="Remove image"
                   >
                     <X className="h-3.5 w-3.5" />
@@ -273,7 +273,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
           )}
 
           {error && (
-            <p className="text-sm text-red-600 dark:text-red-400 text-center">{error}</p>
+            <p className="text-sm text-destructive dark:text-red-400 text-center">{error}</p>
           )}
         </div>
 
@@ -282,7 +282,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="w-full rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+            className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
           >
             {isSubmitting ? (
               <>

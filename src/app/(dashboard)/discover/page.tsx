@@ -46,8 +46,8 @@ export default function DiscoverPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-8 lg:px-8">
       <div className="mb-4 sm:mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">Discover Users</h1>
-        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 sm:mt-2 sm:text-base">
+        <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Discover Users</h1>
+        <p className="mt-1 text-sm text-muted-foreground sm:mt-2 sm:text-base">
           Find and connect with students, researchers, and faculty
         </p>
       </div>
@@ -85,16 +85,16 @@ export default function DiscoverPage() {
               </>
             ) : users.length === 0 ? (
               // Empty state
-              <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8 text-center sm:p-12">
-                <p className="text-base font-medium text-gray-900 dark:text-gray-100 sm:text-lg">No users found</p>
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 sm:mt-2">
+              <div className="rounded-lg border border-border bg-card p-8 text-center sm:p-12">
+                <p className="text-base font-medium text-foreground sm:text-lg">No users found</p>
+                <p className="mt-1 text-sm text-muted-foreground sm:mt-2">
                   Try adjusting your search or filters
                 </p>
               </div>
             ) : (
               // Results list
               <>
-                <div className="mb-3 text-xs text-gray-600 dark:text-gray-400 sm:mb-4 sm:text-sm">
+                <div className="mb-3 text-xs text-muted-foreground sm:mb-4 sm:text-sm">
                   Found {users.length} {users.length === 1 ? "user" : "users"}
                 </div>
                 {users.map((user) => (

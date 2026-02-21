@@ -17,8 +17,8 @@ const statusOptions: { value: Status; label: string; icon: React.ReactNode; colo
   {
     value: "online",
     label: "Online",
-    icon: <Circle className="h-3 w-3 fill-green-500 text-green-500" />,
-    color: "text-green-500",
+    icon: <Circle className="h-3 w-3 fill-green-500 text-success" />,
+    color: "text-success",
     description: "You appear online to others",
   },
   {
@@ -31,15 +31,15 @@ const statusOptions: { value: Status; label: string; icon: React.ReactNode; colo
   {
     value: "dnd",
     label: "Do Not Disturb",
-    icon: <MinusCircle className="h-3 w-3 fill-red-500 text-red-500" />,
-    color: "text-red-500",
+    icon: <MinusCircle className="h-3 w-3 fill-red-500 text-destructive" />,
+    color: "text-destructive",
     description: "Suppress notifications",
   },
   {
     value: "invisible",
     label: "Invisible",
-    icon: <EyeOff className="h-3 w-3 text-gray-400" />,
-    color: "text-gray-400",
+    icon: <EyeOff className="h-3 w-3 text-muted-foreground" />,
+    color: "text-muted-foreground",
     description: "Appear offline to others",
   },
 ]
@@ -105,23 +105,23 @@ export function StatusSelector({
               w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-left
               ${
                 selectedStatus === option.value
-                  ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
-                  : "hover:bg-gray-50 dark:hover:bg-gray-700/50 border border-transparent"
+                  ? "bg-primary/10 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
+                  : "hover:bg-accent/50 border border-transparent"
               }
               disabled:opacity-50
             `}
           >
             <span className="flex-shrink-0">{option.icon}</span>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              <p className="text-sm font-medium text-foreground">
                 {option.label}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 {option.description}
               </p>
             </div>
             {selectedStatus === option.value && (
-              <span className="text-blue-500 text-xs font-medium">Active</span>
+              <span className="text-primary text-xs font-medium">Active</span>
             )}
           </button>
         ))}
@@ -129,7 +129,7 @@ export function StatusSelector({
 
       {/* Custom Status Input */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <label className="block text-sm font-medium text-foreground mb-1">
           Custom Status
         </label>
         <div className="flex gap-2">
@@ -141,19 +141,19 @@ export function StatusSelector({
             onBlur={handleCustomStatusSave}
             placeholder="What's on your mind? (e.g., Studying 📚)"
             maxLength={100}
-            className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 rounded-lg border border-border bg-card bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground dark:placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
           {customStatus !== currentCustomStatus && (
             <button
               onClick={handleCustomStatusSave}
               disabled={isUpdating}
-              className="px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
+              className="px-3 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg disabled:opacity-50"
             >
               Save
             </button>
           )}
         </div>
-        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        <p className="mt-1 text-xs text-muted-foreground">
           {customStatus.length}/100 characters
         </p>
       </div>

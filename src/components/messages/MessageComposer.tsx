@@ -125,22 +125,22 @@ export function MessageComposer({
   const quickEmojis = ["😀", "😂", "❤️", "👍", "🔥", "😊", "🎉", "💯", "🤔", "😢", "😍", "👏"]
 
   return (
-    <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0">
+    <div className="border-t border-border bg-card flex-shrink-0">
       {/* Reply indicator */}
       {replyingTo && (
         <div className="flex items-center gap-2 px-4 pt-2">
-          <div className="flex-1 flex items-center gap-2 pl-3 py-1.5 border-l-2 border-blue-500 bg-blue-50 dark:bg-blue-900/20 rounded-r-lg">
+          <div className="flex-1 flex items-center gap-2 pl-3 py-1.5 border-l-2 border-blue-500 bg-primary/10 dark:bg-blue-900/20 rounded-r-lg">
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-blue-600 dark:text-blue-400">
+              <p className="text-xs font-medium text-primary">
                 Replying to {replyingTo.senderName}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+              <p className="text-xs text-muted-foreground truncate">
                 {replyingTo.content}
               </p>
             </div>
             <button
               onClick={onCancelReply}
-              className="p-1 rounded-full text-gray-400 hover:text-gray-600"
+              className="p-1 rounded-full text-muted-foreground hover:text-muted-foreground"
             >
               <X className="h-3 w-3" />
             </button>
@@ -151,7 +151,7 @@ export function MessageComposer({
       {/* Emoji picker */}
       {showEmojiPicker && (
         <div className="px-4 pt-2">
-          <div className="flex flex-wrap gap-1 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <div className="flex flex-wrap gap-1 p-2 bg-muted/50 bg-muted rounded-lg">
             {quickEmojis.map((emoji) => (
               <button
                 key={emoji}
@@ -159,7 +159,7 @@ export function MessageComposer({
                   setContent((prev) => prev + emoji)
                   textareaRef.current?.focus()
                 }}
-                className="p-1.5 text-lg hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
+                className="p-1.5 text-lg hover:bg-muted dark:hover:bg-muted rounded transition-colors"
               >
                 {emoji}
               </button>
@@ -173,7 +173,7 @@ export function MessageComposer({
         {/* Emoji button */}
         <button
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          className="p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-gray-700 flex-shrink-0"
+          className="p-2 rounded-full text-muted-foreground hover:text-muted-foreground hover:bg-muted dark:hover:text-muted-foreground hover:bg-accent flex-shrink-0"
           title="Add emoji"
         >
           <Smile className="h-5 w-5" />
@@ -181,7 +181,7 @@ export function MessageComposer({
 
         {/* Attachment button */}
         <button
-          className="p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-gray-700 flex-shrink-0"
+          className="p-2 rounded-full text-muted-foreground hover:text-muted-foreground hover:bg-muted dark:hover:text-muted-foreground hover:bg-accent flex-shrink-0"
           title="Attach file"
         >
           <Paperclip className="h-5 w-5" />
@@ -196,7 +196,7 @@ export function MessageComposer({
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
             rows={1}
-            className="w-full resize-none rounded-2xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+            className="w-full resize-none rounded-2xl border border-border bg-muted/50 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent border-border bg-muted text-foreground dark:placeholder:text-muted-foreground"
             style={{ maxHeight: "120px" }}
           />
         </div>
@@ -207,8 +207,8 @@ export function MessageComposer({
           disabled={!content.trim() || isSending}
           className={`p-2.5 rounded-full flex-shrink-0 transition-colors ${
             content.trim() && !isSending
-              ? "bg-blue-600 text-white hover:bg-blue-700"
-              : "bg-gray-200 text-gray-400 dark:bg-gray-700 dark:text-gray-500 cursor-not-allowed"
+              ? "bg-primary text-primary-foreground hover:bg-primary/90"
+              : "bg-muted text-muted-foreground bg-muted dark:text-muted-foreground cursor-not-allowed"
           }`}
           title="Send message"
         >

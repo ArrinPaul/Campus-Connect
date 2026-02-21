@@ -32,7 +32,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
   if (!isLoaded) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary"></div>
       </div>
     )
   }
@@ -42,8 +42,8 @@ export default function ProfilePage({ params }: ProfilePageProps) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Not Authenticated</h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">Please sign in to view profiles.</p>
+          <h2 className="text-xl font-semibold text-foreground">Not Authenticated</h2>
+          <p className="mt-2 text-muted-foreground">Please sign in to view profiles.</p>
         </div>
       </div>
     )
@@ -93,7 +93,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
           </p>
           <a
             href="/discover"
-            className="inline-block rounded-md bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
+            className="inline-block rounded-md bg-primary px-6 py-3 text-white hover:bg-primary/90"
           >
             Discover Users
           </a>
@@ -112,7 +112,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 
       {/* Skills Section */}
       <div className="mt-8">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Skills</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-4">Skills</h2>
         {isOwnProfile ? (
           <SkillsManager skills={profileUser.skills} />
         ) : (

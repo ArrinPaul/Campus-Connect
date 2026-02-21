@@ -39,7 +39,7 @@ export default function CreateCommunityPage() {
   if (!isSignedIn) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-gray-500">Please sign in to create a community.</p>
+        <p className="text-muted-foreground">Please sign in to create a community.</p>
       </div>
     )
   }
@@ -80,27 +80,27 @@ export default function CreateCommunityPage() {
     <div className="mx-auto max-w-2xl px-4 py-4 sm:px-6 sm:py-8">
       <Link
         href="/communities"
-        className="inline-flex items-center gap-1 mb-4 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+        className="inline-flex items-center gap-1 mb-4 text-sm text-muted-foreground hover:text-foreground text-muted-foreground hover:text-foreground"
       >
         <ChevronLeft className="h-4 w-4" />
         Back to Communities
       </Link>
 
-      <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-100">
+      <h1 className="mb-6 text-2xl font-bold text-foreground">
         Create Community
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* General Info */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-          <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm border-border bg-card">
+          <h2 className="mb-4 text-lg font-semibold text-foreground">
             Community Info
           </h2>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Name <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Name <span className="text-destructive">*</span>
               </label>
               <input
                 type="text"
@@ -109,14 +109,14 @@ export default function CreateCommunityPage() {
                 placeholder="e.g. Computer Science Club"
                 maxLength={100}
                 required
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring border-border bg-muted text-foreground"
               />
-              <p className="mt-1 text-xs text-gray-400">{name.length}/100</p>
+              <p className="mt-1 text-xs text-muted-foreground">{name.length}/100</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Description <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Description <span className="text-destructive">*</span>
               </label>
               <textarea
                 value={description}
@@ -124,19 +124,19 @@ export default function CreateCommunityPage() {
                 placeholder="What is this community about?"
                 rows={3}
                 required
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring border-border bg-muted text-foreground"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Category
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                  className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm focus:border-ring focus:outline-none border-border bg-muted text-foreground"
                 >
                   {CATEGORIES.map((c) => (
                     <option key={c} value={c}>
@@ -147,7 +147,7 @@ export default function CreateCommunityPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Type
                 </label>
                 <select
@@ -155,7 +155,7 @@ export default function CreateCommunityPage() {
                   onChange={(e) =>
                     setType(e.target.value as "public" | "private" | "secret")
                   }
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                  className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm focus:border-ring focus:outline-none border-border bg-muted text-foreground"
                 >
                   <option value="public">Public — Anyone can join</option>
                   <option value="private">Private — Requires approval</option>
@@ -167,27 +167,27 @@ export default function CreateCommunityPage() {
         </div>
 
         {/* Rules */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-          <h2 className="mb-1 text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Rules <span className="text-sm font-normal text-gray-400">(optional)</span>
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm border-border bg-card">
+          <h2 className="mb-1 text-lg font-semibold text-foreground">
+            Rules <span className="text-sm font-normal text-muted-foreground">(optional)</span>
           </h2>
-          <p className="mb-4 text-sm text-gray-500">
+          <p className="mb-4 text-sm text-muted-foreground">
             Add community rules to help members understand expected behavior.
           </p>
 
           <ol className="mb-3 space-y-2">
             {rules.map((rule, i) => (
               <li key={i} className="flex items-center gap-2">
-                <span className="flex-shrink-0 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                <span className="flex-shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary dark:bg-blue-900 dark:text-blue-300">
                   {i + 1}
                 </span>
-                <span className="flex-1 text-sm text-gray-700 dark:text-gray-300">
+                <span className="flex-1 text-sm text-foreground">
                   {rule}
                 </span>
                 <button
                   type="button"
                   onClick={() => removeRule(i)}
-                  className="text-gray-400 hover:text-red-500"
+                  className="text-muted-foreground hover:text-destructive"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -207,13 +207,13 @@ export default function CreateCommunityPage() {
                 }
               }}
               placeholder="Add a rule..."
-              className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+              className="flex-1 rounded-lg border border-border px-3 py-2 text-sm focus:border-ring focus:outline-none border-border bg-muted text-foreground"
             />
             <button
               type="button"
               onClick={addRule}
               disabled={!newRule.trim()}
-              className="rounded-lg bg-blue-100 px-3 py-2 text-sm text-blue-600 hover:bg-blue-200 disabled:opacity-50 dark:bg-blue-900 dark:text-blue-300 transition-colors"
+              className="rounded-lg bg-primary/10 px-3 py-2 text-sm text-primary hover:bg-blue-200 disabled:opacity-50 dark:bg-blue-900 dark:text-blue-300 transition-colors"
             >
               <Plus className="h-4 w-4" />
             </button>
@@ -222,14 +222,14 @@ export default function CreateCommunityPage() {
 
         {/* Submit */}
         {error && (
-          <p className="text-sm text-red-500">{error}</p>
+          <p className="text-sm text-destructive">{error}</p>
         )}
 
         <div className="flex justify-end">
           <button
             type="submit"
             disabled={isSubmitting || !name.trim() || !description.trim()}
-            className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
           >
             {isSubmitting ? "Creating..." : "Create Community"}
           </button>

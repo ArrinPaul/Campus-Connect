@@ -42,12 +42,12 @@ export default function MessagesPage() {
   }, [])
 
   return (
-    <div className="h-[calc(100vh-64px)] bg-gray-50 dark:bg-gray-900">
+    <div className="h-[calc(100vh-64px)] bg-background">
       <div className="mx-auto max-w-7xl h-full">
-        <div className="flex h-full border-x border-gray-200 dark:border-gray-700">
+        <div className="flex h-full border-x border-border">
           {/* Conversation List — hidden on mobile when chat is open */}
           <div
-            className={`w-full md:w-80 lg:w-96 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0 ${
+            className={`w-full md:w-80 lg:w-96 border-r border-border bg-card flex-shrink-0 ${
               showMobileChat ? "hidden md:flex md:flex-col" : "flex flex-col"
             }`}
           >
@@ -61,7 +61,7 @@ export default function MessagesPage() {
 
           {/* Chat Area — hidden on mobile when showing conversation list */}
           <div
-            className={`flex-1 flex flex-col bg-white dark:bg-gray-800 ${
+            className={`flex-1 flex flex-col bg-card ${
               showMobileChat ? "flex" : "hidden md:flex"
             }`}
           >
@@ -72,7 +72,7 @@ export default function MessagesPage() {
               />
             ) : (
               <div className="flex-1 flex items-center justify-center">
-                <div className="text-center text-gray-500 dark:text-gray-400">
+                <div className="text-center text-muted-foreground">
                   <MessageSquare className="h-16 w-16 mx-auto mb-4 opacity-30" />
                   <h3 className="text-lg font-medium mb-1">No conversation selected</h3>
                   <p className="text-sm">

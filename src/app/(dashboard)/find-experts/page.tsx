@@ -55,38 +55,38 @@ export default function FindExpertsPage() {
     <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-8 lg:px-8">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-foreground sm:text-3xl flex items-center gap-2">
           <Award className="h-7 w-7 text-amber-500" />
           Find Experts
         </h1>
-        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 sm:mt-2 sm:text-base">
+        <p className="mt-1 text-sm text-muted-foreground sm:mt-2 sm:text-base">
           Search for users with expertise in specific skills
         </p>
       </div>
 
       {/* Search Controls */}
-      <div className="mb-6 space-y-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <div className="mb-6 space-y-4 rounded-xl border border-border bg-card p-4 shadow-sm border-border bg-card">
         {/* Skill input */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1">
             Skills to search for
           </label>
           <div className="flex gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 value={skillInput}
                 onChange={(e) => setSkillInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Type a skill and press Enter..."
-                className="w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
+                className="w-full rounded-lg border border-border bg-card py-2 pl-10 pr-4 text-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring border-border bg-muted text-foreground dark:placeholder:text-muted-foreground"
               />
             </div>
             <button
               onClick={handleAddSkill}
               disabled={!skillInput.trim()}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Add
             </button>
@@ -99,7 +99,7 @@ export default function FindExpertsPage() {
             {skills.map((skill) => (
               <span
                 key={skill}
-                className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200"
               >
                 {skill}
                 <button
@@ -115,11 +115,11 @@ export default function FindExpertsPage() {
 
         {/* Experience level filter */}
         <div className="flex items-center gap-3">
-          <Filter className="h-4 w-4 text-gray-500" />
+          <Filter className="h-4 w-4 text-muted-foreground" />
           <select
             value={experienceLevel}
             onChange={(e) => setExperienceLevel(e.target.value)}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+            className="rounded-lg border border-border bg-card px-3 py-2 text-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring border-border bg-muted text-foreground"
           >
             {EXPERIENCE_LEVELS.map((level) => (
               <option key={level.value} value={level.value}>
@@ -132,12 +132,12 @@ export default function FindExpertsPage() {
 
       {/* Results */}
       {skills.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 py-16 dark:border-gray-600 dark:bg-gray-800/50">
-          <Search className="mb-3 h-10 w-10 text-gray-400" />
-          <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/50 py-16 border-border bg-card/50">
+          <Search className="mb-3 h-10 w-10 text-muted-foreground" />
+          <p className="text-lg font-medium text-foreground">
             Add skills to find experts
           </p>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-muted-foreground">
             Enter one or more skills above to search for matching experts
           </p>
         </div>
@@ -148,17 +148,17 @@ export default function FindExpertsPage() {
           ))}
         </div>
       ) : results.items.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 py-16 dark:border-gray-600 dark:bg-gray-800/50">
-          <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/50 py-16 border-border bg-card/50">
+          <p className="text-lg font-medium text-foreground">
             No experts found
           </p>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-muted-foreground">
             Try different skills or broaden your experience level filter
           </p>
         </div>
       ) : (
         <div className="space-y-4">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-muted-foreground">
             Found {results.items.length} expert{results.items.length !== 1 ? "s" : ""}
           </p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

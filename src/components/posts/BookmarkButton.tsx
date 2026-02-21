@@ -80,7 +80,7 @@ export function BookmarkButton({
                   onClick={handleToggleBookmark}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all hover:bg-accent ${
                     isBookmarked
-                      ? "text-blue-600 dark:text-blue-400"
+                      ? "text-primary"
                       : "text-muted-foreground hover:text-foreground"
                   } ${compact ? "px-2 py-1 text-sm" : ""}`}
                 >
@@ -127,7 +127,7 @@ export function BookmarkButton({
             <Bookmark className="h-4 w-4 mr-2" />
             Saved
             {bookmarkDetails?.collectionName === "Saved" && (
-              <span className="ml-auto text-blue-600">✓</span>
+              <span className="ml-auto text-primary">✓</span>
             )}
           </DropdownMenuItem>
 
@@ -146,7 +146,7 @@ export function BookmarkButton({
                   {collection.count}
                 </span>
                 {bookmarkDetails?.collectionName === collection.name && (
-                  <span className="ml-2 text-blue-600">✓</span>
+                  <span className="ml-2 text-primary">✓</span>
                 )}
               </DropdownMenuItem>
             ))}
@@ -166,13 +166,13 @@ export function BookmarkButton({
                     handleCreateCollection()
                   }
                 }}
-                className="flex-1 px-2 py-1 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-2 py-1 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                 onClick={(e) => e.stopPropagation()}
               />
               <button
                 onClick={handleCreateCollection}
                 disabled={!newCollectionName.trim()}
-                className="px-2 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-2 py-1 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <FolderPlus className="h-4 w-4" />
               </button>

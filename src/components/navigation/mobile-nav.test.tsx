@@ -16,6 +16,11 @@ jest.mock("convex/react", () => ({
   useQuery: jest.fn(() => 0),
 }))
 
+// Mock next/navigation
+jest.mock("next/navigation", () => ({
+  usePathname: jest.fn(() => "/feed"),
+}))
+
 // Mock Next.js Link
 jest.mock("next/link", () => {
   const MockLink = ({ children, ...props }: any) => (
@@ -37,10 +42,10 @@ describe("MobileNav", () => {
     render(<MobileNav />)
     
     const menuButton = screen.getByLabelText("Toggle navigation menu")
-    const styles = window.getComputedStyle(menuButton)
     
-    expect(styles.minWidth).toBe("44px")
-    expect(styles.minHeight).toBe("44px")
+    // Button uses h-10 w-10 Tailwind classes for touch target
+    expect(menuButton.className).toContain("h-10")
+    expect(menuButton.className).toContain("w-10")
   })
 
   it("should open menu when button is clicked", async () => {
@@ -48,9 +53,9 @@ describe("MobileNav", () => {
     
     const menuButton = screen.getByLabelText("Toggle navigation menu")
     
-    // Menu panel should have translate-x-full class initially (hidden)
-    const menuPanel = container.querySelector(".fixed.right-0.top-0")
-    expect(menuPanel?.className).toContain("translate-x-full")
+    // Menu panel should have -translate-x-full class initially (hidden)
+    const menuPanel = container.querySelector(".fixed.left-0.top-0")
+    expect(menuPanel?.className).toContain("-translate-x-full")
     
     // Click to open
     fireEvent.click(menuButton)
@@ -65,7 +70,7 @@ describe("MobileNav", () => {
     const { container } = render(<MobileNav />)
     
     const menuButton = screen.getByLabelText("Toggle navigation menu")
-    const menuPanel = container.querySelector(".fixed.right-0.top-0")
+    const menuPanel = container.querySelector(".fixed.left-0.top-0")
     
     // Open menu
     fireEvent.click(menuButton)
@@ -78,9 +83,9 @@ describe("MobileNav", () => {
     const closeButton = screen.getByLabelText("Close menu")
     fireEvent.click(closeButton)
     
-    // Menu should be closed (translate-x-full)
+    // Menu should be closed (-translate-x-full)
     await waitFor(() => {
-      expect(menuPanel?.className).toContain("translate-x-full")
+      expect(menuPanel?.className).toContain("-translate-x-full")
     })
   })
 
@@ -88,7 +93,7 @@ describe("MobileNav", () => {
     const { container } = render(<MobileNav />)
     
     const menuButton = screen.getByLabelText("Toggle navigation menu")
-    const menuPanel = container.querySelector(".fixed.right-0.top-0")
+    const menuPanel = container.querySelector(".fixed.left-0.top-0")
     
     // Open menu
     fireEvent.click(menuButton)
@@ -98,13 +103,13 @@ describe("MobileNav", () => {
     })
     
     // Click overlay
-    const overlay = container.querySelector(".fixed.inset-0.bg-black")
+    const overlay = container.querySelector(".fixed.inset-0.backdrop-blur-sm")
     expect(overlay).toBeInTheDocument()
     fireEvent.click(overlay!)
     
-    // Menu should be closed (translate-x-full)
+    // Menu should be closed (-translate-x-full)
     await waitFor(() => {
-      expect(menuPanel?.className).toContain("translate-x-full")
+      expect(menuPanel?.className).toContain("-translate-x-full")
     })
   })
 
@@ -126,7 +131,7 @@ describe("MobileNav", () => {
     const { container } = render(<MobileNav />)
     
     const menuButton = screen.getByLabelText("Toggle navigation menu")
-    const menuPanel = container.querySelector(".fixed.right-0.top-0")
+    const menuPanel = container.querySelector(".fixed.left-0.top-0")
     
     fireEvent.click(menuButton)
     
@@ -141,9 +146,9 @@ describe("MobileNav", () => {
     // Verify the link has the closeMenu handler by checking it's clickable
     fireEvent.click(feedLink!)
     
-    // Menu should be closed (translate-x-full) after clicking
+    // Menu should be closed (-translate-x-full) after clicking
     await waitFor(() => {
-      expect(menuPanel?.className).toContain("translate-x-full")
+      expect(menuPanel?.className).toContain("-translate-x-full")
     }, { timeout: 100 })
   })
 
@@ -192,10 +197,10 @@ describe("MobileNav", () => {
     const profileLink = screen.getByText("Profile").closest("a")
     const settingsLink = screen.getByText("Settings").closest("a")
     
-    // Check that links have proper padding for touch targets (py-3 provides vertical padding)
-    expect(feedLink?.className).toContain("py-3")
-    expect(discoverLink?.className).toContain("py-3")
-    expect(profileLink?.className).toContain("py-3")
-    expect(settingsLink?.className).toContain("py-3")
+    // Check that links have proper padding for touch targets (py-2.5 provides vertical padding)
+    expect(feedLink?.className).toContain("py-2.5")
+    expect(discoverLink?.className).toContain("py-2.5")
+    expect(profileLink?.className).toContain("py-2.5")
+    expect(settingsLink?.className).toContain("py-2.5")
   })
 })

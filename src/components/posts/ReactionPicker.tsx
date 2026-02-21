@@ -117,7 +117,7 @@ export function ReactionPicker({
               onMouseLeave={handleMouseLeave}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all hover:bg-accent ${
                 userReaction
-                  ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                  ? "bg-primary/10 dark:bg-blue-900/30 text-primary"
                   : "text-muted-foreground hover:text-foreground"
               } ${compact ? "px-2 py-1 text-sm" : ""}`}
             >

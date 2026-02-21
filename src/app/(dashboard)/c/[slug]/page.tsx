@@ -43,7 +43,7 @@ export default function CommunityPage({ params }: CommunityPageProps) {
   if (!isLoaded) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
       </div>
     )
   }
@@ -64,7 +64,7 @@ export default function CommunityPage({ params }: CommunityPageProps) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-2xl font-bold text-foreground">
             Community Not Found
           </h1>
           <p className="mt-2 text-gray-500">
@@ -72,7 +72,7 @@ export default function CommunityPage({ params }: CommunityPageProps) {
           </p>
           <Link
             href="/communities"
-            className="mt-4 inline-block rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+            className="mt-4 inline-block rounded-lg bg-primary px-4 py-2 text-sm text-white hover:bg-primary/90"
           >
             Browse Communities
           </Link>
@@ -157,10 +157,10 @@ export default function CommunityPage({ params }: CommunityPageProps) {
       <div className="mt-2 px-4 sm:px-0">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-2xl font-bold text-foreground">
               {community.name}
             </h1>
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               <span className="inline-flex items-center gap-1">
                 <TypeIcon className="h-3.5 w-3.5" />
                 {community.type.charAt(0).toUpperCase() + community.type.slice(1)}
@@ -178,7 +178,7 @@ export default function CommunityPage({ params }: CommunityPageProps) {
 
           <div className="flex items-center gap-2">
             {actionError && (
-              <p className="text-xs text-red-500">{actionError}</p>
+              <p className="text-xs text-destructive">{actionError}</p>
             )}
             {isAdmin && (
               <Link
@@ -193,7 +193,7 @@ export default function CommunityPage({ params }: CommunityPageProps) {
               <button
                 onClick={handleJoin}
                 disabled={isLoading}
-                className="rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                className="rounded-lg bg-primary px-4 py-1.5 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50 transition-colors"
               >
                 {isLoading
                   ? "..."
@@ -211,7 +211,7 @@ export default function CommunityPage({ params }: CommunityPageProps) {
               <button
                 onClick={handleLeave}
                 disabled={isLoading}
-                className="rounded-lg border border-gray-300 px-4 py-1.5 text-sm font-medium text-gray-600 hover:border-red-400 hover:text-red-600 disabled:opacity-50 dark:border-gray-600 dark:text-gray-300 transition-colors"
+                className="rounded-lg border border-gray-300 px-4 py-1.5 text-sm font-medium text-gray-600 hover:border-red-400 hover:text-destructive disabled:opacity-50 dark:border-gray-600 dark:text-gray-300 transition-colors"
               >
                 {isLoading ? "..." : "Leave"}
               </button>
@@ -219,13 +219,13 @@ export default function CommunityPage({ params }: CommunityPageProps) {
           </div>
         </div>
 
-        <p className="mt-3 text-gray-600 dark:text-gray-400">
+        <p className="mt-3 text-muted-foreground">
           {community.description}
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="mt-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="mt-4 border-b border-border">
         <nav className="flex gap-6">
           {(["posts", "about", "members"] as Tab[]).map((tab) => (
             <button
@@ -233,7 +233,7 @@ export default function CommunityPage({ params }: CommunityPageProps) {
               onClick={() => setActiveTab(tab)}
               className={`flex items-center gap-2 border-b-2 pb-3 text-sm font-medium capitalize transition-colors ${
                 activeTab === tab
-                  ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                  ? "border-primary text-primary dark:border-blue-400 dark:text-blue-400"
                   : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               }`}
             >
@@ -264,10 +264,10 @@ export default function CommunityPage({ params }: CommunityPageProps) {
               ) : posts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 py-16 dark:border-gray-600 dark:bg-gray-800/50">
                   <FileText className="mb-3 h-10 w-10 text-gray-400" />
-                  <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  <p className="text-lg font-medium text-foreground">
                     No posts yet
                   </p>
-                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     {isMember
                       ? "Be the first to post in this community"
                       : "Join to start posting"}
@@ -281,14 +281,14 @@ export default function CommunityPage({ params }: CommunityPageProps) {
                       className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
                     >
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="font-medium text-gray-900 dark:text-gray-100">
+                        <span className="font-medium text-foreground">
                           {post.author?.name ?? "Unknown"}
                         </span>
                         <span className="text-xs text-gray-400">
                           {new Date(post.createdAt).toLocaleDateString()}
                         </span>
                       </div>
-                      <p className="text-gray-700 dark:text-gray-300">
+                      <p className="text-foreground">
                         {post.content}
                       </p>
                     </div>
@@ -327,12 +327,12 @@ export default function CommunityPage({ params }: CommunityPageProps) {
         {activeTab === "members" && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              <h2 className="text-lg font-semibold text-foreground">
                 Members ({community.memberCount})
               </h2>
               <Link
                 href={`/c/${params.slug}/members`}
-                className="text-sm text-blue-600 hover:underline dark:text-blue-400"
+                className="text-sm text-primary hover:underline dark:text-blue-400"
               >
                 View all →
               </Link>
@@ -359,10 +359,10 @@ export default function CommunityPage({ params }: CommunityPageProps) {
                       {member?.name?.charAt(0) ?? "?"}
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
+                      <p className="truncate text-sm font-medium text-foreground">
                         {member?.name}
                       </p>
-                      <p className="text-xs capitalize text-gray-500 dark:text-gray-400">
+                      <p className="text-xs capitalize text-muted-foreground">
                         {member?.role}
                       </p>
                     </div>

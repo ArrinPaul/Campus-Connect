@@ -21,11 +21,11 @@ interface OnlineStatusDotProps {
 }
 
 const statusColors: Record<string, string> = {
-  online: "bg-green-500",
+  online: "bg-success",
   away: "bg-yellow-500",
-  dnd: "bg-red-500",
-  invisible: "bg-gray-400",
-  offline: "bg-gray-400",
+  dnd: "bg-destructive",
+  invisible: "bg-muted",
+  offline: "bg-muted",
 }
 
 const statusLabels: Record<string, string> = {
@@ -103,7 +103,7 @@ export function OnlineStatusDot({
 
   if (showLastSeen && resolvedStatus === "offline" && lastSeenAt) {
     return (
-      <span className={`text-xs text-gray-500 dark:text-gray-400 ${className}`}>
+      <span className={`text-xs text-muted-foreground ${className}`}>
         Last seen {formatLastSeen(lastSeenAt)}
       </span>
     )
@@ -112,7 +112,7 @@ export function OnlineStatusDot({
   const dot = (
     <span
       className={`
-        inline-block rounded-full border-2 border-white dark:border-gray-800
+        inline-block rounded-full border-2 border-card
         ${colorClass} ${sizeClass}
         ${resolvedStatus === "online" ? "animate-pulse" : ""}
         ${overlay ? `absolute ${overlayPositions[size]}` : ""}

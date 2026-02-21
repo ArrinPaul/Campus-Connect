@@ -50,13 +50,18 @@ jest.mock("next/link", () => {
   return MockLink
 })
 
+// Mock next/navigation
+jest.mock("next/navigation", () => ({
+  usePathname: jest.fn(() => "/feed"),
+}))
+
 describe("DashboardLayout - Responsive Design", () => {
   const mockChildren = <div>Test Content</div>
 
   it("should render the layout with navigation", () => {
     render(<DashboardLayout>{mockChildren}</DashboardLayout>)
     
-    expect(screen.getByText("Campus Connect")).toBeInTheDocument()
+    expect(screen.getAllByText("Campus Connect").length).toBeGreaterThan(0)
     expect(screen.getByText("Test Content")).toBeInTheDocument()
   })
 
@@ -75,14 +80,14 @@ describe("DashboardLayout - Responsive Design", () => {
   })
 
   it("should have responsive classes for desktop navigation", () => {
-    render(<DashboardLayout>{mockChildren}</DashboardLayout>)
+    const { container } = render(<DashboardLayout>{mockChildren}</DashboardLayout>)
     
-    // Find the desktop navigation container
-    const desktopNav = screen.getByText("Feed").closest("div")
+    // Find the sidebar (aside element) with hidden md:flex
+    const sidebar = container.querySelector("aside")
     
     // Should have hidden class for mobile (md:flex)
-    expect(desktopNav?.className).toContain("hidden")
-    expect(desktopNav?.className).toContain("md:flex")
+    expect(sidebar?.className).toContain("hidden")
+    expect(sidebar?.className).toContain("md:flex")
   })
 
   it("should have responsive classes for mobile navigation", () => {
@@ -110,26 +115,25 @@ describe("DashboardLayout - Responsive Design", () => {
     expect(userButtons.length).toBeGreaterThan(0)
   })
 
-  it("should have responsive padding classes", () => {
+  it("should have responsive padding on header", () => {
     const { container } = render(<DashboardLayout>{mockChildren}</DashboardLayout>)
     
-    // Find the navigation container
-    const navContainer = container.querySelector(".mx-auto.max-w-7xl")
+    // Find the header/top bar
+    const header = container.querySelector("header")
     
     // Should have responsive padding
-    expect(navContainer?.className).toContain("px-4")
-    expect(navContainer?.className).toContain("sm:px-6")
-    expect(navContainer?.className).toContain("lg:px-8")
+    expect(header?.className).toContain("px-4")
+    expect(header?.className).toContain("sm:px-6")
   })
 
-  it("should have responsive logo text size", () => {
+  it("should have sidebar brand text", () => {
     render(<DashboardLayout>{mockChildren}</DashboardLayout>)
     
-    const logo = screen.getByText("Campus Connect")
-    
-    // Should have responsive text size
-    expect(logo.className).toContain("text-lg")
-    expect(logo.className).toContain("sm:text-xl")
+    const logos = screen.getAllByText("Campus Connect")
+    expect(logos.length).toBeGreaterThan(0)
+    // Check sidebar brand uses appropriate text styling
+    const sidebarLogo = logos[0]
+    expect(sidebarLogo.className).toContain("text-base")
   })
 
   it("should render children in main element", () => {
@@ -145,8 +149,8 @@ describe("DashboardLayout - Responsive Design", () => {
     
     const nav = container.querySelector("nav")
     expect(nav).toBeInTheDocument()
-    expect(nav?.className).toContain("border-b")
-    expect(nav?.className).toContain("bg-white")
-    expect(nav?.className).toContain("dark:bg-gray-800")
+    // Sidebar nav has overflow-y-auto
+    expect(nav?.className).toContain("flex-1")
+    expect(nav?.className).toContain("overflow-y-auto")
   })
 })
