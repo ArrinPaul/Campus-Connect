@@ -131,15 +131,17 @@ export const createComment = mutation({
     });
 
     if (args.parentCommentId) {
-      await ctx.scheduler.runAfter(0, internal.counters.updateCommentReplyCount, {
-        commentId: args.parentCommentId,
-        delta: 1,
-      });
+      const parentComment = await ctx.db.get(args.parentCommentId);
+      if (parentComment) {
+        await ctx.db.patch(args.parentCommentId, {
+          replyCount: Math.max(0, (parentComment.replyCount ?? 0) + 1),
+        });
+      }
     }
 
-    await ctx.scheduler.runAfter(0, internal.counters.incrementPostCounts, {
-      postId: args.postId,
-      commentCount: 1,
+    // Increment post comment count inline
+    await ctx.db.patch(args.postId, {
+      commentCount: Math.max(0, (post.commentCount ?? 0) + 1),
     });
 
     if (post.authorId !== user._id) {

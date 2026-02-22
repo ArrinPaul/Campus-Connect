@@ -21,7 +21,7 @@ export const getFeedPosts = query({
         .query("userFeed")
         .withIndex("by_user", q => q.eq("userId", user._id))
         .order("desc")
-        .paginate({ cursor: args.cursor, numItems: limit });
+        .paginate({ cursor: args.cursor ?? null, numItems: limit });
     
     const posts = await Promise.all(
         feed.page.map(async (item) => {

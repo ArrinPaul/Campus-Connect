@@ -1,5 +1,5 @@
 'use client';
-import GenericErrorPage from './v2/(components)/errors/GenericErrorPage';
+import GenericErrorPage from './(components)/errors/GenericErrorPage';
 
 export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void; }) {
   return (

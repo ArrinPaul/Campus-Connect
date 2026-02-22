@@ -13,6 +13,7 @@ import type * as bookmarks from "../bookmarks.js";
 import type * as calls from "../calls.js";
 import type * as comments from "../comments.js";
 import type * as communities from "../communities.js";
+import type * as counters from "../counters.js";
 import type * as conversations from "../conversations.js";
 import type * as crons from "../crons.js";
 import type * as events from "../events.js";
@@ -65,6 +66,7 @@ declare const fullApi: ApiFromModules<{
   comments: typeof comments;
   communities: typeof communities;
   conversations: typeof conversations;
+  counters: typeof counters;
   crons: typeof crons;
   events: typeof events;
   feed_ranking: typeof feed_ranking;

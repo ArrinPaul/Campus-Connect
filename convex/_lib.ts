@@ -98,4 +98,9 @@ export const RATE_LIMITS = {
   sendMessage:    { windowMs: 60_000,  maxHits: 40  },
   followUser:     { windowMs: 300_000, maxHits: 50  },
   addReaction:    { windowMs: 60_000,  maxHits: 60  },
+  postJob:        { windowMs: 3_600_000, maxHits: 5 },
+  askQuestion:    { windowMs: 60_000,  maxHits: 10  },
+  postAnswer:     { windowMs: 60_000,  maxHits: 20  },
+  createRepost:   { windowMs: 60_000,  maxHits: 30  },
+  uploadPaper:    { windowMs: 3_600_000, maxHits: 5 },
 } as const;

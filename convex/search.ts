@@ -21,7 +21,7 @@ async function isPostVisibleToUser(
 
   const membership = await ctx.db
     .query("communityMembers")
-    .withIndex("by_community_user", (q) =>
+    .withIndex("by_community_user", (q: any) =>
       q.eq("communityId", post.communityId!).eq("userId", userId)
     )
     .unique();
@@ -63,13 +63,13 @@ export const universalSearch = query({
     // --- Search Users ---
     const users = await ctx.db
       .query("users")
-      .withSearchIndex("by_search", (search) => search.search(q))
+      .withSearchIndex("by_search", (search) => search.search("name", q))
       .take(limitPerCategory);
 
     // --- Search Posts ---
     const posts = await ctx.db
       .query("posts")
-      .withSearchIndex("by_content", (search) => search.search(q))
+      .withSearchIndex("by_content", (search) => search.search("content", q))
       .take(limitPerCategory);
     
     // Enrich and filter posts for visibility
@@ -117,7 +117,7 @@ export const searchPosts = query({
     
     const posts = await ctx.db
         .query("posts")
-        .withSearchIndex("by_content", (search) => search.search(q))
+        .withSearchIndex("by_content", (search) => search.search("content", q))
         .take(50);
     
     // Enrich and filter posts for visibility
@@ -154,9 +154,9 @@ export const searchUsersEnhanced = query({
         const users = await ctx.db
             .query("users")
             .withSearchIndex("by_search", (search) => {
-                let query = search.search(q)
+                let query = search.search("name", q)
                 if(args.role) {
-                    query = query.eq("role", args.role)
+                    query = query.eq("role", args.role as any)
                 }
                 if(args.university) {
                     query = query.eq("university", args.university)

@@ -1,14 +1,19 @@
 import React from 'react';
-import V2DashboardLayout from '../v2/(dashboard)/layout';
+import { MainLayout } from '../(components)/layouts/main-layout';
+import { PrimarySidebar } from '../(components)/navigation/primary-sidebar';
+import { MobileBottomNav } from '../(components)/navigation/mobile-bottom-nav';
 
-// This is a temporary bridge component.
-// It renders the new v2 layout, passing the page content (children) into it.
-// This allows us to incrementally migrate pages from the old dashboard
-// to the new v2 structure without breaking routing.
-export default function BridgeToV2Layout({
+export default function V2DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <V2DashboardLayout>{children}</V2DashboardLayout>;
+  return (
+    <MainLayout
+      sidebar={<PrimarySidebar />}
+      mobileNav={<MobileBottomNav />}
+    >
+      {children}
+    </MainLayout>
+  );
 }
