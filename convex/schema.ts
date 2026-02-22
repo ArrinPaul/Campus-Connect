@@ -73,7 +73,11 @@ export default defineSchema({
     .index("by_clerkId", ["clerkId"])
     .index("by_email", ["email"])
     .index("by_username", ["username"])
-    .index("by_lastSeenAt", ["lastSeenAt"]),
+    .index("by_lastSeenAt", ["lastSeenAt"])
+    .searchIndex("by_search", {
+      searchField: "name",
+      filterFields: ["username", "bio", "university", "role", "skills"],
+    }),
 
   posts: defineTable({
     authorId: v.id("users"),
@@ -120,7 +124,16 @@ export default defineSchema({
   })
     .index("by_author", ["authorId"])
     .index("by_createdAt", ["createdAt"])
-    .index("by_community", ["communityId"]),
+    .index("by_community", ["communityId"])
+    .searchIndex("by_content", {
+      searchField: "content",
+    }),
+
+  userFeed: defineTable({
+    userId: v.id("users"), // The user whose feed this is
+    postId: v.id("posts"), // The post appearing in the feed
+    createdAt: v.number(),
+  }).index("by_user", ["userId", "createdAt"]),
 
   likes: defineTable({
     userId: v.id("users"),

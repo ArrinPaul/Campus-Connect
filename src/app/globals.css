@@ -3,76 +3,76 @@
 @tailwind utilities;
 
 /* ─── DESIGN SYSTEM ──────────────────────────────────────────────
-   The Common Room — Humanist, Engaging, Warm
-   Philosophy: Inviting, Tactile, Alive
-   Inspired by: Notion, Discord, Linear
+   Gemini CLI Redesign — "Social Productivity"
+   Philosophy: Premium, Human-Crafted, Alive
+   Inspiration: Linear, Instagram, Discord
    ─────────────────────────────────────────────────────────────── */
 
 @layer base {
   :root {
     /* ── Light Theme (Default) ────────────────────────────────── */
-    --background: 33 22% 95%; /* Creamy off-white */
-    --foreground: 20 14% 12%; /* Dark, soft black */
+    --background: 240 5% 96%; /* Neutral, cool off-white */
+    --foreground: 240 10% 3.9%; /* Almost black */
 
-    --card: 33 20% 92%;
-    --card-foreground: 20 14% 12%;
+    --card: 240 5% 96%;
+    --card-foreground: 240 10% 3.9%;
 
-    --popover: 33 22% 95%;
-    --popover-foreground: 20 14% 12%;
+    --popover: 240 5% 96%;
+    --popover-foreground: 240 10% 3.9%;
 
-    /* -- Primary (Deep Indigo) -- */
-    --primary: 242 58% 51%;
-    --primary-foreground: 40 100% 98%;
+    /* -- Primary (Brand Blue) -- */
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 33 15% 88%;
-    --secondary-foreground: 20 10% 25%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
 
-    --muted: 33 15% 90%;
-    --muted-foreground: 20 8% 45%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
 
-    --accent: 33 15% 88%;
-    --accent-foreground: 20 14% 12%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
 
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
     
-    --border: 33 15% 85%;
-    --input: 33 15% 87%;
-    --ring: 242 58% 51%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 221 83% 53%;
 
     --radius: 0.5rem;
   }
 
   .dark {
     /* ── Dark Theme ───────────────────────────────────────────── */
-    --background: 20 14% 6%; /* Rich charcoal */
-    --foreground: 33 10% 88%; /* Soft off-white */
+    --background: 240 10% 3.9%; /* Deep, dark blue-ish grey */
+    --foreground: 210 40% 98%; /* Light grey */
     
-    --card: 20 12% 9%;
-    --card-foreground: 33 10% 88%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 20 10% 8%;
-    --popover-foreground: 33 10% 88%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 210 40% 98%;
 
-    /* -- Primary (Brighter Indigo) -- */
-    --primary: 242 68% 66%;
-    --primary-foreground: 242 58% 10%;
+    /* -- Primary (Brighter Brand Blue) -- */
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
     
-    --secondary: 20 10% 12%;
-    --secondary-foreground: 33 8% 75%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 210 40% 98%;
     
-    --muted: 20 10% 12%;
-    --muted-foreground: 33 8% 55%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
 
-    --accent: 20 10% 12%;
-    --accent-foreground: 33 10% 88%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 63% 55%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 20 10% 15%;
-    --input: 20 10% 14%;
-    --ring: 242 68% 66%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 217 91% 60%;
   }
 }
 
@@ -88,10 +88,10 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-sans), "Manrope", sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-bold text-foreground;
+    @apply font-display font-semibold text-foreground;
   }
   :focus-visible {
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
@@ -100,22 +100,13 @@
 
 /* ─── NEW COMPONENT UTILITIES ────────────────────────────────── */
 @layer components {
-  /* A subtle, breathing background effect to make the app feel alive */
-  .bg-alive {
-    background: radial-gradient(circle at 10% 20%, hsl(var(--primary) / 0.03), transparent 30%),
-                radial-gradient(circle at 80% 70%, hsl(200 50% 50% / 0.03), transparent 30%);
-    animation: bg-pan 45s linear infinite;
+  /* A subtle, breathing background effect for the main layout to feel alive */
+  .bg-grid-glow {
+    background-image:
+      radial-gradient(circle at 1px 1px, hsl(var(--border) / 0.5) 1px, transparent 0);
+    background-size: 40px 40px;
   }
-  @keyframes bg-pan {
-    0% { background-position: 0% 0%; }
-    100% { background-position: 100% 100%; }
-  }
-
-  /* A soft, inset shadow for inputs and other elements */
-  .shadow-inset-soft {
-    box-shadow: inset 0 1px 2px 0 hsl(var(--background) / 0.5);
-  }
-
+  
   /* Primary button with a satisfying press-down effect */
   .btn-press {
     @apply transition-transform duration-150 active:scale-[0.97];
@@ -139,40 +130,54 @@
     transition: background 0.2s;
   }
   .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--secondary-foreground));
+    background: hsl(var(--muted-foreground));
   }
 }
 
 /* ─── ANIMATION UTILITIES ─────────────────────────────────────── */
 @layer utilities {
-  @keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  .animate-fade-in {
-    animation: fade-in 0.3s ease-out forwards;
+  @keyframes slide-down-and-fade {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
-  @keyframes fade-in-up {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+  @keyframes slide-up-and-fade {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  .animate-fade-in-up {
-    animation: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+  .animate-in {
+    animation: slide-down-and-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  
+  .animate-out {
+    animation: slide-up-and-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-direction: reverse;
   }
 
   /* Staggered animation delays */
-  .stagger-1 { animation-delay: 0.05s; }
-  .stagger-2 { animation-delay: 0.1s; }
-  .stagger-3 { animation-delay: 0.15s; }
-  .stagger-4 { animation-delay: 0.2s; }
-  .stagger-5 { animation-delay: 0.25s; }
+  .delay-1 { animation-delay: 0.05s; }
+  .delay-2 { animation-delay: 0.1s; }
+  .delay-3 { animation-delay: 0.15s; }
+  .delay-4 { animation-delay: 0.2s; }
+  .delay-5 { animation-delay: 0.25s; }
 }
 
 /* ─── SELECTION HIGHLIGHT ────────────────────────────────────── */
 ::selection {
-  background: hsl(var(--primary) / 0.15);
-  color: hsl(var(--foreground));
+  background: hsl(var(--primary) / 0.2);
 }
 
 /* ─── REDUCED MOTION PREFERENCE ──────────────────────────────── */

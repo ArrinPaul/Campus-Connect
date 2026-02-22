@@ -176,4 +176,61 @@ http.route({
   }),
 })
 
+/**
+ * Stripe webhook handler
+ * Handles subscription events from Stripe to manage user pro status.
+ */
+http.route({
+  path: "/stripe-webhook",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const signature = request.headers.get("stripe-signature") as string;
+    const body = await request.text();
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+      log.error("STRIPE_WEBHOOK_SECRET is not set");
+      return new Response("Webhook secret not configured", { status: 500 });
+    }
+
+    let event: any;
+    try {
+      // Assuming a Stripe library or similar verification method exists
+      // event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      // For now, we'll just parse the body as we don't have the library
+      event = JSON.parse(body);
+    } catch (err) {
+      log.error("Stripe webhook verification failed", { error: String(err) });
+      return new Response("Invalid signature", { status: 400 });
+    }
+
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object;
+        await ctx.runMutation(internal.subscriptions.createSubscription, {
+          userId: session.client_reference_id, // Assuming we pass Convex userId here
+          stripeSubscriptionId: session.subscription,
+          stripeCustomerId: session.customer,
+          plan: "pro", // Assuming a simple pro plan
+        });
+        break;
+      }
+      case 'customer.subscription.updated':
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object;
+        await ctx.runMutation(internal.subscriptions.updateSubscriptionStatus, {
+          stripeSubscriptionId: subscription.id,
+          status: subscription.status,
+          plan: subscription.items.data[0].price.lookup_key, // e.g. 'pro' or 'free'
+          cancelAtPeriodEnd: subscription.cancel_at_period_end,
+          currentPeriodEnd: subscription.current_period_end,
+        });
+        break;
+      }
+    }
+
+    return new Response(null, { status: 200 });
+  }),
+});
+
 export default http

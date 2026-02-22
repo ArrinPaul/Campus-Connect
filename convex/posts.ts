@@ -1,791 +1,320 @@
-import { v } from "convex/values"
-import { query, mutation } from "./_generated/server"
-import { Id } from "./_generated/dataModel"
-import { internal } from "./_generated/api"
-import { sanitizeText, sanitizeMarkdown, isValidSafeUrl } from "./sanitize"
-import { linkHashtagsToPost } from "./hashtags"
-import { extractMentions } from "./mentionUtils"
-import { POST_MAX_LENGTH } from "./validation_constants"
-import { checkRateLimit, RATE_LIMITS } from "./_lib"
+import { v } from "convex/values";
+import { query, mutation, internalAction, internalQuery, internalMutation } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
+import { internal } from "./_generated/api";
+import { sanitizeMarkdown } from "./sanitize";
+import { POST_MAX_LENGTH } from "./validation_constants";
+import { checkRateLimit, RATE_LIMITS, getAuthenticatedUser, requireOnboarding } from "./_lib";
 
-/**
- * Get feed posts with pagination
- * Returns posts in reverse chronological order (newest first)
- * Filters by followed users if user is following anyone
- * Returns all posts if user is not following anyone
- * Includes author data in responses
- * Validates: Requirements 6.1, 6.2, 6.3, 12.4
- */
 export const getFeedPosts = query({
   args: {
-    limit: v.optional(v.number()),
     cursor: v.optional(v.string()),
+    limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    // Require authentication
-    const identity = await ctx.auth.getUserIdentity()
-    if (!identity) {
-      throw new Error("Unauthorized")
-    }
+    const user = await getAuthenticatedUser(ctx);
+    if (!user) return { posts: [], hasMore: false, nextCursor: null };
 
-    // Get current user
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
-      .unique()
+    const limit = args.limit ?? 10;
+    
+    const feed = await ctx.db
+        .query("userFeed")
+        .withIndex("by_user", q => q.eq("userId", user._id))
+        .order("desc")
+        .paginate({ cursor: args.cursor, numItems: limit });
+    
+    const posts = await Promise.all(
+        feed.page.map(async (item) => {
+            const post = await ctx.db.get(item.postId);
+            if(!post) return null;
+            const author = await ctx.db.get(post.authorId);
+            return { ...post, author };
+        })
+    );
 
-    if (!user) {
-      throw new Error("User not found")
-    }
-
-    const limit = Math.min(args.limit ?? 20, 100) // Default to 20, max 100
-
-    // Get current user's following list
-    const followingList = await ctx.db
-      .query("follows")
-      .withIndex("by_follower", (q) => q.eq("followerId", user._id))
-      .collect()
-
-    // Extract the IDs of users being followed
-    const followingIds = followingList.map((follow) => follow.followingId)
-
-    // Get all posts ordered by createdAt descending (newest first)
-    let postsQuery = ctx.db
-      .query("posts")
-      .withIndex("by_createdAt")
-      .order("desc")
-
-    // Apply cursor-based pagination if cursor is provided
-    if (args.cursor) {
-      try {
-        const cursorPost = await ctx.db.get(args.cursor as Id<"posts">)
-        if (cursorPost) {
-          postsQuery = postsQuery.filter((q) =>
-            q.lt(q.field("createdAt"), cursorPost.createdAt)
-          )
-        }
-      } catch {
-        // Invalid cursor — return results from the beginning
-      }
-    }
-
-    // Filter by followed users if following anyone
-    if (followingIds.length > 0) {
-      postsQuery = postsQuery.filter((q) =>
-        q.or(
-          ...followingIds.map((id) => q.eq(q.field("authorId"), id))
-        )
-      )
-    }
-
-    // Fetch posts with limit + 1 to determine if there are more
-    const posts = await postsQuery.take(limit + 1)
-
-    // Determine if there are more posts
-    const hasMore = posts.length > limit
-    const postsToReturn = hasMore ? posts.slice(0, limit) : posts
-
-    // Fetch author data for each post
-    const postsWithAuthors = await Promise.all(
-      postsToReturn.map(async (post) => {
-        const author = await ctx.db.get(post.authorId)
-        return {
-          ...post,
-          author: author || null,
-        }
-      })
-    )
-
-    // Return posts with pagination info
     return {
-      posts: postsWithAuthors,
-      nextCursor: hasMore ? postsToReturn[postsToReturn.length - 1]._id : null,
-      hasMore,
+        posts: posts.filter(Boolean),
+        hasMore: !feed.isDone,
+        nextCursor: feed.continueCursor,
     }
   },
-})
+});
 
-/**
- * Get a single post by ID
- * Includes author data in response
- * Validates: Requirements 6.6, 12.4
- */
 export const getPostById = query({
   args: {
     postId: v.id("posts"),
   },
   handler: async (ctx, args) => {
-    // Require authentication
-    const identity = await ctx.auth.getUserIdentity()
-    if (!identity) {
-      throw new Error("Unauthorized")
-    }
-
-    // Fetch the post
-    const post = await ctx.db.get(args.postId)
-
-    if (!post) {
-      return null
-    }
-
-    // Fetch author data
-    const author = await ctx.db.get(post.authorId)
-
-    return {
-      ...post,
-      author: author || null,
-    }
+    const post = await ctx.db.get(args.postId);
+    if (!post) return null;
+    const author = await ctx.db.get(post.authorId);
+    return { ...post, author };
   },
-})
+});
 
-/**
- * Create a new post
- * Validates content (non-empty, max 5000 chars)
- * Initializes likeCount and commentCount to 0
- * Validates: Requirements 4.1, 4.2, 4.3, 4.5, 12.4, 12.5
- */
 export const createPost = mutation({
   args: {
     content: v.string(),
-    mediaUrls: v.optional(v.array(v.string())),
-    mediaType: v.optional(
-      v.union(
-        v.literal("image"),
-        v.literal("video"),
-        v.literal("file"),
-        v.literal("link")
-      )
-    ),
-    mediaFileNames: v.optional(v.array(v.string())),
-    linkPreview: v.optional(
-      v.object({
-        url: v.string(),
-        title: v.optional(v.string()),
-        description: v.optional(v.string()),
-        image: v.optional(v.string()),
-        favicon: v.optional(v.string()),
-      })
-    ),
-    // Phase 3.3 — attach a pre-created poll
-    pollId: v.optional(v.id("polls")),
-    // Phase 5.1 — post to a community
-    communityId: v.optional(v.id("communities")),
   },
   handler: async (ctx, args) => {
-    // Require authentication
-    const identity = await ctx.auth.getUserIdentity()
-    if (!identity) {
-      throw new Error("Unauthorized")
-    }
+    const user = await requireOnboarding(ctx);
+    await checkRateLimit(ctx, user._id, "createPost", RATE_LIMITS.createPost);
 
-    // Get current user
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
-      .unique()
-
-    if (!user) {
-      throw new Error("User not found")
-    }
-
-    // Rate limit: 10 posts per minute
-    await checkRateLimit(ctx, user._id, "createPost", RATE_LIMITS.createPost)
-
-    // Validate content - non-empty
-    if (!args.content || args.content.trim().length === 0) {
-      throw new Error("Post content cannot be empty")
-    }
-
-    // Validate content - max length
+    if (!args.content.trim()) throw new Error("Post content cannot be empty");
     if (args.content.length > POST_MAX_LENGTH) {
-      throw new Error(`Post content must not exceed ${POST_MAX_LENGTH} characters`)
+      throw new Error(`Post content must not exceed ${POST_MAX_LENGTH} characters`);
     }
 
-    // Sanitize content — preserves markdown syntax while blocking XSS
-    const sanitizedContent = sanitizeMarkdown(args.content)
+    const sanitizedContent = sanitizeMarkdown(args.content);
 
-    // Validate media URLs if provided
-    if (args.mediaUrls) {
-      for (const url of args.mediaUrls) {
-        if (!isValidSafeUrl(url)) {
-          throw new Error("Invalid media URL")
-        }
-      }
-    }
-
-    // Validate link preview URLs if provided
-    if (args.linkPreview) {
-      if (!isValidSafeUrl(args.linkPreview.url)) {
-        throw new Error("Invalid link preview URL")
-      }
-      if (args.linkPreview.image && !isValidSafeUrl(args.linkPreview.image)) {
-        throw new Error("Invalid link preview image URL")
-      }
-      if (args.linkPreview.favicon && !isValidSafeUrl(args.linkPreview.favicon)) {
-        throw new Error("Invalid link preview favicon URL")
-      }
-    }
-
-    // Create post with initialized counts
-    const now = Date.now()
     const postId = await ctx.db.insert("posts", {
       authorId: user._id,
       content: sanitizedContent,
       likeCount: 0,
       commentCount: 0,
       shareCount: 0,
-      reactionCounts: { like: 0, love: 0, laugh: 0, wow: 0, sad: 0, scholarly: 0 },
-      createdAt: now,
-      updatedAt: now,
-      ...(args.mediaUrls ? { mediaUrls: args.mediaUrls } : {}),
-      ...(args.mediaType ? { mediaType: args.mediaType } : {}),
-      ...(args.mediaFileNames ? { mediaFileNames: args.mediaFileNames } : {}),
-      ...(args.linkPreview ? { linkPreview: args.linkPreview } : {}),
-      ...(args.pollId ? { pollId: args.pollId } : {}),
-      ...(args.communityId ? { communityId: args.communityId } : {}),
-    })
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
 
-    // Link hashtags to post
-    await linkHashtagsToPost(ctx, postId, sanitizedContent)
+    await ctx.scheduler.runAfter(0, internal.posts.fanOutPost, {
+      postId,
+      authorId: user._id,
+    });
 
-    // Extract mentions and notify mentioned users
-    const mentions = extractMentions(sanitizedContent)
-    for (const username of mentions) {
-      // Find the mentioned user
-      const mentionedUser = await ctx.db
-        .query("users")
-        .withIndex("by_username", (q) => q.eq("username", username))
-        .first()
-
-      // If username index miss, skip silently — no full table scan fallback
-      const resolvedUser = mentionedUser || null
-
-      // Schedule notification if user found and not self-mention
-      if (resolvedUser && resolvedUser._id !== user._id) {
-        await ctx.scheduler.runAfter(0, internal.notifications.createNotification, {
-          recipientId: resolvedUser._id,
-          actorId: user._id,
-          type: "mention" as const,
-          referenceId: postId,
-          message: `mentioned you in a post`,
-        })
-      }
-    }
-
-    // Award reputation for creating a post
-    await ctx.scheduler.runAfter(0, internal.gamification.awardReputation, {
-      userId: user._id,
-      action: "post_created",
-    })
-    await ctx.scheduler.runAfter(0, internal.gamification.checkAchievements, {
-      userId: user._id,
-    })
-
-    // Return the created post
-    const post = await ctx.db.get(postId)
-    return post
+    return postId;
   },
+});
+
+export const fanOutPost = internalAction({
+  args: {
+    postId: v.id("posts"),
+    authorId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const followers = await ctx.runQuery(internal.posts.getFollowers, { authorId: args.authorId });
+    
+    await ctx.runMutation(internal.posts.addToFeed, {
+        userId: args.authorId,
+        postId: args.postId
+    });
+
+    for (const follower of followers) {
+      await ctx.runMutation(internal.posts.addToFeed, {
+        userId: follower.followerId,
+        postId: args.postId,
+      });
+    }
+  },
+});
+
+export const getFollowers = internalQuery({
+    args: { authorId: v.id("users") },
+    handler: async (ctx, args) => {
+        return await ctx.db
+            .query("follows")
+            .withIndex("by_following", q => q.eq("followingId", args.authorId))
+            .collect();
+    }
+});
+
+export const addToFeed = internalMutation({
+    args: {
+        userId: v.id("users"),
+        postId: v.id("posts"),
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.insert("userFeed", {
+            userId: args.userId,
+            postId: args.postId,
+            createdAt: Date.now(),
+        })
+    }
 })
 
-/**
- * Delete a post
- * Validates user is the post author (authorization)
- * Validates: Requirements 4.6, 4.7, 12.4, 12.5
- */
 export const deletePost = mutation({
   args: {
     postId: v.id("posts"),
   },
   handler: async (ctx, args) => {
-    // Require authentication
-    const identity = await ctx.auth.getUserIdentity()
-    if (!identity) {
-      throw new Error("Unauthorized")
+    const user = await getAuthenticatedUser(ctx);
+    const post = await ctx.db.get(args.postId);
+    if (!post) throw new Error("Post not found");
+    if (post.authorId !== user._id) throw new Error("Forbidden");
+
+    await ctx.scheduler.runAfter(0, internal.posts.deletePostAction, {
+        postId: args.postId,
+    });
+  }
+});
+
+export const deletePostAction = internalAction({
+    args: { postId: v.id("posts") },
+    handler: async (ctx, args) => {
+        await Promise.all([
+            ctx.runMutation(internal.posts.cleanupPostComments, { postId: args.postId }),
+            ctx.runMutation(internal.posts.cleanupPostReactions, { postId: args.postId }),
+            ctx.runMutation(internal.posts.cleanupPostReposts, { postId: args.postId }),
+            ctx.runMutation(internal.posts.cleanupPostBookmarks, { postId: args.postId }),
+        ]);
+
+        await ctx.runMutation(internal.posts.deletePostDocument, { postId: args.postId });
     }
-
-    // Get current user
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
-      .unique()
-
-    if (!user) {
-      throw new Error("User not found")
-    }
-
-    // Get the post
-    const post = await ctx.db.get(args.postId)
-
-    if (!post) {
-      throw new Error("Post not found")
-    }
-
-    // Verify user is the post author (authorization)
-    if (post.authorId !== user._id) {
-      throw new Error("Forbidden: You can only delete your own posts")
-    }
-
-    // Cascade delete: remove all likes associated with this post
-    const likes = await ctx.db
-      .query("likes")
-      .withIndex("by_post", (q) => q.eq("postId", args.postId))
-      .collect()
-    for (const like of likes) {
-      await ctx.db.delete(like._id)
-    }
-
-    // Cascade delete: remove all comments associated with this post
-    const comments = await ctx.db
-      .query("comments")
-      .withIndex("by_post", (q) => q.eq("postId", args.postId))
-      .collect()
-    for (const comment of comments) {
-      // Also delete reactions on each comment
-      const commentReactions = await ctx.db
-        .query("reactions")
-        .withIndex("by_target", (q) =>
-          q.eq("targetId", comment._id).eq("targetType", "comment")
-        )
-        .collect()
-      for (const r of commentReactions) {
-        await ctx.db.delete(r._id)
-      }
-      await ctx.db.delete(comment._id)
-    }
-
-    // Cascade delete: remove all reactions on this post
-    const reactions = await ctx.db
-      .query("reactions")
-      .withIndex("by_target", (q) =>
-        q.eq("targetId", args.postId).eq("targetType", "post")
-      )
-      .collect()
-    for (const reaction of reactions) {
-      await ctx.db.delete(reaction._id)
-    }
-
-    // Cascade delete: remove all reposts of this post
-    const reposts = await ctx.db
-      .query("reposts")
-      .withIndex("by_original_post", (q) => q.eq("originalPostId", args.postId))
-      .collect()
-    for (const repost of reposts) {
-      await ctx.db.delete(repost._id)
-    }
-
-    // Cascade delete: remove bookmarks of this post from ALL users (uses new by_post index)
-    const allBookmarks = await ctx.db
-      .query("bookmarks")
-      .withIndex("by_post", (q) => q.eq("postId", args.postId))
-      .collect()
-    for (const bookmark of allBookmarks) {
-      await ctx.db.delete(bookmark._id)
-    }
-
-    // Cascade delete: remove postHashtag links and decrement hashtag postCounts
-    const postHashtags = await ctx.db
-      .query("postHashtags")
-      .withIndex("by_post", (q) => q.eq("postId", args.postId))
-      .collect()
-    for (const link of postHashtags) {
-      const hashtag = await ctx.db.get(link.hashtagId)
-      if (hashtag) {
-        await ctx.db.patch(link.hashtagId, {
-          postCount: Math.max(0, hashtag.postCount - 1),
-        })
-      }
-      await ctx.db.delete(link._id)
-    }
-
-    // Cascade delete: remove poll and pollVotes if attached
-    if (post.pollId) {
-      const pollVotes = await ctx.db
-        .query("pollVotes")
-        .withIndex("by_poll", (q) => q.eq("pollId", post.pollId!))
-        .collect()
-      for (const vote of pollVotes) {
-        await ctx.db.delete(vote._id)
-      }
-      await ctx.db.delete(post.pollId)
-    }
-
-    // Cascade delete: remove notifications referencing this post
-    const notifications = await ctx.db
-      .query("notifications")
-      .filter((q) => q.eq(q.field("referenceId"), args.postId))
-      .collect()
-    for (const notif of notifications) {
-      await ctx.db.delete(notif._id)
-    }
-
-    // Delete the post
-    await ctx.db.delete(args.postId)
-
-    return { success: true }
-  },
 })
 
-/**
- * Edit an existing post
- * Only the post author can edit. Content is validated and sanitized.
- * Validates: Requirements 4.4, 12.4, 12.5
- */
-export const editPost = mutation({
-  args: {
-    postId: v.id("posts"),
-    content: v.optional(v.string()),
-    mediaUrls: v.optional(v.array(v.string())),
-    mediaType: v.optional(
-      v.union(
-        v.literal("image"),
-        v.literal("video"),
-        v.literal("file"),
-        v.literal("link")
-      )
-    ),
-    linkPreview: v.optional(
-      v.object({
-        url: v.string(),
-        title: v.optional(v.string()),
-        description: v.optional(v.string()),
-        image: v.optional(v.string()),
-        favicon: v.optional(v.string()),
-      })
-    ),
-  },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity()
-    if (!identity) throw new Error("Unauthorized")
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
-      .unique()
-    if (!user) throw new Error("User not found")
-
-    const post = await ctx.db.get(args.postId)
-    if (!post) throw new Error("Post not found")
-    if (post.authorId !== user._id) throw new Error("Forbidden: You can only edit your own posts")
-
-    const updates: Record<string, any> = { updatedAt: Date.now() }
-
-    if (args.content !== undefined) {
-      if (!args.content || args.content.trim().length === 0) {
-        throw new Error("Post content cannot be empty")
-      }
-      if (args.content.length > POST_MAX_LENGTH) {
-        throw new Error(`Post content must not exceed ${POST_MAX_LENGTH} characters`)
-      }
-      updates.content = sanitizeMarkdown(args.content)
-
-      // Re-link hashtags
-      await linkHashtagsToPost(ctx, args.postId, updates.content)
+export const cleanupPostComments = internalMutation({
+    args: { postId: v.id("posts") },
+    handler: async (ctx, args) => {
+        const comments = await ctx.db.query("comments").withIndex("by_post", q => q.eq("postId", args.postId)).collect();
+        for(const comment of comments) {
+            await ctx.db.delete(comment._id);
+        }
     }
-
-    if (args.mediaUrls !== undefined) {
-      for (const url of args.mediaUrls) {
-        if (!isValidSafeUrl(url)) throw new Error("Invalid media URL")
-      }
-      updates.mediaUrls = args.mediaUrls
-    }
-
-    if (args.mediaType !== undefined) {
-      updates.mediaType = args.mediaType
-    }
-
-    if (args.linkPreview !== undefined) {
-      if (args.linkPreview.url && !isValidSafeUrl(args.linkPreview.url)) {
-        throw new Error("Invalid link preview URL")
-      }
-      updates.linkPreview = args.linkPreview
-    }
-
-    await ctx.db.patch(args.postId, updates)
-
-    const updatedPost = await ctx.db.get(args.postId)
-    const author = await ctx.db.get(post.authorId)
-    return { ...updatedPost, author: author || null }
-  },
 })
 
-/**
- * Check if current user has liked a post
- * Validates: Requirements 5.4, 12.4
- */
-export const hasUserLikedPost = query({
-  args: {
-    postId: v.id("posts"),
-  },
-  handler: async (ctx, args) => {
-    // Require authentication
-    const identity = await ctx.auth.getUserIdentity()
-    if (!identity) {
-      return false
+export const cleanupPostReactions = internalMutation({
+    args: { postId: v.id("posts") },
+    handler: async (ctx, args) => {
+        const reactions = await ctx.db.query("reactions").withIndex("by_target", q => q.eq("targetId", args.postId)).collect();
+        for(const reaction of reactions) {
+            await ctx.db.delete(reaction._id);
+        }
     }
-
-    // Get current user
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
-      .unique()
-
-    if (!user) {
-      return false
-    }
-
-    // Check reactions table (single source of truth)
-    const reaction = await ctx.db
-      .query("reactions")
-      .withIndex("by_user_target", (q) =>
-        q.eq("userId", user._id).eq("targetId", args.postId).eq("targetType", "post")
-      )
-      .unique()
-
-    return reaction !== null
-  },
 })
 
-/**
- * Like a post (delegates to the reactions system for consistency)
- * Maintains backward compatibility by also updating the legacy likeCount field.
- * Validates: Requirements 5.1, 5.2, 5.4, 12.4
- */
+export const cleanupPostReposts = internalMutation({
+    args: { postId: v.id("posts") },
+    handler: async (ctx, args) => {
+        const reposts = await ctx.db.query("reposts").withIndex("by_original_post", q => q.eq("originalPostId", args.postId)).collect();
+        for(const repost of reposts) {
+            await ctx.db.delete(repost._id);
+        }
+    }
+})
+
+export const cleanupPostBookmarks = internalMutation({
+    args: { postId: v.id("posts") },
+    handler: async (ctx, args) => {
+        const bookmarks = await ctx.db.query("bookmarks").withIndex("by_post", q => q.eq("postId", args.postId)).collect();
+        for(const bookmark of bookmarks) {
+            await ctx.db.delete(bookmark._id);
+        }
+    }
+})
+
+export const deletePostDocument = internalMutation({
+    args: { postId: v.id("posts") },
+    handler: async (ctx, args) => {
+        await ctx.db.delete(args.postId);
+    }
+})
+
 export const likePost = mutation({
   args: {
     postId: v.id("posts"),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity()
-    if (!identity) throw new Error("Unauthorized")
+    const user = await requireOnboarding(ctx);
+    const post = await ctx.db.get(args.postId);
+    if (!post) throw new Error("Post not found");
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
-      .unique()
-    if (!user) throw new Error("User not found")
-
-    const post = await ctx.db.get(args.postId)
-    if (!post) throw new Error("Post not found")
-
-    // Check if user already reacted (via reactions system)
     const existingReaction = await ctx.db
       .query("reactions")
       .withIndex("by_user_target", (q) =>
         q.eq("userId", user._id).eq("targetId", args.postId).eq("targetType", "post")
       )
-      .unique()
+      .unique();
+    if (existingReaction) throw new Error("Already liked");
 
-    if (existingReaction) {
-      throw new Error("You have already liked this post")
-    }
-
-    // Insert reaction record (single source of truth)
     await ctx.db.insert("reactions", {
       userId: user._id,
       targetId: args.postId,
       targetType: "post",
       type: "like",
       createdAt: Date.now(),
-    })
+    });
 
-    // Sync legacy likeCount + reactionCounts
-    const rc = post.reactionCounts ?? { like: 0, love: 0, laugh: 0, wow: 0, sad: 0, scholarly: 0 }
-    await ctx.db.patch(args.postId, {
-      likeCount: (post.likeCount ?? 0) + 1,
-      reactionCounts: { ...rc, like: rc.like + 1 },
-    })
-
-    // Notify post author
-    if (post.authorId !== user._id) {
-      await ctx.scheduler.runAfter(0, internal.notifications.createNotification, {
-        recipientId: post.authorId,
-        actorId: user._id,
-        type: "reaction" as const,
-        referenceId: args.postId,
-        message: `${user.name} liked your post`,
-      })
-      await ctx.scheduler.runAfter(0, internal.gamification.awardReputation, {
-        userId: post.authorId,
-        action: "receive_like",
-      })
-    }
-
-    return { success: true }
+    await ctx.scheduler.runAfter(0, internal.counters.updateReactionCounts, {
+      targetId: args.postId,
+      reactionType: "like",
+      delta: 1,
+    });
   },
-})
+});
 
-/**
- * Unlike a post (removes user's reaction from the reactions system)
- * Maintains backward compatibility by also updating the legacy likeCount field.
- * Validates: Requirements 5.3, 12.4
- */
 export const unlikePost = mutation({
   args: {
     postId: v.id("posts"),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity()
-    if (!identity) throw new Error("Unauthorized")
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
-      .unique()
-    if (!user) throw new Error("User not found")
-
-    const post = await ctx.db.get(args.postId)
-    if (!post) throw new Error("Post not found")
-
-    // Check for reaction (single source of truth)
+    const user = await requireOnboarding(ctx);
+    const post = await ctx.db.get(args.postId);
+    if (!post) throw new Error("Post not found");
     const existingReaction = await ctx.db
       .query("reactions")
       .withIndex("by_user_target", (q) =>
         q.eq("userId", user._id).eq("targetId", args.postId).eq("targetType", "post")
       )
-      .unique()
+      .unique();
+    if (!existingReaction) throw new Error("Not liked");
 
-    if (!existingReaction) {
-      throw new Error("You have not liked this post")
-    }
-
-    await ctx.db.delete(existingReaction._id)
-
-    // Sync legacy likeCount + reactionCounts
-    const rc = post.reactionCounts ?? { like: 0, love: 0, laugh: 0, wow: 0, sad: 0, scholarly: 0 }
-    const reactType = existingReaction.type as keyof typeof rc
-    await ctx.db.patch(args.postId, {
-      likeCount: Math.max(0, (post.likeCount ?? 0) - 1),
-      reactionCounts: { ...rc, [reactType]: Math.max(0, (rc[reactType] ?? 0) - 1) },
-    })
-
-    return { success: true }
+    await ctx.db.delete(existingReaction._id);
+    await ctx.scheduler.runAfter(0, internal.counters.updateReactionCounts, {
+      targetId: args.postId,
+      reactionType: existingReaction.type,
+      delta: -1,
+    });
   },
-})
+});
 
-/**
- * Get unified feed with both posts and reposts
- * Returns posts and reposts in chronological order
- * Reposts include both the reposter info and original post/author
- * Validates: Requirements 1.6 (Share/Repost Feed Display)
- */
-export const getUnifiedFeed = query({
+export const getExplorePosts = query({
   args: {
     limit: v.optional(v.number()),
     cursor: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    // Require authentication
-    const identity = await ctx.auth.getUserIdentity()
-    if (!identity) {
-      throw new Error("Unauthorized")
-    }
+    // Authentication is optional for explore feed, but if present,
+    // we should still join author data.
+    
+    const limit = Math.min(args.limit ?? 20, 100);
 
-    // Get current user
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
-      .unique()
-
-    if (!user) {
-      throw new Error("User not found")
-    }
-
-    const limit = Math.min(args.limit ?? 20, 100)
-
-    // Get current user's following list
-    const followingList = await ctx.db
-      .query("follows")
-      .withIndex("by_follower", (q) => q.eq("followerId", user._id))
-      .collect()
-
-    const followingIds = followingList.map((follow) => follow.followingId)
-
-    // Get posts from followed users
     let postsQuery = ctx.db
       .query("posts")
       .withIndex("by_createdAt")
-      .order("desc")
+      .order("desc");
 
-    // Filter by followed users if following anyone
-    if (followingIds.length > 0) {
-      postsQuery = postsQuery.filter((q) =>
-        q.or(
-          ...followingIds.map((id) => q.eq(q.field("authorId"), id))
-        )
-      )
+    if (args.cursor) {
+      try {
+        const cursorPost = await ctx.db.get(args.cursor as Id<"posts">);
+        if (cursorPost) {
+          postsQuery = postsQuery.filter((q) =>
+            q.lt(q.field("createdAt"), cursorPost.createdAt)
+          );
+        }
+      } catch {
+        // Invalid cursor — return results from the beginning
+      }
     }
 
-    const posts = await postsQuery.take(limit * 2) // Fetch more to merge with reposts
+    const posts = await postsQuery.take(limit + 1);
 
-    // Get reposts from followed users
-    let repostsQuery = ctx.db
-      .query("reposts")
-      .withIndex("by_createdAt")
-      .order("desc")
+    const hasMore = posts.length > limit;
+    const postsToReturn = hasMore ? posts.slice(0, limit) : posts;
 
-    if (followingIds.length > 0) {
-      repostsQuery = repostsQuery.filter((q) =>
-        q.or(
-          ...followingIds.map((id) => q.eq(q.field("userId"), id))
-        )
-      )
-    }
-
-    const reposts = await repostsQuery.take(limit * 2)
-
-    // Transform posts into feed items
-    const postItems = await Promise.all(
-      posts.map(async (post) => {
-        const author = await ctx.db.get(post.authorId)
+    const postsWithAuthors = await Promise.all(
+      postsToReturn.map(async (post) => {
+        const author = await ctx.db.get(post.authorId);
         return {
-          type: "post" as const,
-          _id: post._id,
-          createdAt: post.createdAt,
-          post: {
-            ...post,
-            author: author || null,
-          },
-        }
+          ...post,
+          author: author || null,
+        };
       })
-    )
-
-    // Transform reposts into feed items
-    const repostItems = await Promise.all(
-      reposts.map(async (repost) => {
-        const reposter = await ctx.db.get(repost.userId)
-        const originalPost = await ctx.db.get(repost.originalPostId)
-        
-        if (!originalPost) return null
-
-        const originalAuthor = await ctx.db.get(originalPost.authorId)
-
-        return {
-          type: "repost" as const,
-          _id: repost._id,
-          createdAt: repost.createdAt,
-          reposter: reposter || null,
-          quoteContent: repost.quoteContent,
-          post: {
-            ...originalPost,
-            author: originalAuthor || null,
-          },
-        }
-      })
-    )
-
-    // Filter out null items and combine all items
-    const allItems = [...postItems, ...repostItems.filter((item) => item !== null)]
-      .sort((a, b) => b.createdAt - a.createdAt) // Sort by newest first
-      .slice(0, limit + 1) // Take limit + 1 for pagination
-
-    // Determine if there are more items
-    const hasMore = allItems.length > limit
-    const itemsToReturn = hasMore ? allItems.slice(0, limit) : allItems
+    );
 
     return {
-      items: itemsToReturn,
-      nextCursor: hasMore ? String(itemsToReturn[itemsToReturn.length - 1].createdAt) : null,
+      posts: postsWithAuthors,
+      nextCursor: hasMore ? postsToReturn[postsToReturn.length - 1]._id : null,
       hasMore,
-    }
+    };
   },
-})
+});
