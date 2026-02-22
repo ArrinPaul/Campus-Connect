@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useCallback, useState } from "react"
+import { useEffect, useRef, useCallback, useState, Suspense } from "react"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -15,7 +15,7 @@ const log = createLogger("stories/page")
 
 const STORY_DURATION_MS = 5000 // 5 seconds per story
 
-export default function StoriesPage() {
+function StoriesPageInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const startUserId = searchParams.get("userId")
@@ -375,6 +375,14 @@ interface StoryWithAuthor {
     profilePicture?: string
     username?: string
   } | null
+}
+
+export default function StoriesPage() {
+  return (
+    <Suspense>
+      <StoriesPageInner />
+    </Suspense>
+  )
 }
 
 interface StoryGroup {

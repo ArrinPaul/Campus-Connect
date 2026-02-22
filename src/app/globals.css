@@ -1,252 +1,186 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ─── DESIGN SYSTEM ──────────────────────────────────────────────
-   Orbital Interface — High-Tech Brutalist Design System
-   Philosophy: Engineered precision · High contrast · Raw function
+   The Common Room — Humanist, Engaging, Warm
+   Philosophy: Inviting, Tactile, Alive
+   Inspired by: Notion, Discord, Linear
    ─────────────────────────────────────────────────────────────── */
 
 @layer base {
   :root {
-    /* ── Dark Theme (Default) ─────────────────────────────────── */
-    --background: 240 10% 4%; /* Near-black */
-    --foreground: 240 7%, 93%; /* Off-white */
+    /* ── Light Theme (Default) ────────────────────────────────── */
+    --background: 33 22% 95%; /* Creamy off-white */
+    --foreground: 20 14% 12%; /* Dark, soft black */
 
-    /* ── Surfaces ────────────────────────────────────────────── */
-    --card: 240 8% 8%; /* Dark gray */
-    --card-foreground: 240 7% 93%;
-    --popover: 240 8% 8%;
-    --popover-foreground: 240 7% 93%;
+    --card: 33 20% 92%;
+    --card-foreground: 20 14% 12%;
 
-    /* ── Primary (Acid Green) ── */
-    --primary: 74 100% 50%; /* #CCFF00 */
-    --primary-foreground: 240 10% 4%; /* Near-black for text on primary */
+    --popover: 33 22% 95%;
+    --popover-foreground: 20 14% 12%;
 
-    /* ── Secondary (Electric Blue) ── */
-    --secondary: 210 100% 56%;
-    --secondary-foreground: 0 0% 100%;
+    /* -- Primary (Deep Indigo) -- */
+    --primary: 242 58% 51%;
+    --primary-foreground: 40 100% 98%;
 
-    /* ── Muted ── */
-    --muted: 240 6% 12%;
-    --muted-foreground: 240 5% 64%;
+    --secondary: 33 15% 88%;
+    --secondary-foreground: 20 10% 25%;
 
-    /* ── Accent (Interface Glow) ── */
-    --accent: 240 6% 16%;
-    --accent-foreground: 240 7% 93%;
+    --muted: 33 15% 90%;
+    --muted-foreground: 20 8% 45%;
 
-    /* ── Destructive (Alert Orange) ── */
-    --destructive: 24 95% 53%;
+    --accent: 33 15% 88%;
+    --accent-foreground: 20 14% 12%;
+
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
+    
+    --border: 33 15% 85%;
+    --input: 33 15% 87%;
+    --ring: 242 58% 51%;
 
-    /* ── Chrome ── */
-    --border: 240 5% 20%;
-    --input: 240 5% 16%;
-    --ring: 74 100% 50%; /* Acid Green for focus */
-    --radius: 0.125rem; /* Sharp corners */
+    --radius: 0.5rem;
   }
 
-  /* Note: Light theme is not part of this redesign, but a placeholder can be added if needed. */
-  .light {
-    --background: 240 7% 93%;
-    --foreground: 240 10% 4%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 4%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 4%;
-    --primary: 74 100% 45%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 240 5% 24%;
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 3% 45%;
-    --accent: 240 5% 96%;
-    --accent-foreground: 240 5% 24%;
-    --destructive: 0 84% 60%;
+  .dark {
+    /* ── Dark Theme ───────────────────────────────────────────── */
+    --background: 20 14% 6%; /* Rich charcoal */
+    --foreground: 33 10% 88%; /* Soft off-white */
+    
+    --card: 20 12% 9%;
+    --card-foreground: 33 10% 88%;
+
+    --popover: 20 10% 8%;
+    --popover-foreground: 33 10% 88%;
+
+    /* -- Primary (Brighter Indigo) -- */
+    --primary: 242 68% 66%;
+    --primary-foreground: 242 58% 10%;
+    
+    --secondary: 20 10% 12%;
+    --secondary-foreground: 33 8% 75%;
+    
+    --muted: 20 10% 12%;
+    --muted-foreground: 33 8% 55%;
+
+    --accent: 20 10% 12%;
+    --accent-foreground: 33 10% 88%;
+
+    --destructive: 0 63% 55%;
     --destructive-foreground: 0 0% 100%;
-    --border: 240 5% 85%;
-    --input: 240 5% 85%;
-    --ring: 74 100% 45%;
+
+    --border: 20 10% 15%;
+    --input: 20 10% 14%;
+    --ring: 242 68% 66%;
   }
 }
 
-/* ─── BASE RESETS ─────────────────────────────────────────────── */
+/* ─── BASE RESETS & TYPOGRAPHY ───────────────────────────────── */
 @layer base {
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground antialiased;
-    font-family: var(--font-sans), "Outfit", sans-serif;
-  }
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-family: var(--font-display), "Space Grotesk", monospace;
-    @apply font-bold tracking-wider uppercase text-primary;
-  }
   html {
-    scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans), "Manrope", sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold text-foreground;
   }
   :focus-visible {
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 }
 
-/* ─── GLOBAL COMPONENT UTILITIES ──────────────────────────────── */
+/* ─── NEW COMPONENT UTILITIES ────────────────────────────────── */
 @layer components {
-  /* ── Technical Grid Background ── */
-  .bg-grid {
-    background-image: linear-gradient(
-        0deg,
-        hsl(var(--border) / 0.2) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        90deg,
-        hsl(var(--border) / 0.2) 1px,
-        transparent 1px
-      );
-    background-size: 32px 32px;
+  /* A subtle, breathing background effect to make the app feel alive */
+  .bg-alive {
+    background: radial-gradient(circle at 10% 20%, hsl(var(--primary) / 0.03), transparent 30%),
+                radial-gradient(circle at 80% 70%, hsl(200 50% 50% / 0.03), transparent 30%);
+    animation: bg-pan 45s linear infinite;
   }
-  .bg-dot-grid {
-    background-image: radial-gradient(
-      circle at 1px 1px,
-      hsl(var(--border) / 0.5) 1px,
-      transparent 0
-    );
-    background-size: 24px 24px;
+  @keyframes bg-pan {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
   }
 
-  /* ── Terminal-style Panels ── */
-  .panel-base {
-    @apply bg-card border border-border rounded-sm;
-  }
-  .panel-interactive {
-    @apply panel-base transition-colors duration-200 hover:bg-accent hover:border-primary/50;
-  }
-  .panel-inset {
-    @apply bg-background border border-border rounded-sm shadow-[inset_0_1px_4px_hsl(var(--background)/0.9)];
+  /* A soft, inset shadow for inputs and other elements */
+  .shadow-inset-soft {
+    box-shadow: inset 0 1px 2px 0 hsl(var(--background) / 0.5);
   }
 
-  /* ── Primary Button (Brutalist) ── */
-  .btn-primary-brutalist {
-    @apply bg-primary text-primary-foreground font-bold uppercase tracking-wider px-6 py-2 rounded-sm border-2 border-primary transition-all duration-200;
-    @apply hover:bg-transparent hover:text-primary;
-    @apply active:translate-x-[2px] active:translate-y-[2px];
-    box-shadow: 2px 2px 0px hsl(var(--primary));
-  }
-  .btn-primary-brutalist:hover {
-    box-shadow: 0px 0px 0px hsl(var(--primary));
-  }
-  .btn-secondary-brutalist {
-    @apply bg-transparent text-muted-foreground font-semibold px-4 py-2 rounded-sm border border-border transition-all duration-200 hover:border-primary hover:text-primary;
+  /* Primary button with a satisfying press-down effect */
+  .btn-press {
+    @apply transition-transform duration-150 active:scale-[0.97];
   }
 
-  /* ── UI Accents ── */
-  .text-glow-primary {
-    text-shadow: 0 0 8px hsl(var(--primary) / 0.5);
-  }
-  .text-glow-secondary {
-    text-shadow: 0 0 8px hsl(var(--secondary) / 0.5);
-  }
-
-  /* Custom scrollbar */
-  .scrollbar-thin {
+  /* Custom scrollbar for a more branded feel */
+  .scrollbar-custom {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--border)) transparent;
   }
-  .scrollbar-thin::-webkit-scrollbar {
+  .scrollbar-custom::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
-  .scrollbar-thin::-webkit-scrollbar-track {
+  .scrollbar-custom::-webkit-scrollbar-track {
     background: transparent;
   }
-  .scrollbar-thin::-webkit-scrollbar-thumb {
+  .scrollbar-custom::-webkit-scrollbar-thumb {
     background: hsl(var(--border));
-    border-radius: 0;
+    border-radius: 3px;
+    transition: background 0.2s;
   }
-  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--primary));
+  .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--secondary-foreground));
   }
 }
 
 /* ─── ANIMATION UTILITIES ─────────────────────────────────────── */
 @layer utilities {
-  /* Fast, snappy transitions */
-  .animate-in {
-    animation-duration: 0.2s;
-    animation-timing-function: ease-out;
-    animation-fill-mode: forwards;
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
-  .stagger-1 {
-    animation-delay: 0.02s;
-  }
-  .stagger-2 {
-    animation-delay: 0.04s;
-  }
-  .stagger-3 {
-    animation-delay: 0.06s;
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out forwards;
   }
 
-  /* Scanline effect */
-  @keyframes scanline {
-    0% {
-      transform: translateY(-10%);
-    }
-    100% {
-      transform: translateY(110%);
-    }
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
   }
-  .has-scanline {
-    position: relative;
-    overflow: hidden;
+  .animate-fade-in-up {
+    animation: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
-  .has-scanline::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 10px;
-    background: hsl(var(--primary) / 0.1);
-    animation: scanline 4s linear infinite;
-    opacity: 0.5;
-    pointer-events: none;
-    filter: blur(2px);
-  }
+
+  /* Staggered animation delays */
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.1s; }
+  .stagger-3 { animation-delay: 0.15s; }
+  .stagger-4 { animation-delay: 0.2s; }
+  .stagger-5 { animation-delay: 0.25s; }
 }
 
-/* ─── SELECTION ───────────────────────────────────────────────── */
+/* ─── SELECTION HIGHLIGHT ────────────────────────────────────── */
 ::selection {
-  background: hsl(var(--primary) / 0.25);
+  background: hsl(var(--primary) / 0.15);
   color: hsl(var(--foreground));
 }
 
-/* ─── REDUCED MOTION ──────────────────────────────────────────── */
+/* ─── REDUCED MOTION PREFERENCE ──────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-    transition-delay: 0ms !important;
     scroll-behavior: auto !important;
   }
-
-  :focus-visible {
-    transition: none !important;
-  }
-}
-
-/* ─── CLERK OVERRIDE ──────────────────────────────────────────── */
-.cl-internal-b3fm6y {
-  display: none;
 }

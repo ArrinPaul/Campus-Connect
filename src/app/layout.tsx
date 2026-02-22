@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Outfit } from "next/font/google";
+import { Syne, Manrope } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ConvexClientProvider } from "@/components/providers/convex-provider";
@@ -13,18 +12,17 @@ import { SkipLink } from "@/components/accessibility/SkipLink";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const outfit = Outfit({
+const manrope = Manrope({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-sans",
-  weight: ["300", "400", "500", "600", "700"],
 });
 
-const spaceGrotesk = Space_Grotesk({
+const syne = Syne({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-display",
-  weight: ["400", "500", "600", "700"],
+  weight: ["700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -61,8 +59,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#05050A" },
-    { media: "(prefers-color-scheme: dark)", color: "#05050A" },
+    { media: "(prefers-color-scheme: light)", color: "#F7F2ED" },
+    { media: "(prefers-color-scheme: dark)", color: "#1A1918" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -76,43 +74,34 @@ export default function RootLayout({
   return (
     <ClerkProvider
       appearance={{
-        baseTheme: dark,
         variables: {
-          colorPrimary: "#CCFF00",
-          colorBackground: "#05050A",
-          colorText: "#E0E0E0",
-          colorInputBackground: "#1A1A1E",
-          colorInputText: "#E0E0E0",
-          borderRadius: "0.25rem",
-          fontFamily: "'Outfit', sans-serif",
+          colorPrimary: "#4340C2",
+          colorBackground: "hsl(var(--card))",
+          colorText: "hsl(var(--foreground))",
+          colorInputBackground: "hsl(var(--background))",
+          colorInputText: "hsl(var(--foreground))",
+          borderRadius: "0.5rem",
+          fontFamily: "'Manrope', sans-serif",
         },
         elements: {
           formButtonPrimary:
-            "bg-primary text-[#05050A] font-bold tracking-wide uppercase transition-all duration-200 hover:bg-white active:scale-[0.98]",
-          card: "bg-[#0A0A0F] border border-[#222] shadow-none rounded-md",
-          headerTitle:
-            "font-display text-2xl font-bold tracking-wider text-primary",
-          headerSubtitle: "text-muted-foreground text-sm font-sans",
-          socialButtonsBlockButton:
-            "border border-[#222] hover:bg-[#111] transition-colors duration-150 rounded-md",
-          formFieldLabel: "text-foreground font-medium text-sm font-sans",
-          footerActionLink: "text-primary hover:text-primary/80",
-          internal: "font-sans",
+            "bg-primary text-primary-foreground font-semibold shadow-sm transition-all duration-200 active:scale-[0.98] hover:brightness-110",
+          card: "shadow-lg border border-border/50 rounded-lg",
+          headerTitle: "font-display text-2xl font-bold text-foreground",
         },
       }}
     >
       <html
         lang="en"
         suppressHydrationWarning
-        className={`${outfit.variable} ${spaceGrotesk.variable}`}
+        className={`${manrope.variable} ${syne.variable}`}
       >
         <body className="font-sans antialiased">
-          {/* Skip link — must be the absolute first focusable element */}
           <SkipLink />
           <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
-            enableSystem={false}
+            defaultTheme="system"
+            enableSystem
             disableTransitionOnChange
           >
             <ConvexClientProvider>
@@ -126,12 +115,7 @@ export default function RootLayout({
           </ThemeProvider>
           <Analytics />
           <SpeedInsights />
-          <Toaster
-            theme="dark"
-            richColors
-            position="bottom-right"
-            closeButton
-          />
+          <Toaster richColors position="bottom-right" closeButton />
         </body>
       </html>
     </ClerkProvider>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
 import { useUser } from "@clerk/nextjs"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
@@ -33,7 +33,7 @@ type SearchTab = "all" | "users" | "posts" | "hashtags"
 const RECENT_SEARCHES_KEY = "campus-connect-recent-searches"
 const MAX_RECENT_SEARCHES = 10
 
-export default function SearchPage() {
+function SearchPageInner() {
   const { isLoaded, isSignedIn } = useUser()
   const searchParams = useSearchParams()
 
@@ -364,6 +364,14 @@ export default function SearchPage() {
         </>
       )}
     </div>
+  )
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense>
+      <SearchPageInner />
+    </Suspense>
   )
 }
 
