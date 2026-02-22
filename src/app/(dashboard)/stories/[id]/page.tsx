@@ -7,6 +7,7 @@ import type { Id } from '@/convex/_generated/dataModel';
 import { notFound, useRouter } from 'next/navigation';
 import { X, ArrowLeft, ArrowRight, Eye, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -109,7 +110,7 @@ function StoryViewerContent({ storyId }: { storyId: Id<'stories'> }) {
             >
                 <div className="h-9 w-9 rounded-full overflow-hidden ring-2 ring-white/50">
                     {story.author?.profilePicture ? (
-                        <img src={story.author.profilePicture} alt={story.author.name || ''} className="h-full w-full object-cover" />
+                        <Image src={story.author.profilePicture} alt={story.author.name || ''} width={36} height={36} className="h-full w-full object-cover" />
                     ) : (
                         <div className="flex h-full w-full items-center justify-center bg-primary text-sm font-bold text-white">
                             {story.author?.name.charAt(0).toUpperCase()}
@@ -130,7 +131,7 @@ function StoryViewerContent({ storyId }: { storyId: Id<'stories'> }) {
             <div className="absolute inset-0 flex items-center justify-center p-4" style={{ backgroundColor: story.backgroundColor || '#111' }}>
                 {story.mediaUrl ? (
                     // TODO: Handle video stories
-                    <img src={story.mediaUrl} alt="Story content" className="max-h-full max-w-full object-contain" />
+                    <Image src={story.mediaUrl} alt="Story content" fill className="object-contain" />
                 ) : (
                     <div className="flex items-center justify-center p-10 text-center">
                         <p className="text-white font-semibold text-2xl leading-snug" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.4)" }}>

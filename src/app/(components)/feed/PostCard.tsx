@@ -7,6 +7,7 @@ import {
   Bookmark,
   MoreHorizontal,
 } from 'lucide-react';
+import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 import { FeedItem } from './types';
 
@@ -21,7 +22,7 @@ const PostAuthorHeader = ({ author, createdAt }: { author: FeedItem['post']['aut
         <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-full bg-muted flex-shrink-0">
                 {author.profilePicture && (
-                    <img src={author.profilePicture} alt={author.name} className="h-full w-full rounded-full object-cover" />
+                    <Image src={author.profilePicture} alt={author.name} width={40} height={40} className="h-full w-full rounded-full object-cover" />
                 )}
             </div>
             <div>

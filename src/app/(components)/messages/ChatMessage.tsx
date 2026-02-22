@@ -1,6 +1,7 @@
 'use client';
 
 import { format } from 'date-fns';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 // Based on the return value of the `getMessages` query
@@ -33,7 +34,7 @@ export function ChatMessage({ message }: Props) {
         <div className={cn("flex items-end gap-2", { "justify-end": message.isOwn })}>
             {!message.isOwn && (
                  <div className="h-8 w-8 rounded-full bg-muted flex-shrink-0">
-                    {message.senderAvatar && <img src={message.senderAvatar} alt={message.senderName} className="h-full w-full rounded-full object-cover" />}
+                    {message.senderAvatar && <Image src={message.senderAvatar} alt={message.senderName} width={32} height={32} className="h-full w-full rounded-full object-cover" />}
                 </div>
             )}
             <div className={cn(

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Doc } from '@/convex/_generated/dataModel';
 import { MessageCircle, Hash, Eye, ArrowUp, ArrowDown, User as UserIcon } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -29,7 +30,7 @@ export function QuestionCard({ question }: Props) {
             <div className="flex flex-wrap items-center justify-between mt-3 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
                     {askerAvatar ? (
-                         <img src={askerAvatar} alt={askerName} className="h-4 w-4 rounded-full object-cover" />
+                         <Image src={askerAvatar} alt={askerName} width={16} height={16} className="h-4 w-4 rounded-full object-cover" />
                     ) : (
                         <UserIcon className="h-3.5 w-3.5" />
                     )}

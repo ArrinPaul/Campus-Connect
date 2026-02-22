@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
+import Image from "next/image"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import imageCompression from "browser-image-compression"
@@ -216,9 +217,11 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
           {/* Image Preview */}
           <div className="relative h-20 w-20 flex-shrink-0">
             {imagePreview ? (
-              <img
+              <Image
                 src={imagePreview}
                 alt="Profile preview"
+                width={80}
+                height={80}
                 className="h-20 w-20 rounded-full object-cover"
               />
             ) : (

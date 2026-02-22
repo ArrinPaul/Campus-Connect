@@ -2,6 +2,7 @@
 
 import type { Doc } from '@/convex/_generated/dataModel';
 import Link from 'next/link';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 // Manually defining type based on getStories query
@@ -26,7 +27,7 @@ export function StoryPreviewCard({ story }: Props) {
             )}>
                 <div className="h-full w-full rounded-full bg-muted flex items-center justify-center overflow-hidden">
                     {authorAvatar ? (
-                        <img src={authorAvatar} alt={authorName} className="h-full w-full object-cover" />
+                        <Image src={authorAvatar} alt={authorName} width={64} height={64} className="h-full w-full object-cover" />
                     ) : (
                         <span className="text-xl font-bold text-primary-foreground">{authorName.charAt(0)}</span>
                     )}

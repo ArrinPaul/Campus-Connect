@@ -65,10 +65,9 @@ export function ExplorePostGrid() {
 
         observer.observe(observerTargetRef.current);
 
+        const target = observerTargetRef.current;
         return () => {
-            if (observerTargetRef.current) {
-                observer.unobserve(observerTargetRef.current);
-            }
+            observer.unobserve(target);
         };
     }, [hasMore, isLoadingMore]);
 

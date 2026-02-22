@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import Image from "next/image"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "@/../convex/_generated/api"
 import { Id } from "@/../convex/_generated/dataModel"
@@ -117,9 +118,11 @@ export function IncomingCallNotification() {
             <div className="flex items-center gap-3 p-4">
               {/* Avatar */}
               {call.callerProfilePicture ? (
-                <img
+                <Image
                   src={call.callerProfilePicture}
                   alt={call.callerName}
+                  width={48}
+                  height={48}
                   className="h-12 w-12 rounded-full object-cover ring-2 ring-ring/30 animate-pulse"
                 />
               ) : (

@@ -1,6 +1,7 @@
 'use client';
 
 import type { Doc } from '@/convex/_generated/dataModel';
+import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 import { useMediaQuery } from '@/hooks/useMediaQuery'; // Assuming a useMediaQuery hook exists
@@ -32,7 +33,7 @@ export function ConversationListItem({ conversation, isSelected }: Props) {
             <div className="flex items-center gap-3 p-3 transition-colors hover:bg-muted/50">
                 <div className="relative h-12 w-12 rounded-full bg-muted flex-shrink-0">
                     {otherUser?.profilePicture && (
-                        <img src={otherUser.profilePicture} alt={otherUser.name ?? ''} className="h-full w-full rounded-full object-cover" />
+                        <Image src={otherUser.profilePicture} alt={otherUser.name ?? ''} width={48} height={48} className="h-full w-full rounded-full object-cover" />
                     )}
                      {conversation.otherUsers.length > 1 && (
                         <div className="absolute bottom-0 right-0 h-5 w-5 rounded-full bg-muted border-2 border-card flex items-center justify-center text-2xs font-bold">{conversation.otherUsers.length}</div>

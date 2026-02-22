@@ -318,3 +318,28 @@ export const getExplorePosts = query({
     };
   },
 });
+
+export const getPostsByUserId = query({
+  args: {
+    userId: v.id("users"),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const limit = Math.min(args.limit ?? 30, 100);
+
+    const posts = await ctx.db
+      .query("posts")
+      .withIndex("by_author", (q) => q.eq("authorId", args.userId))
+      .order("desc")
+      .take(limit);
+
+    const postsWithAuthor = await Promise.all(
+      posts.map(async (post) => {
+        const author = await ctx.db.get(post.authorId);
+        return { ...post, author: author || null };
+      })
+    );
+
+    return postsWithAuthor;
+  },
+});

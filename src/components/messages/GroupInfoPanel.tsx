@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "@/../convex/_generated/api"
 import { Id } from "@/../convex/_generated/dataModel"
@@ -184,9 +185,11 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
         <div className="p-4 text-center border-b border-border">
           <div className="mx-auto h-16 w-16 rounded-full bg-accent-violet/10 flex items-center justify-center mb-3">
             {conversation.avatar ? (
-              <img
+              <Image
                 src={conversation.avatar}
                 alt={conversation.name || "Group"}
+                width={64}
+                height={64}
                 className="h-16 w-16 rounded-full object-cover"
               />
             ) : (
@@ -372,9 +375,11 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
                   className="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-accent group"
                 >
                   {member.profilePicture ? (
-                    <img
+                      <Image
                       src={member.profilePicture}
                       alt={member.name}
+                      width={32}
+                      height={32}
                       className="h-8 w-8 rounded-full object-cover"
                     />
                   ) : (

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { Send, Image as ImageIcon, ChartBar, File, Loader2 } from 'lucide-react';
@@ -47,7 +48,7 @@ export function CreatePost({ communityId }: Props) {
       <div className="flex items-start gap-3">
         <div className="h-10 w-10 rounded-full bg-muted flex-shrink-0">
           {currentUser?.profilePicture ? (
-            <img src={currentUser.profilePicture} alt={currentUser.name ?? ''} className="h-full w-full rounded-full object-cover" />
+            <Image src={currentUser.profilePicture} alt={currentUser.name ?? ''} width={40} height={40} className="h-full w-full rounded-full object-cover" />
           ) : (
             <div className="h-full w-full rounded-full bg-primary/10" />
           )}

@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef, useCallback, useMemo } from "react"
+import Image from "next/image"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "@/../convex/_generated/api"
 import { Id } from "@/../convex/_generated/dataModel"
@@ -80,7 +81,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
   const muteConversation = useMutation(api.conversations.muteConversation)
   const deleteConversation = useMutation(api.conversations.deleteConversation)
 
-  const messages = messagesData?.messages || []
+  const messages = useMemo(() => messagesData?.messages || [], [messagesData])
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -177,9 +178,11 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
         {/* Avatar with online status */}
         <div className="relative flex-shrink-0">
           {avatarUrl ? (
-            <img
+            <Image
               src={avatarUrl}
               alt={displayName}
+              width={40}
+              height={40}
               className="h-10 w-10 rounded-full object-cover"
             />
           ) : (

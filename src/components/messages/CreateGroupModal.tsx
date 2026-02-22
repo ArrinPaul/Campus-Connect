@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import Image from "next/image"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "@/../convex/_generated/api"
 import { Id } from "@/../convex/_generated/dataModel"
@@ -153,9 +154,11 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
                     className="flex items-center gap-1.5 bg-primary/10 text-primary rounded-full pl-1.5 pr-2 py-1"
                   >
                     {member.profilePicture ? (
-                      <img
+                      <Image
                         src={member.profilePicture}
                         alt={member.name}
+                        width={20}
+                        height={20}
                         className="h-5 w-5 rounded-full object-cover"
                       />
                     ) : (
@@ -218,9 +221,11 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
                         className="w-full flex items-center gap-3 p-3 hover:bg-accent text-left"
                       >
                         {user.profilePicture ? (
-                          <img
+                          <Image
                             src={user.profilePicture}
                             alt={user.name}
+                            width={32}
+                            height={32}
                             className="h-8 w-8 rounded-full object-cover"
                           />
                         ) : (

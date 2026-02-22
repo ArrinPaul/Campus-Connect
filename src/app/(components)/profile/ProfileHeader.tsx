@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from 'convex/react';
+import Image from 'next/image';
 import type { Doc } from '@/convex/_generated/dataModel';
 import { api } from '@/convex/_generated/api';
 import { Mail, Plus, Check, Edit } from 'lucide-react';
@@ -55,7 +56,7 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
                     {/* Profile Picture */}
                     <div className="h-28 w-28 sm:h-32 sm:w-32 rounded-full border-4 border-background bg-muted flex-shrink-0">
                         {profile.profilePicture && (
-                            <img src={profile.profilePicture} alt={profile.name} className="h-full w-full rounded-full object-cover" />
+                            <Image src={profile.profilePicture} alt={profile.name} width={128} height={128} className="h-full w-full rounded-full object-cover" />
                         )}
                     </div>
                     

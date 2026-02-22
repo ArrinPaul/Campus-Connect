@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
+import Image from "next/image"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/../convex/_generated/api"
 import { Id } from "@/../convex/_generated/dataModel"
@@ -169,9 +170,11 @@ export function CallModal({
           {/* Avatar */}
           <div className="relative">
             {callerProfilePicture ? (
-              <img
+              <Image
                 src={callerProfilePicture}
                 alt={callerName}
+                width={112}
+                height={112}
                 className={`h-28 w-28 rounded-full object-cover ${
                   callState === "ringing" || callState === "connecting"
                     ? "animate-pulse ring-4 ring-ring/50"

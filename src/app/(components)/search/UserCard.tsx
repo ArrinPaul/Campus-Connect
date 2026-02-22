@@ -2,6 +2,7 @@
 
 import type { Doc } from '@/convex/_generated/dataModel';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // Simplified for search results
 type User = Doc<'users'>; 
@@ -16,7 +17,7 @@ export function UserCard({ user }: Props) {
             <div className="flex items-center gap-3">
                 <div className="h-12 w-12 rounded-full bg-muted flex-shrink-0">
                     {user.profilePicture && (
-                        <img src={user.profilePicture} alt={user.name} className="h-full w-full rounded-full object-cover" />
+                        <Image src={user.profilePicture} alt={user.name} width={48} height={48} className="h-full w-full rounded-full object-cover" />
                     )}
                 </div>
                 <div>

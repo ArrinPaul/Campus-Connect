@@ -2,6 +2,7 @@
 
 import type { Doc } from '@/convex/_generated/dataModel';
 import { User as UserIcon, ArrowUp, ArrowDown, CheckCircle } from 'lucide-react';
+import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -64,7 +65,7 @@ export function AnswerCard({ answer, isQuestionOwner, onAccept }: Props) {
                     <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
                         <div className="flex items-center gap-1">
                             {answererAvatar ? (
-                                <img src={answererAvatar} alt={answererName} className="h-4 w-4 rounded-full object-cover" />
+                                <Image src={answererAvatar} alt={answererName} width={16} height={16} className="h-4 w-4 rounded-full object-cover" />
                             ) : (
                                 <UserIcon className="h-3.5 w-3.5" />
                             )}

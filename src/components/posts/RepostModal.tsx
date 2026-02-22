@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
@@ -164,9 +165,11 @@ export function RepostModal({ post, isOpen, onClose, onSuccess }: RepostModalPro
             <div className="border border-border rounded-lg p-4 bg-background">
               <div className="flex items-center gap-3 mb-3">
                 {post.author?.profilePicture ? (
-                  <img
+                  <Image
                     src={post.author.profilePicture}
                     alt={post.author.name}
+                    width={40}
+                    height={40}
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 ) : (

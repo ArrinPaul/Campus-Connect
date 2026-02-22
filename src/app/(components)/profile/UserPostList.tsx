@@ -4,14 +4,12 @@ import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 import { PostCard } from '../../(components)/feed/PostCard';
-import { FeedItem } from '../../(components)/feed/types';
+import type { FeedItem } from '../../(components)/feed/types';
 
 export function UserPostList({ userId }: { userId: Id<'users'> }) {
-    const userPosts = useQuery(api.posts.getPostsByUserId, { userId });
+    const posts = useQuery(api.posts.getPostsByUserId, { userId });
 
-    if (userPosts === undefined) {
-        // This is caught by the parent Suspense boundary, but it's good practice
-        // to handle the loading state within the component as well.
+    if (posts === undefined) {
         return (
              <div className="space-y-4 max-w-xl mx-auto">
                 <div className="rounded-lg border bg-card p-4 animate-pulse">
@@ -24,7 +22,7 @@ export function UserPostList({ userId }: { userId: Id<'users'> }) {
         );
     }
 
-    if (userPosts.length === 0) {
+    if (posts.length === 0) {
         return (
             <div className="rounded-lg border bg-card p-8 text-center mt-8 max-w-xl mx-auto">
                 <h3 className="text-lg font-semibold">No posts yet</h3>
@@ -37,9 +35,17 @@ export function UserPostList({ userId }: { userId: Id<'users'> }) {
 
     return (
         <div className="space-y-4 mt-8 max-w-xl mx-auto">
-            {userPosts.map((item) => (
-                <PostCard key={`${item.type}-${item._id}`} item={item as FeedItem} />
-            ))}
+            {posts.map((post) => {
+                if (!post) return null;
+                const item: FeedItem = {
+                    type: 'post',
+                    _id: post._id,
+                    createdAt: post.createdAt,
+                    post: post as any,
+                };
+                return <PostCard key={post._id} item={item} />;
+            })}
         </div>
     );
 }
+

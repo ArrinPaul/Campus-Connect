@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Doc } from '@/convex/_generated/dataModel';
 import { Users } from 'lucide-react';
 
@@ -20,7 +21,7 @@ export function CommunityCard({ community }: Props) {
             <div className="p-4">
                 <div className="-mt-10">
                      <div className="h-16 w-16 rounded-md border-4 border-card bg-muted mx-auto">
-                        {community.avatar && <img src={community.avatar} alt={community.name} className="h-full w-full rounded-sm object-cover" />}
+                        {community.avatar && <Image src={community.avatar} alt={community.name} width={64} height={64} className="h-full w-full rounded-sm object-cover" />}
                     </div>
                 </div>
                 <h3 className="text-center font-bold mt-2 truncate">{community.name}</h3>

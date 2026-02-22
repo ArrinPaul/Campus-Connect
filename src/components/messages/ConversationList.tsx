@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import Image from "next/image"
 import { Id } from "@/../convex/_generated/dataModel"
 import { Search, Plus, Users, MessageSquare } from "lucide-react"
 import { OnlineStatusDot } from "@/components/ui/OnlineStatusDot"
@@ -162,9 +163,11 @@ export function ConversationList({
                 {/* Avatar */}
                 <div className="relative flex-shrink-0">
                   {avatarUrl ? (
-                    <img
+                    <Image
                       src={avatarUrl}
                       alt={displayName}
+                      width={44}
+                      height={44}
                       className="h-11 w-11 rounded-full object-cover ring-1 ring-border/30"
                     />
                   ) : (

@@ -6,6 +6,7 @@ import type { Id } from '@/convex/_generated/dataModel';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, BookOpen, ExternalLink, Hash, GitPullRequest, User as UserIcon, Calendar } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { format } from 'date-fns';
 
 type PageProps = {
@@ -78,7 +79,7 @@ export default function ResearchDetailPage({ params }: PageProps) {
                     <div className="mt-6 border-t pt-6 flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-muted">
                             {paper.uploader.profilePicture && (
-                                <img src={paper.uploader.profilePicture} alt={paper.uploader.name ?? ''} className="h-full w-full rounded-full object-cover" />
+                                <Image src={paper.uploader.profilePicture} alt={paper.uploader.name ?? ''} width={40} height={40} className="h-full w-full rounded-full object-cover" />
                             )}
                         </div>
                         <div>

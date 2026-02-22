@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Doc } from '@/convex/_generated/dataModel';
 import { Award, User as UserIcon, GraduationCap } from 'lucide-react';
 
@@ -25,7 +26,7 @@ export function LeaderboardItem({ entry }: Props) {
             <span className="font-bold text-lg text-primary w-8 text-center flex-shrink-0">#{entry.rank}</span>
             <div className="h-12 w-12 rounded-full bg-muted flex-shrink-0">
                 {avatar ? (
-                    <img src={avatar} alt={name} className="h-full w-full rounded-full object-cover" />
+                    <Image src={avatar} alt={name} width={48} height={48} className="h-full w-full rounded-full object-cover" />
                 ) : (
                     <UserIcon className="h-8 w-8 text-muted-foreground" />
                 )}

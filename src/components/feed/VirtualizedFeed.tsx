@@ -8,7 +8,7 @@ import { Repeat2 } from "lucide-react"
 import { api } from "@/convex/_generated/api"
 import type { FunctionReturnType } from "convex/server"
 
-type ConvexFeedItem = NonNullable<FunctionReturnType<typeof api.posts.getUnifiedFeed>>["items"][number]
+type ConvexFeedItem = NonNullable<FunctionReturnType<typeof api.feed_ranking.getRankedFeed>>["items"][number]
 
 interface VirtualizedFeedProps {
   items: ConvexFeedItem[]

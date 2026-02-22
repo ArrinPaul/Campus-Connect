@@ -6,6 +6,7 @@ import type { Id } from '@/convex/_generated/dataModel';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Tag, DollarSign, MapPin, Package, Clock, User as UserIcon, CheckCircle, MessageSquare, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 import { useState } from 'react';
@@ -56,7 +57,7 @@ export default function ListingDetailPage({ params }: PageProps) {
             <div className="bg-card border rounded-lg p-6">
                 <div className="relative h-96 w-full rounded-md bg-muted overflow-hidden mb-6">
                     {listing.images && listing.images.length > 0 ? (
-                        <img src={listing.images[0]} alt={listing.title} className="h-full w-full object-cover" />
+                        <Image src={listing.images[0]} alt={listing.title} fill className="object-cover" />
                     ) : (
                         <div className="flex items-center justify-center h-full text-muted-foreground">No Image</div>
                     )}
@@ -87,7 +88,7 @@ export default function ListingDetailPage({ params }: PageProps) {
                 <div className="mt-6 border-t pt-6 flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-muted">
                         {sellerAvatar ? (
-                            <img src={sellerAvatar} alt={sellerName} className="h-full w-full rounded-full object-cover" />
+                            <Image src={sellerAvatar} alt={sellerName} width={40} height={40} className="h-full w-full rounded-full object-cover" />
                         ) : (
                             <UserIcon className="h-4 w-4" />
                         )}

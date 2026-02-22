@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Doc } from '@/convex/_generated/dataModel';
 import { BookOpen, User as UserIcon, Star, Download, FileText, ExternalLink } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -46,7 +47,7 @@ export function ResourceCard({ resource }: Props) {
 
             <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground border-t pt-3">
                  {uploaderAvatar ? (
-                    <img src={uploaderAvatar} alt={uploaderName} className="h-5 w-5 rounded-full object-cover" />
+                    <Image src={uploaderAvatar} alt={uploaderName} width={20} height={20} className="h-5 w-5 rounded-full object-cover" />
                 ) : (
                     <UserIcon className="h-4 w-4" />
                 )}

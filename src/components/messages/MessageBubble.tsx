@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { useMutation } from "convex/react"
 import { api } from "@/../convex/_generated/api"
 import { Id } from "@/../convex/_generated/dataModel"
@@ -171,9 +172,11 @@ export function MessageBubble({
         {!message.isOwn && isGroup && showSenderName && (
           <div className="flex-shrink-0 mr-2 self-end">
             {message.senderAvatar ? (
-              <img
+              <Image
                 src={message.senderAvatar}
                 alt={message.senderName}
+                width={28}
+                height={28}
                 className="h-7 w-7 rounded-full object-cover ring-1 ring-border/30"
               />
             ) : (
@@ -240,9 +243,11 @@ export function MessageBubble({
             {message.messageType === "image" && (
               <div>
                 {message.attachmentUrl && (
-                  <img
+                  <Image
                     src={message.attachmentUrl}
                     alt="Image"
+                    width={400}
+                    height={300}
                     className="rounded-lg max-w-full max-h-64 object-cover mb-1"
                   />
                 )}

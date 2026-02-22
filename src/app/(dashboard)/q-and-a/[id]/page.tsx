@@ -7,6 +7,7 @@ import type { Id } from '@/convex/_generated/dataModel';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, User as UserIcon, MessageCircle, Eye, ArrowUp, ArrowDown, CheckCircle, Loader2, Calendar, BookOpen } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 import { AnswerCard } from '../../../(components)/q-and-a/AnswerCard';
 import { AskAnswerForm } from '../../../(components)/q-and-a/AskAnswerForm';
@@ -87,7 +88,7 @@ function QuestionDetailPageContent({ questionId }: { questionId: Id<'questions'>
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground mb-4">
                     <div className="flex items-center gap-1.5">
                         {askerAvatar ? (
-                            <img src={askerAvatar} alt={askerName} className="h-4 w-4 rounded-full object-cover" />
+                            <Image src={askerAvatar} alt={askerName} width={16} height={16} className="h-4 w-4 rounded-full object-cover" />
                         ) : (
                             <UserIcon className="h-4 w-4" />
                         )}

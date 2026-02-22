@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import type { Doc } from '@/convex/_generated/dataModel';
 import { Users, Rss, Settings, Lock } from 'lucide-react';
 import Link from 'next/link';
@@ -30,7 +31,7 @@ export function CommunityHeader({ community }: Props) {
                 <div className="max-w-4xl mx-auto px-4">
                      <div className="flex items-end gap-4 -mt-16">
                         <div className="h-32 w-32 rounded-md border-4 border-card bg-muted flex-shrink-0">
-                            {community.avatar && <img src={community.avatar} alt={community.name} className="h-full w-full rounded-sm object-cover" />}
+                            {community.avatar && <Image src={community.avatar} alt={community.name} width={128} height={128} className="h-full w-full rounded-sm object-cover" />}
                         </div>
                     </div>
                     <div className="mt-4 flex flex-col md:flex-row justify-between md:items-start">

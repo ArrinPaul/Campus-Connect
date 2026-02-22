@@ -14,7 +14,7 @@ import { TrendingHashtags } from "@/components/trending/TrendingHashtags"
 import type { FeedType } from "@/app/(dashboard)/feed/page"
 import type { FunctionReturnType } from "convex/server"
 
-type ConvexFeedItem = NonNullable<FunctionReturnType<typeof api.posts.getUnifiedFeed>>["items"][number]
+type ConvexFeedItem = NonNullable<FunctionReturnType<typeof api.feed_ranking.getRankedFeed>>["items"][number]
 
 interface FeedContainerProps {
   feedType?: FeedType
@@ -37,8 +37,8 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
       : ("skip" as const)
 
   // Queries for each feed type (Convex requires static query references)
-  const followingData = useQuery(
-    api.posts.getUnifiedFeed,
+  const followingDataRaw = useQuery(
+    api.posts.getFeedPosts,
     feedType === "following" ? queryArgs : "skip"
   )
   const forYouData = useQuery(
@@ -51,8 +51,8 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
   )
 
   // More data queries
-  const moreFollowingData = useQuery(
-    api.posts.getUnifiedFeed,
+  const moreFollowingDataRaw = useQuery(
+    api.posts.getFeedPosts,
     feedType === "following" ? moreQueryArgs : "skip"
   )
   const moreForYouData = useQuery(
@@ -63,6 +63,35 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
     api.feed_ranking.getTrendingFeed,
     feedType === "trending" ? moreQueryArgs : "skip"
   )
+
+  // Normalize getFeedPosts response ({posts}) → shared {items, nextCursor, hasMore} shape
+  const followingData = followingDataRaw
+    ? {
+        items: (followingDataRaw.posts.filter(Boolean) as NonNullable<typeof followingDataRaw.posts[number]>[]).map((post) => ({
+          type: "post" as const,
+          _id: post._id,
+          createdAt: post.createdAt,
+          authorId: String(post.authorId),
+          post,
+        })),
+        nextCursor: followingDataRaw.nextCursor,
+        hasMore: followingDataRaw.hasMore,
+      }
+    : undefined
+
+  const moreFollowingData = moreFollowingDataRaw
+    ? {
+        items: (moreFollowingDataRaw.posts.filter(Boolean) as NonNullable<typeof moreFollowingDataRaw.posts[number]>[]).map((post) => ({
+          type: "post" as const,
+          _id: post._id,
+          createdAt: post.createdAt,
+          authorId: String(post.authorId),
+          post,
+        })),
+        nextCursor: moreFollowingDataRaw.nextCursor,
+        hasMore: moreFollowingDataRaw.hasMore,
+      }
+    : undefined
 
   // Select active feed data based on feedType
   const feedData =

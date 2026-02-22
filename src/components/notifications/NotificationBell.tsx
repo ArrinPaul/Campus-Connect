@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import Image from "next/image"
 import { Bell } from "lucide-react"
 import { useQuery } from "convex/react"
 import { api } from "@/../convex/_generated/api"
@@ -130,9 +131,11 @@ export function NotificationBell() {
                       {notification.actor && (
                         <div className="flex-shrink-0">
                           {notification.actor.profilePicture ? (
-                            <img
+                            <Image
                               src={notification.actor.profilePicture}
                               alt={notification.actor.name}
+                              width={40}
+                              height={40}
                               className="w-10 h-10 rounded-full"
                             />
                           ) : (

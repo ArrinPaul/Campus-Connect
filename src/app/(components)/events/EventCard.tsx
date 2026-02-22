@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Doc } from '@/convex/_generated/dataModel';
 import { Calendar, MapPin, Users, Video, Globe, User as UserIcon } from 'lucide-react';
 import { format, isToday, isTomorrow } from 'date-fns';
@@ -55,7 +56,7 @@ export function EventCard({ event }: Props) {
 
             <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground border-t pt-3">
                  {event.organizer?.profilePicture ? (
-                    <img src={event.organizer.profilePicture} alt={event.organizer.name || ''} className="h-5 w-5 rounded-full object-cover" />
+                    <Image src={event.organizer.profilePicture} alt={event.organizer.name || ''} width={20} height={20} className="h-5 w-5 rounded-full object-cover" />
                 ) : (
                     <UserIcon className="h-4 w-4" />
                 )}

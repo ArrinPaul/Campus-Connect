@@ -7,6 +7,7 @@ import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useRef } from 'react';
 
 type Props = {
@@ -40,7 +41,7 @@ export function ChatWindow({ conversationId }: Props) {
                     <ArrowLeft className="h-5 w-5"/>
                 </Link>
                 <div className="relative h-10 w-10 rounded-full bg-muted">
-                    {chatPartner?.profilePicture && <img src={chatPartner.profilePicture} alt={chatPartner.name ?? ''} className="h-full w-full rounded-full object-cover" />}
+                    {chatPartner?.profilePicture && <Image src={chatPartner.profilePicture} alt={chatPartner.name ?? ''} width={40} height={40} className="h-full w-full rounded-full object-cover" />}
                     {/* TODO: Add online status indicator */}
                 </div>
                 <p className="font-bold">{chatPartner?.name ?? '...'}</p>

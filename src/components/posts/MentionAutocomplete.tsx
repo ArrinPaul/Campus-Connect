@@ -2,7 +2,7 @@
 
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
-import { Avatar } from "@/components/ui/avatar"
+import Image from "next/image"
 import { User } from "lucide-react"
 import { useState, useEffect } from "react"
 
@@ -102,9 +102,11 @@ export function MentionAutocomplete({
             }`}
           >
             {user.profilePicture ? (
-              <img
+              <Image
                 src={user.profilePicture}
                 alt={user.name}
+                width={32}
+                height={32}
                 className="w-8 h-8 rounded-full object-cover"
               />
             ) : (

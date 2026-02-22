@@ -6,6 +6,7 @@ import type { Id } from '@/convex/_generated/dataModel';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Calendar, MapPin, Users, Video, Globe, User as UserIcon, CheckCircle, Clock, XCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { format, formatDistanceToNow, isPast } from 'date-fns';
 import { toast } from 'sonner';
 import { useState } from 'react';
@@ -82,7 +83,7 @@ export default function EventDetailPage({ params }: PageProps) {
                     <div className="mt-6 border-t pt-6 flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-muted">
                             {event.organizer.profilePicture && (
-                                <img src={event.organizer.profilePicture} alt={event.organizer.name || ''} className="h-full w-full rounded-full object-cover" />
+                                <Image src={event.organizer.profilePicture} alt={event.organizer.name || ''} width={40} height={40} className="h-full w-full rounded-full object-cover" />
                             )}
                         </div>
                         <div>
