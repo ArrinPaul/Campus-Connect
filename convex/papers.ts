@@ -1,6 +1,7 @@
 import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
 import { internal } from "./_generated/api"
+import { checkRateLimit, RATE_LIMITS } from "./_lib"
 
 // ──────────────────────────────────────────────
 // Auth helper
@@ -36,6 +37,9 @@ export const uploadPaper = mutation({
   },
   handler: async (ctx, args) => {
     const user = await getAuthUser(ctx)
+
+    // Rate limit: 5 paper uploads per hour
+    await checkRateLimit(ctx, user._id, "uploadPaper", RATE_LIMITS.uploadPaper)
 
     if (!args.title.trim()) throw new Error("Title cannot be empty")
     if (args.title.length > 300) throw new Error("Title must not exceed 300 characters")

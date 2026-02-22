@@ -1,5 +1,6 @@
 import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
+import { checkRateLimit, RATE_LIMITS } from "./_lib"
 
 // ──────────────────────────────────────────────
 // Auth helper
@@ -37,6 +38,9 @@ export const postJob = mutation({
   },
   handler: async (ctx, args) => {
     const user = await getAuthUser(ctx)
+
+    // Rate limit: 5 job posts per hour
+    await checkRateLimit(ctx, user._id, "postJob", RATE_LIMITS.postJob)
 
     if (!args.title.trim()) throw new Error("Job title cannot be empty")
     if (args.title.length > 200) throw new Error("Title must not exceed 200 characters")

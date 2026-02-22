@@ -108,6 +108,49 @@ export function searchRelevanceScore(query: string, text: string): number {
 }
 
 // ────────────────────────────────────────────
+// Helper: check if a post is visible to the current user
+// Posts in secret communities are only visible to members.
+// ────────────────────────────────────────────
+async function isPostVisibleToUser(
+  ctx: any,
+  post: { communityId?: string | null },
+  userId: string
+): Promise<boolean> {
+  if (!post.communityId) return true // Public feed post
+  const community = await ctx.db.get(post.communityId)
+  if (!community) return true // Community deleted — allow read
+  if (community.type !== "secret") return true // Public or private — visible
+  // Secret: only members (non-pending) can see
+  const membership = await ctx.db
+    .query("communityMembers")
+    .withIndex("by_community_user", (q: any) =>
+      q.eq("communityId", post.communityId).eq("userId", userId)
+    )
+    .unique()
+  return !!membership && membership.role !== "pending"
+}
+
+// Safe user projection — omits all PII and internal fields
+function safeUserProjection(user: any) {
+  return {
+    _id: user._id,
+    name: user.name,
+    username: user.username,
+    profilePicture: user.profilePicture,
+    bio: user.bio,
+    role: user.role,
+    university: user.university,
+    skills: user.skills,
+    followerCount: user.followerCount,
+    followingCount: user.followingCount,
+    isVerified: user.isVerified,
+    reputation: user.reputation,
+    level: user.level,
+    createdAt: user.createdAt,
+  }
+}
+
+// ────────────────────────────────────────────
 // Universal Search — searches across all types
 // Returns top results from Users, Posts, and Hashtags
 // ────────────────────────────────────────────
@@ -157,6 +200,12 @@ export const universalSearch = query({
       .slice(0, limitPerCategory)
 
     // --- Posts ---
+    const currentUser = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .unique()
+    const currentUserId = currentUser ? (currentUser._id as string) : ""
+
     const recentPosts = await ctx.db
       .query("posts")
       .withIndex("by_createdAt")
@@ -167,6 +216,10 @@ export const universalSearch = query({
       recentPosts.map(async (post) => {
         const contentScore = searchRelevanceScore(q, post.content)
         if (contentScore <= 0.1) return null
+
+        // SEC-3: Filter out posts from secret communities the user isn't in
+        const visible = await isPostVisibleToUser(ctx, post, currentUserId)
+        if (!visible) return null
 
         const author = await ctx.db.get(post.authorId)
         return {
@@ -308,6 +361,15 @@ export const searchPosts = query({
           if (totalEng < args.minEngagement) return null
         }
 
+        // SEC-3: Filter out posts from secret communities the user isn't in
+        const currentUser = await ctx.db
+          .query("users")
+          .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+          .unique()
+        const currentUserId = currentUser ? (currentUser._id as string) : ""
+        const visible = await isPostVisibleToUser(ctx, post, currentUserId)
+        if (!visible) return null
+
         const author = await ctx.db.get(post.authorId)
         return {
           _id: post._id,
@@ -418,7 +480,7 @@ export const searchUsersEnhanced = query({
     const items = hasMore ? page.slice(0, limit) : page
 
     return {
-      items: items.map((r) => r.user),
+      items: items.map((r) => safeUserProjection(r.user)),
       nextCursor: hasMore ? String(startIndex + limit) : null,
       hasMore,
       totalCount: scored.length,

@@ -1,6 +1,7 @@
 import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
 import { api, internal } from "./_generated/api"
+import { checkRateLimit, RATE_LIMITS } from "./_lib"
 
 /**
  * Follow a user
@@ -31,6 +32,9 @@ export const followUser = mutation({
     if (currentUser._id === args.userId) {
       throw new Error("Cannot follow yourself")
     }
+
+    // Rate limit: 50 follows per 5 minutes
+    await checkRateLimit(ctx, currentUser._id, "followUser", RATE_LIMITS.followUser)
 
     // Check if target user exists
     const targetUser = await ctx.db.get(args.userId)

@@ -1,6 +1,7 @@
 import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
 import { internal } from "./_generated/api"
+import { checkRateLimit, RATE_LIMITS } from "./_lib"
 
 // ──────────────────────────────────────────────
 // Auth helper
@@ -32,6 +33,9 @@ export const askQuestion = mutation({
   },
   handler: async (ctx, args) => {
     const user = await getAuthUser(ctx)
+
+    // Rate limit: 10 questions per 5 minutes
+    await checkRateLimit(ctx, user._id, "askQuestion", RATE_LIMITS.askQuestion)
 
     if (!args.title.trim()) throw new Error("Title cannot be empty")
     if (args.title.length > 300) throw new Error("Title must not exceed 300 characters")
@@ -121,6 +125,9 @@ export const answerQuestion = mutation({
     const user = await getAuthUser(ctx)
     const question = await ctx.db.get(args.questionId)
     if (!question) throw new Error("Question not found")
+
+    // Rate limit: 20 answers per 5 minutes
+    await checkRateLimit(ctx, user._id, "postAnswer", RATE_LIMITS.postAnswer)
 
     if (!args.content.trim()) throw new Error("Answer cannot be empty")
     if (args.content.length > 10000) throw new Error("Answer must not exceed 10000 characters")

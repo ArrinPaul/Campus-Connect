@@ -2,6 +2,7 @@ import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
 import { Id } from "./_generated/dataModel"
 import { sanitizeText } from "./sanitize"
+import { checkRateLimit, RATE_LIMITS } from "./_lib"
 
 /**
  * Create a repost (plain repost or quote post with comment)
@@ -30,6 +31,9 @@ export const createRepost = mutation({
     if (!user) {
       throw new Error("User not found")
     }
+
+    // Rate limit: 10 reposts per minute
+    await checkRateLimit(ctx, user._id, "createRepost", RATE_LIMITS.createRepost)
 
     // Check if original post exists
     const originalPost = await ctx.db.get(args.originalPostId)

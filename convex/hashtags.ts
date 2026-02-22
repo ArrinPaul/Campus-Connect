@@ -109,13 +109,15 @@ export const getTrending = query({
 })
 
 /**
- * Query: Get posts by hashtag (paginated)
+ * Query: Get posts by hashtag (cursor-based pagination)
+ * Uses by_hashtag_created index to avoid loading all links into memory.
+ * Cursor is the createdAt timestamp of the last item from the previous page.
  */
 export const getPostsByHashtag = query({
   args: {
     tag: v.string(),
     limit: v.optional(v.number()),
-    cursor: v.optional(v.string()),
+    cursor: v.optional(v.number()), // createdAt of last item from previous page
   },
   handler: async (ctx, args) => {
     const limit = Math.min(args.limit || 20, 100)
@@ -131,20 +133,23 @@ export const getPostsByHashtag = query({
       return { posts: [], cursor: null, hashtag: null }
     }
 
-    // Get post-hashtag links
+    // Use by_hashtag_created index for O(limit) scan instead of O(all) + slice
     const links = await ctx.db
       .query("postHashtags")
-      .withIndex("by_hashtag", (q) => q.eq("hashtagId", hashtag._id))
+      .withIndex("by_hashtag_created", (q) => {
+        const base = q.eq("hashtagId", hashtag._id)
+        return args.cursor !== undefined ? base.lt("createdAt", args.cursor) : base
+      })
       .order("desc")
-      .collect()
+      .take(limit + 1)
 
-    // Apply pagination
-    const startIndex = args.cursor ? parseInt(args.cursor) : 0
-    const paginatedLinks = links.slice(startIndex, startIndex + limit)
+    const hasMore = links.length > limit
+    const pageLinks = hasMore ? links.slice(0, limit) : links
+    const nextCursor = hasMore ? pageLinks[pageLinks.length - 1].createdAt : null
 
     // Fetch post details for each link
     const postsWithAuthors = await Promise.all(
-      paginatedLinks.map(async (link) => {
+      pageLinks.map(async (link) => {
         const post = await ctx.db.get(link.postId)
         if (!post) return null
 
@@ -173,10 +178,6 @@ export const getPostsByHashtag = query({
 
     // Filter out null values (deleted posts)
     const validPosts = postsWithAuthors.filter((p) => p !== null)
-
-    // Determine next cursor
-    const hasMore = startIndex + limit < links.length
-    const nextCursor = hasMore ? String(startIndex + limit) : null
 
     return {
       posts: validPosts,

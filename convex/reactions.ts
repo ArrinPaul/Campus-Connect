@@ -2,6 +2,7 @@ import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import { Doc, Id } from "./_generated/dataModel"
 import { api, internal } from "./_generated/api"
+import { checkRateLimit, RATE_LIMITS } from "./_lib"
 
 // Reaction types
 export const reactionTypes = ["like", "love", "laugh", "wow", "sad", "scholarly"] as const
@@ -36,6 +37,9 @@ export const addReaction = mutation({
     if (!user) {
       throw new Error("User not found")
     }
+
+    // Rate limit: 60 reactions per minute
+    await checkRateLimit(ctx, user._id, "addReaction", RATE_LIMITS.addReaction)
 
     // Check if user already reacted to this target
     const existingReaction = await ctx.db

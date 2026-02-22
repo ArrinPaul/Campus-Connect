@@ -6,6 +6,7 @@ import { sanitizeText, sanitizeMarkdown, isValidSafeUrl } from "./sanitize"
 import { linkHashtagsToPost } from "./hashtags"
 import { extractMentions } from "./mentionUtils"
 import { POST_MAX_LENGTH } from "./validation_constants"
+import { checkRateLimit, RATE_LIMITS } from "./_lib"
 
 /**
  * Get feed posts with pagination
@@ -186,6 +187,9 @@ export const createPost = mutation({
     if (!user) {
       throw new Error("User not found")
     }
+
+    // Rate limit: 10 posts per minute
+    await checkRateLimit(ctx, user._id, "createPost", RATE_LIMITS.createPost)
 
     // Validate content - non-empty
     if (!args.content || args.content.trim().length === 0) {
@@ -369,15 +373,10 @@ export const deletePost = mutation({
       await ctx.db.delete(repost._id)
     }
 
-    // Cascade delete: remove all bookmarks of this post
-    const bookmarks = await ctx.db
-      .query("bookmarks")
-      .withIndex("by_user_and_post", (q) => q.eq("userId", user._id).eq("postId", args.postId))
-      .collect()
-    // Also delete bookmarks from OTHER users (query by post via filter)
+    // Cascade delete: remove bookmarks of this post from ALL users (uses new by_post index)
     const allBookmarks = await ctx.db
       .query("bookmarks")
-      .filter((q) => q.eq(q.field("postId"), args.postId))
+      .withIndex("by_post", (q) => q.eq("postId", args.postId))
       .collect()
     for (const bookmark of allBookmarks) {
       await ctx.db.delete(bookmark._id)

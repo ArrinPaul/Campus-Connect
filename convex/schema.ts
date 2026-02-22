@@ -157,7 +157,8 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_user_and_post", ["userId", "postId"])
-    .index("by_user_and_collection", ["userId", "collectionName"]),
+    .index("by_user_and_collection", ["userId", "collectionName"])
+    .index("by_post", ["postId"]),  // enables fast cascade delete when a post is removed
 
   comments: defineTable({
     postId: v.id("posts"),
@@ -229,7 +230,8 @@ export default defineSchema({
   })
     .index("by_recipient", ["recipientId"])
     .index("by_recipient_unread", ["recipientId", "isRead"])
-    .index("by_recipient_created", ["recipientId", "createdAt"]),
+    .index("by_recipient_created", ["recipientId", "createdAt"])
+    .index("by_actor", ["actorId"]),   // enables indexed cleanup when actor is deleted
 
   reposts: defineTable({
     userId: v.id("users"), // user who reposted
@@ -412,7 +414,8 @@ export default defineSchema({
     computedAt: v.number(),            // timestamp when computed
   })
     .index("by_user", ["userId", "score"])
-    .index("by_user_dismissed", ["userId", "isDismissed"]),
+    .index("by_user_dismissed", ["userId", "isDismissed"])
+    .index("by_suggested_user", ["suggestedUserId"]),  // enables cleanup of stale suggestions
 
   // Phase 4.5 — Skill-Based Matching & Endorsements
   skillEndorsements: defineTable({
@@ -758,4 +761,13 @@ export default defineSchema({
     createdAt: v.number(),
   })
     .index("by_user", ["userId"]),
+
+  // Rate limiting — sliding-window counters per user/action
+  rateLimits: defineTable({
+    userId: v.id("users"),
+    action: v.string(),       // e.g., "createPost", "sendMessage"
+    windowStart: v.number(),  // start of the current window (Unix timestamp ms)
+    count: v.number(),        // attempts within the current window
+  })
+    .index("by_user_action", ["userId", "action"]),
 })

@@ -14,7 +14,7 @@ export default function HashtagPage() {
 
   // Pagination state
   const [allPosts, setAllPosts] = useState<any[]>([])
-  const [paginationCursor, setPaginationCursor] = useState<string | null>(null)
+  const [paginationCursor, setPaginationCursor] = useState<number | null>(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const hasInitialized = useRef(false)
   const prevTag = useRef(tag)

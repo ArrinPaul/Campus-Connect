@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss"
+import type { Config } from "tailwindcss";
 
 const config: Config = {
   darkMode: "class",
@@ -10,8 +10,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-sora)", "Sora", "sans-serif"],
-        display: ["var(--font-fraunces)", "Fraunces", "serif"],
+        sans: ["var(--font-sans)", "Outfit", "sans-serif"],
+        display: ["var(--font-display)", "Space Grotesk", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -47,52 +47,11 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        success: {
-          DEFAULT: "hsl(var(--success))",
-          foreground: "hsl(var(--success-foreground))",
-        },
-        warning: {
-          DEFAULT: "hsl(var(--warning))",
-          foreground: "hsl(var(--warning-foreground))",
-        },
-        info: {
-          DEFAULT: "hsl(var(--info))",
-          foreground: "hsl(var(--info-foreground))",
-        },
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-        },
-        "accent-amber": "hsl(var(--accent-amber))",
-        "accent-emerald": "hsl(var(--accent-emerald))",
-        "accent-rose": "hsl(var(--accent-rose))",
-        "accent-violet": "hsl(var(--accent-violet))",
-        "accent-sky": "hsl(var(--accent-sky))",
       },
       borderRadius: {
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-        xl: "calc(var(--radius) + 4px)",
-        "2xl": "calc(var(--radius) + 8px)",
-      },
-      fontSize: {
-        "2xs": ["0.625rem", { lineHeight: "0.875rem" }],
-      },
-      boxShadow: {
-        "glass": "0 0 0 1px rgba(255,255,255,0.05), 0 1px 2px rgba(0,0,0,0.1)",
-        "glass-lg": "0 0 0 1px rgba(255,255,255,0.08), 0 8px 32px rgba(0,0,0,0.12)",
-        "elevation-1": "0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)",
-        "elevation-2": "0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.06)",
-        "elevation-3": "0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.06)",
-        "elevation-4": "0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.06)",
-        "glow-sm": "0 0 12px -2px hsl(var(--primary) / 0.25)",
-        "glow": "0 0 20px -4px hsl(var(--primary) / 0.3)",
-        "glow-lg": "0 0 40px -8px hsl(var(--primary) / 0.35)",
-        "inner-glow": "inset 0 1px 0 0 rgba(255,255,255,0.05)",
+        md: "calc(var(--radius) + 2px)",
+        sm: "var(--radius)",
       },
       keyframes: {
         "accordion-down": {
@@ -103,54 +62,26 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "fade-in": {
-          from: { opacity: "0" },
-          to: { opacity: "1" },
-        },
-        "fade-up": {
-          from: { opacity: "0", transform: "translateY(8px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
-        },
-        "slide-in-right": {
-          from: { transform: "translateX(100%)" },
-          to: { transform: "translateX(0)" },
-        },
-        "scale-in": {
-          from: { opacity: "0", transform: "scale(0.95)" },
-          to: { opacity: "1", transform: "scale(1)" },
-        },
-        "shimmer": {
-          "0%": { backgroundPosition: "-200% 0" },
-          "100%": { backgroundPosition: "200% 0" },
-        },
-        "pulse-soft": {
-          "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.6" },
-        },
-        "float": {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-6px)" },
+        "caret-blink": {
+          "0%,70%,100%": { opacity: "1" },
+          "20%,50%": { opacity: "0" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.3s ease-out",
-        "fade-up": "fade-up 0.4s ease-out",
-        "slide-in-right": "slide-in-right 0.3s ease-out",
-        "scale-in": "scale-in 0.2s ease-out",
-        "shimmer": "shimmer 2s ease-in-out infinite",
-        "pulse-soft": "pulse-soft 2s ease-in-out infinite",
-        "float": "float 3s ease-in-out infinite",
+        "caret-blink": "caret-blink 1.25s ease-out infinite",
+      },
+      boxShadow: {
+        brutalist: "4px 4px 0px hsl(var(--primary))",
       },
       backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-        "mesh-gradient": "linear-gradient(135deg, hsl(var(--primary) / 0.08) 0%, transparent 40%, hsl(var(--accent-violet) / 0.06) 70%, hsl(var(--accent-amber) / 0.04) 100%)",
-        "noise": "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E\")",
+        grid: "linear-gradient(0deg,hsl(var(--border) / 0.2) 1px,transparent 1px),linear-gradient(90deg,hsl(var(--border) / 0.2) 1px,transparent 1px)",
+        "dot-grid":
+          "radial-gradient(circle at 1px 1px, hsl(var(--border) / 0.5) 1px, transparent 0)",
       },
     },
   },
   plugins: [],
-}
-export default config
+};
+export default config;

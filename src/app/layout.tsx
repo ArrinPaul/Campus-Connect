@@ -1,30 +1,31 @@
-import type { Metadata, Viewport } from "next"
-import { Fraunces, Sora } from "next/font/google"
-import { ClerkProvider } from "@clerk/nextjs"
-import { Analytics } from "@vercel/analytics/react"
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import { ConvexClientProvider } from "@/components/providers/convex-provider"
-import { ThemeProvider } from "@/components/providers/theme-provider"
-import { PostHogProvider } from "@/components/providers/posthog-provider"
-import { PostHogPageView } from "@/components/analytics/posthog-pageview"
-import { LiveRegionProvider } from "@/components/accessibility/LiveRegion"
-import { SkipLink } from "@/components/accessibility/SkipLink"
-import { Toaster } from "sonner"
-import "./globals.css"
+import type { Metadata, Viewport } from "next";
+import { Space_Grotesk, Outfit } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { ConvexClientProvider } from "@/components/providers/convex-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { PostHogProvider } from "@/components/providers/posthog-provider";
+import { PostHogPageView } from "@/components/analytics/posthog-pageview";
+import { LiveRegionProvider } from "@/components/accessibility/LiveRegion";
+import { SkipLink } from "@/components/accessibility/SkipLink";
+import { Toaster } from "sonner";
+import "./globals.css";
 
-const sora = Sora({
+const outfit = Outfit({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-sora",
+  variable: "--font-sans",
   weight: ["300", "400", "500", "600", "700"],
-})
+});
 
-const fraunces = Fraunces({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-fraunces",
-  weight: ["400", "500", "600", "700", "800", "900"],
-})
+  variable: "--font-display",
+  weight: ["400", "500", "600", "700"],
+});
 
 export const metadata: Metadata = {
   title: {
@@ -56,56 +57,62 @@ export const metadata: Metadata = {
     description:
       "The all-in-one academic platform for students and researchers.",
   },
-}
+};
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f8f9fb" },
-    { media: "(prefers-color-scheme: dark)", color: "#0e1117" },
+    { media: "(prefers-color-scheme: light)", color: "#05050A" },
+    { media: "(prefers-color-scheme: dark)", color: "#05050A" },
   ],
   width: "device-width",
   initialScale: 1,
-}
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <ClerkProvider
       appearance={{
+        baseTheme: dark,
         variables: {
-          colorPrimary: "#F45D48",
-          colorBackground: "hsl(26 25% 97%)",
-          colorText: "hsl(228 18% 12%)",
-          colorInputBackground: "hsl(0 0% 100%)",
-          colorInputText: "hsl(228 18% 12%)",
-          borderRadius: "0.625rem",
-          fontFamily: "'Sora', sans-serif",
+          colorPrimary: "#CCFF00",
+          colorBackground: "#05050A",
+          colorText: "#E0E0E0",
+          colorInputBackground: "#1A1A1E",
+          colorInputText: "#E0E0E0",
+          borderRadius: "0.25rem",
+          fontFamily: "'Outfit', sans-serif",
         },
         elements: {
           formButtonPrimary:
-            "bg-[#0A84FF] text-white font-semibold shadow-sm transition-all duration-200 active:scale-[0.98] hover:brightness-110",
-          card: "shadow-elevation-2 border border-border rounded-xl",
-          headerTitle: "text-xl font-semibold tracking-tight",
-          headerSubtitle: "text-muted-foreground text-sm",
+            "bg-primary text-[#05050A] font-bold tracking-wide uppercase transition-all duration-200 hover:bg-white active:scale-[0.98]",
+          card: "bg-[#0A0A0F] border border-[#222] shadow-none rounded-md",
+          headerTitle:
+            "font-display text-2xl font-bold tracking-wider text-primary",
+          headerSubtitle: "text-muted-foreground text-sm font-sans",
           socialButtonsBlockButton:
-            "border border-border hover:bg-accent transition-colors duration-150 rounded-lg",
-          formFieldLabel: "text-foreground font-medium text-sm",
+            "border border-[#222] hover:bg-[#111] transition-colors duration-150 rounded-md",
+          formFieldLabel: "text-foreground font-medium text-sm font-sans",
           footerActionLink: "text-primary hover:text-primary/80",
           internal: "font-sans",
         },
       }}
     >
-      <html lang="en" suppressHydrationWarning className={`${sora.variable} ${fraunces.variable}`}>
+      <html
+        lang="en"
+        suppressHydrationWarning
+        className={`${outfit.variable} ${spaceGrotesk.variable}`}
+      >
         <body className="font-sans antialiased">
           {/* Skip link — must be the absolute first focusable element */}
           <SkipLink />
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
-            enableSystem
+            defaultTheme="dark"
+            enableSystem={false}
             disableTransitionOnChange
           >
             <ConvexClientProvider>
@@ -119,9 +126,14 @@ export default function RootLayout({
           </ThemeProvider>
           <Analytics />
           <SpeedInsights />
-          <Toaster richColors position="bottom-right" closeButton />
+          <Toaster
+            theme="dark"
+            richColors
+            position="bottom-right"
+            closeButton
+          />
         </body>
       </html>
     </ClerkProvider>
-  )
+  );
 }

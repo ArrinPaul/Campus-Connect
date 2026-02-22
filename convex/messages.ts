@@ -11,6 +11,7 @@ import { internal } from "./_generated/api"
 import { Id } from "./_generated/dataModel"
 import { sanitizeMarkdown, isValidSafeUrl } from "./sanitize"
 import { MESSAGE_MAX_LENGTH } from "./validation_constants"
+import { checkRateLimit, RATE_LIMITS } from "./_lib"
 
 /**
  * Helper: get current authenticated user from identity
@@ -53,6 +54,9 @@ export const sendMessage = mutation({
   handler: async (ctx, args) => {
     const currentUser = await getCurrentUser(ctx)
     if (!currentUser) throw new Error("Not authenticated")
+
+    // Rate limit: 40 messages per minute
+    await checkRateLimit(ctx, currentUser._id, "sendMessage", RATE_LIMITS.sendMessage)
 
     const conversation = await ctx.db.get(args.conversationId)
     if (!conversation) throw new Error("Conversation not found")

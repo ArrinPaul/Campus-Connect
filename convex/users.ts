@@ -117,13 +117,13 @@ export const deleteUserFromWebhook = internalMutation({
       return
     }
 
-    // Delete all posts by this user (and their associated likes/comments)
+    // Delete all posts by this user and ALL associated child records
     const posts = await ctx.db
       .query("posts")
       .withIndex("by_author", (q) => q.eq("authorId", user._id))
       .collect()
     for (const post of posts) {
-      // Delete likes on this post
+      // Delete legacy likes on this post
       const postLikes = await ctx.db
         .query("likes")
         .withIndex("by_post", (q) => q.eq("postId", post._id))
@@ -131,13 +131,74 @@ export const deleteUserFromWebhook = internalMutation({
       for (const like of postLikes) {
         await ctx.db.delete(like._id)
       }
-      // Delete comments on this post
+      // Delete comments and their reactions on this post
       const postComments = await ctx.db
         .query("comments")
         .withIndex("by_post", (q) => q.eq("postId", post._id))
         .collect()
       for (const c of postComments) {
+        // Delete reactions on each comment
+        const commentReactions = await ctx.db
+          .query("reactions")
+          .withIndex("by_target", (q) =>
+            q.eq("targetId", c._id as string).eq("targetType", "comment")
+          )
+          .collect()
+        for (const r of commentReactions) {
+          await ctx.db.delete(r._id)
+        }
         await ctx.db.delete(c._id)
+      }
+      // Delete reactions on this post
+      const postReactions = await ctx.db
+        .query("reactions")
+        .withIndex("by_target", (q) =>
+          q.eq("targetId", post._id as string).eq("targetType", "post")
+        )
+        .collect()
+      for (const r of postReactions) {
+        await ctx.db.delete(r._id)
+      }
+      // Delete reposts of this post
+      const postReposts = await ctx.db
+        .query("reposts")
+        .withIndex("by_original_post", (q) => q.eq("originalPostId", post._id))
+        .collect()
+      for (const repost of postReposts) {
+        await ctx.db.delete(repost._id)
+      }
+      // Delete bookmarks of this post (using new by_post index)
+      const postBookmarks = await ctx.db
+        .query("bookmarks")
+        .withIndex("by_post", (q) => q.eq("postId", post._id))
+        .collect()
+      for (const bookmark of postBookmarks) {
+        await ctx.db.delete(bookmark._id)
+      }
+      // Delete postHashtag links and decrement hashtag postCounts
+      const postHashtagLinks = await ctx.db
+        .query("postHashtags")
+        .withIndex("by_post", (q) => q.eq("postId", post._id))
+        .collect()
+      for (const link of postHashtagLinks) {
+        const hashtag = await ctx.db.get(link.hashtagId)
+        if (hashtag) {
+          await ctx.db.patch(link.hashtagId, {
+            postCount: Math.max(0, hashtag.postCount - 1),
+          })
+        }
+        await ctx.db.delete(link._id)
+      }
+      // Delete poll and pollVotes if attached
+      if (post.pollId) {
+        const pollVotes = await ctx.db
+          .query("pollVotes")
+          .withIndex("by_poll", (q) => q.eq("pollId", post.pollId!))
+          .collect()
+        for (const vote of pollVotes) {
+          await ctx.db.delete(vote._id)
+        }
+        await ctx.db.delete(post.pollId)
       }
       await ctx.db.delete(post._id)
     }
@@ -247,10 +308,10 @@ export const deleteUserFromWebhook = internalMutation({
     for (const notif of receivedNotifs) {
       await ctx.db.delete(notif._id)
     }
-    // Notifications where user is the actor
+    // Notifications where user is the actor (use new by_actor index — avoids full table scan)
     const sentNotifs = await ctx.db
       .query("notifications")
-      .filter((q) => q.eq(q.field("actorId"), user._id))
+      .withIndex("by_actor", (q) => q.eq("actorId", user._id))
       .collect()
     for (const notif of sentNotifs) {
       await ctx.db.delete(notif._id)
@@ -298,10 +359,10 @@ export const deleteUserFromWebhook = internalMutation({
       await ctx.db.patch(msg._id, { isDeleted: true, content: "[Deleted User]" })
     }
 
-    // Delete typing indicators
+    // Delete typing indicators (use by_user_conversation prefix scan — avoids full table scan)
     const typingIndicators = await ctx.db
       .query("typingIndicators")
-      .filter((q) => q.eq(q.field("userId"), user._id))
+      .withIndex("by_user_conversation", (q) => q.eq("userId", user._id))
       .collect()
     for (const indicator of typingIndicators) {
       await ctx.db.delete(indicator._id)
@@ -316,10 +377,10 @@ export const deleteUserFromWebhook = internalMutation({
       await ctx.db.delete(call._id)
     }
 
-    // Delete poll votes by this user
+    // Delete poll votes by this user (use by_user_poll prefix scan — avoids full table scan)
     const userPollVotes = await ctx.db
       .query("pollVotes")
-      .filter((q) => q.eq(q.field("userId"), user._id))
+      .withIndex("by_user_poll", (q) => q.eq("userId", user._id))
       .collect()
     for (const vote of userPollVotes) {
       // Decrement the poll option vote count
@@ -347,12 +408,20 @@ export const deleteUserFromWebhook = internalMutation({
       await ctx.db.delete(achievement._id)
     }
 
-    // Delete suggestions (both given and received)
+    // Delete suggestions where this user is the recipient
     const userSuggestions = await ctx.db
       .query("suggestions")
       .withIndex("by_user", (q) => q.eq("userId", user._id))
       .collect()
     for (const suggestion of userSuggestions) {
+      await ctx.db.delete(suggestion._id)
+    }
+    // Delete suggestions where this user is the suggested target (new by_suggested_user index)
+    const targetSuggestions = await ctx.db
+      .query("suggestions")
+      .withIndex("by_suggested_user", (q) => q.eq("suggestedUserId", user._id))
+      .collect()
+    for (const suggestion of targetSuggestions) {
       await ctx.db.delete(suggestion._id)
     }
 
@@ -372,18 +441,41 @@ export const deleteUserFromWebhook = internalMutation({
       await ctx.db.delete(endorsement._id)
     }
 
-    // Delete community memberships
+    // Delete community memberships — handle owner case to prevent orphaned communities
     const communityMemberships = await ctx.db
       .query("communityMembers")
       .withIndex("by_user", (q) => q.eq("userId", user._id))
       .collect()
     for (const membership of communityMemberships) {
-      // Decrement community member count
       const community = await ctx.db.get(membership.communityId)
       if (community) {
+        // Decrement member count
         await ctx.db.patch(membership.communityId, {
           memberCount: Math.max(0, community.memberCount - 1),
         })
+        // If deleting user was the owner, transfer ownership or delete the community
+        if (membership.role === "owner") {
+          // Find next most senior member (admin → moderator → member)
+          const remainingMembers = await ctx.db
+            .query("communityMembers")
+            .withIndex("by_community", (q) => q.eq("communityId", membership.communityId))
+            .collect()
+          const otherMembers = remainingMembers.filter(
+            (m) => m.userId !== user._id && m.role !== "pending"
+          )
+          const newOwner =
+            otherMembers.find((m) => m.role === "admin") ??
+            otherMembers.find((m) => m.role === "moderator") ??
+            otherMembers.find((m) => m.role === "member")
+          if (newOwner) {
+            // Promote to owner
+            await ctx.db.patch(newOwner._id, { role: "owner" })
+            await ctx.db.patch(membership.communityId, { createdBy: newOwner.userId })
+          } else {
+            // No remaining members — delete the community entirely
+            await ctx.db.delete(membership.communityId)
+          }
+        }
       }
       await ctx.db.delete(membership._id)
     }
@@ -526,10 +618,10 @@ export const deleteUserFromWebhook = internalMutation({
       await ctx.db.delete(answer._id)
     }
 
-    // Delete question votes by this user
+    // Delete question votes by this user (use by_user_target prefix scan — avoids full table scan)
     const userQVotes = await ctx.db
       .query("questionVotes")
-      .filter((q) => q.eq(q.field("userId"), user._id))
+      .withIndex("by_user_target", (q) => q.eq("userId", user._id))
       .collect()
     for (const vote of userQVotes) {
       // Reverse the vote on the target (question or answer)
@@ -592,6 +684,15 @@ export const deleteUserFromWebhook = internalMutation({
       .collect()
     for (const sub of pushSubs) {
       await ctx.db.delete(sub._id)
+    }
+
+    // Delete rate limit counters for this user
+    const rateLimitRecords = await ctx.db
+      .query("rateLimits")
+      .withIndex("by_user_action", (q) => q.eq("userId", user._id))
+      .collect()
+    for (const rl of rateLimitRecords) {
+      await ctx.db.delete(rl._id)
     }
 
     // Finally delete the user record
