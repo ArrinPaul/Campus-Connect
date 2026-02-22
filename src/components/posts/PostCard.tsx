@@ -17,6 +17,7 @@ import { RepostModal } from "@/components/posts/RepostModal"
 import { MediaGallery } from "@/components/posts/MediaGallery"
 import { LinkPreviewCard } from "@/components/posts/LinkPreviewCard"
 import { PollCard } from "@/components/posts/PollCard"
+import { AvatarWithStatus } from "@/components/ui/OnlineStatusDot"
 import { createLogger } from "@/lib/logger"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -225,26 +226,28 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
   const role = roleConfig[author.role] ?? roleConfig.Student
 
   return (
-    <article className="group/post animate-in rounded-xl bg-card border border-border/50 p-4 shadow-elevation-1 transition-all duration-200 hover:shadow-elevation-2 hover:border-border sm:p-6">
+    <article className="group/post animate-fade-rise rounded-xl bg-card border border-border/60 p-4 shadow-elevation-1 transition-all duration-200 hover:shadow-elevation-2 hover:border-border sm:p-6">
       {/* Author Info */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2.5 sm:gap-3">
           {/* Avatar */}
-          <div className="relative h-9 w-9 flex-shrink-0 sm:h-10 sm:w-10">
-            {author.profilePicture ? (
-              <Image
-                src={author.profilePicture}
-                alt={author.name}
-                fill
-                sizes="(max-width: 640px) 36px, 40px"
-                className="rounded-full object-cover ring-2 ring-border/30"
-              />
-            ) : (
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent-violet text-xs font-bold text-white sm:h-10 sm:w-10 sm:text-sm">
-                {author.name.charAt(0).toUpperCase()}
-              </div>
-            )}
-          </div>
+          <AvatarWithStatus userId={author._id} size="sm">
+            <div className="relative h-9 w-9 flex-shrink-0 sm:h-10 sm:w-10">
+              {author.profilePicture ? (
+                <Image
+                  src={author.profilePicture}
+                  alt={author.name}
+                  fill
+                  sizes="(max-width: 640px) 36px, 40px"
+                  className="rounded-full object-cover ring-2 ring-border/30"
+                />
+              ) : (
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent-rose text-xs font-bold text-white sm:h-10 sm:w-10 sm:text-sm">
+                  {author.name.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+          </AvatarWithStatus>
 
           {/* Name, Role Badge, and Timestamp */}
           <div className="min-w-0">

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useCallback, useEffect, useRef } from "react"
+import Link from "next/link"
 import { useUser } from "@clerk/nextjs"
 import { useQuery, useConvexAuth } from "convex/react"
 import { api } from "@/convex/_generated/api"
@@ -8,6 +9,8 @@ import { PostCard } from "@/components/posts/PostCard"
 import { InfiniteScrollTrigger } from "./InfiniteScrollTrigger"
 import { VirtualizedFeed } from "./VirtualizedFeed"
 import { Repeat2 } from "lucide-react"
+import { SuggestedUsers } from "@/components/discover/SuggestedUsers"
+import { TrendingHashtags } from "@/components/trending/TrendingHashtags"
 import type { FeedType } from "@/app/(dashboard)/feed/page"
 import type { FunctionReturnType } from "convex/server"
 
@@ -182,25 +185,39 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
     const { title, description } = emptyMessages[feedType]
 
     return (
-      <div className="rounded-lg bg-card p-8 text-center shadow-elevation-1 sm:p-12">
-        <svg
-          className="mx-auto h-10 w-10 text-muted-foreground sm:h-12 sm:w-12"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
-          />
-        </svg>
-        <h3 className="mt-3 text-base font-medium text-foreground sm:mt-4 sm:text-lg">{title}</h3>
-        <p className="mt-1 text-xs text-muted-foreground sm:mt-2 sm:text-sm">
-          {description}
-        </p>
+      <div className="space-y-4">
+        <div className="rounded-2xl border border-border/60 bg-card/80 p-6 text-center shadow-elevation-1 sm:p-8">
+          <div className="mx-auto h-12 w-12 rounded-2xl brand-gradient flex items-center justify-center shadow-glow-sm">
+            <Repeat2 className="h-5 w-5 text-white" />
+          </div>
+          <h3 className="mt-4 text-lg font-semibold text-foreground sm:text-xl font-display">{title}</h3>
+          <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            <Link
+              href="/discover"
+              className="inline-flex items-center rounded-full bg-primary/10 px-4 py-2 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors"
+            >
+              Explore communities
+            </Link>
+            <Link
+              href="/search"
+              className="inline-flex items-center rounded-full border border-border/60 px-4 py-2 text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors"
+            >
+              Search topics
+            </Link>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="rounded-2xl border border-border/60 bg-card shadow-elevation-1 overflow-hidden">
+            <div className="h-[3px] w-full gradient-warm" />
+            <SuggestedUsers limit={4} showSeeAll />
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-card shadow-elevation-1 overflow-hidden">
+            <div className="h-[3px] w-full brand-gradient" />
+            <TrendingHashtags limit={8} />
+          </div>
+        </div>
       </div>
     )
   }

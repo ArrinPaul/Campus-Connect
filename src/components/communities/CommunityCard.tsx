@@ -38,14 +38,14 @@ const TYPE_LABELS = {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Academic: "bg-primary/10 text-primary dark:bg-blue-900 dark:text-blue-300",
-  Research: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300",
-  Social: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
-  Sports: "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300",
-  Clubs: "bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300",
-  Technology: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900 dark:text-cyan-300",
-  Arts: "bg-rose-100 text-rose-700 dark:bg-rose-900 dark:text-rose-300",
-  Other: "bg-muted text-foreground bg-muted text-muted-foreground",
+  Academic: "bg-primary/10 text-primary",
+  Research: "bg-accent-violet/10 text-accent-violet",
+  Social: "bg-accent-emerald/10 text-accent-emerald",
+  Sports: "bg-accent-amber/10 text-accent-amber",
+  Clubs: "bg-accent-rose/10 text-accent-rose",
+  Technology: "bg-accent-sky/10 text-accent-sky",
+  Arts: "bg-accent-violet/10 text-accent-violet",
+  Other: "bg-muted text-muted-foreground",
 }
 
 export function CommunityCard({

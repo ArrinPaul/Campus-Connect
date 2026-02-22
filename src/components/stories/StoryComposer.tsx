@@ -296,7 +296,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
           )}
 
           {error && (
-            <p className="text-sm text-destructive dark:text-red-400 text-center">{error}</p>
+            <p className="text-sm text-destructive text-center">{error}</p>
           )}
         </div>
 

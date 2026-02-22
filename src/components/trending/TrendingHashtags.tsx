@@ -66,7 +66,7 @@ export function TrendingHashtags({
             </div>
 
             {/* Icon */}
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 dark:bg-blue-900/30 text-primary group-hover:bg-blue-200 dark:group-hover:bg-blue-900/50 transition-colors">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
               <Hash className="w-4 h-4" />
             </div>
 
@@ -82,7 +82,7 @@ export function TrendingHashtags({
 
             {/* Trending Indicator */}
             {index < 3 && (
-              <TrendingUp className="w-4 h-4 text-success dark:text-green-400" />
+              <TrendingUp className="w-4 h-4 text-accent-emerald" />
             )}
           </Link>
         ))}

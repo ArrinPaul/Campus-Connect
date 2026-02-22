@@ -24,10 +24,10 @@ const TIMELINE_ICONS: Record<string, LucideIcon> = {
   award: Award,
 }
 const TIMELINE_COLORS: Record<string, string> = {
-  course: "bg-blue-100 dark:bg-blue-900/40 text-primary",
-  certification: "bg-green-100 dark:bg-green-900/40 text-success dark:text-green-400",
-  publication: "bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400",
-  award: "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-400",
+  course: "bg-primary/10 text-primary",
+  certification: "bg-accent-emerald/10 text-accent-emerald",
+  publication: "bg-accent-violet/10 text-accent-violet",
+  award: "bg-accent-amber/10 text-accent-amber",
 }
 
 export default function PortfolioPage() {
@@ -50,7 +50,7 @@ export default function PortfolioPage() {
     <div className="mx-auto max-w-4xl px-4 py-6">
       <Link
         href={`/profile/${userId}`}
-        className="mb-4 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+        className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Profile
@@ -128,8 +128,8 @@ function ProjectsTab({ projects, isOwner }: { projects: PortfolioProject[] | und
       <div className="space-y-3">
         {[1, 2].map((i) => (
           <div key={i} className="animate-pulse rounded-xl border border-border bg-card p-5">
-            <div className="h-5 w-2/3 rounded bg-gray-200 dark:bg-gray-700 mb-2" />
-            <div className="h-3 w-full rounded bg-gray-200 dark:bg-gray-700" />
+            <div className="h-5 w-2/3 rounded-md bg-muted animate-shimmer mb-2" />
+            <div className="h-3 w-full rounded-md bg-muted animate-shimmer" />
           </div>
         ))}
       </div>
@@ -139,7 +139,7 @@ function ProjectsTab({ projects, isOwner }: { projects: PortfolioProject[] | und
   if (projects.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <Code className="mb-3 h-12 w-12 text-gray-300 dark:text-gray-600" />
+        <Code className="mb-3 h-12 w-12 text-muted-foreground/40" />
         <p className="text-muted-foreground">No projects yet</p>
       </div>
     )
@@ -163,7 +163,7 @@ function ProjectsTab({ projects, isOwner }: { projects: PortfolioProject[] | und
                     console.error("Failed to delete project:", error)
                   }
                 }}
-                className="text-gray-400 hover:text-destructive"
+                className="text-muted-foreground hover:text-destructive"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -224,8 +224,8 @@ function TimelineTab({ timeline, isOwner }: { timeline: TimelineEntry[] | undefi
       <div className="space-y-3">
         {[1, 2, 3].map((i) => (
           <div key={i} className="animate-pulse flex gap-3 py-3">
-            <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700" />
-            <div className="flex-1"><div className="h-4 w-1/2 rounded bg-gray-200 dark:bg-gray-700" /></div>
+            <div className="h-8 w-8 rounded-full bg-muted animate-shimmer" />
+            <div className="flex-1"><div className="h-4 w-1/2 rounded-md bg-muted animate-shimmer" /></div>
           </div>
         ))}
       </div>
@@ -235,7 +235,7 @@ function TimelineTab({ timeline, isOwner }: { timeline: TimelineEntry[] | undefi
   if (timeline.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <Calendar className="mb-3 h-12 w-12 text-gray-300 dark:text-gray-600" />
+        <Calendar className="mb-3 h-12 w-12 text-muted-foreground/40" />
         <p className="text-muted-foreground">No milestones yet</p>
       </div>
     )
@@ -245,7 +245,7 @@ function TimelineTab({ timeline, isOwner }: { timeline: TimelineEntry[] | undefi
     <div className="relative pl-6 border-l-2 border-border space-y-6">
       {timeline.map((item) => {
         const Icon = TIMELINE_ICONS[item.type] || BookOpen
-        const colorClass = TIMELINE_COLORS[item.type] || "bg-gray-100 text-gray-600"
+        const colorClass = TIMELINE_COLORS[item.type] || "bg-muted text-muted-foreground"
         return (
           <div key={item._id} className="relative">
             <div className={`absolute -left-[29px] flex h-8 w-8 items-center justify-center rounded-full ${colorClass}`}>
@@ -271,7 +271,7 @@ function TimelineTab({ timeline, isOwner }: { timeline: TimelineEntry[] | undefi
                         console.error("Failed to delete item:", error)
                       }
                     }}
-                    className="text-gray-400 hover:text-destructive"
+                    className="text-muted-foreground hover:text-destructive"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -305,7 +305,7 @@ function ContributionHeatmap({ data }: { data: Record<string, number> | undefine
   }, [data])
 
   if (data === undefined) {
-    return <div className="animate-pulse h-32 w-full rounded-xl bg-gray-200 dark:bg-gray-700" />
+    return <div className="animate-shimmer h-32 w-full rounded-xl bg-muted" />
   }
 
   const totalContributions = heatmapCells

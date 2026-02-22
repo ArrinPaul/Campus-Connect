@@ -177,7 +177,7 @@ export function CallModal({
                     ? "animate-pulse ring-4 ring-ring/50"
                     : callState === "active"
                     ? "ring-4 ring-green-500/50"
-                    : "ring-4 ring-gray-500/50"
+                    : "ring-4 ring-border/60"
                 }`}
               />
             ) : (
@@ -187,7 +187,7 @@ export function CallModal({
                     ? "animate-pulse ring-4 ring-ring/50"
                     : callState === "active"
                     ? "ring-4 ring-green-500/50"
-                    : "ring-4 ring-gray-500/50"
+                    : "ring-4 ring-border/60"
                 }`}
               >
                 {callerName.charAt(0).toUpperCase()}

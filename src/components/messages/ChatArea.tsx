@@ -186,8 +186,8 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
             <div
               className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-medium ${
                 isGroup
-                  ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
-                  : "bg-primary/10 text-primary dark:bg-blue-900/30 dark:text-blue-300"
+                  ? "bg-accent-violet/10 text-accent-violet"
+                  : "bg-primary/10 text-primary"
               }`}
             >
               {isGroup ? (
@@ -335,7 +335,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
                   </button>
                   <button
                     onClick={handleDelete}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-destructive dark:text-red-400 hover:bg-muted/50 dark:hover:bg-muted"
+                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-destructive hover:bg-muted/50 transition-colors"
                   >
                     <Trash2 className="h-4 w-4" /> Delete conversation
                   </button>

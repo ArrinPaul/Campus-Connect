@@ -49,13 +49,13 @@ export default function FindPartnersPage() {
 
       {/* Beginner CTA for Mentors */}
       {isBeginner && (
-        <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
-          <GraduationCap className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-accent-amber/20 bg-accent-amber/10 p-4">
+          <GraduationCap className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent-amber" />
           <div>
-            <p className="font-medium text-amber-800 dark:text-amber-300">
+            <p className="font-medium text-accent-amber">
               Looking for guidance?
             </p>
-            <p className="mt-0.5 text-sm text-amber-700 dark:text-amber-400">
+            <p className="mt-0.5 text-sm text-accent-amber/80">
               As a beginner, you can find experienced mentors who share your areas of interest.
             </p>
             <button
@@ -76,7 +76,7 @@ export default function FindPartnersPage() {
             onClick={() => setActiveTab("partners")}
             className={`flex items-center gap-2 border-b-2 pb-3 text-sm font-medium transition-colors ${
               activeTab === "partners"
-                ? "border-primary text-primary dark:border-blue-400 text-primary"
+                ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:border-border hover:text-foreground text-muted-foreground dark:hover:border-border hover:text-foreground"
             }`}
           >
@@ -87,7 +87,7 @@ export default function FindPartnersPage() {
             onClick={() => setActiveTab("mentors")}
             className={`flex items-center gap-2 border-b-2 pb-3 text-sm font-medium transition-colors ${
               activeTab === "mentors"
-                ? "border-primary text-primary dark:border-blue-400 text-primary"
+                ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:border-border hover:text-foreground text-muted-foreground dark:hover:border-border hover:text-foreground"
             }`}
           >
@@ -105,10 +105,10 @@ export default function FindPartnersPage() {
           </p>
 
           {!currentUser?.skills?.length && currentUser !== undefined && (
-            <div className="mb-6 flex items-start gap-3 rounded-xl border border-blue-200 bg-primary/10 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+            <div className="mb-6 flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/10 p-4">
               <Star className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
               <div>
-                <p className="text-sm font-medium text-blue-800 dark:text-blue-300">
+                <p className="text-sm font-medium text-primary">
                   Add skills to your profile
                 </p>
                 <p className="mt-0.5 text-sm text-primary text-primary">
@@ -159,7 +159,7 @@ export default function FindPartnersPage() {
                             {partner.complementarySkills.slice(0, 3).map((skill: string) => (
                               <span
                                 key={skill}
-                                className="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-800 dark:bg-purple-900 dark:text-purple-200"
+                                className="inline-flex items-center rounded-full bg-accent-violet/10 px-2 py-0.5 text-xs font-medium text-accent-violet"
                               >
                                 {skill}
                               </span>
@@ -181,7 +181,7 @@ export default function FindPartnersPage() {
                             {partner.sharedSkills.slice(0, 3).map((skill: string) => (
                               <span
                                 key={skill}
-                                className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200"
+                                className="inline-flex items-center rounded-full bg-accent-emerald/10 px-2 py-0.5 text-xs font-medium text-accent-emerald"
                               >
                                 {skill}
                               </span>
@@ -239,7 +239,7 @@ export default function FindPartnersPage() {
                           {mentor.sharedSkills.slice(0, 4).map((skill: string) => (
                             <span
                               key={skill}
-                              className="inline-flex items-center gap-0.5 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900 dark:text-amber-200"
+                              className="inline-flex items-center gap-0.5 rounded-full bg-accent-amber/10 px-2 py-0.5 text-xs font-medium text-accent-amber"
                             >
                               <GraduationCap className="h-2.5 w-2.5" />
                               {skill}

@@ -74,7 +74,7 @@ export function SkillEndorsements({
           className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2 border-border bg-card"
         >
           <div className="flex items-center gap-2 min-w-0">
-            <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-sm font-medium text-primary dark:bg-blue-900 dark:text-blue-200">
+            <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-sm font-medium text-primary">
               {skill.name}
             </span>
             {skill.count > 0 && (

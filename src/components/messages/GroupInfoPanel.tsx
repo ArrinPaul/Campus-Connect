@@ -182,7 +182,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
       <div className="flex-1 overflow-y-auto">
         {/* Group Header */}
         <div className="p-4 text-center border-b border-border">
-          <div className="mx-auto h-16 w-16 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-3">
+          <div className="mx-auto h-16 w-16 rounded-full bg-accent-violet/10 flex items-center justify-center mb-3">
             {conversation.avatar ? (
               <img
                 src={conversation.avatar}
@@ -190,7 +190,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
                 className="h-16 w-16 rounded-full object-cover"
               />
             ) : (
-              <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+              <span className="text-2xl font-bold text-accent-violet">
                 {getInitials(conversation.name || "G")}
               </span>
             )}

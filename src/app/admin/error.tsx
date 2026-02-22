@@ -18,9 +18,9 @@ export default function AdminError({
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
-      <div className="max-w-md rounded-lg border border-red-200 bg-red-50 p-8 text-center dark:border-red-800 dark:bg-red-900/20">
+      <div className="max-w-md rounded-xl border border-destructive/20 bg-destructive/5 p-8 text-center">
         <svg
-          className="mx-auto h-16 w-16 text-destructive dark:text-red-400"
+          className="mx-auto h-16 w-16 text-destructive"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

@@ -121,7 +121,7 @@ export function PollCard({ pollId }: PollCardProps) {
                 key={option.id}
                 className={`relative overflow-hidden rounded-lg border transition-colors ${
                   isSelected
-                    ? "border-blue-400 dark:border-blue-500 bg-primary/10 dark:bg-blue-900/20"
+                    ? "border-primary bg-primary/10"
                     : "border-border bg-card"
                 }`}
               >
@@ -129,7 +129,7 @@ export function PollCard({ pollId }: PollCardProps) {
                 <div
                   className={`absolute inset-y-0 left-0 transition-all duration-500 ${
                     isSelected
-                      ? "bg-primary/10 dark:bg-blue-900/40"
+                      ? "bg-primary/15"
                       : "bg-muted/60"
                   }`}
                   style={{ width: `${percentage}%` }}

@@ -229,7 +229,7 @@ export default function SearchPage() {
                 onClick={() => setShowFilters(!showFilters)}
                 className={`flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors border ${
                   showFilters
-                    ? "bg-primary/10 dark:bg-blue-900/20 text-primary border-blue-200 dark:border-blue-800"
+                    ? "bg-primary/10 text-primary border-primary/20"
                     : "bg-card text-muted-foreground border-border hover:bg-accent"
                 }`}
               >
@@ -530,7 +530,7 @@ function UniversalResults({
               <Link
                 key={hashtag._id}
                 href={`/hashtag/${hashtag.tag}`}
-                className="inline-flex items-center gap-1 rounded-full bg-primary/10 dark:bg-blue-900/20 px-3 py-1 text-sm text-primary hover:bg-primary/10 dark:hover:bg-blue-900/40 transition-colors"
+                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm text-primary hover:bg-primary/20 transition-colors"
               >
                 <Hash className="h-3 w-3" />
                 <HighlightText text={hashtag.tag} query={query} />
@@ -611,7 +611,7 @@ function HashtagSearchResults({ results, query }: { results: HashtagSearchResult
           className="flex items-center justify-between rounded-lg border border-border bg-card p-3 hover:bg-accent/50 transition-colors"
         >
           <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 dark:bg-blue-900/20">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
               <Hash className="h-5 w-5 text-primary" />
             </div>
             <div>

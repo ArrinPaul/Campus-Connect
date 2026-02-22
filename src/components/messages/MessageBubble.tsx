@@ -199,10 +199,10 @@ export function MessageBubble({
 
           {/* Message bubble */}
           <div
-            className={`relative px-4 py-2.5 rounded-2xl transition-colors ${
+            className={`relative px-4 py-2.5 rounded-2xl transition-colors shadow-elevation-1 ${
               message.isOwn
-                ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-br-md shadow-sm"
-                : "bg-muted/70 text-foreground rounded-bl-md"
+                ? "bg-gradient-to-br from-primary via-primary/90 to-accent-rose/90 text-primary-foreground rounded-br-md"
+                : "bg-card/80 border border-border/60 text-foreground rounded-bl-md"
             }`}
           >
             {/* Reply quote */}

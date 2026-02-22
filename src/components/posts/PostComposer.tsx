@@ -515,7 +515,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
                   key={hashtag._id}
                   className={`px-4 py-2 cursor-pointer transition-colors ${
                     index === selectedHashtagIndex
-                      ? "bg-primary/10 dark:bg-blue-900/20 text-primary"
+                      ? "bg-primary/10 text-primary"
                       : "text-foreground hover:bg-accent"
                   }`}
                   onClick={() => insertHashtag(hashtag.tag)}
@@ -549,7 +549,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
         )}
 
         {error && (
-          <p className="mt-1 text-xs text-destructive dark:text-red-400">{error}</p>
+          <p className="mt-1 text-xs text-destructive">{error}</p>
         )}
       </div>
 
@@ -612,7 +612,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
           onClick={() => setShowPollUI((v) => !v)}
           className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
             showPollUI
-              ? "bg-primary/10 dark:bg-blue-900/40 text-primary"
+              ? "bg-primary/10 text-primary"
               : "text-muted-foreground hover:bg-accent"
           }`}
           title="Add poll"
@@ -631,9 +631,9 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
 
       {/* ── Poll Creator ─────────────────────────────────────────────────── */}
       {showPollUI && (
-        <div className="rounded-xl border border-blue-200 dark:border-blue-800 bg-primary/10 dark:bg-blue-950/30 p-4 space-y-3">
+        <div className="rounded-xl border border-primary/20 bg-primary/10 p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-primary dark:text-blue-300 flex items-center gap-1.5">
+            <span className="text-sm font-semibold text-primary flex items-center gap-1.5">
               <BarChart2 className="h-4 w-4" />
               Create Poll
             </span>
@@ -691,7 +691,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
           </div>
 
           {/* Duration & Anonymous */}
-          <div className="flex flex-wrap items-center gap-4 pt-1 border-t border-blue-200 dark:border-blue-800">
+          <div className="flex flex-wrap items-center gap-4 pt-1 border-t border-primary/20">
             <div className="flex items-center gap-2">
               <label className="text-xs text-muted-foreground whitespace-nowrap">Duration</label>
               <select

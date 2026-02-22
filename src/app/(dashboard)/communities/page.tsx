@@ -124,7 +124,7 @@ export default function CommunitiesPage() {
               onClick={() => setActiveCategory(category)}
               className={`rounded-t-lg px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
                 activeCategory === category
-                  ? "border-b-2 border-primary text-primary dark:border-blue-400 text-primary"
+                  ? "border-b-2 border-primary text-primary"
                   : "text-muted-foreground hover:text-foreground text-muted-foreground hover:text-foreground"
               }`}
             >

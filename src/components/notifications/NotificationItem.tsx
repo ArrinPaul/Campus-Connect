@@ -80,7 +80,7 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
     <button
       onClick={handleClick}
       className={`w-full px-4 py-4 text-left hover:bg-accent transition-colors ${
-        !notification.isRead ? "bg-primary/10 dark:bg-blue-900/20" : ""
+        !notification.isRead ? "bg-primary/10" : ""
       }`}
     >
       <div className="flex items-start space-x-3">

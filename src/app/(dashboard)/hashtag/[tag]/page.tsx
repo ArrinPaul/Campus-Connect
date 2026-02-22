@@ -83,7 +83,7 @@ export default function HashtagPage() {
       <div className="min-h-screen bg-background">
         <div className="max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-center py-12 gap-4">
-            <Hash className="w-16 h-16 text-gray-400" />
+            <Hash className="w-16 h-16 text-muted-foreground/40" />
             <h2 className="text-xl font-semibold text-foreground">
               Invalid hashtag
             </h2>
@@ -129,7 +129,7 @@ export default function HashtagPage() {
         {!isLoading && posts.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 gap-4">
             <div className="relative">
-              <Hash className="w-20 h-20 text-gray-300 dark:text-gray-600" />
+              <Hash className="w-20 h-20 text-muted-foreground/30" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-12 h-12 border-2 border-border rounded-full opacity-50" />
               </div>

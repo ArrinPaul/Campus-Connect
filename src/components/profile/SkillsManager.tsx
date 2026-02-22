@@ -103,7 +103,7 @@ export function SkillsManager({ skills, onUpdate }: SkillsManagerProps) {
           {skills.map((skill) => (
             <div
               key={skill}
-              className="flex items-center gap-2 rounded-full bg-primary/10 dark:bg-blue-900 px-3 py-1 text-sm text-primary dark:text-blue-200"
+              className="flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm text-primary"
             >
               <span>{skill}</span>
               <button

@@ -150,7 +150,7 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
                 {selectedMembers.map((member) => (
                   <div
                     key={member._id}
-                    className="flex items-center gap-1.5 bg-primary/10 dark:bg-blue-900/20 text-primary dark:text-blue-300 rounded-full pl-1.5 pr-2 py-1"
+                    className="flex items-center gap-1.5 bg-primary/10 text-primary rounded-full pl-1.5 pr-2 py-1"
                   >
                     {member.profilePicture ? (
                       <img
@@ -159,7 +159,7 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
                         className="h-5 w-5 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="h-5 w-5 rounded-full bg-blue-200 dark:bg-blue-800 flex items-center justify-center text-[8px] font-bold">
+                      <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-[8px] font-bold text-primary">
                         {getInitials(member.name)}
                       </div>
                     )}

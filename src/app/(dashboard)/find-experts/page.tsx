@@ -99,7 +99,7 @@ export default function FindExpertsPage() {
             {skills.map((skill) => (
               <span
                 key={skill}
-                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
               >
                 {skill}
                 <button
@@ -170,14 +170,14 @@ export default function FindExpertsPage() {
                   {expert.matchedSkills.map((skill: string) => (
                     <span
                       key={skill}
-                      className="inline-flex items-center gap-0.5 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200"
+                      className="inline-flex items-center gap-0.5 rounded-full bg-accent-emerald/10 px-2 py-0.5 text-xs font-medium text-accent-emerald"
                     >
                       <Star className="h-2.5 w-2.5" />
                       {skill}
                     </span>
                   ))}
                   {expert.endorsementCount > 0 && (
-                    <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900 dark:text-amber-200">
+                    <span className="inline-flex items-center gap-0.5 rounded-full bg-accent-amber/10 px-2 py-0.5 text-xs font-medium text-accent-amber">
                       <Award className="h-2.5 w-2.5" />
                       {expert.endorsementCount} endorsement{expert.endorsementCount !== 1 ? "s" : ""}
                     </span>

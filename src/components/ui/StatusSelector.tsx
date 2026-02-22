@@ -108,7 +108,7 @@ export function StatusSelector({
               w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-left
               ${
                 selectedStatus === option.value
-                  ? "bg-primary/10 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
+                  ? "bg-primary/10 border border-primary/20"
                   : "hover:bg-accent/50 border border-transparent"
               }
               disabled:opacity-50

@@ -178,7 +178,7 @@ export default function CreateCommunityPage() {
           <ol className="mb-3 space-y-2">
             {rules.map((rule, i) => (
               <li key={i} className="flex items-center gap-2">
-                <span className="flex-shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary dark:bg-blue-900 dark:text-blue-300">
+                <span className="flex-shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
                   {i + 1}
                 </span>
                 <span className="flex-1 text-sm text-foreground">
@@ -213,7 +213,7 @@ export default function CreateCommunityPage() {
               type="button"
               onClick={addRule}
               disabled={!newRule.trim()}
-              className="rounded-lg bg-primary/10 px-3 py-2 text-sm text-primary hover:bg-blue-200 disabled:opacity-50 dark:bg-blue-900 dark:text-blue-300 transition-colors"
+              className="rounded-lg bg-primary/10 px-3 py-2 text-sm text-primary hover:bg-primary/20 disabled:opacity-50 transition-colors"
             >
               <Plus className="h-4 w-4" />
             </button>

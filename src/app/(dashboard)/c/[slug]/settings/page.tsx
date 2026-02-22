@@ -68,7 +68,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
 
   if (community === null) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center text-gray-500">
+      <div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">
         Community not found
       </div>
     )
@@ -151,7 +151,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
     <div className="mx-auto max-w-2xl px-4 py-4 sm:px-6 sm:py-8">
       <Link
         href={`/c/${params.slug}`}
-        className="inline-flex items-center gap-1 mb-4 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+        className="inline-flex items-center gap-1 mb-4 text-sm text-muted-foreground hover:text-foreground"
       >
         <ChevronLeft className="h-4 w-4" />
         Back to {community.name}
@@ -164,7 +164,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
 
       <div className="space-y-6">
         {/* General Settings */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <div className="rounded-xl border border-border bg-card p-6 shadow-elevation-1">
           <h2 className="mb-4 text-lg font-semibold text-foreground">
             General
           </h2>
@@ -179,7 +179,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 maxLength={100}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
               />
             </div>
 
@@ -191,7 +191,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
               />
             </div>
 
@@ -203,7 +203,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
                 >
                   {CATEGORIES.map((c) => (
                     <option key={c} value={c}>
@@ -222,7 +222,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
                   onChange={(e) =>
                     setType(e.target.value as "public" | "private" | "secret")
                   }
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
                 >
                   <option value="public">Public</option>
                   <option value="private">Private</option>
@@ -234,7 +234,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
         </div>
 
         {/* Rules */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <div className="rounded-xl border border-border bg-card p-6 shadow-elevation-1">
           <h2 className="mb-4 text-lg font-semibold text-foreground">
             Community Rules
           </h2>
@@ -242,7 +242,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
           <ol className="mb-3 space-y-2">
             {rules.map((rule, i) => (
               <li key={i} className="flex items-center gap-2">
-                <span className="flex-shrink-0 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                <span className="flex-shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
                   {i + 1}
                 </span>
                 <span className="flex-1 text-sm text-foreground">
@@ -250,7 +250,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
                 </span>
                 <button
                   onClick={() => removeRule(i)}
-                  className="text-gray-400 hover:text-destructive"
+                  className="text-muted-foreground hover:text-destructive"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -270,7 +270,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
                 }
               }}
               placeholder="Add a rule..."
-              className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+              className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
             />
             <button
               onClick={addRule}
@@ -286,7 +286,7 @@ export default function CommunitySettingsPage({ params }: SettingsPageProps) {
         <div className="flex items-center justify-between">
           {saveError && <p className="text-sm text-destructive">{saveError}</p>}
           {saveSuccess && (
-            <p className="text-sm text-success dark:text-green-400">
+            <p className="text-sm text-accent-emerald">
               Settings saved!
             </p>
           )}

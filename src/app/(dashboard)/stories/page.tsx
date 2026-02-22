@@ -265,7 +265,7 @@ export default function StoriesPage() {
           className="flex items-center gap-2"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="relative h-9 w-9 rounded-full overflow-hidden ring-2 ring-white/50">
+          <div className="relative h-9 w-9 rounded-full overflow-hidden ring-2 ring-card/50">
             {currentGroup.author?.profilePicture ? (
               <Image
                 src={currentGroup.author.profilePicture}

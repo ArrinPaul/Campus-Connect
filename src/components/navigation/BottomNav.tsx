@@ -36,7 +36,7 @@ export function BottomNav({ currentUserId }: BottomNavProps) {
   return (
     <nav
       aria-label="Mobile navigation"
-      className="fixed bottom-0 inset-x-0 z-50 md:hidden border-t border-border/60 glass-strong"
+      className="fixed bottom-0 inset-x-0 z-50 md:hidden border-t border-border/50 bg-card/80 backdrop-blur-2xl shadow-elevation-3"
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="flex items-center justify-around h-14">
@@ -65,6 +65,9 @@ export function BottomNav({ currentUserId }: BottomNavProps) {
               aria-label={label}
               aria-current={active ? "page" : undefined}
             >
+              {active && (
+                <span className="absolute inset-x-2 top-1.5 bottom-1.5 rounded-2xl bg-primary/10" aria-hidden="true" />
+              )}
               <div className="relative">
                 <Icon
                   className={cn(
@@ -88,9 +91,6 @@ export function BottomNav({ currentUserId }: BottomNavProps) {
               >
                 {label}
               </span>
-              {active && (
-                <span className="absolute top-0 inset-x-3 h-[2.5px] rounded-b-full brand-gradient" />
-              )}
             </Link>
           )
         })}

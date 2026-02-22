@@ -132,7 +132,7 @@ export function MessageComposer({
       {/* Reply indicator */}
       {replyingTo && (
         <div className="flex items-center gap-2 px-4 pt-2">
-          <div className="flex-1 flex items-center gap-2 pl-3 py-1.5 border-l-2 border-blue-500 bg-primary/10 dark:bg-blue-900/20 rounded-r-lg">
+          <div className="flex-1 flex items-center gap-2 pl-3 py-1.5 border-l-2 border-primary bg-primary/10 rounded-r-lg">
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-primary">
                 Replying to {replyingTo.senderName}

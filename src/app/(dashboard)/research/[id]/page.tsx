@@ -16,9 +16,9 @@ import { useState } from "react"
 function PaperDetailSkeleton() {
   return (
     <div className="animate-pulse space-y-4 py-6 px-4 max-w-3xl mx-auto">
-      <div className="h-6 w-2/3 rounded bg-gray-200 dark:bg-gray-700" />
-      <div className="h-4 w-1/3 rounded bg-gray-200 dark:bg-gray-700" />
-      <div className="h-32 w-full rounded-xl bg-gray-200 dark:bg-gray-700" />
+      <div className="h-6 w-2/3 rounded-md bg-muted animate-shimmer" />
+      <div className="h-4 w-1/3 rounded-md bg-muted animate-shimmer" />
+      <div className="h-32 w-full rounded-xl bg-muted animate-shimmer" />
     </div>
   )
 }
@@ -36,7 +36,7 @@ export default function PaperDetailPage() {
   if (paper === null) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <FileText className="mb-3 h-12 w-12 text-gray-300 dark:text-gray-600" />
+        <FileText className="mb-3 h-12 w-12 text-muted-foreground/40" />
         <p className="text-muted-foreground">Paper not found</p>
         <Link href="/research" className="mt-3 text-sm text-primary hover:underline">← Back to Research Hub</Link>
       </div>
@@ -58,7 +58,7 @@ export default function PaperDetailPage() {
     <div className="mx-auto max-w-3xl px-4 py-6">
       <Link
         href="/research"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+        className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Research Hub
@@ -96,7 +96,7 @@ export default function PaperDetailPage() {
           {new Date(paper.createdAt).toLocaleDateString()}
         </span>
         {paper.lookingForCollaborators && (
-          <span className="flex items-center gap-1 text-success dark:text-green-400 font-medium">
+            <span className="flex items-center gap-1 text-accent-emerald font-medium">
             <Users className="h-3 w-3" />
             Looking for Collaborators
           </span>
@@ -109,7 +109,7 @@ export default function PaperDetailPage() {
           {paper.tags.map((tag: string) => (
             <span
               key={tag}
-              className="rounded-full bg-blue-50 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs text-primary"
+              className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs text-primary"
             >
               <Tag className="inline h-3 w-3 mr-0.5" />
               {tag}
@@ -132,7 +132,7 @@ export default function PaperDetailPage() {
           href={paper.pdfUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mb-5 flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm text-primary hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
+          className="mb-5 flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm text-primary hover:border-primary/40 transition-colors"
         >
           <Download className="h-4 w-4" />
           Download PDF
@@ -170,7 +170,7 @@ export default function PaperDetailPage() {
               <Link
                 key={author._id}
                 href={`/profile/${author._id}`}
-                className="flex items-center gap-1.5 rounded-full bg-gray-50 dark:bg-gray-700 px-3 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
+                className="flex items-center gap-1.5 rounded-full bg-muted/50 px-3 py-1 text-sm hover:bg-muted transition-colors"
               >
                 {author.profilePicture ? (
                   <Image src={author.profilePicture} alt="" width={20} height={20} className="rounded-full" />

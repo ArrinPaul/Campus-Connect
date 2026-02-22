@@ -20,9 +20,9 @@ const ROLE_ICONS: Record<string, React.ElementType> = {
 }
 
 const ROLE_COLORS: Record<string, string> = {
-  owner: "text-amber-600 dark:text-amber-400",
+  owner: "text-accent-amber",
   admin: "text-primary",
-  moderator: "text-success dark:text-green-400",
+  moderator: "text-accent-emerald",
   member: "text-muted-foreground",
 }
 
@@ -93,7 +93,7 @@ export default function CommunityMembersPage({ params }: MembersPageProps) {
       {/* Back Link */}
       <Link
         href={`/c/${params.slug}`}
-        className="inline-flex items-center gap-1 mb-4 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+        className="inline-flex items-center gap-1 mb-4 text-sm text-muted-foreground hover:text-foreground"
       >
         <ChevronLeft className="h-4 w-4" />
         Back to {community?.name ?? "community"}
@@ -113,13 +113,13 @@ export default function CommunityMembersPage({ params }: MembersPageProps) {
 
       {/* Search */}
       <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search members..."
-          className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
+          className="w-full rounded-xl border border-border bg-background py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/30"
         />
       </div>
 
@@ -129,7 +129,7 @@ export default function CommunityMembersPage({ params }: MembersPageProps) {
           {[1, 2, 3, 4, 5].map((i) => (
             <div
               key={i}
-              className="h-16 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700"
+              className="h-16 animate-shimmer rounded-xl bg-muted"
             />
           ))}
         </div>
@@ -146,7 +146,7 @@ export default function CommunityMembersPage({ params }: MembersPageProps) {
             return (
               <div
                 key={member._id}
-                className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800"
+                className="flex items-center justify-between rounded-xl border border-border/50 bg-card p-3"
               >
                 <Link
                   href={`/profile/${member.username ?? member.userId}`}
@@ -177,7 +177,7 @@ export default function CommunityMembersPage({ params }: MembersPageProps) {
                           e.target.value as "admin" | "moderator" | "member"
                         )
                       }
-                      className="rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                      className="rounded border border-border bg-background px-2 py-1 text-xs text-foreground focus:outline-none"
                     >
                       <option value="admin">Admin</option>
                       <option value="moderator">Moderator</option>
@@ -185,7 +185,7 @@ export default function CommunityMembersPage({ params }: MembersPageProps) {
                     </select>
                     <button
                       onClick={() => handleRemove(member.userId as Id<"users">)}
-                      className="rounded border border-red-300 px-2 py-1 text-xs text-destructive hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
+                      className="rounded border border-destructive/30 px-2 py-1 text-xs text-destructive hover:bg-destructive/10 transition-colors"
                     >
                       Remove
                     </button>

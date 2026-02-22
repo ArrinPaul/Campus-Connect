@@ -66,7 +66,7 @@ function ToolbarButton({
       aria-label={title}
       className={`rounded p-1 transition-colors ${
         active
-          ? "bg-primary/10 dark:bg-blue-900/50 text-primary"
+          ? "bg-primary/10 text-primary"
           : "text-muted-foreground hover:bg-accent"
       } disabled:opacity-40`}
     >

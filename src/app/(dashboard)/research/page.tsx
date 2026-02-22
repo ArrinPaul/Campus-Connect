@@ -149,7 +149,7 @@ export default function ResearchPage() {
                       {paper.tags.slice(0, 5).map((tag: string) => (
                         <span
                           key={tag}
-                          className="rounded-full bg-primary/10 dark:bg-blue-900/30 px-2 py-0.5 text-xs text-primary"
+                          className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary"
                         >
                           {tag}
                         </span>
@@ -161,7 +161,7 @@ export default function ResearchPage() {
                   )}
                 </div>
                 {paper.lookingForCollaborators && (
-                  <span className="flex-shrink-0 rounded-full bg-green-50 dark:bg-green-900/30 px-2 py-0.5 text-xs font-medium text-success dark:text-green-400">
+                  <span className="flex-shrink-0 rounded-full bg-accent-emerald/10 px-2 py-0.5 text-xs font-medium text-accent-emerald">
                     <Users className="inline h-3 w-3 mr-1" />
                     Collaborators Wanted
                   </span>
@@ -309,7 +309,7 @@ function UploadPaperModal({ onClose }: { onClose: () => void }) {
             Looking for collaborators
           </label>
 
-          {error && <p className="text-sm text-destructive dark:text-red-400">{error}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
 
           <div className="flex justify-end gap-2 pt-2">
             <button

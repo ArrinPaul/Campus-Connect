@@ -270,7 +270,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
           placeholder="Tell us about yourself..."
         />
         <div className="mt-1 flex justify-between text-sm">
-          <span className="text-destructive dark:text-red-400">{errors.bio}</span>
+          <span className="text-destructive">{errors.bio}</span>
           <span className="text-muted-foreground">{bio.length}/500</span>
         </div>
       </div>
@@ -293,7 +293,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
           placeholder="Your university name"
         />
         <div className="mt-1 flex justify-between text-sm">
-          <span className="text-destructive dark:text-red-400">{errors.university}</span>
+          <span className="text-destructive">{errors.university}</span>
           <span className="text-muted-foreground">{university.length}/200</span>
         </div>
       </div>

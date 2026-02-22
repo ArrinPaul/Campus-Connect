@@ -232,7 +232,7 @@ export default function SuggestedUsersPage() {
 
                   {/* Role & university */}
                   <div className="mt-0.5 flex flex-wrap items-center gap-2">
-                    <span className="text-xs rounded-full bg-primary/10 dark:bg-blue-900 px-2 py-0.5 font-medium text-blue-800 dark:text-blue-200">
+                    <span className="text-xs rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
                       {user.role}
                     </span>
                     {user.university && (

@@ -130,7 +130,7 @@ export function CreateEventModal({ onClose, communityId }: CreateEventModalProps
                   onClick={() => setEventType(value)}
                   className={`flex flex-col items-center gap-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
                     eventType === value
-                      ? "border-blue-500 bg-primary/10 dark:bg-blue-900/20 text-primary"
+                      ? "border-primary bg-primary/10 text-primary"
                       : "border-border text-muted-foreground hover:border-border hover:border-border"
                   }`}
                 >
@@ -215,7 +215,7 @@ export function CreateEventModal({ onClose, communityId }: CreateEventModalProps
           </div>
 
           {error && (
-            <p className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-3 py-2 text-sm text-destructive dark:text-red-400">
+            <p className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-sm text-destructive">
               {error}
             </p>
           )}

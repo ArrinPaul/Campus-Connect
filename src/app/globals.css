@@ -19,125 +19,129 @@
 
 @layer base {
   :root {
-    /* ── Backgrounds (warm whites) ── */
-    --background: 220 14% 98%;
-    --foreground: 224 20% 10%;
+    /* ── Backgrounds (warm paper) ── */
+    --background: 26 25% 97%;
+    --foreground: 228 18% 12%;
 
     /* ── Cards & Surfaces ── */
     --card: 0 0% 100%;
-    --card-foreground: 224 20% 10%;
+    --card-foreground: 228 18% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 224 20% 10%;
+    --popover-foreground: 228 18% 12%;
 
-    /* ── Primary (iOS System Blue) ── */
-    --primary: 211 100% 50%;
+    /* ── Primary (coral) ── */
+    --primary: 14 89% 58%;
     --primary-foreground: 0 0% 100%;
 
     /* ── Secondary ── */
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 220 9% 32%;
+    --secondary: 28 22% 95%;
+    --secondary-foreground: 226 12% 30%;
 
     /* ── Muted ── */
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 28 20% 94%;
+    --muted-foreground: 226 10% 46%;
 
     /* ── Accent ── */
-    --accent: 220 14% 96%;
-    --accent-foreground: 224 20% 10%;
+    --accent: 28 22% 94%;
+    --accent-foreground: 228 18% 12%;
 
     /* ── Destructive ── */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     /* ── Status Colors ── */
-    --success: 142 71% 45%;
+    --success: 146 54% 45%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
+    --warning: 34 92% 55%;
     --warning-foreground: 0 0% 100%;
-    --info: 211 100% 50%;
+    --info: 204 84% 52%;
     --info-foreground: 0 0% 100%;
 
     /* ── Semantic Accents ── */
-    --accent-amber: 38 95% 54%;
-    --accent-emerald: 160 84% 39%;
-    --accent-rose: 347 77% 50%;
-    --accent-violet: 263 70% 58%;
-    --accent-sky: 199 89% 48%;
+    --accent-amber: 36 95% 55%;
+    --accent-emerald: 160 60% 44%;
+    --accent-rose: 352 78% 58%;
+    --accent-violet: 260 62% 62%;
+    --accent-sky: 196 78% 54%;
 
     /* ── Chrome ── */
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 211 100% 50%;
-    --radius: 0.625rem;
+    --border: 26 16% 88%;
+    --input: 26 16% 88%;
+    --ring: 14 89% 58%;
+    --radius: 0.75rem;
 
     /* ── Sidebar ── */
-    --sidebar: 220 14% 97%;
-    --sidebar-foreground: 224 20% 10%;
-    --sidebar-accent: 220 14% 95%;
-    --sidebar-accent-foreground: 224 20% 10%;
-    --sidebar-border: 220 13% 92%;
+    --sidebar: 26 26% 96%;
+    --sidebar-foreground: 228 18% 12%;
+    --sidebar-accent: 24 22% 93%;
+    --sidebar-accent-foreground: 228 18% 12%;
+    --sidebar-border: 26 16% 88%;
 
     /* ── Brand Accent ── */
-    --accent-blue: 211 100% 50%;
+    --accent-blue: 204 84% 52%;
+    --accent-coral: 14 89% 58%;
+    --accent-moss: 148 36% 42%;
+    --accent-sand: 30 36% 85%;
+    --accent-ink: 226 18% 14%;
   }
 
   .dark {
     /* ── Backgrounds (warm darks) ── */
-    --background: 224 20% 6%;
-    --foreground: 220 14% 95%;
+    --background: 226 20% 8%;
+    --foreground: 26 18% 93%;
 
     /* ── Cards & Surfaces ── */
-    --card: 224 18% 10%;
-    --card-foreground: 220 14% 95%;
-    --popover: 224 18% 10%;
-    --popover-foreground: 220 14% 95%;
+    --card: 226 18% 12%;
+    --card-foreground: 26 18% 93%;
+    --popover: 226 18% 12%;
+    --popover-foreground: 26 18% 93%;
 
     /* ── Primary (iOS Blue, brighter in dark) ── */
-    --primary: 211 100% 56%;
+    --primary: 14 89% 62%;
     --primary-foreground: 0 0% 100%;
 
     /* ── Secondary ── */
-    --secondary: 224 14% 14%;
-    --secondary-foreground: 220 9% 70%;
+    --secondary: 226 16% 16%;
+    --secondary-foreground: 24 12% 72%;
 
     /* ── Muted ── */
-    --muted: 224 14% 14%;
-    --muted-foreground: 220 9% 55%;
+    --muted: 226 16% 16%;
+    --muted-foreground: 24 10% 58%;
 
     /* ── Accent ── */
-    --accent: 224 14% 14%;
-    --accent-foreground: 220 14% 95%;
+    --accent: 226 16% 16%;
+    --accent-foreground: 26 18% 93%;
 
     /* ── Destructive ── */
-    --destructive: 0 72% 51%;
+    --destructive: 0 72% 56%;
     --destructive-foreground: 0 0% 100%;
 
     /* ── Status Colors ── */
-    --success: 142 71% 45%;
+    --success: 146 54% 48%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
+    --warning: 34 92% 58%;
     --warning-foreground: 0 0% 100%;
-    --info: 211 100% 56%;
+    --info: 204 84% 58%;
     --info-foreground: 0 0% 100%;
 
     /* ── Semantic Accents ── */
-    --accent-amber: 38 95% 58%;
-    --accent-emerald: 160 84% 44%;
-    --accent-rose: 347 77% 55%;
-    --accent-violet: 263 70% 64%;
-    --accent-sky: 199 89% 52%;
+    --accent-amber: 36 95% 60%;
+    --accent-emerald: 160 60% 50%;
+    --accent-rose: 352 78% 62%;
+    --accent-violet: 260 62% 68%;
+    --accent-sky: 196 78% 58%;
 
     /* ── Chrome ── */
-    --border: 224 12% 18%;
-    --input: 224 12% 18%;
-    --ring: 211 100% 56%;
+    --border: 226 14% 20%;
+    --input: 226 14% 20%;
+    --ring: 14 89% 62%;
 
     /* ── Sidebar ── */
-    --sidebar: 224 20% 7%;
-    --sidebar-foreground: 220 14% 95%;
-    --sidebar-accent: 224 14% 12%;
-    --sidebar-accent-foreground: 220 14% 95%;
-    --sidebar-border: 224 12% 15%;
+    --sidebar: 226 20% 9%;
+    --sidebar-foreground: 26 18% 93%;
+    --sidebar-accent: 226 16% 14%;
+    --sidebar-accent-foreground: 26 18% 93%;
+    --sidebar-border: 226 14% 18%;
   }
 }
 
@@ -148,11 +152,11 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: var(--font-geist-sans), 'Geist', system-ui, sans-serif;
+    font-family: var(--font-sora), 'Sora', sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Bricolage Grotesque', var(--font-geist-sans), system-ui, sans-serif;
+    font-family: var(--font-fraunces), 'Fraunces', serif;
     font-feature-settings: "ss01" 1;
   }
   html {
@@ -169,10 +173,10 @@
 @layer components {
   /* ── Brand accent surface ── */
   .brand-gradient {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent-violet)) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent-rose)) 100%);
   }
   .brand-gradient-text {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent-violet)) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent-rose)) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -197,6 +201,9 @@
   }
   .glass-strong {
     @apply bg-card/95 backdrop-blur-2xl border border-border/60;
+  }
+  .glass-panel {
+    @apply bg-card/70 backdrop-blur-2xl border border-border/50 shadow-elevation-2;
   }
 
   /* ── Dashboard atmosphere ──────────────────────────────── */
@@ -226,7 +233,7 @@
     height: 500px;
     top: -120px;
     right: -80px;
-    background: radial-gradient(circle, hsl(var(--primary) / 0.08), transparent 70%);
+    background: radial-gradient(circle, hsl(var(--primary) / 0.1), transparent 70%);
   }
   :is(.dark) .atmosphere-orb-primary {
     background: radial-gradient(circle, hsl(var(--primary) / 0.06), transparent 70%);
@@ -236,7 +243,7 @@
     height: 400px;
     bottom: -60px;
     left: 10%;
-    background: radial-gradient(circle, hsl(var(--accent-violet) / 0.06), transparent 70%);
+    background: radial-gradient(circle, hsl(var(--accent-rose) / 0.08), transparent 70%);
   }
   :is(.dark) .atmosphere-orb-violet {
     background: radial-gradient(circle, hsl(var(--accent-violet) / 0.04), transparent 70%);
@@ -252,7 +259,7 @@
 
   /* Text accent utility */
   .text-gradient {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent-violet)) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent-rose)) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -301,7 +308,7 @@
 
   /* Primary button — gradient accent */
   .btn-gradient {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent-violet)) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent-rose)) 100%);
     @apply text-white font-semibold transition-all duration-200 hover:brightness-110 hover:shadow-glow active:scale-[0.97];
   }
 
@@ -309,6 +316,34 @@
   .bg-dot-pattern {
     background-image: radial-gradient(circle, hsl(var(--border)) 1px, transparent 1px);
     background-size: 24px 24px;
+  }
+  .bg-ink-grid {
+    background-image: linear-gradient(0deg, hsl(var(--border) / 0.4) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.35) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .presence-chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/80 px-3 py-1 text-xs font-semibold text-muted-foreground shadow-sm;
+  }
+  .presence-pulse {
+    @apply relative flex h-2.5 w-2.5 items-center justify-center rounded-full bg-success;
+  }
+  .presence-pulse::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 9999px;
+    border: 1px solid hsl(var(--success) / 0.6);
+    animation: pulse-ring 2s ease-out infinite;
+  }
+  .surface-elevated {
+    @apply bg-card/90 border border-border/70 shadow-elevation-3;
+  }
+  .surface-pressed {
+    @apply bg-muted/60 border border-border/60 shadow-elevation-1;
+  }
+  .floating-card {
+    @apply shadow-elevation-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-elevation-4;
   }
 
   /* Section wrapper */
@@ -399,6 +434,28 @@
     background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--border)) 50%, hsl(var(--muted)) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse-ring {
+    0% { transform: scale(0.6); opacity: 0.8; }
+    70% { transform: scale(1); opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes fade-rise {
+    from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .animate-fade-rise {
+    animation: fade-rise 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes float-slow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .animate-float-slow {
+    animation: float-slow 6s ease-in-out infinite;
   }
 }
 

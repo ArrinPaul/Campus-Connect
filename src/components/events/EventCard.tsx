@@ -30,13 +30,13 @@ interface EventCardProps {
 }
 
 const EVENT_TYPE_CONFIG = {
-  in_person: { icon: MapPin, label: "In Person", color: "text-success dark:text-green-400" },
+  in_person: { icon: MapPin, label: "In Person", color: "text-accent-emerald" },
   virtual: { icon: Video, label: "Virtual", color: "text-primary" },
-  hybrid: { icon: Globe, label: "Hybrid", color: "text-purple-600 dark:text-purple-400" },
+  hybrid: { icon: Globe, label: "Hybrid", color: "text-accent-violet" },
 }
 
 const RSVP_COLORS = {
-  going: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+  going: "bg-accent-emerald/15 text-accent-emerald",
   maybe: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
   not_going: "bg-muted text-muted-foreground bg-muted text-muted-foreground",
 }

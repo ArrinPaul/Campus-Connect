@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useUser } from "@clerk/nextjs"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { useQuery } from "convex/react"
 import { api } from "@/../convex/_generated/api"
 import { PostComposer } from "@/components/posts/PostComposer"
@@ -13,7 +14,7 @@ import { StoryRow } from "@/components/stories/StoryRow"
 import { SuggestedUsers } from "@/components/discover/SuggestedUsers"
 import { RecommendedPosts, TrendingInSkill } from "@/components/feed/RecommendedPosts"
 import { cn } from "@/lib/utils"
-import { Sparkles, Users, TrendingUp, PenLine } from "lucide-react"
+import { Sparkles, Users, TrendingUp, PenLine, ArrowRight } from "lucide-react"
 
 export type FeedType = "for-you" | "following" | "trending"
 
@@ -85,6 +86,37 @@ export default function FeedPage() {
         {/* ── Main column ── */}
         <div className="lg:col-span-8 space-y-4">
 
+          {/* Welcome strip */}
+          <div className="rounded-2xl border border-border/60 bg-card/80 backdrop-blur-xl p-4 shadow-elevation-1">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-[13px] text-muted-foreground">Welcome back</p>
+                <h1 className="text-lg sm:text-xl font-semibold text-foreground font-display">
+                  Good to see you, {firstName}
+                </h1>
+              </div>
+              <div className="presence-chip">
+                <span className="presence-pulse" aria-hidden="true" />
+                <span className="text-foreground">Live now</span>
+                <span className="text-muted-foreground/70">in your network</span>
+              </div>
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <Link
+                href="#composer"
+                className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors"
+              >
+                <PenLine className="h-3.5 w-3.5" /> Start a post
+              </Link>
+              <Link
+                href="/discover"
+                className="inline-flex items-center gap-2 rounded-full border border-border/60 px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors"
+              >
+                Explore communities <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          </div>
+
           {/* Stories */}
           <ErrorBoundary>
             <div className="rounded-xl border border-border/50 bg-card shadow-elevation-1 px-4 py-3 overflow-hidden">
@@ -94,7 +126,7 @@ export default function FeedPage() {
 
           {/* Composer card */}
           <ErrorBoundary>
-            <div className="rounded-xl border border-border/50 bg-card shadow-elevation-1 overflow-hidden">
+            <div id="composer" className="rounded-xl border border-border/50 bg-card shadow-elevation-1 overflow-hidden">
               {/* gradient header strip */}
               <div className="h-1 w-full brand-gradient" />
               <div className="p-5">

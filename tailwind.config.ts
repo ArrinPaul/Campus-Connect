@@ -10,8 +10,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-geist-sans)", "Geist", "system-ui", "sans-serif"],
-        display: ["var(--font-bricolage)", "Bricolage Grotesque", "system-ui", "sans-serif"],
+        sans: ["var(--font-sora)", "Sora", "sans-serif"],
+        display: ["var(--font-fraunces)", "Fraunces", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",

@@ -81,7 +81,7 @@ export default function BillingPage() {
       )}
 
       {message && (
-        <div className="rounded-lg border border-blue-200 bg-primary/10 p-3 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-200">
+        <div className="rounded-lg border border-primary/20 bg-primary/10 p-3 text-sm text-primary">
           {message}
         </div>
       )}

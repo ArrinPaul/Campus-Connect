@@ -122,7 +122,7 @@ export function NotificationBell() {
                     key={notification._id}
                     onClick={() => handleNotificationClick(notification._id, notification.referenceId)}
                     className={`w-full px-4 py-3 text-left hover:bg-accent transition-colors ${
-                      !notification.isRead ? "bg-primary/10 dark:bg-blue-900/20" : ""
+                      !notification.isRead ? "bg-primary/10" : ""
                     }`}
                   >
                     <div className="flex items-start space-x-3">

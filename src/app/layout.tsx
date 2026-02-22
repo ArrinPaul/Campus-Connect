@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Bricolage_Grotesque } from "next/font/google"
-import { GeistSans } from "geist/font/sans"
+import { Fraunces, Sora } from "next/font/google"
 import { ClerkProvider } from "@clerk/nextjs"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
@@ -13,11 +12,18 @@ import { SkipLink } from "@/components/accessibility/SkipLink"
 import { Toaster } from "sonner"
 import "./globals.css"
 
-const bricolage = Bricolage_Grotesque({
+const sora = Sora({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-bricolage",
-  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-sora",
+  weight: ["300", "400", "500", "600", "700"],
+})
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-fraunces",
+  weight: ["400", "500", "600", "700", "800", "900"],
 })
 
 export const metadata: Metadata = {
@@ -70,13 +76,13 @@ export default function RootLayout({
     <ClerkProvider
       appearance={{
         variables: {
-          colorPrimary: "#0A84FF",
-          colorBackground: "hsl(220 14% 98%)",
-          colorText: "hsl(224 20% 10%)",
+          colorPrimary: "#F45D48",
+          colorBackground: "hsl(26 25% 97%)",
+          colorText: "hsl(228 18% 12%)",
           colorInputBackground: "hsl(0 0% 100%)",
-          colorInputText: "hsl(224 20% 10%)",
+          colorInputText: "hsl(228 18% 12%)",
           borderRadius: "0.625rem",
-          fontFamily: "'Geist', system-ui, sans-serif",
+          fontFamily: "'Sora', sans-serif",
         },
         elements: {
           formButtonPrimary:
@@ -92,7 +98,7 @@ export default function RootLayout({
         },
       }}
     >
-      <html lang="en" suppressHydrationWarning className={`${GeistSans.variable} ${bricolage.variable}`}>
+      <html lang="en" suppressHydrationWarning className={`${sora.variable} ${fraunces.variable}`}>
         <body className="font-sans antialiased">
           {/* Skip link — must be the absolute first focusable element */}
           <SkipLink />

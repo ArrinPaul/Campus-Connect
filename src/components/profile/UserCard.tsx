@@ -43,7 +43,7 @@ export const UserCard = memo(function UserCard({ user }: UserCardProps) {
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-semibold text-foreground truncate sm:text-base">{user.name}</h3>
           <div className="flex flex-col gap-1 mt-1 sm:flex-row sm:items-center sm:gap-2">
-            <span className="text-xs rounded-full bg-primary/10 dark:bg-blue-900 px-2 py-0.5 font-medium text-primary dark:text-blue-200 w-fit">
+            <span className="text-xs rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary w-fit">
               {user.role}
             </span>
             {user.university && (

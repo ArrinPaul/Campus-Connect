@@ -20,7 +20,7 @@ export default function Error({
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="max-w-md rounded-lg border border-red-200 dark:border-red-800 bg-card p-8 text-center shadow-lg">
         <svg
-          className="mx-auto h-16 w-16 text-destructive dark:text-red-400"
+          className="mx-auto h-16 w-16 text-destructive"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

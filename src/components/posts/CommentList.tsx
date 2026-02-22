@@ -244,7 +244,7 @@ export function CommentList({
               {isAtMaxDepth && replyCount > 0 && (
                 <Link
                   href={`#comment-${comment._id}`}
-                  className="text-xs text-purple-600 hover:text-purple-700 dark:text-purple-400 flex items-center gap-1"
+                  className="text-xs text-accent-violet hover:text-accent-violet/80 flex items-center gap-1"
                 >
                   <ArrowRight className="h-3 w-3" />
                   Continue this thread
@@ -274,7 +274,7 @@ export function CommentList({
                 <button
                   onClick={() => handleDelete(comment._id)}
                   disabled={deletingId === comment._id}
-                  className="text-xs text-destructive hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50"
+                  className="text-xs text-destructive hover:text-destructive/80 disabled:opacity-50"
                 >
                   {deletingId === comment._id ? "Deleting…" : "Delete"}
                 </button>
@@ -304,7 +304,7 @@ export function CommentList({
                   disabled={isSubmittingReply}
                 />
                 {replyError && (
-                  <p className="text-xs text-destructive dark:text-red-400">{replyError}</p>
+                  <p className="text-xs text-destructive">{replyError}</p>
                 )}
                 <div className="flex justify-end">
                   <button

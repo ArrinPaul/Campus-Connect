@@ -122,7 +122,7 @@ export function ReactionPicker({
               onMouseLeave={handleMouseLeave}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all hover:bg-accent ${
                 userReaction
-                  ? "bg-primary/10 dark:bg-blue-900/30 text-primary"
+                  ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:text-foreground"
               } ${compact ? "px-2 py-1 text-sm" : ""}`}
               aria-label={userReaction ? `You reacted with ${reactionLabels[userReaction as ReactionType]}` : "React to this post"}

@@ -29,17 +29,17 @@ export function TypingIndicator({ users }: TypingIndicatorProps) {
   return (
     <div className="flex items-center gap-2 py-1.5 px-1">
       {/* Animated dots */}
-      <div className="flex items-center gap-0.5 bg-muted rounded-full px-3 py-2">
+      <div className="flex items-center gap-0.5 bg-muted/70 backdrop-blur-sm rounded-full px-3 py-2">
         <span
-          className="w-1.5 h-1.5 bg-muted rounded-full animate-bounce"
+          className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-bounce"
           style={{ animationDelay: "0ms", animationDuration: "1s" }}
         />
         <span
-          className="w-1.5 h-1.5 bg-muted rounded-full animate-bounce"
+          className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-bounce"
           style={{ animationDelay: "200ms", animationDuration: "1s" }}
         />
         <span
-          className="w-1.5 h-1.5 bg-muted rounded-full animate-bounce"
+          className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-bounce"
           style={{ animationDelay: "400ms", animationDuration: "1s" }}
         />
       </div>

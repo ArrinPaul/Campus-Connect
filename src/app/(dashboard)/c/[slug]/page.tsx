@@ -137,7 +137,7 @@ export default function CommunityPage({ params }: CommunityPageProps) {
       {/* Community Header */}
       <div className="-mt-8 ml-4 flex items-end gap-4 sm:-mt-12 sm:ml-6">
         <div className="relative">
-          <div className="relative flex h-16 w-16 items-center justify-center rounded-xl border-4 border-white bg-primary text-2xl font-bold text-white dark:border-gray-900 sm:h-24 sm:w-24 sm:text-4xl">
+          <div className="relative flex h-16 w-16 items-center justify-center rounded-xl border-4 border-card bg-primary text-2xl font-bold text-white sm:h-24 sm:w-24 sm:text-4xl">
             {community.avatar ? (
               <Image
                 src={community.avatar}
@@ -205,7 +205,7 @@ export default function CommunityPage({ params }: CommunityPageProps) {
               </button>
             )}
             {isPending && (
-              <span className="rounded-lg bg-yellow-100 px-4 py-1.5 text-sm font-medium text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300">
+              <span className="rounded-lg bg-accent-amber/15 px-4 py-1.5 text-sm font-medium text-accent-amber">
                 Request Pending
               </span>
             )}

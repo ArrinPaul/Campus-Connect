@@ -106,7 +106,7 @@ export function CommentComposer({
       />
 
       {error && (
-        <p className="text-xs text-destructive dark:text-red-400">{error}</p>
+        <p className="text-xs text-destructive">{error}</p>
       )}
 
       <div className="flex justify-end gap-2">

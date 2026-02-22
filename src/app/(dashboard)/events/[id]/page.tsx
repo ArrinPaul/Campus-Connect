@@ -14,25 +14,25 @@ import {
 } from "lucide-react"
 
 const EVENT_TYPE_CONFIG = {
-  in_person: { icon: MapPin, label: "In Person", color: "text-success dark:text-green-400" },
+  in_person: { icon: MapPin, label: "In Person", color: "text-accent-emerald" },
   virtual: { icon: Video, label: "Virtual", color: "text-primary" },
-  hybrid: { icon: Globe, label: "Hybrid", color: "text-purple-600 dark:text-purple-400" },
+  hybrid: { icon: Globe, label: "Hybrid", color: "text-accent-violet" },
 }
 
 const RSVP_OPTIONS = [
   { status: "going" as const, label: "Going", icon: CheckCircle, color: "bg-success hover:bg-green-700 text-white" },
   { status: "maybe" as const, label: "Maybe", icon: HelpCircle, color: "bg-warning hover:bg-yellow-600 text-white" },
-  { status: "not_going" as const, label: "Not Going", icon: XCircle, color: "bg-gray-500 hover:bg-gray-600 text-white" },
+  { status: "not_going" as const, label: "Not Going", icon: XCircle, color: "bg-secondary text-secondary-foreground hover:bg-secondary/80" },
 ]
 
 function EventDetailSkeleton() {
   return (
     <div className="animate-pulse space-y-4 py-6 px-4">
-      <div className="h-6 w-2/3 rounded bg-gray-200 dark:bg-gray-700" />
-      <div className="h-4 w-1/3 rounded bg-gray-200 dark:bg-gray-700" />
-      <div className="h-20 w-full rounded-xl bg-gray-200 dark:bg-gray-700" />
-      <div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" />
-      <div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" />
+      <div className="h-6 w-2/3 rounded-md bg-muted animate-shimmer" />
+      <div className="h-4 w-1/3 rounded-md bg-muted animate-shimmer" />
+      <div className="h-20 w-full rounded-xl bg-muted animate-shimmer" />
+      <div className="h-4 w-full rounded-md bg-muted animate-shimmer" />
+      <div className="h-4 w-3/4 rounded-md bg-muted animate-shimmer" />
     </div>
   )
 }
@@ -100,7 +100,7 @@ export default function EventDetailPage() {
   if (event === null) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <Calendar className="mb-3 h-12 w-12 text-gray-300 dark:text-gray-600" />
+        <Calendar className="mb-3 h-12 w-12 text-muted-foreground/40" />
         <p className="text-muted-foreground">Event not found</p>
         <Link href="/events" className="mt-3 text-sm text-primary hover:underline">← Back to Events</Link>
       </div>
@@ -117,7 +117,7 @@ export default function EventDetailPage() {
       {/* Back navigation */}
       <Link
         href="/events"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+        className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Events
@@ -131,7 +131,7 @@ export default function EventDetailPage() {
           </h1>
           <button
             onClick={() => navigator.clipboard.writeText(window.location.href)}
-            className="flex-shrink-0 rounded-full border border-border p-2 text-gray-400 hover:text-foreground hover:border-gray-300 dark:hover:border-gray-600"
+            className="flex-shrink-0 rounded-full border border-border p-2 text-muted-foreground hover:text-foreground hover:border-border/80"
             title="Copy link"
           >
             <Share2 className="h-4 w-4" />
@@ -153,7 +153,7 @@ export default function EventDetailPage() {
               Organized by{" "}
               <Link
                 href={`/profile/${event.organizer._id}`}
-                className="font-medium text-foreground hover:text-primary dark:hover:text-blue-400"
+                className="font-medium text-foreground hover:text-primary"
               >
                 {event.organizer.name}
               </Link>
@@ -163,7 +163,7 @@ export default function EventDetailPage() {
       </div>
 
       {/* Key details card */}
-      <div className="mb-5 rounded-xl border border-border bg-card divide-y divide-gray-100 dark:divide-gray-700">
+      <div className="mb-5 rounded-xl border border-border bg-card divide-y divide-border/50">
         {/* Date */}
         <div className="flex items-center gap-3 px-4 py-3">
           <Calendar className="h-5 w-5 text-primary flex-shrink-0" />
@@ -227,7 +227,7 @@ export default function EventDetailPage() {
                 className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all disabled:opacity-50 ${
                   event.viewerRsvp === status
                     ? `${color} ring-2 ring-offset-2 ring-current`
-                    : "border border-border text-muted-foreground hover:border-gray-300 dark:hover:border-gray-500"
+                    : "border border-border text-muted-foreground hover:border-border/80"
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -236,10 +236,10 @@ export default function EventDetailPage() {
             ))}
           </div>
           {isFull && (
-            <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">This event is at full capacity.</p>
+            <p className="mt-2 text-xs text-accent-amber">This event is at full capacity.</p>
           )}
           {rsvpError && (
-            <p className="mt-2 text-xs text-destructive dark:text-red-400">{rsvpError}</p>
+            <p className="mt-2 text-xs text-destructive">{rsvpError}</p>
           )}
         </div>
       )}
@@ -285,10 +285,10 @@ export default function EventDetailPage() {
                       src={(attendee as { profilePicture: string }).profilePicture}
                       alt={"name" in attendee ? (attendee as { name: string }).name : ""}
                       fill
-                      className="rounded-full object-cover ring-2 ring-white dark:ring-gray-800 group-hover:ring-blue-300"
+                      className="rounded-full object-cover ring-2 ring-card group-hover:ring-primary/40"
                     />
                   ) : (
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-white ring-2 ring-white dark:ring-gray-800 group-hover:ring-blue-300">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-white ring-2 ring-card group-hover:ring-primary/40">
                       {"name" in attendee ? (attendee as { name: string }).name.charAt(0) : "?"}
                     </div>
                   )}
@@ -309,7 +309,7 @@ export default function EventDetailPage() {
       <div className="mt-4">
         <button
           onClick={handleAddToCalendar}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary dark:hover:text-blue-400"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"
         >
           <Calendar className="h-4 w-4" />
           Add to Google Calendar

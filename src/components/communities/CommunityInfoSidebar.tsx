@@ -41,7 +41,7 @@ export function CommunityInfoSidebar({
           <ol className="mt-3 space-y-2">
             {rules.map((rule, i) => (
               <li key={i} className="flex items-start gap-2 text-sm">
-                <span className="flex-shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary dark:bg-blue-900 dark:text-blue-300">
+                <span className="flex-shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
                   {i + 1}
                 </span>
                 <span className="text-foreground">{rule}</span>

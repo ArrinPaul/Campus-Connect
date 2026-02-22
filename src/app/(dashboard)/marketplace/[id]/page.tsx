@@ -113,7 +113,7 @@ export default function ListingDetailPage() {
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs bg-muted px-2 py-0.5 rounded-full">{listing.category}</span>
               {listing.status === "sold" && (
-                <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full dark:bg-red-900 dark:text-red-400">
+                <span className="text-xs bg-destructive/15 text-destructive px-2 py-0.5 rounded-full">
                   SOLD
                 </span>
               )}
