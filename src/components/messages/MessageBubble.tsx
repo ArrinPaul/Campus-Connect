@@ -118,13 +118,13 @@ export function MessageBubble({
       <>
         {showTimestamp && (
           <div className="flex justify-center my-4">
-            <span className="text-xs text-muted-foreground bg-muted bg-muted px-3 py-1 rounded-full">
+            <span className="text-xs text-muted-foreground bg-muted/80 backdrop-blur-sm px-3 py-1 rounded-full">
               {formatDate(message.createdAt)}
             </span>
           </div>
         )}
         <div className="flex justify-center my-2">
-          <span className="text-xs text-muted-foreground italic bg-muted px-3 py-1 rounded-full">
+          <span className="text-xs text-muted-foreground italic bg-muted/60 px-3 py-1 rounded-full">
             {message.content}
           </span>
         </div>
@@ -138,7 +138,7 @@ export function MessageBubble({
       <div
         className={`flex ${message.isOwn ? "justify-end" : "justify-start"} my-1`}
       >
-        <div className="max-w-[70%] px-4 py-2 rounded-2xl bg-muted bg-muted">
+        <div className="max-w-[70%] px-4 py-2 rounded-2xl bg-muted/60">
           <p className="text-sm text-muted-foreground italic">
             🚫 This message was deleted
           </p>
@@ -158,7 +158,7 @@ export function MessageBubble({
     <>
       {showTimestamp && (
         <div className="flex justify-center my-4">
-          <span className="text-xs text-muted-foreground bg-muted bg-muted px-3 py-1 rounded-full">
+          <span className="text-xs text-muted-foreground bg-muted/80 backdrop-blur-sm px-3 py-1 rounded-full">
             {formatDate(message.createdAt)}
           </span>
         </div>
@@ -174,10 +174,10 @@ export function MessageBubble({
               <img
                 src={message.senderAvatar}
                 alt={message.senderName}
-                className="h-7 w-7 rounded-full object-cover"
+                className="h-7 w-7 rounded-full object-cover ring-1 ring-border/30"
               />
             ) : (
-              <div className="h-7 w-7 rounded-full bg-muted dark:bg-muted flex items-center justify-center text-[10px] font-medium text-muted-foreground">
+              <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/20 to-accent-violet/20 flex items-center justify-center text-[10px] font-semibold text-foreground">
                 {message.senderName[0]?.toUpperCase()}
               </div>
             )}
@@ -199,25 +199,25 @@ export function MessageBubble({
 
           {/* Message bubble */}
           <div
-            className={`relative px-4 py-2 rounded-2xl ${
+            className={`relative px-4 py-2.5 rounded-2xl transition-colors ${
               message.isOwn
-                ? "bg-primary text-primary-foreground rounded-br-md"
-                : "bg-muted bg-muted text-foreground rounded-bl-md"
+                ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-br-md shadow-sm"
+                : "bg-muted/70 text-foreground rounded-bl-md"
             }`}
           >
             {/* Reply quote */}
             {message.replyToMessage && (
               <div
-                className={`mb-2 pl-2 border-l-2 ${
+                className={`mb-2 pl-2.5 border-l-2 rounded-r-md py-1 ${
                   message.isOwn
-                    ? "border-blue-300 text-blue-100"
-                    : "border-border text-muted-foreground"
+                    ? "border-white/40 bg-white/10"
+                    : "border-primary/40 bg-primary/5"
                 }`}
               >
-                <p className="text-[10px] font-medium">
+                <p className="text-[10px] font-semibold opacity-90">
                   {message.replyToMessage.senderName}
                 </p>
-                <p className="text-xs truncate opacity-80">
+                <p className="text-xs truncate opacity-70">
                   {message.replyToMessage.content}
                 </p>
               </div>
@@ -266,8 +266,8 @@ export function MessageBubble({
                       rel="noopener noreferrer"
                       className={`text-xs underline ${
                         message.isOwn
-                          ? "text-blue-200 hover:text-blue-100"
-                          : "text-primary hover:text-primary text-primary"
+                          ? "text-primary-foreground/70 hover:text-primary-foreground"
+                          : "text-primary hover:text-primary/80"
                       }`}
                     >
                       Download
@@ -285,7 +285,7 @@ export function MessageBubble({
             >
               <span
                 className={`text-[10px] ${
-                  message.isOwn ? "text-blue-200" : "text-muted-foreground"
+                  message.isOwn ? "text-primary-foreground/60" : "text-muted-foreground"
                 }`}
               >
                 {formatTime(message.createdAt)}
@@ -293,7 +293,7 @@ export function MessageBubble({
               {message.updatedAt && (
                 <span
                   className={`text-[10px] italic ${
-                    message.isOwn ? "text-blue-200" : "text-muted-foreground"
+                    message.isOwn ? "text-primary-foreground/60" : "text-muted-foreground"
                   }`}
                 >
                   edited
@@ -302,11 +302,11 @@ export function MessageBubble({
               {message.isOwn && (
                 <span className="text-[10px]">
                   {message.status === "read" ? (
-                    <CheckCheck className="h-3 w-3 text-blue-200" />
+                    <CheckCheck className="h-3 w-3 text-primary-foreground/70" />
                   ) : message.status === "delivered" ? (
-                    <CheckCheck className="h-3 w-3 text-blue-300/50" />
+                    <CheckCheck className="h-3 w-3 text-primary-foreground/40" />
                   ) : (
-                    <Check className="h-3 w-3 text-blue-300/50" />
+                    <Check className="h-3 w-3 text-primary-foreground/40" />
                   )}
                 </span>
               )}
@@ -322,7 +322,7 @@ export function MessageBubble({
         >
           <button
             onClick={() => setShowContextMenu(!showContextMenu)}
-            className="p-1 rounded-full text-muted-foreground hover:text-muted-foreground hover:bg-accent"
+            className="p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             aria-label="Message options"
           >
             <MoreHorizontal className="h-4 w-4" />
@@ -337,7 +337,7 @@ export function MessageBubble({
               onClick={() => setShowContextMenu(false)}
             />
             <div
-              className={`absolute top-full mt-1 z-20 w-44 rounded-lg bg-card bg-muted shadow-lg border border-border py-1 ${
+              className={`absolute top-full mt-1 z-20 w-44 rounded-xl bg-card shadow-elevation-2 border border-border/60 py-1 animate-fade-in-scale ${
                 message.isOwn ? "right-0" : "left-0"
               }`}
             >
@@ -346,26 +346,26 @@ export function MessageBubble({
                   onReply()
                   setShowContextMenu(false)
                 }}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground text-foreground hover:bg-muted/50 dark:hover:bg-muted"
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
               >
                 <Reply className="h-4 w-4" /> Reply
               </button>
               <button
                 onClick={handleCopy}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground text-foreground hover:bg-muted/50 dark:hover:bg-muted"
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
               >
                 <Copy className="h-4 w-4" /> Copy
               </button>
               <button
                 onClick={handleDeleteForMe}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground text-foreground hover:bg-muted/50 dark:hover:bg-muted"
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
               >
                 <Trash2 className="h-4 w-4" /> Delete for me
               </button>
               {canDeleteForEveryone && (
                 <button
                   onClick={handleDeleteForEveryone}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-destructive dark:text-red-400 hover:bg-muted/50 dark:hover:bg-muted"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
                 >
                   <Trash2 className="h-4 w-4" /> Delete for everyone
                 </button>

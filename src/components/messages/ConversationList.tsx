@@ -98,14 +98,14 @@ export function ConversationList({
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b border-border">
+      <div className="p-4 border-b border-border/60">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-xl font-bold text-foreground">
+          <h2 className="text-lg font-bold text-foreground font-display">
             Messages
           </h2>
           <button
             onClick={onCreateGroup}
-            className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-muted text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
+            className="p-2 rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
             title="Create group"
           >
             <Users className="h-5 w-5" />
@@ -120,7 +120,7 @@ export function ConversationList({
             placeholder="Search conversations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-border bg-muted/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent border-border bg-muted text-foreground dark:placeholder:text-muted-foreground"
+            className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-border/60 bg-muted/50 text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
           />
         </div>
       </div>
@@ -129,14 +129,16 @@ export function ConversationList({
       <div className="flex-1 overflow-y-auto">
         {filteredConversations.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-            <MessageSquare className="h-12 w-12 text-muted-foreground dark:text-muted-foreground mb-3" />
-            <p className="text-sm text-muted-foreground">
+            <div className="h-12 w-12 rounded-xl bg-muted/80 flex items-center justify-center mb-3">
+              <MessageSquare className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <p className="text-sm font-medium text-muted-foreground">
               {searchQuery
                 ? "No conversations match your search"
                 : "No conversations yet"}
             </p>
             {!searchQuery && (
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs text-muted-foreground/60 mt-1">
                 Visit a user&apos;s profile to start a conversation
               </p>
             )}
@@ -151,10 +153,10 @@ export function ConversationList({
               <button
                 key={conv._id}
                 onClick={() => onSelectConversation(conv._id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-accent ${
+                className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-150 ${
                   isSelected
-                    ? "bg-primary/10 dark:bg-blue-900/20 border-l-2 border-blue-500"
-                    : "border-l-2 border-transparent"
+                    ? "bg-primary/8 border-l-2 border-primary"
+                    : "border-l-2 border-transparent hover:bg-muted/60"
                 }`}
               >
                 {/* Avatar */}
@@ -163,14 +165,14 @@ export function ConversationList({
                     <img
                       src={avatarUrl}
                       alt={displayName}
-                      className="h-12 w-12 rounded-full object-cover"
+                      className="h-11 w-11 rounded-full object-cover ring-1 ring-border/30"
                     />
                   ) : (
                     <div
-                      className={`h-12 w-12 rounded-full flex items-center justify-center text-sm font-medium ${
+                      className={`h-11 w-11 rounded-full flex items-center justify-center text-sm font-semibold ${
                         conv.type === "group"
-                          ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
-                          : "bg-primary/10 text-primary dark:bg-blue-900/30 dark:text-blue-300"
+                          ? "bg-accent-violet/10 text-accent-violet"
+                          : "bg-primary/10 text-primary"
                       }`}
                     >
                       {conv.type === "group" ? (

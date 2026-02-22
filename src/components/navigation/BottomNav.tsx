@@ -36,7 +36,7 @@ export function BottomNav({ currentUserId }: BottomNavProps) {
   return (
     <nav
       aria-label="Mobile navigation"
-      className="fixed bottom-0 inset-x-0 z-50 md:hidden border-t border-border bg-background/95 backdrop-blur-xl"
+      className="fixed bottom-0 inset-x-0 z-50 md:hidden border-t border-border/60 glass-strong"
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="flex items-center justify-around h-14">
@@ -57,10 +57,10 @@ export function BottomNav({ currentUserId }: BottomNavProps) {
               key={href}
               href={resolvedHref}
               className={cn(
-                "relative flex flex-col items-center justify-center gap-0.5 w-16 h-full transition-colors duration-150",
+                "relative flex flex-col items-center justify-center gap-0.5 w-16 h-full transition-all duration-200",
                 active
                   ? "text-primary"
-                  : "text-muted-foreground active:text-foreground"
+                  : "text-muted-foreground active:text-foreground active:scale-95"
               )}
               aria-label={label}
               aria-current={active ? "page" : undefined}
@@ -69,12 +69,13 @@ export function BottomNav({ currentUserId }: BottomNavProps) {
                 <Icon
                   className={cn(
                     "h-[22px] w-[22px] transition-all duration-200",
-                    active && "scale-105"
+                    active && "scale-110"
                   )}
-                  strokeWidth={active ? 2.2 : 1.8}
+                  strokeWidth={active ? 2.4 : 1.8}
+                  fill={active ? "currentColor" : "none"}
                 />
                 {showBadge && (
-                  <span className="absolute -top-1 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground">
+                  <span className="absolute -top-1.5 -right-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-accent-rose px-1 text-[9px] font-bold text-white shadow-sm">
                     {totalUnread > 99 ? "99+" : totalUnread}
                   </span>
                 )}
@@ -82,13 +83,13 @@ export function BottomNav({ currentUserId }: BottomNavProps) {
               <span
                 className={cn(
                   "text-[10px] leading-tight",
-                  active ? "font-semibold" : "font-medium"
+                  active ? "font-bold" : "font-medium"
                 )}
               >
                 {label}
               </span>
               {active && (
-                <span className="absolute top-0 inset-x-4 h-[2px] rounded-b-full bg-primary" />
+                <span className="absolute top-0 inset-x-3 h-[2.5px] rounded-b-full brand-gradient" />
               )}
             </Link>
           )

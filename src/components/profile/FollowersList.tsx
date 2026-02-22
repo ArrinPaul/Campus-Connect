@@ -12,12 +12,12 @@ interface FollowersListProps {
 
 export function FollowersList({ userId }: FollowersListProps) {
   const { isLoaded, isSignedIn } = useUser()
-  const followers = useQuery(
+  const followersData = useQuery(
     api.follows.getFollowers,
     isLoaded && isSignedIn ? { userId } : "skip"
   )
 
-  if (followers === undefined) {
+  if (followersData === undefined) {
     return (
       <div className="rounded-lg bg-card p-6 shadow-elevation-1">
         <h2 className="text-xl font-bold text-foreground mb-4">Followers</h2>
@@ -30,7 +30,9 @@ export function FollowersList({ userId }: FollowersListProps) {
     )
   }
 
-  if (followers.length === 0) {
+  const followers = followersData.users ?? followersData
+
+  if (!Array.isArray(followers) || followers.length === 0) {
     return (
       <div className="rounded-lg bg-card p-6 shadow-elevation-1">
         <h2 className="text-xl font-bold text-foreground mb-4">Followers</h2>
@@ -45,7 +47,7 @@ export function FollowersList({ userId }: FollowersListProps) {
         Followers ({followers.length})
       </h2>
       <div className="space-y-3">
-        {followers.map((follower) => (
+        {followers.map((follower: any) => (
           <UserCard key={follower._id} user={follower} />
         ))}
       </div>

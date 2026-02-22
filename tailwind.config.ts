@@ -10,7 +10,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-dm-sans)", "DM Sans", "system-ui", "sans-serif"],
+        sans: ["var(--font-geist-sans)", "Geist", "system-ui", "sans-serif"],
         display: ["var(--font-bricolage)", "Bricolage Grotesque", "system-ui", "sans-serif"],
       },
       colors: {
@@ -66,6 +66,11 @@ const config: Config = {
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
         },
+        "accent-amber": "hsl(var(--accent-amber))",
+        "accent-emerald": "hsl(var(--accent-emerald))",
+        "accent-rose": "hsl(var(--accent-rose))",
+        "accent-violet": "hsl(var(--accent-violet))",
+        "accent-sky": "hsl(var(--accent-sky))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -141,7 +146,7 @@ const config: Config = {
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-        "mesh-gradient": "linear-gradient(135deg, hsl(var(--primary) / 0.12) 0%, transparent 50%, hsl(var(--accent) / 0.08) 100%)",
+        "mesh-gradient": "linear-gradient(135deg, hsl(var(--primary) / 0.08) 0%, transparent 40%, hsl(var(--accent-violet) / 0.06) 70%, hsl(var(--accent-amber) / 0.04) 100%)",
         "noise": "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E\")",
       },
     },

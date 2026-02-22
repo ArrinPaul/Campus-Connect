@@ -38,8 +38,8 @@ export default function QuestionDetailPage() {
   if (question === undefined) {
     return (
       <div className="max-w-4xl mx-auto p-6 animate-pulse space-y-4">
-        <div className="h-8 bg-gray-200 rounded w-2/3" />
-        <div className="h-40 bg-gray-200 rounded" />
+        <div className="h-8 bg-muted rounded-md animate-shimmer w-2/3" />
+        <div className="h-40 bg-muted rounded-xl animate-shimmer" />
       </div>
     )
   }
@@ -47,8 +47,8 @@ export default function QuestionDetailPage() {
   if (question === null) {
     return (
       <div className="max-w-4xl mx-auto p-6 text-center py-20">
-        <MessageCircle className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-        <p className="text-lg text-gray-500">Question not found</p>
+        <MessageCircle className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
+        <p className="text-lg text-muted-foreground">Question not found</p>
         <Link href="/q-and-a" className="text-orange-600 hover:underline text-sm mt-2 inline-block">
           Back to Q&A
         </Link>
@@ -89,19 +89,19 @@ export default function QuestionDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <Link href="/q-and-a" className="flex items-center gap-1 text-gray-500 hover:text-gray-700 text-sm">
+      <Link href="/q-and-a" className="flex items-center gap-1 text-muted-foreground hover:text-foreground text-sm">
         <ArrowLeft className="w-4 h-4" /> Back to Q&A
       </Link>
 
       {/* Question */}
-      <div className="bg-white border rounded-xl p-6">
+      <div className="bg-card border border-border/50 rounded-xl p-6">
         <div className="flex gap-4">
           {/* Vote Column */}
           <div className="flex flex-col items-center gap-1">
             <button
               onClick={() => handleVote(questionId, "question", "up")}
               className={`p-1 rounded hover:bg-orange-50 ${
-                question.viewerVotes[questionId] === "up" ? "text-orange-500" : "text-gray-400"
+                question.viewerVotes[questionId] === "up" ? "text-orange-500" : "text-muted-foreground"
               }`}
             >
               <ThumbsUp className="w-5 h-5" />
@@ -110,7 +110,7 @@ export default function QuestionDetailPage() {
             <button
               onClick={() => handleVote(questionId, "question", "down")}
               className={`p-1 rounded hover:bg-orange-50 ${
-                question.viewerVotes[questionId] === "down" ? "text-destructive" : "text-gray-400"
+                question.viewerVotes[questionId] === "down" ? "text-destructive" : "text-muted-foreground"
               }`}
             >
               <ThumbsDown className="w-5 h-5" />
@@ -121,24 +121,24 @@ export default function QuestionDetailPage() {
           <div className="flex-1">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold">{question.title}</h1>
-              <button onClick={handleDelete} className="text-gray-400 hover:text-destructive">
+              <button onClick={handleDelete} className="text-muted-foreground hover:text-destructive">
                 <Trash2 className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="flex items-center gap-4 text-sm text-gray-500 mt-2 mb-4">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2 mb-4">
               <span className="flex items-center gap-1">
                 <Eye className="w-4 h-4" /> {question.viewCount} views
               </span>
               <span>{question.answerCount} answer{question.answerCount !== 1 ? "s" : ""}</span>
               {question.course && (
-                <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">
+                <span className="px-2 py-0.5 bg-muted rounded text-xs">
                   {question.course}
                 </span>
               )}
             </div>
 
-            <div className="text-gray-700 whitespace-pre-wrap leading-relaxed mb-4">
+            <div className="text-foreground/80 whitespace-pre-wrap leading-relaxed mb-4">
               {question.content}
             </div>
 
@@ -151,7 +151,7 @@ export default function QuestionDetailPage() {
                 ))}
               </div>
 
-              <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 {question.asker && (
                   <>
                     <Image
@@ -164,7 +164,7 @@ export default function QuestionDetailPage() {
                     <span>{question.asker.name}</span>
                   </>
                 )}
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-muted-foreground">
                   {new Date(question.createdAt).toLocaleDateString()}
                 </span>
               </div>
@@ -183,7 +183,7 @@ export default function QuestionDetailPage() {
           {question.answers.map((answer) => (
             <div
               key={answer._id}
-              className={`bg-white border rounded-xl p-5 ${
+              className={`bg-card border border-border/50 rounded-xl p-5 ${
                 answer.isAccepted ? "border-green-300 bg-green-50/30" : ""
               }`}
             >
@@ -193,7 +193,7 @@ export default function QuestionDetailPage() {
                   <button
                     onClick={() => handleVote(answer._id, "answer", "up")}
                     className={`p-1 rounded hover:bg-orange-50 ${
-                      question.viewerVotes[answer._id] === "up" ? "text-orange-500" : "text-gray-400"
+                      question.viewerVotes[answer._id] === "up" ? "text-orange-500" : "text-muted-foreground"
                     }`}
                   >
                     <ThumbsUp className="w-4 h-4" />
@@ -202,7 +202,7 @@ export default function QuestionDetailPage() {
                   <button
                     onClick={() => handleVote(answer._id, "answer", "down")}
                     className={`p-1 rounded hover:bg-orange-50 ${
-                      question.viewerVotes[answer._id] === "down" ? "text-destructive" : "text-gray-400"
+                      question.viewerVotes[answer._id] === "down" ? "text-destructive" : "text-muted-foreground"
                     }`}
                   >
                     <ThumbsDown className="w-4 h-4" />
@@ -219,7 +219,7 @@ export default function QuestionDetailPage() {
                           console.error("Failed to accept answer:", error)
                         }
                       }}
-                      className="text-gray-300 hover:text-success mt-1"
+                      className="text-muted-foreground/50 hover:text-success mt-1"
                       title="Accept this answer"
                     >
                       <CheckCircle className="w-5 h-5" />
@@ -229,11 +229,11 @@ export default function QuestionDetailPage() {
 
                 {/* Content */}
                 <div className="flex-1">
-                  <div className="text-gray-700 whitespace-pre-wrap leading-relaxed mb-3">
+                  <div className="text-foreground/80 whitespace-pre-wrap leading-relaxed mb-3">
                     {answer.content}
                   </div>
 
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     {answer.answerer && (
                       <>
                         <Image
@@ -246,7 +246,7 @@ export default function QuestionDetailPage() {
                         <span>{answer.answerer.name}</span>
                       </>
                     )}
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-muted-foreground">
                       {new Date(answer.createdAt).toLocaleDateString()}
                     </span>
                     {answer.isAccepted && (
@@ -263,7 +263,7 @@ export default function QuestionDetailPage() {
       </div>
 
       {/* Write Answer */}
-      <div className="bg-white border rounded-xl p-6">
+      <div className="bg-card border border-border/50 rounded-xl p-6">
         <h3 className="text-lg font-semibold mb-3">Your Answer</h3>
         <textarea
           rows={5}

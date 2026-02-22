@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useMutation } from "convex/react"
+import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
@@ -27,7 +27,7 @@ import { useRouter } from "next/navigation"
  */
 export default function PrivacySettingsPage() {
   const router = useRouter()
-  const exportData = useMutation(api.users.exportUserData)
+  const exportDataResult = useQuery(api.users.exportUserData)
   const deleteAccount = useMutation(api.users.deleteAccount)
 
   const [isExporting, setIsExporting] = useState(false)
@@ -40,7 +40,10 @@ export default function PrivacySettingsPage() {
   const handleExportData = async () => {
     setIsExporting(true)
     try {
-      const data = await exportData()
+      if (!exportDataResult) {
+        throw new Error("Data not loaded yet. Please wait and try again.")
+      }
+      const data = exportDataResult
 
       // Create JSON blob and download
       const jsonString = JSON.stringify(data, null, 2)

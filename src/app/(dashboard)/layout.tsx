@@ -171,13 +171,18 @@ export default function DashboardLayout({
 
   return (
     <div className="flex min-h-screen bg-background">
+      {/* ── Atmosphere layers ─────────────────────────────── */}
+      <div className="atmosphere-noise" aria-hidden="true" />
+      <div className="atmosphere-orb atmosphere-orb-primary" aria-hidden="true" />
+      <div className="atmosphere-orb atmosphere-orb-violet" aria-hidden="true" />
+
       <KeyboardShortcutsModal open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
 
       {/* ── Sidebar (desktop) ─────────────────────────────── */}
       <aside
         aria-label="Main navigation"
         className={cn(
-          "hidden md:flex flex-col fixed inset-y-0 left-0 z-40 border-r border-sidebar-border bg-sidebar transition-all duration-300 ease-in-out",
+          "hidden md:flex flex-col fixed inset-y-0 left-0 z-40 border-r border-sidebar-border sidebar-glass transition-all duration-300 ease-in-out",
           collapsed ? "w-[72px]" : "w-[248px]"
         )}
       >
@@ -347,7 +352,7 @@ export default function DashboardLayout({
         <header
           role="banner"
           aria-label="Site header"
-          className="sticky top-0 z-30 flex h-[60px] items-center gap-3 border-b border-border bg-background/90 backdrop-blur-2xl px-4 sm:px-6"
+          className="sticky top-0 z-30 flex h-[60px] items-center gap-3 border-b border-border/60 glass-strong px-4 sm:px-6"
         >
           {/* Mobile hamburger */}
           <div className="flex items-center md:hidden">
@@ -394,7 +399,7 @@ export default function DashboardLayout({
         </header>
 
         {/* Page Content */}
-        <main id="main-content" className="flex-1 pb-16 md:pb-0" aria-label="Main content" tabIndex={-1}>
+        <main id="main-content" className="relative z-10 flex-1 pb-16 md:pb-0" aria-label="Main content" tabIndex={-1}>
           {children}
         </main>
       </div>

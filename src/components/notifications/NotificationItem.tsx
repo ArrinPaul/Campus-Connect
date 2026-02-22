@@ -12,7 +12,7 @@ interface NotificationItemProps {
     _id: Id<"notifications">
     recipientId: Id<"users">
     actorId: Id<"users">
-    type: "reaction" | "comment" | "mention" | "follow" | "reply"
+    type: "reaction" | "comment" | "mention" | "follow" | "reply" | "message" | "event"
     referenceId?: string
     message: string
     isRead: boolean

@@ -56,25 +56,25 @@ export default function ProfilePage({ params }: ProfilePageProps) {
         <ProfileHeaderSkeleton />
         
         <div className="mt-8">
-          <div className="h-8 w-32 rounded bg-gray-200 dark:bg-gray-700 mb-4" />
+          <div className="h-7 w-32 rounded-md bg-muted animate-shimmer mb-4" />
           <div className="flex flex-wrap gap-2">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-8 w-20 rounded-full bg-gray-200 dark:bg-gray-700" />
+              <div key={i} className="h-8 w-20 rounded-full bg-muted animate-shimmer" />
             ))}
           </div>
         </div>
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-3">
-            <div className="h-8 w-40 rounded bg-gray-200 dark:bg-gray-700" />
+            <div className="h-7 w-40 rounded-md bg-muted animate-shimmer" />
             {[...Array(2)].map((_, i) => (
-              <div key={i} className="h-20 rounded-lg bg-gray-200 dark:bg-gray-700" />
+              <div key={i} className="h-20 rounded-xl bg-muted animate-shimmer" />
             ))}
           </div>
           <div className="space-y-3">
-            <div className="h-8 w-40 rounded bg-gray-200 dark:bg-gray-700" />
+            <div className="h-7 w-40 rounded-md bg-muted animate-shimmer" />
             {[...Array(2)].map((_, i) => (
-              <div key={i} className="h-20 rounded-lg bg-gray-200 dark:bg-gray-700" />
+              <div key={i} className="h-20 rounded-xl bg-muted animate-shimmer" />
             ))}
           </div>
         </div>
@@ -87,13 +87,13 @@ export default function ProfilePage({ params }: ProfilePageProps) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">User Not Found</h1>
-          <p className="text-gray-600 mb-8">
+          <h1 className="text-4xl font-bold text-foreground mb-4 font-display">User Not Found</h1>
+          <p className="text-muted-foreground mb-8">
             The user you&apos;re looking for doesn&apos;t exist or has been removed.
           </p>
           <a
             href="/discover"
-            className="inline-block rounded-md bg-primary px-6 py-3 text-white hover:bg-primary/90"
+            className="inline-block rounded-xl btn-gradient px-6 py-3"
           >
             Discover Users
           </a>
@@ -112,7 +112,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 
       {/* Skills Section */}
       <div className="mt-8">
-        <h2 className="text-2xl font-bold text-foreground mb-4">Skills</h2>
+        <h2 className="text-xl font-bold text-foreground mb-4 font-display">Skills</h2>
         {isOwnProfile ? (
           <SkillsManager skills={profileUser.skills} />
         ) : (
@@ -123,7 +123,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
       {/* Profile Form (only for own profile) */}
       {isOwnProfile && (
         <div className="mt-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Edit Profile</h2>
+          <h2 className="text-xl font-bold text-foreground mb-4 font-display">Edit Profile</h2>
           <ProfileForm initialData={profileUser} />
         </div>
       )}
@@ -131,13 +131,13 @@ export default function ProfilePage({ params }: ProfilePageProps) {
       {/* Followers and Following */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <h2 className="text-xl font-bold text-foreground mb-4 font-display">
             Followers ({profileUser.followerCount})
           </h2>
           <FollowersList userId={profileUser._id} />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <h2 className="text-xl font-bold text-foreground mb-4 font-display">
             Following ({profileUser.followingCount})
           </h2>
           <FollowingList userId={profileUser._id} />

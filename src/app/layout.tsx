@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next"
-import { DM_Sans, Bricolage_Grotesque } from "next/font/google"
+import { Bricolage_Grotesque } from "next/font/google"
+import { GeistSans } from "geist/font/sans"
 import { ClerkProvider } from "@clerk/nextjs"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
@@ -11,13 +12,6 @@ import { LiveRegionProvider } from "@/components/accessibility/LiveRegion"
 import { SkipLink } from "@/components/accessibility/SkipLink"
 import { Toaster } from "sonner"
 import "./globals.css"
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-dm-sans",
-  weight: ["300", "400", "500", "600", "700"],
-})
 
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -60,8 +54,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fafafa" },
-    { media: "(prefers-color-scheme: dark)", color: "#030712" },
+    { media: "(prefers-color-scheme: light)", color: "#f8f9fb" },
+    { media: "(prefers-color-scheme: dark)", color: "#0e1117" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -77,12 +71,12 @@ export default function RootLayout({
       appearance={{
         variables: {
           colorPrimary: "#0A84FF",
-          colorBackground: "hsl(0 0% 100%)",
-          colorText: "hsl(0 0% 9%)",
+          colorBackground: "hsl(220 14% 98%)",
+          colorText: "hsl(224 20% 10%)",
           colorInputBackground: "hsl(0 0% 100%)",
-          colorInputText: "hsl(0 0% 9%)",
+          colorInputText: "hsl(224 20% 10%)",
           borderRadius: "0.625rem",
-          fontFamily: "'DM Sans', system-ui, sans-serif",
+          fontFamily: "'Geist', system-ui, sans-serif",
         },
         elements: {
           formButtonPrimary:
@@ -98,7 +92,7 @@ export default function RootLayout({
         },
       }}
     >
-      <html lang="en" suppressHydrationWarning className={`${dmSans.variable} ${bricolage.variable}`}>
+      <html lang="en" suppressHydrationWarning className={`${GeistSans.variable} ${bricolage.variable}`}>
         <body className="font-sans antialiased">
           {/* Skip link — must be the absolute first focusable element */}
           <SkipLink />

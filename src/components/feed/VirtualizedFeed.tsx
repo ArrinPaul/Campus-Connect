@@ -77,9 +77,9 @@ export function VirtualizedFeed({
               {item.type === "repost" &&
                 item.post.author &&
                 item.reposter && (
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 px-4 pt-3 text-xs text-muted-foreground">
-                      <Repeat2 className="h-3 w-3" />
+                  <div className="space-y-0">
+                    <div className="flex items-center gap-2 px-4 pt-3 pb-1 text-xs font-medium text-accent-emerald">
+                      <Repeat2 className="h-3.5 w-3.5" />
                       <span>
                         {item.reposter.name || item.reposter.username}{" "}
                         reposted
@@ -87,8 +87,8 @@ export function VirtualizedFeed({
                     </div>
                     {item.quoteContent && (
                       <div className="px-4 pb-2">
-                        <p className="text-sm text-foreground">
-                          {item.quoteContent}
+                        <p className="text-sm text-muted-foreground italic">
+                          &ldquo;{item.quoteContent}&rdquo;
                         </p>
                       </div>
                     )}

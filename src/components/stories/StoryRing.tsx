@@ -50,12 +50,12 @@ export function StoryRing({
   )
 
   const avatarContainerClass = cn(
-    "relative flex items-center justify-center rounded-full p-[3px]",
+    "relative flex items-center justify-center rounded-full",
     hasStories && hasUnseen
-      ? "bg-primary"
+      ? "story-ring"
       : hasStories
-      ? "bg-muted dark:bg-muted"
-      : "bg-transparent"
+      ? "story-ring-seen"
+      : ""
   )
 
   const displayName =
@@ -75,9 +75,9 @@ export function StoryRing({
       }
     >
       <div className={avatarContainerClass} style={{ width: 68, height: 68 }}>
-        {/* White gap between ring and avatar */}
-        <div className="rounded-full bg-card p-[2px]">
-          <div className="relative h-14 w-14 rounded-full overflow-hidden bg-muted">
+        {/* Gap between ring and avatar */}
+        <div className="rounded-full bg-card p-[3px]">
+          <div className="relative h-[54px] w-[54px] rounded-full overflow-hidden bg-muted">
             {user.profilePicture ? (
               <Image
                 src={user.profilePicture}
@@ -87,7 +87,7 @@ export function StoryRing({
                 className="object-cover"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-primary text-primary-foreground text-xl font-bold">
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary to-accent-violet text-primary-foreground text-lg font-bold">
                 {user.name.charAt(0).toUpperCase()}
               </div>
             )}
@@ -96,7 +96,7 @@ export function StoryRing({
 
         {/* "+" overlay for own ring (create story) */}
         {isOwn && (
-          <div className="absolute bottom-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-primary ring-2 ring-white dark:ring-gray-900">
+          <div className="absolute bottom-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-primary ring-2 ring-card">
             <Plus className="h-3 w-3 text-primary-foreground" strokeWidth={3} />
           </div>
         )}

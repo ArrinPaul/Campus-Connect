@@ -6,7 +6,7 @@ import { useUser } from "@clerk/nextjs"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
-import { Share2, Copy, Repeat2 } from "lucide-react"
+import { Share2, Copy, Repeat2, MessageCircle, Trash2, MoreHorizontal } from "lucide-react"
 import { CommentList } from "@/components/posts/CommentList"
 import { CommentComposer } from "@/components/posts/CommentComposer"
 import { ReactionPicker, ReactionSummary } from "@/components/posts/ReactionPicker"
@@ -19,6 +19,7 @@ import { LinkPreviewCard } from "@/components/posts/LinkPreviewCard"
 import { PollCard } from "@/components/posts/PollCard"
 import { createLogger } from "@/lib/logger"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 import type { ReactionCounts } from "@/types"
 
 const log = createLogger("PostCard")
@@ -85,12 +86,25 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
     showComments ? { postId: post._id } : "skip"
   )
 
-  const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this post?")) {
-      return
-    }
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showMenu, setShowMenu] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
+  // Close menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false)
+      }
+    }
+    if (showMenu) document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [showMenu])
+
+  const handleDelete = async () => {
     setIsDeleting(true)
+    setShowDeleteConfirm(false)
+    setShowMenu(false)
     try {
       await deletePost({ postId: post._id })
       toast.success("Post deleted")
@@ -100,6 +114,21 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
     } finally {
       setIsDeleting(false)
     }
+  }
+
+  const roleConfig: Record<string, { label: string; className: string }> = {
+    Student: {
+      label: "Student",
+      className: "bg-accent-sky/10 text-accent-sky dark:bg-accent-sky/15",
+    },
+    Faculty: {
+      label: "Faculty",
+      className: "bg-accent-amber/10 text-accent-amber dark:bg-accent-amber/15",
+    },
+    "Research Scholar": {
+      label: "Scholar",
+      className: "bg-accent-violet/10 text-accent-violet dark:bg-accent-violet/15",
+    },
   }
 
   // Close share dropdown when clicking outside
@@ -193,46 +222,90 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
     }
   }
 
+  const role = roleConfig[author.role] ?? roleConfig.Student
+
   return (
-    <div className="rounded-lg bg-card p-4 shadow-elevation-1 sm:p-6">
+    <article className="group/post animate-in rounded-xl bg-card border border-border/50 p-4 shadow-elevation-1 transition-all duration-200 hover:shadow-elevation-2 hover:border-border sm:p-6">
       {/* Author Info */}
       <div className="flex items-start justify-between">
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3">
           {/* Avatar */}
-          <div className="relative h-8 w-8 flex-shrink-0 sm:h-10 sm:w-10">
+          <div className="relative h-9 w-9 flex-shrink-0 sm:h-10 sm:w-10">
             {author.profilePicture ? (
               <Image
                 src={author.profilePicture}
                 alt={author.name}
                 fill
-                sizes="(max-width: 640px) 32px, 40px"
-                className="rounded-full object-cover"
+                sizes="(max-width: 640px) 36px, 40px"
+                className="rounded-full object-cover ring-2 ring-border/30"
               />
             ) : (
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground sm:h-10 sm:w-10 sm:text-sm">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent-violet text-xs font-bold text-white sm:h-10 sm:w-10 sm:text-sm">
                 {author.name.charAt(0).toUpperCase()}
               </div>
             )}
           </div>
 
-          {/* Name and Timestamp */}
-          <div>
-            <p className="text-sm font-semibold text-foreground sm:text-base">{author.name}</p>
-            <p className="text-xs text-muted-foreground sm:text-sm">{formatTimestamp(post.createdAt)}</p>
+          {/* Name, Role Badge, and Timestamp */}
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-semibold text-foreground truncate sm:text-base">{author.name}</p>
+              <span className={cn(
+                "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
+                role.className
+              )}>
+                {role.label}
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground/70 sm:text-[13px]">{formatTimestamp(post.createdAt)}</p>
           </div>
         </div>
 
-        {/* Delete Button (only for own posts) */}
+        {/* Post Menu (own posts) */}
         {isOwnPost && (
-          <button
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="text-xs text-destructive hover:text-red-800 disabled:opacity-50 sm:text-sm"
-            aria-label="Delete post"
-            style={{ minWidth: "44px", minHeight: "44px" }}
-          >
-            {isDeleting ? "Deleting..." : "Delete"}
-          </button>
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="rounded-lg p-2 text-muted-foreground/50 opacity-0 group-hover/post:opacity-100 hover:bg-muted hover:text-foreground transition-all duration-150"
+              aria-label="Post options"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </button>
+
+            {/* Delete Confirmation Dropdown */}
+            {showMenu && (
+              <div className="absolute right-0 top-full mt-1 z-50 w-44 bg-card border border-border rounded-xl shadow-elevation-2 overflow-hidden animate-fade-in-scale">
+                {!showDeleteConfirm ? (
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="w-full px-4 py-2.5 text-left text-sm text-destructive hover:bg-destructive/10 flex items-center gap-2.5 transition-colors"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    <span>Delete post</span>
+                  </button>
+                ) : (
+                  <div className="p-3 space-y-2">
+                    <p className="text-xs text-muted-foreground">Delete this post?</p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleDelete}
+                        disabled={isDeleting}
+                        className="flex-1 rounded-lg bg-destructive px-3 py-1.5 text-xs font-medium text-white hover:bg-destructive/90 disabled:opacity-50"
+                      >
+                        {isDeleting ? "..." : "Delete"}
+                      </button>
+                      <button
+                        onClick={() => { setShowDeleteConfirm(false); setShowMenu(false) }}
+                        className="flex-1 rounded-lg bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted/80"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         )}
       </div>
 
@@ -271,7 +344,7 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
       )}
 
       {/* Engagement Stats and Actions */}
-      <div className="mt-3 flex items-center gap-4 border-t border-border pt-3 sm:mt-4 sm:gap-6 sm:pt-4">
+      <div className="mt-3 flex items-center gap-1 border-t border-border/40 pt-3 sm:mt-4 sm:pt-4">
         {/* Reaction Picker */}
         {currentUser && (
           <ReactionPicker
@@ -290,24 +363,14 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
         {/* Comment Toggle Button */}
         <button
           onClick={() => setShowComments(!showComments)}
-          className="flex items-center gap-1.5 text-muted-foreground hover:text-primary sm:gap-2"
+          className={cn(
+            "flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-muted-foreground transition-all duration-150 hover:bg-accent-sky/10 hover:text-accent-sky sm:gap-2",
+            showComments && "bg-accent-sky/10 text-accent-sky"
+          )}
           aria-label={showComments ? "Hide comments" : "Show comments"}
           style={{ minWidth: "44px", minHeight: "44px" }}
         >
-          <svg
-            className="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
-            />
-          </svg>
+          <MessageCircle className="h-[18px] w-[18px]" />
           <span className="text-xs font-medium sm:text-sm">{post.commentCount}</span>
         </button>
 
@@ -315,11 +378,11 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
         <div className="relative" ref={shareDropdownRef}>
           <button
             onClick={() => setShowShareDropdown(!showShareDropdown)}
-            className="flex items-center gap-1.5 text-muted-foreground hover:text-success dark:hover:text-green-400 sm:gap-2"
+            className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-muted-foreground transition-all duration-150 hover:bg-accent-emerald/10 hover:text-accent-emerald sm:gap-2"
             aria-label="Share post"
             style={{ minWidth: "44px", minHeight: "44px" }}
           >
-            <Share2 className="h-5 w-5" />
+            <Share2 className="h-[18px] w-[18px]" />
             {post.shareCount > 0 && (
               <span className="text-xs font-medium sm:text-sm">{post.shareCount}</span>
             )}
@@ -327,38 +390,38 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
 
           {/* Share Dropdown Menu */}
           {showShareDropdown && (
-            <div className="absolute top-full mt-2 left-0 z-50 w-48 bg-card border border-border rounded-lg shadow-lg overflow-hidden">
+            <div className="absolute top-full mt-2 left-0 z-50 w-48 bg-card border border-border rounded-xl shadow-elevation-2 overflow-hidden animate-fade-in-scale">
               {currentUser && !isOwnPost && (
                 <>
                   <button
                     onClick={handleDirectRepost}
-                    className="w-full px-4 py-3 text-left text-sm hover:bg-accent flex items-center gap-3"
+                    className="w-full px-4 py-2.5 text-left text-sm hover:bg-accent-emerald/10 flex items-center gap-3 transition-colors"
                   >
-                    <Repeat2 className="w-4 h-4" />
+                    <Repeat2 className="w-4 h-4 text-accent-emerald" />
                     <span>Repost</span>
                   </button>
                   <button
                     onClick={handleQuotePost}
-                    className="w-full px-4 py-3 text-left text-sm hover:bg-accent flex items-center gap-3 border-t border-border"
+                    className="w-full px-4 py-2.5 text-left text-sm hover:bg-accent-emerald/10 flex items-center gap-3 border-t border-border/40 transition-colors"
                   >
-                    <Repeat2 className="w-4 h-4" />
+                    <Repeat2 className="w-4 h-4 text-accent-violet" />
                     <span>Quote Post</span>
                   </button>
                 </>
               )}
               <button
                 onClick={handleCopyLink}
-                className="w-full px-4 py-3 text-left text-sm hover:bg-accent flex items-center gap-3 border-t border-border"
+                className="w-full px-4 py-2.5 text-left text-sm hover:bg-muted flex items-center gap-3 border-t border-border/40 transition-colors"
               >
-                <Copy className="w-4 h-4" />
+                <Copy className="w-4 h-4 text-muted-foreground" />
                 <span>Copy Link</span>
               </button>
               {typeof window !== 'undefined' && 'share' in navigator && (
                 <button
                   onClick={handleWebShare}
-                  className="w-full px-4 py-3 text-left text-sm hover:bg-accent flex items-center gap-3 border-t border-border"
+                  className="w-full px-4 py-2.5 text-left text-sm hover:bg-muted flex items-center gap-3 border-t border-border/40 transition-colors"
                 >
-                  <Share2 className="w-4 h-4" />
+                  <Share2 className="w-4 h-4 text-muted-foreground" />
                   <span>Share via...</span>
                 </button>
               )}
@@ -366,12 +429,8 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
           )}
         </div>
 
-        {/* Share Success Message */}
-        {shareSuccess && (
-          <div className="fixed bottom-4 right-4 bg-success text-primary-foreground px-4 py-2 rounded-lg shadow-lg z-50">
-            {shareSuccess}
-          </div>
-        )}
+        {/* Spacer */}
+        <div className="flex-1" />
 
         {/* Bookmark Button */}
         {currentUser && (
@@ -401,10 +460,10 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
       />
 
       {/* Inline Comments Section */}
-      <div className="mt-3 border-t border-border pt-3 sm:mt-4 sm:pt-4 space-y-4">
+      <div className="mt-3 border-t border-border/40 pt-3 sm:mt-4 sm:pt-4 space-y-4">
         <CommentList postId={post._id} comments={comments} isLoading={comments === undefined} />
         <CommentComposer postId={post._id} />
       </div>
-    </div>
+    </article>
   )
 })

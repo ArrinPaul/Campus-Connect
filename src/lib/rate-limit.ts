@@ -210,7 +210,6 @@ function isUpstashConfigured(): boolean {
   )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let _upstashLimiters: Record<RouteType, any> | null = null
 
 async function getUpstashLimiters(): Promise<Record<RouteType, any>> {

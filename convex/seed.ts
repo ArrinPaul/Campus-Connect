@@ -773,7 +773,9 @@ export const seedAllInternal = internalMutation({
       lastMessagePreview: "Has anyone looked at the new Mamba architecture paper?",
       createdAt: daysAgo(20),
     })
-    for (const [idx, uid] of [userIds[0], userIds[2], userIds[5], userIds[7]].entries()) {
+    const groupParticipants = [userIds[0], userIds[2], userIds[5], userIds[7]]
+    for (let idx = 0; idx < groupParticipants.length; idx++) {
+      const uid = groupParticipants[idx]
       await ctx.db.insert("conversationParticipants", {
         conversationId: groupConv,
         userId: uid,

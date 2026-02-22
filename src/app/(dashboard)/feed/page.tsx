@@ -87,14 +87,14 @@ export default function FeedPage() {
 
           {/* Stories */}
           <ErrorBoundary>
-            <div className="rounded-xl border border-border bg-card shadow-elevation-1 px-4 py-3 overflow-hidden">
+            <div className="rounded-xl border border-border/50 bg-card shadow-elevation-1 px-4 py-3 overflow-hidden">
               <StoryRow />
             </div>
           </ErrorBoundary>
 
           {/* Composer card */}
           <ErrorBoundary>
-            <div className="rounded-xl border border-border bg-card shadow-elevation-1 overflow-hidden">
+            <div className="rounded-xl border border-border/50 bg-card shadow-elevation-1 overflow-hidden">
               {/* gradient header strip */}
               <div className="h-1 w-full brand-gradient" />
               <div className="p-5">
@@ -120,7 +120,7 @@ export default function FeedPage() {
           </ErrorBoundary>
 
           {/* Feed tabs */}
-          <div className="rounded-xl border border-border bg-card shadow-elevation-1 p-1.5 flex gap-1">
+          <div className="rounded-xl border border-border/50 bg-card shadow-elevation-1 p-1.5 flex gap-1">
             {FEED_TABS.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
@@ -134,7 +134,7 @@ export default function FeedPage() {
               >
                 {feedType === key && (
                   <span
-                    className="absolute inset-0 rounded-lg bg-primary transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                    className="absolute inset-0 rounded-lg brand-gradient transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
                     aria-hidden
                     style={{ willChange: "transform" }}
                   />
@@ -156,32 +156,32 @@ export default function FeedPage() {
           <div className="sticky top-[76px] space-y-4">
 
             {/* Trending hashtags */}
-            <div className="rounded-xl border border-border bg-card shadow-elevation-1 overflow-hidden">
-              <div className="h-[3px] w-full brand-gradient" />
+            <div className="rounded-xl border border-border/50 bg-card shadow-elevation-1 overflow-hidden">
+              <div className="h-[3px] w-full gradient-warm" />
               <ErrorBoundary>
                 <TrendingHashtags limit={10} />
               </ErrorBoundary>
             </div>
 
             {/* Suggested users */}
-            <div className="rounded-xl border border-border bg-card shadow-elevation-1 overflow-hidden">
-              <div className="h-[3px] w-full bg-primary" />
+            <div className="rounded-xl border border-border/50 bg-card shadow-elevation-1 overflow-hidden">
+              <div className="h-[3px] w-full brand-gradient" />
               <ErrorBoundary>
                 <SuggestedUsers limit={3} showSeeAll />
               </ErrorBoundary>
             </div>
 
             {/* Recommended posts */}
-            <div className="rounded-xl border border-border bg-card shadow-elevation-1 overflow-hidden">
-              <div className="h-[3px] w-full bg-primary" />
+            <div className="rounded-xl border border-border/50 bg-card shadow-elevation-1 overflow-hidden">
+              <div className="h-[3px] w-full" style={{ background: "linear-gradient(90deg, hsl(var(--accent-emerald)), hsl(var(--accent-sky)))" }} />
               <ErrorBoundary>
                 <RecommendedPosts limit={3} />
               </ErrorBoundary>
             </div>
 
             {/* Trending in skill */}
-            <div className="rounded-xl border border-border bg-card shadow-elevation-1 overflow-hidden">
-              <div className="h-[3px] w-full bg-primary" />
+            <div className="rounded-xl border border-border/50 bg-card shadow-elevation-1 overflow-hidden">
+              <div className="h-[3px] w-full" style={{ background: "linear-gradient(90deg, hsl(var(--accent-violet)), hsl(var(--accent-rose)))" }} />
               <ErrorBoundary>
                 <TrendingInSkill limit={5} />
               </ErrorBoundary>

@@ -25,9 +25,9 @@ export default function JobDetailPage() {
   if (job === undefined) {
     return (
       <div className="max-w-4xl mx-auto p-6 animate-pulse space-y-4">
-        <div className="h-8 bg-gray-200 rounded w-1/3" />
-        <div className="h-6 bg-gray-200 rounded w-1/4" />
-        <div className="h-40 bg-gray-200 rounded" />
+        <div className="h-8 bg-muted rounded-md animate-shimmer w-1/3" />
+        <div className="h-6 bg-muted rounded-md animate-shimmer w-1/4" />
+        <div className="h-40 bg-muted rounded-xl animate-shimmer" />
       </div>
     )
   }
@@ -35,8 +35,8 @@ export default function JobDetailPage() {
   if (job === null) {
     return (
       <div className="max-w-4xl mx-auto p-6 text-center py-20">
-        <Briefcase className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-        <p className="text-lg text-gray-500">Job not found</p>
+        <Briefcase className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
+        <p className="text-lg text-muted-foreground">Job not found</p>
         <Link href="/jobs" className="text-primary hover:underline text-sm mt-2 inline-block">
           Back to Jobs
         </Link>
@@ -56,12 +56,12 @@ export default function JobDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <Link href="/jobs" className="flex items-center gap-1 text-gray-500 hover:text-gray-700 text-sm">
+      <Link href="/jobs" className="flex items-center gap-1 text-muted-foreground hover:text-foreground text-sm">
         <ArrowLeft className="w-4 h-4" /> Back to Jobs
       </Link>
 
       {/* Header */}
-      <div className="bg-white border rounded-xl p-6">
+      <div className="bg-card border border-border/50 rounded-xl p-6">
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3 mb-2">
@@ -87,7 +87,7 @@ export default function JobDetailPage() {
               )}
             </div>
 
-            <div className="flex items-center gap-4 text-sm text-gray-500">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <span className="flex items-center gap-1">
                 <Building2 className="w-4 h-4" /> {job.company}
               </span>
@@ -114,7 +114,7 @@ export default function JobDetailPage() {
           <div className="flex gap-2">
             <button
               onClick={handleDelete}
-              className="p-2 text-gray-400 hover:text-destructive"
+              className="p-2 text-muted-foreground hover:text-destructive"
               title="Delete job"
             >
               <Trash2 className="w-5 h-5" />
@@ -134,7 +134,7 @@ export default function JobDetailPage() {
             />
             <div>
               <p className="text-sm font-medium">{job.poster.name}</p>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 Posted {new Date(job.createdAt).toLocaleDateString()}
               </p>
             </div>
@@ -143,16 +143,16 @@ export default function JobDetailPage() {
       </div>
 
       {/* Description */}
-      <div className="bg-white border rounded-xl p-6">
+      <div className="bg-card border border-border/50 rounded-xl p-6">
         <h2 className="text-lg font-semibold mb-3">Description</h2>
-        <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+        <div className="text-foreground/80 whitespace-pre-wrap leading-relaxed">
           {job.description}
         </div>
       </div>
 
       {/* Skills */}
       {job.skillsRequired.length > 0 && (
-        <div className="bg-white border rounded-xl p-6">
+        <div className="bg-card border border-border/50 rounded-xl p-6">
           <h2 className="text-lg font-semibold mb-3">Required Skills</h2>
           <div className="flex flex-wrap gap-2">
             {job.skillsRequired.map((skill: string) => (
@@ -169,7 +169,7 @@ export default function JobDetailPage() {
 
       {/* Apply / Already Applied */}
       {!job.isExpired && (
-        <div className="bg-white border rounded-xl p-6 text-center">
+        <div className="bg-card border border-border/50 rounded-xl p-6 text-center">
           {job.viewerApplication ? (
             <div className="flex items-center justify-center gap-2 text-success">
               <CheckCircle className="w-5 h-5" />
@@ -190,7 +190,7 @@ export default function JobDetailPage() {
       )}
 
       {/* View Applications (Poster) */}
-      <div className="bg-white border rounded-xl p-6">
+      <div className="bg-card border border-border/50 rounded-xl p-6">
         <button
           onClick={() => setShowApplications(!showApplications)}
           className="text-primary hover:underline text-sm font-medium"
@@ -231,10 +231,10 @@ function ApplyModal({ jobId, onClose }: { jobId: Id<"jobs">; onClose: () => void
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl p-6 w-full max-w-lg">
+      <div className="bg-card rounded-xl p-6 w-full max-w-lg shadow-elevation-2">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold">Apply to this Position</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -249,7 +249,7 @@ function ApplyModal({ jobId, onClose }: { jobId: Id<"jobs">; onClose: () => void
               placeholder="Tell the employer why you're a great fit..."
               className="w-full border rounded-lg px-3 py-2 text-sm"
             />
-            <p className="text-xs text-gray-400 mt-1">{coverLetter.length}/3000</p>
+            <p className="text-xs text-muted-foreground mt-1">{coverLetter.length}/3000</p>
           </div>
 
           {error && <p className="text-destructive text-sm">{error}</p>}
@@ -272,13 +272,13 @@ function ApplicationsList({ jobId }: { jobId: Id<"jobs"> }) {
   const updateStatus = useMutation(api.jobs.updateApplicationStatus)
 
   if (apps === undefined)
-    return <p className="text-gray-400 text-sm mt-3">Loading...</p>
+    return <p className="text-muted-foreground text-sm mt-3">Loading...</p>
 
   if (!Array.isArray(apps))
-    return <p className="text-red-400 text-sm mt-3">Only the poster can view applications.</p>
+    return <p className="text-destructive text-sm mt-3">Only the poster can view applications.</p>
 
   if (apps.length === 0)
-    return <p className="text-gray-400 text-sm mt-3">No applications yet.</p>
+    return <p className="text-muted-foreground text-sm mt-3">No applications yet.</p>
 
   const statusColors: Record<string, string> = {
     applied: "bg-yellow-100 text-yellow-700",
@@ -302,7 +302,7 @@ function ApplicationsList({ jobId }: { jobId: Id<"jobs"> }) {
             <div>
               <p className="font-medium text-sm">{app.applicant?.name || "Unknown"}</p>
               {app.applicant?.university && (
-                <p className="text-xs text-gray-500">{app.applicant.university}</p>
+                <p className="text-xs text-muted-foreground">{app.applicant.university}</p>
               )}
               <span className={`px-2 py-0.5 rounded-full text-xs ${statusColors[app.status]}`}>
                 {app.status}

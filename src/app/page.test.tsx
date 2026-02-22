@@ -15,6 +15,7 @@ jest.mock("next/navigation", () => ({
 
 // Mock framer-motion (we use LazyMotion + m components)
 jest.mock("framer-motion", () => {
+  // eslint-disable-next-line react/display-name
   const element = (tag: string) => ({ children, className, style, ...rest }: any) => {
     const Tag = tag as any
     return <Tag className={className} style={style}>{children}</Tag>

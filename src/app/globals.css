@@ -12,38 +12,38 @@
 @import "highlight.js/styles/github-dark.css";
 
 /* ─── DESIGN SYSTEM ──────────────────────────────────────────────
-   Campus Connect — Premium Neutral Design System
-   Philosophy: Content-first · Quiet chrome · Single accent
-   Inspired by: Apple HIG · Linear · Vercel · Stripe
+   Campus Connect — Warm Academic Design System
+   Philosophy: Warm neutrals · Multi-accent · Alive with motion
+   Inspired by: Instagram · Discord · Linear · Notion
    ─────────────────────────────────────────────────────────────── */
 
 @layer base {
   :root {
-    /* ── Backgrounds ── */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
+    /* ── Backgrounds (warm whites) ── */
+    --background: 220 14% 98%;
+    --foreground: 224 20% 10%;
 
     /* ── Cards & Surfaces ── */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
+    --card-foreground: 224 20% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
+    --popover-foreground: 224 20% 10%;
 
     /* ── Primary (iOS System Blue) ── */
     --primary: 211 100% 50%;
     --primary-foreground: 0 0% 100%;
 
     /* ── Secondary ── */
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 32%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 9% 32%;
 
     /* ── Muted ── */
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
 
     /* ── Accent ── */
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 9%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 224 20% 10%;
 
     /* ── Destructive ── */
     --destructive: 0 84% 60%;
@@ -57,49 +57,56 @@
     --info: 211 100% 50%;
     --info-foreground: 0 0% 100%;
 
+    /* ── Semantic Accents ── */
+    --accent-amber: 38 95% 54%;
+    --accent-emerald: 160 84% 39%;
+    --accent-rose: 347 77% 50%;
+    --accent-violet: 263 70% 58%;
+    --accent-sky: 199 89% 48%;
+
     /* ── Chrome ── */
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
     --ring: 211 100% 50%;
     --radius: 0.625rem;
 
     /* ── Sidebar ── */
-    --sidebar: 0 0% 98%;
-    --sidebar-foreground: 0 0% 9%;
-    --sidebar-accent: 0 0% 95%;
-    --sidebar-accent-foreground: 0 0% 9%;
-    --sidebar-border: 0 0% 92%;
+    --sidebar: 220 14% 97%;
+    --sidebar-foreground: 224 20% 10%;
+    --sidebar-accent: 220 14% 95%;
+    --sidebar-accent-foreground: 224 20% 10%;
+    --sidebar-border: 220 13% 92%;
 
     /* ── Brand Accent ── */
     --accent-blue: 211 100% 50%;
   }
 
   .dark {
-    /* ── Backgrounds ── */
-    --background: 0 0% 5%;
-    --foreground: 0 0% 95%;
+    /* ── Backgrounds (warm darks) ── */
+    --background: 224 20% 6%;
+    --foreground: 220 14% 95%;
 
     /* ── Cards & Surfaces ── */
-    --card: 0 0% 9%;
-    --card-foreground: 0 0% 95%;
-    --popover: 0 0% 9%;
-    --popover-foreground: 0 0% 95%;
+    --card: 224 18% 10%;
+    --card-foreground: 220 14% 95%;
+    --popover: 224 18% 10%;
+    --popover-foreground: 220 14% 95%;
 
     /* ── Primary (iOS Blue, brighter in dark) ── */
     --primary: 211 100% 56%;
     --primary-foreground: 0 0% 100%;
 
     /* ── Secondary ── */
-    --secondary: 0 0% 13%;
-    --secondary-foreground: 0 0% 70%;
+    --secondary: 224 14% 14%;
+    --secondary-foreground: 220 9% 70%;
 
     /* ── Muted ── */
-    --muted: 0 0% 13%;
-    --muted-foreground: 0 0% 55%;
+    --muted: 224 14% 14%;
+    --muted-foreground: 220 9% 55%;
 
     /* ── Accent ── */
-    --accent: 0 0% 13%;
-    --accent-foreground: 0 0% 95%;
+    --accent: 224 14% 14%;
+    --accent-foreground: 220 14% 95%;
 
     /* ── Destructive ── */
     --destructive: 0 72% 51%;
@@ -113,17 +120,24 @@
     --info: 211 100% 56%;
     --info-foreground: 0 0% 100%;
 
+    /* ── Semantic Accents ── */
+    --accent-amber: 38 95% 58%;
+    --accent-emerald: 160 84% 44%;
+    --accent-rose: 347 77% 55%;
+    --accent-violet: 263 70% 64%;
+    --accent-sky: 199 89% 52%;
+
     /* ── Chrome ── */
-    --border: 0 0% 16%;
-    --input: 0 0% 16%;
+    --border: 224 12% 18%;
+    --input: 224 12% 18%;
     --ring: 211 100% 56%;
 
     /* ── Sidebar ── */
-    --sidebar: 0 0% 7%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-accent: 0 0% 12%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 0 0% 14%;
+    --sidebar: 224 20% 7%;
+    --sidebar-foreground: 220 14% 95%;
+    --sidebar-accent: 224 14% 12%;
+    --sidebar-accent-foreground: 220 14% 95%;
+    --sidebar-border: 224 12% 15%;
   }
 }
 
@@ -134,11 +148,11 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: var(--font-geist-sans), 'Geist', system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Bricolage Grotesque', 'DM Sans', system-ui, sans-serif;
+    font-family: 'Bricolage Grotesque', var(--font-geist-sans), system-ui, sans-serif;
     font-feature-settings: "ss01" 1;
   }
   html {
@@ -155,13 +169,26 @@
 @layer components {
   /* ── Brand accent surface ── */
   .brand-gradient {
-    background: hsl(var(--primary));
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent-violet)) 100%);
   }
   .brand-gradient-text {
-    color: hsl(var(--primary));
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent-violet)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
   .brand-gradient-border {
     border: 2px solid hsl(var(--primary));
+  }
+
+  /* ── Warm gradient (achievements, XP, streaks) ── */
+  .gradient-warm {
+    background: linear-gradient(135deg, hsl(var(--accent-amber)) 0%, hsl(var(--accent-rose)) 100%);
+  }
+
+  /* ── Story ring gradient (Instagram-style) ── */
+  .gradient-story {
+    background: conic-gradient(from 180deg, hsl(var(--accent-amber)), hsl(var(--accent-rose)), hsl(var(--accent-violet)), hsl(var(--primary)), hsl(var(--accent-amber)));
   }
 
   /* Glass morphism card surface */
@@ -172,12 +199,72 @@
     @apply bg-card/95 backdrop-blur-2xl border border-border/60;
   }
 
+  /* ── Dashboard atmosphere ──────────────────────────────── */
+  /* Noise texture overlay */
+  .atmosphere-noise {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    opacity: 0.4;
+  }
+  :is(.dark) .atmosphere-noise {
+    opacity: 0.25;
+  }
+
+  /* Ambient glow orbs — soft colored blurs behind content */
+  .atmosphere-orb {
+    position: fixed;
+    pointer-events: none;
+    border-radius: 9999px;
+    filter: blur(100px);
+    z-index: 0;
+  }
+  .atmosphere-orb-primary {
+    width: 500px;
+    height: 500px;
+    top: -120px;
+    right: -80px;
+    background: radial-gradient(circle, hsl(var(--primary) / 0.08), transparent 70%);
+  }
+  :is(.dark) .atmosphere-orb-primary {
+    background: radial-gradient(circle, hsl(var(--primary) / 0.06), transparent 70%);
+  }
+  .atmosphere-orb-violet {
+    width: 400px;
+    height: 400px;
+    bottom: -60px;
+    left: 10%;
+    background: radial-gradient(circle, hsl(var(--accent-violet) / 0.06), transparent 70%);
+  }
+  :is(.dark) .atmosphere-orb-violet {
+    background: radial-gradient(circle, hsl(var(--accent-violet) / 0.04), transparent 70%);
+  }
+
+  /* Sidebar glass surface */
+  .sidebar-glass {
+    @apply bg-sidebar/90 backdrop-blur-xl;
+  }
+  :is(.dark) .sidebar-glass {
+    @apply bg-sidebar/80;
+  }
+
   /* Text accent utility */
   .text-gradient {
-    color: hsl(var(--primary));
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent-violet)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
   .text-gradient-subtle {
     @apply text-muted-foreground;
+  }
+  .text-gradient-warm {
+    background: linear-gradient(135deg, hsl(var(--accent-amber)) 0%, hsl(var(--accent-rose)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   /* Card patterns */
@@ -191,19 +278,30 @@
     @apply bg-muted/50 rounded-lg border border-border/50;
   }
 
-  /* Stories ring — clean single-color ring */
+  /* Stories ring — gradient ring for unseen, gray for seen */
   .story-ring {
-    box-shadow: 0 0 0 2.5px hsl(var(--primary));
+    position: relative;
     border-radius: 9999px;
+  }
+  .story-ring::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 9999px;
+    padding: 2.5px;
+    background: conic-gradient(from 180deg, hsl(var(--accent-amber)), hsl(var(--accent-rose)), hsl(var(--accent-violet)), hsl(var(--primary)), hsl(var(--accent-amber)));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
   }
   .story-ring-seen {
     box-shadow: 0 0 0 2px hsl(var(--border));
     border-radius: 9999px;
   }
 
-  /* Primary button — solid accent */
+  /* Primary button — gradient accent */
   .btn-gradient {
-    background: hsl(var(--primary));
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent-violet)) 100%);
     @apply text-white font-semibold transition-all duration-200 hover:brightness-110 hover:shadow-glow active:scale-[0.97];
   }
 
