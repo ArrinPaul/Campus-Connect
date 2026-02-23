@@ -48,8 +48,8 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
     conversationId,
   })
   const searchResults = useQuery(
-    api.users.searchUsers,
-    addMemberSearch.trim().length >= 2 ? { query: addMemberSearch.trim() } : "skip"
+    api.users.searchUsersByUsername,
+    addMemberSearch.trim().length >= 2 ? { query: addMemberSearch.trim(), limit: 10 } : "skip"
   )
 
   // Mutations

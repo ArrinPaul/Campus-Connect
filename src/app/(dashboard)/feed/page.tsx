@@ -11,7 +11,6 @@ export default function FeedPage() {
       {/* Main Feed Content */}
       <div className="col-span-12 lg:col-span-8 xl:col-span-6 xl:col-start-4">
         <Suspense fallback={<FeedSkeleton />}>
-          {/* @ts-expect-error Server Component */}
           <Feed />
         </Suspense>
       </div>

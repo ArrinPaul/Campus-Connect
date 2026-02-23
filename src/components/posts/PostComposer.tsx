@@ -429,7 +429,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
         linkPreview: linkPreviewData ?? undefined,
         ...(pollId ? { pollId: pollId as Id<"polls"> } : {}),
       })
-      postId = createdPost?._id as string | undefined
+      postId = createdPost as string | undefined
 
       // Link poll to post (set two-way reference)
       if (pollId && postId) {

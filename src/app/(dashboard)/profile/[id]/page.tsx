@@ -41,7 +41,6 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
 export default function ProfilePage({ params }: ProfilePageProps) {
     return (
         <Suspense fallback={<ProfileSkeleton />}>
-            {/* @ts-expect-error Server Component */}
             <ProfilePageContent userId={params.id} />
         </Suspense>
     );

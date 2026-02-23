@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import {
   internalMutation,
+  internalAction,
   query,
   mutation,
   action,
@@ -102,7 +103,7 @@ export const deleteUserFromWebhook = internalMutation({
   },
 });
 
-export const deleteUserAccount = action({
+export const deleteUserAccount = internalAction({
   args: {
     userId: v.id("users"),
     clerkId: v.string(),
@@ -543,7 +544,7 @@ export const updateProfilePicture = mutation({
       .first();
     if (!user) throw new Error("User not found");
     const url = await ctx.storage.getUrl(args.storageId);
-    await ctx.db.patch(user._id, { profilePicture: url });
+    await ctx.db.patch(user._id, { profilePicture: url ?? undefined });
     return url;
   },
 });

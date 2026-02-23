@@ -55,6 +55,18 @@ export const getPostById = query({
 export const createPost = mutation({
   args: {
     content: v.string(),
+    mediaUrls: v.optional(v.array(v.string())),
+    mediaType: v.optional(v.union(v.literal("image"), v.literal("video"), v.literal("file"), v.literal("link"))),
+    mediaFileNames: v.optional(v.array(v.string())),
+    linkPreview: v.optional(v.object({
+      url: v.string(),
+      title: v.optional(v.string()),
+      description: v.optional(v.string()),
+      image: v.optional(v.string()),
+      favicon: v.optional(v.string()),
+    })),
+    pollId: v.optional(v.id("polls")),
+    communityId: v.optional(v.id("communities")),
   },
   handler: async (ctx, args) => {
     const user = await requireOnboarding(ctx);
@@ -73,6 +85,12 @@ export const createPost = mutation({
       likeCount: 0,
       commentCount: 0,
       shareCount: 0,
+      mediaUrls: args.mediaUrls,
+      mediaType: args.mediaType,
+      mediaFileNames: args.mediaFileNames,
+      linkPreview: args.linkPreview,
+      pollId: args.pollId,
+      communityId: args.communityId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });

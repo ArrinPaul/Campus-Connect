@@ -8,13 +8,14 @@
  * @module
  */
 
+import type * as _lib from "../_lib.js";
 import type * as ads from "../ads.js";
 import type * as bookmarks from "../bookmarks.js";
 import type * as calls from "../calls.js";
 import type * as comments from "../comments.js";
 import type * as communities from "../communities.js";
-import type * as counters from "../counters.js";
 import type * as conversations from "../conversations.js";
+import type * as counters from "../counters.js";
 import type * as crons from "../crons.js";
 import type * as events from "../events.js";
 import type * as feed_ranking from "../feed_ranking.js";
@@ -60,6 +61,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  _lib: typeof _lib;
   ads: typeof ads;
   bookmarks: typeof bookmarks;
   calls: typeof calls;

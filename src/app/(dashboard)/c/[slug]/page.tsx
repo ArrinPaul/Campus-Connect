@@ -54,7 +54,6 @@ async function CommunityPageContent({ slug }: { slug: string }) {
 export default function CommunityPage({ params }: PageProps) {
     return (
         <Suspense fallback={<div>Loading community...</div>}>
-            {/* @ts-expect-error Server Component */}
             <CommunityPageContent slug={params.slug} />
         </Suspense>
     );

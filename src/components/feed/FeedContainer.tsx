@@ -11,8 +11,9 @@ import { VirtualizedFeed } from "./VirtualizedFeed"
 import { Repeat2 } from "lucide-react"
 import { SuggestedUsers } from "@/components/discover/SuggestedUsers"
 import { TrendingHashtags } from "@/components/trending/TrendingHashtags"
-import type { FeedType } from "@/app/(dashboard)/feed/page"
 import type { FunctionReturnType } from "convex/server"
+
+type FeedType = "following" | "for-you" | "trending"
 
 type ConvexFeedItem = NonNullable<FunctionReturnType<typeof api.feed_ranking.getRankedFeed>>["items"][number]
 
@@ -124,14 +125,14 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
     if (!feedData) return
     
     if (!hasInitializedRef.current) {
-      setAllItems(feedData.items)
+      setAllItems(feedData.items as ConvexFeedItem[])
       setCursor(feedData.nextCursor)
       hasInitializedRef.current = true
     } else if (!isLoadingMore) {
       // Handle real-time updates for the initial batch
       setAllItems((prev) => {
         const existingIds = new Set(prev.map((item) => item._id))
-        const newItems = feedData.items.filter((item) => !existingIds.has(item._id))
+        const newItems = (feedData.items as ConvexFeedItem[]).filter((item) => !existingIds.has(item._id))
         return [...newItems, ...prev]
       })
       setCursor(feedData.nextCursor)
@@ -141,7 +142,7 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
   // Update allItems when more data loads
   useEffect(() => {
     if (moreFeedData && isLoadingMore) {
-      setAllItems((prev) => [...prev, ...moreFeedData.items])
+      setAllItems((prev) => [...prev, ...(moreFeedData.items as ConvexFeedItem[])])
       setCursor(moreFeedData.nextCursor)
       setIsLoadingMore(false)
     }
