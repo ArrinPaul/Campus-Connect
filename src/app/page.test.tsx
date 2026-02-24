@@ -41,17 +41,16 @@ jest.mock("framer-motion", () => {
 
 // Mock Next.js Link
 jest.mock("next/link", () => {
-  const MockLink = ({ children, ...props }: any) => <a {...props}>{children}</a>
+  const MockLink = ({ children, href, ...props }: any) => <a href={href} {...props}>{children}</a>
   MockLink.displayName = "MockLink"
   return MockLink
 })
 
-// Mock Button component
-jest.mock("@/components/ui/button", () => ({
-  Button: ({ children, asChild, variant, size, className, ...props }: any) => {
-    if (asChild) return children
-    return <button className={className} {...props}>{children}</button>
-  },
+// Mock lucide-react icons
+jest.mock("lucide-react", () => ({
+  LogIn: () => null,
+  UserPlus: () => null,
+  ArrowRight: () => null,
 }))
 
 describe("Landing Page", () => {
@@ -94,9 +93,7 @@ describe("Landing Page", () => {
 
     render(<Home />)
 
-    // Check for loading spinner
-    const spinner = document.querySelector(".animate-spin")
-    expect(spinner).toBeInTheDocument()
+    expect(screen.getByText(/Loading/i)).toBeInTheDocument()
   })
 
   it("should display hero section with title and description", () => {
@@ -107,15 +104,11 @@ describe("Landing Page", () => {
 
     render(<Home />)
 
-    expect(
-      screen.getByText(/Your Academic Journey/)
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText(/Connect with peers, collaborate on research/)
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Connect, Collaborate, Conquer/i)).toBeInTheDocument()
+    expect(screen.getByText(/academic community/i)).toBeInTheDocument()
   })
 
-  it("should display Sign Up CTA button with correct link", () => {
+  it("should display Get Started CTA button with correct link", () => {
     ;(useUser as jest.Mock).mockReturnValue({
       isSignedIn: false,
       isLoaded: true,
@@ -128,7 +121,7 @@ describe("Landing Page", () => {
     expect(signUpLink).toHaveAttribute("href", "/sign-up")
   })
 
-  it("should display Sign In CTA button with correct link", () => {
+  it("should display Log In button with correct link", () => {
     ;(useUser as jest.Mock).mockReturnValue({
       isSignedIn: false,
       isLoaded: true,
@@ -136,12 +129,12 @@ describe("Landing Page", () => {
 
     render(<Home />)
 
-    const signInLink = screen.getByRole("link", { name: /sign in/i })
-    expect(signInLink).toBeInTheDocument()
-    expect(signInLink).toHaveAttribute("href", "/sign-in")
+    const logInLink = screen.getByRole("link", { name: /log in/i })
+    expect(logInLink).toBeInTheDocument()
+    expect(logInLink).toHaveAttribute("href", "/sign-in")
   })
 
-  it("should display features section", () => {
+  it("should display feed link for existing members", () => {
     ;(useUser as jest.Mock).mockReturnValue({
       isSignedIn: false,
       isLoaded: true,
@@ -149,9 +142,6 @@ describe("Landing Page", () => {
 
     render(<Home />)
 
-    expect(screen.getByText("Built for Academic Excellence")).toBeInTheDocument()
-    expect(screen.getByText("Smart Networking")).toBeInTheDocument()
-    expect(screen.getByText("Research Collaboration")).toBeInTheDocument()
-    expect(screen.getByText("Hackathons & Events")).toBeInTheDocument()
+    expect(screen.getByText(/already a member/i)).toBeInTheDocument()
   })
 })

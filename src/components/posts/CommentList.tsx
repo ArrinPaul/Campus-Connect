@@ -1,13 +1,13 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import Image from "next/image"
 import Link from "next/link"
 import { useUser } from "@clerk/nextjs"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import { CommentSkeleton } from "@/components/ui/loading-skeleton"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { parseMentions } from "@/lib/mention-utils"
 import { ChevronDown, ChevronUp, MessageSquare, ArrowRight } from "lucide-react"
 import dynamic from "next/dynamic"
@@ -55,6 +55,9 @@ interface CommentListProps {
   isLoading?: boolean
   sortBy?: SortOption
   onSortChange?: (sort: SortOption) => void
+  hasMore?: boolean
+  isLoadingMore?: boolean
+  onLoadMore?: () => void
 }
 
 const MAX_INDENT_DEPTH = 5
@@ -66,6 +69,9 @@ export function CommentList({
   isLoading = false,
   sortBy = "old",
   onSortChange,
+  hasMore = false,
+  isLoadingMore = false,
+  onLoadMore,
 }: CommentListProps) {
   const { isLoaded, isSignedIn } = useUser()
   const deleteComment = useMutation(api.comments.deleteComment)
@@ -181,10 +187,11 @@ export function CommentList({
           {/* Author Avatar */}
           <div className="relative h-7 w-7 flex-shrink-0">
             {comment.author?.profilePicture ? (
-              <Image
+              <OptimizedImage
                 src={comment.author.profilePicture}
                 alt={comment.author.name}
                 fill
+                isAvatar
                 className="rounded-full object-cover"
               />
             ) : (
@@ -376,6 +383,29 @@ export function CommentList({
       ) : (
         <div className="space-y-3">
           {topLevelComments.map((comment) => renderComment(comment))}
+
+          {/* Load More Button */}
+          {hasMore && onLoadMore && (
+            <div className="flex justify-center pt-2">
+              <button
+                onClick={onLoadMore}
+                disabled={isLoadingMore}
+                className="text-sm text-primary hover:text-primary/80 font-medium disabled:opacity-50 flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-primary/5 transition-colors"
+              >
+                {isLoadingMore ? (
+                  <>
+                    <ButtonLoadingSpinner />
+                    Loading more…
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="w-4 h-4" />
+                    Load more comments
+                  </>
+                )}
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

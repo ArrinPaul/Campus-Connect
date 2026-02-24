@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, memo, useRef, useEffect } from "react"
-import Image from "next/image"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { useUser } from "@clerk/nextjs"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
@@ -75,17 +75,62 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
   const [showShareDropdown, setShowShareDropdown] = useState(false)
   const [showRepostModal, setShowRepostModal] = useState(false)
   const [shareSuccess, setShareSuccess] = useState<string | null>(null)
+  const [commentSort, setCommentSort] = useState<"old" | "new" | "best" | "controversial">("old")
+  const [commentCursor, setCommentCursor] = useState<string | undefined>(undefined)
+  const [allComments, setAllComments] = useState<any[]>([])
+  const [isLoadingMoreComments, setIsLoadingMoreComments] = useState(false)
   
   const shareDropdownRef = useRef<HTMLDivElement>(null)
   const createRepost = useMutation(api.reposts.createRepost)
 
   const isOwnPost = currentUser?._id === post.authorId
 
-  // Only fetch comments when expanded
-  const comments = useQuery(
+  // Only fetch comments when expanded — paginated
+  const commentsData = useQuery(
     api.comments.getPostComments,
-    showComments ? { postId: post._id } : "skip"
+    showComments ? { postId: post._id, sortBy: commentSort, limit: 20 } : "skip"
   )
+
+  const moreCommentsData = useQuery(
+    api.comments.getPostComments,
+    showComments && isLoadingMoreComments && commentCursor
+      ? { postId: post._id, sortBy: commentSort, limit: 20, cursor: commentCursor }
+      : "skip"
+  )
+
+  // Initialize comments from first page
+  useEffect(() => {
+    if (commentsData && !isLoadingMoreComments) {
+      setAllComments(commentsData.comments)
+      setCommentCursor(commentsData.nextCursor ?? undefined)
+    }
+  }, [commentsData, isLoadingMoreComments])
+
+  // Append more comments
+  useEffect(() => {
+    if (moreCommentsData && isLoadingMoreComments) {
+      setAllComments((prev) => {
+        const existingIds = new Set(prev.map((c: any) => c._id))
+        const newComments = moreCommentsData.comments.filter((c: any) => !existingIds.has(c._id))
+        return [...prev, ...newComments]
+      })
+      setCommentCursor(moreCommentsData.nextCursor ?? undefined)
+      setIsLoadingMoreComments(false)
+    }
+  }, [moreCommentsData, isLoadingMoreComments])
+
+  // Reset pagination when sort changes
+  useEffect(() => {
+    setAllComments([])
+    setCommentCursor(undefined)
+    setIsLoadingMoreComments(false)
+  }, [commentSort])
+
+  const handleLoadMoreComments = () => {
+    if (commentCursor && !isLoadingMoreComments) {
+      setIsLoadingMoreComments(true)
+    }
+  }
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
@@ -234,10 +279,11 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
           <AvatarWithStatus userId={author._id} size="sm">
             <div className="relative h-9 w-9 flex-shrink-0 sm:h-10 sm:w-10">
               {author.profilePicture ? (
-                <Image
+                <OptimizedImage
                   src={author.profilePicture}
                   alt={author.name}
                   fill
+                  isAvatar
                   sizes="(max-width: 640px) 36px, 40px"
                   className="rounded-full object-cover ring-2 ring-border/30"
                 />
@@ -465,7 +511,16 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
       {/* Inline Comments Section */}
       {showComments && (
         <div className="mt-3 border-t border-border/40 pt-3 sm:mt-4 sm:pt-4 space-y-4">
-          <CommentList postId={post._id} comments={comments} isLoading={comments === undefined} />
+          <CommentList
+            postId={post._id}
+            comments={allComments.length > 0 ? allComments : commentsData?.comments}
+            isLoading={commentsData === undefined}
+            sortBy={commentSort}
+            onSortChange={setCommentSort}
+            hasMore={commentsData?.hasMore ?? false}
+            isLoadingMore={isLoadingMoreComments}
+            onLoadMore={handleLoadMoreComments}
+          />
           <CommentComposer postId={post._id} />
         </div>
       )}

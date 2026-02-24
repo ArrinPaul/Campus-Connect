@@ -17,6 +17,8 @@ const customJestConfig = {
     // Legacy relative imports in test files
     '../../convex/_generated/api': '<rootDir>/__mocks__/convex/api.js',
     '../../convex/_generated/dataModel': '<rootDir>/__mocks__/convex/dataModel.ts',
+    // Fix wrong-depth relative imports mistakenly using 3 levels up instead of 2
+    '\\.\\./\\.\\./\\.\\./lib/validations': '<rootDir>/src/lib/validations',
   },
   testMatch: [
     '**/__tests__/**/*.[jt]s?(x)',

@@ -141,8 +141,8 @@ describe("Responsive Component Behavior", () => {
       const { container } = render(<PostCard post={mockPost} author={mockAuthor} />)
       
       const avatar = container.querySelector(".relative")
-      expect(avatar?.className).toContain("h-8")
-      expect(avatar?.className).toContain("w-8")
+      expect(avatar?.className).toContain("h-9")
+      expect(avatar?.className).toContain("w-9")
       expect(avatar?.className).toContain("sm:h-10")
       expect(avatar?.className).toContain("sm:w-10")
     })

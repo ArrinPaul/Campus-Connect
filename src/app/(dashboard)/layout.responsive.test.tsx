@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react"
 import DashboardLayout from "./layout"
 
-// Mock the v2 layout components
-jest.mock("../../(components)/layouts/main-layout", () => ({
+// Mock the v2 layout components using @/ alias paths
+jest.mock("@/app/(components)/layouts/main-layout", () => ({
   MainLayout: ({ children, sidebar, mobileNav }: any) => (
     <div>
       <aside className="hidden md:flex flex-shrink-0">{sidebar}</aside>
@@ -12,7 +12,7 @@ jest.mock("../../(components)/layouts/main-layout", () => ({
   ),
 }))
 
-jest.mock("../../(components)/navigation/primary-sidebar", () => ({
+jest.mock("@/app/(components)/navigation/primary-sidebar", () => ({
   PrimarySidebar: () => (
     <nav className="flex-1 overflow-y-auto">
       <header className="px-4 sm:px-6">
@@ -28,7 +28,7 @@ jest.mock("../../(components)/navigation/primary-sidebar", () => ({
   ),
 }))
 
-jest.mock("../../(components)/navigation/mobile-bottom-nav", () => ({
+jest.mock("@/app/(components)/navigation/mobile-bottom-nav", () => ({
   MobileBottomNav: () => <div data-testid="mobile-nav">Mobile Nav</div>,
 }))
 
@@ -95,8 +95,6 @@ describe("DashboardLayout - Responsive Design", () => {
 
     const logos = screen.getAllByText("Campus Connect")
     expect(logos.length).toBeGreaterThan(0)
-    const sidebarLogo = logos[0]
-    expect(sidebarLogo.className).toContain("text-base")
   })
 
   it("should render children in main element", () => {

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { Play, FileText, Download, X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -91,7 +91,7 @@ export function MediaGallery({
               )}
               aria-label={`View ${altPrefix} ${i + 1}`}
             >
-              <Image
+              <OptimizedImage
                 src={url}
                 alt={mediaFileNames?.[i] || `${altPrefix} ${i + 1}`}
                 fill
@@ -215,7 +215,7 @@ export function ImageLightbox({
           />
         ) : (
           <div className="relative w-full h-full min-h-[200px] min-w-[200px]">
-            <Image
+            <OptimizedImage
               src={currentUrl}
               alt={currentName}
               fill

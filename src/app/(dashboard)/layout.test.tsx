@@ -17,7 +17,7 @@ Object.defineProperty(window, "matchMedia", {
 })
 
 // Mock the v2 layout components
-jest.mock("../../(components)/layouts/main-layout", () => ({
+jest.mock("@/app/(components)/layouts/main-layout", () => ({
   MainLayout: ({ children, sidebar, mobileNav }: any) => (
     <div>
       <aside className="hidden md:flex flex-shrink-0">{sidebar}</aside>
@@ -27,7 +27,7 @@ jest.mock("../../(components)/layouts/main-layout", () => ({
   ),
 }))
 
-jest.mock("../../(components)/navigation/primary-sidebar", () => ({
+jest.mock("@/app/(components)/navigation/primary-sidebar", () => ({
   PrimarySidebar: () => (
     <nav className="flex-1 overflow-y-auto">
       <div>
@@ -42,7 +42,7 @@ jest.mock("../../(components)/navigation/primary-sidebar", () => ({
   ),
 }))
 
-jest.mock("../../(components)/navigation/mobile-bottom-nav", () => ({
+jest.mock("@/app/(components)/navigation/mobile-bottom-nav", () => ({
   MobileBottomNav: () => <div data-testid="mobile-nav">MobileNav</div>,
 }))
 

@@ -200,6 +200,7 @@ export default defineSchema({
     createdAt: v.number(),
   })
     .index("by_post", ["postId"])
+    .index("by_post_created", ["postId", "createdAt"])
     .index("by_author", ["authorId"])
     .index("by_parent", ["parentCommentId"]),
 

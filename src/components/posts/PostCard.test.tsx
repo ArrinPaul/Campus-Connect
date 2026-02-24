@@ -162,51 +162,63 @@ describe("PostCard", () => {
     expect(screen.getByText("3")).toBeInTheDocument()
   })
 
-  it("should show delete button for own posts", () => {
+  it("should show options menu button for own posts", () => {
     mockGetCurrentUser.mockReturnValue({ _id: "user123" as Id<"users"> })
 
     render(<PostCard post={mockPost} author={mockAuthor} />)
 
-    expect(screen.getByText("Delete")).toBeInTheDocument()
+    expect(screen.getByLabelText("Post options")).toBeInTheDocument()
   })
 
-  it("should not show delete button for other users' posts", () => {
+  it("should not show options menu button for other users' posts", () => {
     mockGetCurrentUser.mockReturnValue({ _id: "otherUser" as Id<"users"> })
 
     render(<PostCard post={mockPost} author={mockAuthor} />)
 
-    expect(screen.queryByText("Delete")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Post options")).not.toBeInTheDocument()
   })
 
-  it("should handle delete post with confirmation", async () => {
+  it("should handle delete post via dropdown menu", async () => {
     mockGetCurrentUser.mockReturnValue({ _id: "user123" as Id<"users"> })
-    ;(global.confirm as jest.Mock).mockReturnValue(true)
     mockDeletePost.mockResolvedValue({ success: true })
 
     render(<PostCard post={mockPost} author={mockAuthor} />)
 
-    const deleteButton = screen.getByText("Delete")
-    fireEvent.click(deleteButton)
+    // Click options button to open dropdown
+    const optionsButton = screen.getByLabelText("Post options")
+    fireEvent.click(optionsButton)
+
+    // Click "Delete post" in the dropdown
+    const deletePostOption = screen.getByText("Delete post")
+    fireEvent.click(deletePostOption)
+
+    // Click "Delete" in the confirmation
+    const confirmDelete = screen.getByText("Delete")
+    fireEvent.click(confirmDelete)
 
     await waitFor(() => {
-      expect(global.confirm).toHaveBeenCalledWith(
-        "Are you sure you want to delete this post?"
-      )
       expect(mockDeletePost).toHaveBeenCalledWith({ postId: "post123" })
     })
   })
 
-  it("should not delete post if confirmation is cancelled", async () => {
+  it("should cancel delete post confirmation", async () => {
     mockGetCurrentUser.mockReturnValue({ _id: "user123" as Id<"users"> })
-    ;(global.confirm as jest.Mock).mockReturnValue(false)
 
     render(<PostCard post={mockPost} author={mockAuthor} />)
 
-    const deleteButton = screen.getByText("Delete")
-    fireEvent.click(deleteButton)
+    // Click options button to open dropdown
+    const optionsButton = screen.getByLabelText("Post options")
+    fireEvent.click(optionsButton)
+
+    // Click "Delete post" in the dropdown
+    const deletePostOption = screen.getByText("Delete post")
+    fireEvent.click(deletePostOption)
+
+    // Click "Cancel" in the confirmation
+    const cancelButton = screen.getByText("Cancel")
+    fireEvent.click(cancelButton)
 
     await waitFor(() => {
-      expect(global.confirm).toHaveBeenCalled()
       expect(mockDeletePost).not.toHaveBeenCalled()
     })
   })

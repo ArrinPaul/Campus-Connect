@@ -34,6 +34,7 @@ jest.mock("@/components/feed/RecommendedPosts", () => ({
 jest.mock("convex/react", () => ({
   useQuery: jest.fn(() => null),
   useMutation: jest.fn(() => jest.fn()),
+  useConvexAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false })),
 }))
 
 describe("FeedPage", () => {

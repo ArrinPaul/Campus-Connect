@@ -14,16 +14,84 @@ export const getPostComments = query({
     postId: v.id("posts"),
     sortBy: v.optional(v.union(v.literal("new"), v.literal("old"), v.literal("best"), v.literal("controversial"))),
     limit: v.optional(v.number()),
+    cursor: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const limit = Math.min(args.limit ?? 50, 200);
-    const comments = await ctx.db
+    const limit = Math.min(args.limit ?? 20, 100);
+    const sortBy = args.sortBy ?? "old";
+    const cursorTs = args.cursor ? Number(args.cursor) : undefined;
+
+    // Fetch top-level comments with cursor-based pagination
+    let topLevelQuery = ctx.db
+      .query("comments")
+      .withIndex("by_post_created", (q) => {
+        const q2 = q.eq("postId", args.postId);
+        if (cursorTs !== undefined) {
+          return sortBy === "new" ? q2.lt("createdAt", cursorTs) : q2.gt("createdAt", cursorTs);
+        }
+        return q2;
+      });
+
+    if (sortBy === "new") {
+      topLevelQuery = topLevelQuery.order("desc");
+    } else {
+      topLevelQuery = topLevelQuery.order("asc");
+    }
+
+    // Fetch more than needed so we can filter to top-level only
+    const allComments = await topLevelQuery.take(limit * 4);
+    const topLevelRaw = allComments.filter((c) => !c.parentCommentId);
+
+    // For "best" and "controversial" sorts, we need all top-level (no cursor)
+    let topLevel: typeof topLevelRaw;
+    let hasMore = false;
+
+    if (sortBy === "best" || sortBy === "controversial") {
+      // For non-chronological sorts, fetch all top-level and paginate in memory
+      const allTopLevel = (await ctx.db
+        .query("comments")
+        .withIndex("by_post", (q) => q.eq("postId", args.postId))
+        .collect())
+        .filter((c) => !c.parentCommentId);
+
+      if (sortBy === "best") {
+        allTopLevel.sort((a, b) => {
+          const scoreA = (a.reactionCounts?.like ?? 0) + (a.replyCount ?? 0);
+          const scoreB = (b.reactionCounts?.like ?? 0) + (b.replyCount ?? 0);
+          return scoreB - scoreA;
+        });
+      }
+      // controversial: most replies with fewest likes
+      if (sortBy === "controversial") {
+        allTopLevel.sort((a, b) => {
+          const scoreA = (a.replyCount ?? 0) - (a.reactionCounts?.like ?? 0);
+          const scoreB = (b.replyCount ?? 0) - (b.reactionCounts?.like ?? 0);
+          return scoreB - scoreA;
+        });
+      }
+
+      const offset = cursorTs ? Number(cursorTs) : 0;
+      topLevel = allTopLevel.slice(offset, offset + limit);
+      hasMore = offset + limit < allTopLevel.length;
+    } else {
+      topLevel = topLevelRaw.slice(0, limit);
+      hasMore = topLevelRaw.length > limit;
+    }
+
+    // Fetch replies for these top-level comments
+    const replyIds = topLevel.map((c) => c._id);
+    const replies = (await ctx.db
       .query("comments")
       .withIndex("by_post", (q) => q.eq("postId", args.postId))
-      .take(limit * 3);
+      .collect())
+      .filter((c) => c.parentCommentId && replyIds.includes(c.parentCommentId));
+
+    replies.sort((a, b) => a.createdAt - b.createdAt);
+
+    const all = [...topLevel, ...replies];
 
     const commentsWithAuthors = await Promise.all(
-      comments.map(async (comment) => {
+      all.map(async (comment) => {
         const author = await ctx.db.get(comment.authorId);
         return {
           ...comment,
@@ -34,25 +102,22 @@ export const getPostComments = query({
       })
     );
 
-    const topLevel = commentsWithAuthors.filter((c) => !c.parentCommentId);
-    const replies = commentsWithAuthors.filter((c) => !!c.parentCommentId);
-
-    const sortBy = args.sortBy ?? "old";
-    if (sortBy === "new") {
-      topLevel.sort((a, b) => b.createdAt - a.createdAt);
-    } else if (sortBy === "old") {
-      topLevel.sort((a, b) => a.createdAt - b.createdAt);
-    } else if (sortBy === "best") {
-      topLevel.sort((a, b) => {
-        const scoreA = (a.reactionCounts?.like ?? 0) + (a.replyCount ?? 0);
-        const scoreB = (b.reactionCounts?.like ?? 0) + (b.replyCount ?? 0);
-        return scoreB - scoreA;
-      });
+    // Compute next cursor
+    let nextCursor: string | null = null;
+    if (hasMore && topLevel.length > 0) {
+      if (sortBy === "best" || sortBy === "controversial") {
+        const offset = cursorTs ? Number(cursorTs) : 0;
+        nextCursor = String(offset + limit);
+      } else {
+        nextCursor = String(topLevel[topLevel.length - 1].createdAt);
+      }
     }
 
-    replies.sort((a, b) => a.createdAt - b.createdAt);
-
-    return [...topLevel, ...replies];
+    return {
+      comments: commentsWithAuthors,
+      nextCursor,
+      hasMore,
+    };
   },
 });
 

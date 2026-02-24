@@ -170,6 +170,11 @@ export const api = {
     getChronologicalFeed: 'feedRanking:getChronologicalFeed',
     getTrendingFeed: 'feedRanking:getTrendingFeed',
   },
+  feed_ranking: {
+    getRankedFeed: 'feed_ranking:getRankedFeed',
+    getChronologicalFeed: 'feed_ranking:getChronologicalFeed',
+    getTrendingFeed: 'feed_ranking:getTrendingFeed',
+  },
   recommendations: {
     getRecommendedPosts: 'recommendations:getRecommendedPosts',
     getSimilarPosts: 'recommendations:getSimilarPosts',
