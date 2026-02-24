@@ -6,9 +6,11 @@ import { NotificationItem } from '@/components/notifications/NotificationItem';
 import { Bell, CheckCheck } from 'lucide-react';
 
 export default function NotificationsPage() {
-  const notifications = useQuery(api.notifications.getNotifications);
+  const data = useQuery(api.notifications.getNotifications, {});
   const markAllAsRead = useMutation(api.notifications.markAllAsRead);
 
+  // Backend returns { notifications: [...], cursor: null }, not a plain array
+  const notifications = data?.notifications;
   const unreadCount = notifications?.filter((n) => !n.isRead).length ?? 0;
 
   return (

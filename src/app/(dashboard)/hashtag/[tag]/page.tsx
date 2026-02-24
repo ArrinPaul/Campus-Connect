@@ -7,7 +7,7 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft, Hash } from 'lucide-react';
 import Link from 'next/link';
 import { PostCard } from '../../../(components)/feed/PostCard';
-import { FeedItem } from '../../(components)/feed/types';
+import type { FeedItem } from '../../../(components)/feed/types';
 
 type PageProps = {
     params: {

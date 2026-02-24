@@ -202,3 +202,77 @@
     scroll-behavior: auto !important;
   }
 }
+/* ─── CLERK COMPONENT STYLING ───────────────────────────────── */
+.cl-root {
+  --color-focus-ring: hsl(var(--ring));
+}
+
+.cl-card {
+  @apply shadow-xl rounded-xl overflow-hidden;
+}
+
+.cl-socialButtonsBlockButton__google,
+.cl-socialButtonsBlockButton__github,
+.cl-socialButtonsBlockButton__microsoft {
+  @apply border border-border/50 bg-background text-foreground hover:bg-accent/50 transition-all duration-200 font-medium shadow-sm;
+}
+
+.cl-formButtonPrimary {
+  @apply bg-primary text-primary-foreground font-semibold shadow-md hover:bg-primary/90 transition-all duration-200 active:scale-[0.98];
+}
+
+.cl-formFieldInput {
+  @apply bg-background border border-border/50 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary;
+}
+
+.cl-formFieldLabel {
+  @apply text-foreground font-medium text-sm;
+}
+
+.cl-dividerLine {
+  @apply bg-border/30;
+}
+
+.cl-dividerText {
+  @apply text-muted-foreground text-sm;
+}
+
+.cl-headerTitle {
+  @apply font-display text-3xl font-bold text-foreground;
+}
+
+.cl-headerSubtitle {
+  @apply text-muted-foreground text-base;
+}
+
+.cl-formLink {
+  @apply text-primary hover:text-primary/80 underline transition-colors;
+}
+
+/* Footer/alternative methods */
+.cl-footer {
+  @apply border-t border-border/30 pt-4;
+}
+
+.cl-alternativeMethodsBlockButton {
+  @apply border border-border/50 text-foreground hover:bg-accent/50 transition-colors;
+}
+
+/* Error and success messages */
+.cl-formFieldErrorText {
+  @apply text-destructive text-sm font-medium;
+}
+
+.cl-formFieldSuccessText {
+  @apply text-green-600 text-sm font-medium;
+}
+
+/* Identifiers page */
+.cl-identifierMobileView {
+  @apply rounded-xl;
+}
+
+/* Loading spinner */
+.cl-spinner {
+  @apply text-primary;
+}

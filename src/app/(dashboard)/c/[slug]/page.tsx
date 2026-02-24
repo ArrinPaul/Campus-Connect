@@ -1,5 +1,7 @@
+'use client';
+
 import React, { Suspense } from 'react';
-import { fetchQuery } from 'convex/nextjs';
+import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { notFound } from 'next/navigation';
 import { CommunityHeader } from '../../../(components)/communities/CommunityHeader';
@@ -12,8 +14,20 @@ type PageProps = {
     };
 };
 
-async function CommunityPageContent({ slug }: { slug: string }) {
-    const community = await fetchQuery(api.communities.getCommunity, { slug });
+function CommunityPageContent({ slug }: { slug: string }) {
+    const community = useQuery(api.communities.getCommunity, { slug });
+
+    if (community === undefined) {
+        return (
+            <div className="max-w-4xl mx-auto py-12 px-4">
+                <div className="h-48 w-full bg-muted animate-pulse rounded-lg" />
+                <div className="mt-6 space-y-4">
+                    <div className="h-8 w-1/3 bg-muted animate-pulse rounded" />
+                    <div className="h-4 w-1/2 bg-muted animate-pulse rounded" />
+                </div>
+            </div>
+        );
+    }
 
     if (!community) {
         notFound();

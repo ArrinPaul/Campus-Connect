@@ -1,7 +1,7 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
-import { useQuery, useMutation } from 'convex/react';
+import { Suspense, useEffect, useRef } from 'react';
+import { useQuery, useMutation, useConvexAuth } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 import { notFound } from 'next/navigation';
@@ -34,15 +34,18 @@ const QuestionDetailPageSkeleton = () => (
 );
 
 function QuestionDetailPageContent({ questionId }: { questionId: Id<'questions'> }) {
+    const { isAuthenticated } = useConvexAuth();
     const question = useQuery(api.questions.getQuestion, { questionId });
     const incrementViewCount = useMutation(api.questions.incrementViewCount);
     const vote = useMutation(api.questions.vote);
     const acceptAnswer = useMutation(api.questions.acceptAnswer);
-    const currentUser = useQuery(api.users.getCurrentUser);
+    const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : 'skip');
+    const hasIncrementedRef = useRef(false);
 
     useEffect(() => {
-        if (question) {
-            incrementViewCount({ questionId });
+        if (question && !hasIncrementedRef.current) {
+            hasIncrementedRef.current = true;
+            incrementViewCount({ questionId }).catch(() => {});
         }
     }, [questionId, question, incrementViewCount]);
 
@@ -115,20 +118,26 @@ function QuestionDetailPageContent({ questionId }: { questionId: Id<'questions'>
 
                 <div className="flex justify-between items-center mt-6 border-t pt-4">
                     <div className="flex items-center gap-3">
-                        <button 
-                            onClick={() => handleVote(question._id, 'question', 'up')} 
-                            className={cn("p-2 rounded-full hover:bg-muted/50 flex items-center gap-1", { "text-primary": question.viewerVotes?.[question._id] === 'up' })}
-                            title="Upvote"
-                        >
-                            <ArrowUp className="h-5 w-5" /> {question.upvotes}
-                        </button>
-                        <button 
-                            onClick={() => handleVote(question._id, 'question', 'down')} 
-                            className={cn("p-2 rounded-full hover:bg-muted/50 flex items-center gap-1", { "text-red-500": question.viewerVotes?.[question._id] === 'down' })}
-                            title="Downvote"
-                        >
-                            <ArrowDown className="h-5 w-5" /> {question.downvotes}
-                        </button>
+                        {isAuthenticated ? (
+                          <>
+                            <button 
+                                onClick={() => handleVote(question._id, 'question', 'up')} 
+                                className={cn("p-2 rounded-full hover:bg-muted/50 flex items-center gap-1", { "text-primary": question.viewerVotes?.[question._id] === 'up' })}
+                                title="Upvote"
+                            >
+                                <ArrowUp className="h-5 w-5" /> {question.upvotes}
+                            </button>
+                            <button 
+                                onClick={() => handleVote(question._id, 'question', 'down')} 
+                                className={cn("p-2 rounded-full hover:bg-muted/50 flex items-center gap-1", { "text-red-500": question.viewerVotes?.[question._id] === 'down' })}
+                                title="Downvote"
+                            >
+                                <ArrowDown className="h-5 w-5" /> {question.downvotes}
+                            </button>
+                          </>
+                        ) : (
+                            <span className="text-sm text-muted-foreground">Sign in to vote</span>
+                        )}
                     </div>
                     <div className="flex items-center gap-2 text-muted-foreground">
                         <MessageCircle className="h-5 w-5" />
@@ -155,7 +164,11 @@ function QuestionDetailPageContent({ questionId }: { questionId: Id<'questions'>
                 )}
             </div>
             
-            <AskAnswerForm questionId={question._id} />
+            {isAuthenticated ? (
+                <AskAnswerForm questionId={question._id} />
+            ) : (
+                <p className="text-center text-muted-foreground mt-8 py-4 border rounded-lg bg-muted/30">Sign in to answer this question</p>
+            )}
         </div>
     );
 }

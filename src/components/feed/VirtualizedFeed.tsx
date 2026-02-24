@@ -8,7 +8,10 @@ import { Repeat2 } from "lucide-react"
 import { api } from "@/convex/_generated/api"
 import type { FunctionReturnType } from "convex/server"
 
-type ConvexFeedItem = NonNullable<FunctionReturnType<typeof api.feed_ranking.getRankedFeed>>["items"][number]
+type ConvexFeedItem = NonNullable<FunctionReturnType<typeof api.feed_ranking.getRankedFeed>>["items"][number] & {
+  reposter?: { name?: string; username?: string } | null
+  quoteContent?: string | null
+}
 
 interface VirtualizedFeedProps {
   items: ConvexFeedItem[]
@@ -74,21 +77,21 @@ export function VirtualizedFeed({
                 <PostCard post={item.post} author={item.post.author} />
               )}
 
-              {item.type === "repost" &&
+              {(item as any).type === "repost" &&
                 item.post.author &&
-                item.reposter && (
+                (item as any).reposter && (
                   <div className="space-y-0">
                     <div className="flex items-center gap-2 px-4 pt-3 pb-1 text-xs font-medium text-accent-emerald">
                       <Repeat2 className="h-3.5 w-3.5" />
                       <span>
-                        {item.reposter.name || item.reposter.username}{" "}
+                        {(item as any).reposter.name || (item as any).reposter.username}{" "}
                         reposted
                       </span>
                     </div>
-                    {item.quoteContent && (
+                    {(item as any).quoteContent && (
                       <div className="px-4 pb-2">
                         <p className="text-sm text-muted-foreground italic">
-                          &ldquo;{item.quoteContent}&rdquo;
+                          &ldquo;{(item as any).quoteContent}&rdquo;
                         </p>
                       </div>
                     )}

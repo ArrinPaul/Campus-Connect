@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { useQuery, useMutation } from 'convex/react';
+import { useQuery, useMutation, useConvexAuth } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { Send, Image as ImageIcon, ChartBar, File, Loader2 } from 'lucide-react';
+import { Send, Image as ImageIcon, ChartBar, File, Loader2, LogIn } from 'lucide-react';
 import { toast } from 'sonner';
+import Link from 'next/link';
 
 import type { Id } from '@/convex/_generated/dataModel';
 
@@ -14,12 +15,21 @@ type Props = {
 };
 
 export function CreatePost({ communityId }: Props) {
-  const currentUser = useQuery(api.users.getCurrentUser);
+  const convexAuth = useConvexAuth();
+  const isAuthenticated = convexAuth?.isAuthenticated ?? false;
+  const isLoading = convexAuth?.isLoading ?? true;
+  
+  const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : "skip");
   const createPost = useMutation(api.posts.createPost);
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
+    if (!isAuthenticated) {
+      toast.error("Please sign in to post");
+      return;
+    }
+
     if (content.trim().length === 0) {
       toast.error("Post content cannot be empty.");
       return;
@@ -35,13 +45,53 @@ export function CreatePost({ communityId }: Props) {
       toast.success("Your post has been published!");
     } catch (error) {
       console.error("Failed to create post:", error);
+      const errorMsg = error instanceof Error ? error.message : "An unexpected error occurred.";
+      // Filter out irrelevant error details for user-friendly message
+      const userMsg = errorMsg.includes("Unauthorized") 
+        ? "You need to be signed in to post."
+        : errorMsg.includes("ONBOARDING_REQUIRED")
+        ? "Please complete onboarding before posting."
+        : errorMsg;
       toast.error("Failed to create post", {
-        description: (error as Error).message || "An unexpected error occurred.",
+        description: userMsg,
       });
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    // Show loading skeleton while Convex auth is initializing
+    return (
+      <div className="rounded-lg border bg-card p-3 sm:p-4 mb-4 animate-pulse">
+        <div className="flex items-start gap-3">
+          <div className="h-10 w-10 rounded-full bg-muted flex-shrink-0" />
+          <div className="w-full space-y-2">
+            <div className="h-12 bg-muted rounded" />
+            <div className="h-8 bg-muted rounded w-1/4" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    // Show sign-in prompt
+    return (
+      <div className="rounded-lg border bg-card p-6 mb-4 text-center">
+        <LogIn className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
+        <h3 className="font-semibold mb-2">Sign in to post</h3>
+        <p className="text-muted-foreground mb-4 text-sm">
+          Join the conversation by signing in to your account.
+        </p>
+        <Link href="/sign-in">
+          <button className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors font-medium">
+            Sign In
+          </button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-lg border bg-card p-3 sm:p-4 mb-4">

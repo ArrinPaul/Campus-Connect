@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 import { ChatMessage } from './ChatMessage';
@@ -20,6 +20,7 @@ export function ChatWindow({ conversationId }: Props) {
     const conversation = useQuery(api.conversations.getConversation, { conversationId });
     const currentUser = useQuery(api.users.getCurrentUser);
     
+    const markAsRead = useMutation(api.messages.markAsRead);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -30,6 +31,16 @@ export function ChatWindow({ conversationId }: Props) {
         // Scroll to bottom on initial load and when new messages arrive
         scrollToBottom();
     }, [messages]);
+
+    // Mark latest message as read when viewing
+    useEffect(() => {
+        if (messages?.messages && messages.messages.length > 0 && currentUser) {
+            const lastMsg = messages.messages[messages.messages.length - 1];
+            if (lastMsg.senderId !== currentUser._id) {
+                markAsRead({ conversationId, messageId: lastMsg._id }).catch(() => {});
+            }
+        }
+    }, [messages, conversationId, markAsRead, currentUser]);
 
     const chatPartner = conversation?.participants?.find(p => p._id !== currentUser?._id);
 

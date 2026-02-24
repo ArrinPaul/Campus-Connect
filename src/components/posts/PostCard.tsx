@@ -463,10 +463,12 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
       />
 
       {/* Inline Comments Section */}
-      <div className="mt-3 border-t border-border/40 pt-3 sm:mt-4 sm:pt-4 space-y-4">
-        <CommentList postId={post._id} comments={comments} isLoading={comments === undefined} />
-        <CommentComposer postId={post._id} />
-      </div>
+      {showComments && (
+        <div className="mt-3 border-t border-border/40 pt-3 sm:mt-4 sm:pt-4 space-y-4">
+          <CommentList postId={post._id} comments={comments} isLoading={comments === undefined} />
+          <CommentComposer postId={post._id} />
+        </div>
+      )}
     </article>
   )
 })

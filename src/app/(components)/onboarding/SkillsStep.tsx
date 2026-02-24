@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { OnboardingData } from '../../(onboarding)/page';
+import { OnboardingData } from '../../(onboarding)/onboarding/page';
 import { X, Check } from 'lucide-react';
 
 const TempButton = ({ children, onClick, disabled=false, variant='primary' }: { children: React.ReactNode, onClick: () => void, disabled?: boolean, variant?: 'primary' | 'outline' }) => {

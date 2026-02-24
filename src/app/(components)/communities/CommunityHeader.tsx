@@ -1,9 +1,13 @@
 'use client';
 
+import React, { useState } from 'react';
 import Image from 'next/image';
 import type { Doc } from '@/convex/_generated/dataModel';
 import { Users, Rss, Settings, Lock } from 'lucide-react';
 import Link from 'next/link';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { useConvexAuth } from 'convex/react';
 
 // Manually defining type based on getCommunity query
 type Community = Doc<'communities'> & {
@@ -15,8 +19,29 @@ type Props = {
 };
 
 export function CommunityHeader({ community }: Props) {
-    // TODO: Add Join/Leave logic
+    const { isAuthenticated } = useConvexAuth();
+    const joinCommunity = useMutation(api.communities.joinCommunity);
+    const leaveCommunity = useMutation(api.communities.leaveCommunity);
+    const [isLoading, setIsLoading] = useState(false);
+
     const isMember = community.viewerRole === 'member' || community.viewerRole === 'admin' || community.viewerRole === 'owner';
+    const isOwner = community.viewerRole === 'owner';
+
+    const handleJoinLeave = async () => {
+        if (!isAuthenticated || isLoading) return;
+        setIsLoading(true);
+        try {
+            if (isMember) {
+                await leaveCommunity({ communityId: community._id });
+            } else {
+                await joinCommunity({ communityId: community._id });
+            }
+        } catch (err) {
+            console.error('Join/Leave failed:', err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const typeInfo = {
         public: { icon: Users, text: 'Public' },
@@ -26,7 +51,7 @@ export function CommunityHeader({ community }: Props) {
 
     return (
         <div>
-            <div className="h-48 w-full bg-muted" style={{ backgroundImage: `url(${community.banner})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+            <div className="h-48 w-full bg-muted" style={community.banner ? { backgroundImage: `url(${community.banner})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined} />
             <div className="bg-card">
                 <div className="max-w-4xl mx-auto px-4">
                      <div className="flex items-end gap-4 -mt-16">
@@ -47,9 +72,19 @@ export function CommunityHeader({ community }: Props) {
                             <p className="text-sm mt-2">{community.description}</p>
                         </div>
                         <div className="mt-4 md:mt-0">
-                             <button className="h-10 w-full md:w-auto py-2 px-4 btn-press bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-semibold">
-                                {isMember ? 'Joined' : 'Join'}
-                            </button>
+                             {!isOwner && (
+                                <button
+                                    onClick={handleJoinLeave}
+                                    disabled={isLoading || !isAuthenticated}
+                                    className={`h-10 w-full md:w-auto py-2 px-4 btn-press rounded-md text-sm font-semibold transition-colors ${
+                                        isMember
+                                            ? 'bg-muted text-muted-foreground hover:bg-destructive hover:text-destructive-foreground'
+                                            : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                                    } disabled:opacity-50`}
+                                >
+                                    {isLoading ? 'Loading...' : isMember ? 'Leave' : 'Join'}
+                                </button>
+                             )}
                         </div>
                     </div>
                      <div className="mt-4 border-b">

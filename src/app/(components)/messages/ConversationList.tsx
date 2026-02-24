@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 import { ConversationListItem } from './ConversationListItem';
+import { NewConversationModal } from './NewConversationModal';
 import { Search, PlusCircle } from 'lucide-react';
 
 type Props = {
@@ -12,13 +14,18 @@ type Props = {
 
 export function ConversationList({ selectedConversationId }: Props) {
     const conversations = useQuery(api.conversations.getConversations, {});
+    const [showNewModal, setShowNewModal] = useState(false);
 
     return (
         <div className="flex flex-col h-full">
             <div className="p-4 border-b flex-shrink-0">
                  <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold">Messages</h2>
-                     <button className="text-primary hover:text-primary/80" title="Start new conversation">
+                     <button
+                        onClick={() => setShowNewModal(true)}
+                        className="text-primary hover:text-primary/80"
+                        title="Start new conversation"
+                     >
                         <PlusCircle className="h-6 w-6" />
                     </button>
                  </div>

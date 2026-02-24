@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { Bell } from "lucide-react"
-import { useQuery } from "convex/react"
+import { useQuery, useConvexAuth, useMutation } from "convex/react"
 import { api } from "@/../convex/_generated/api"
+import type { Id } from "@/../convex/_generated/dataModel"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
@@ -22,8 +23,9 @@ export function NotificationBell() {
   const router = useRouter()
   const { announce } = useLiveRegion()
 
-  const unreadCount = useQuery(api.notifications.getUnreadCount)
-  const recentNotifications = useQuery(api.notifications.getRecentNotifications)
+  const { isAuthenticated } = useConvexAuth()
+  const unreadCount = useQuery(api.notifications.getUnreadCount, isAuthenticated ? {} : 'skip')
+  const recentNotifications = useQuery(api.notifications.getRecentNotifications, isAuthenticated ? {} : 'skip')
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -53,10 +55,25 @@ export function NotificationBell() {
     prevUnreadRef.current = unreadCount
   }, [unreadCount, announce])
 
-  const handleNotificationClick = (notificationId: string, referenceId?: string) => {
+  const markNotificationAsRead = useMutation(api.notifications.markAsRead);
+
+  const handleNotificationClick = (notification: { _id: string; type?: string; actorId?: string; referenceId?: string }) => {
     setIsOpen(false)
-    if (referenceId) {
-      router.push(`/feed?post=${referenceId}`)
+    markNotificationAsRead({ notificationId: notification._id as Id<"notifications"> }).catch(() => {});
+    switch (notification.type) {
+      case 'message':
+        router.push('/messages');
+        break;
+      case 'follow':
+        router.push(`/profile/${notification.actorId}`);
+        break;
+      case 'event':
+        router.push(`/events/${notification.referenceId}`);
+        break;
+      default:
+        if (notification.referenceId) {
+          router.push(`/feed?post=${notification.referenceId}`);
+        }
     }
   }
 
@@ -121,7 +138,7 @@ export function NotificationBell() {
                 {recentNotifications.map((notification) => (
                   <button
                     key={notification._id}
-                    onClick={() => handleNotificationClick(notification._id, notification.referenceId)}
+                    onClick={() => handleNotificationClick(notification)}
                     className={`w-full px-4 py-3 text-left hover:bg-accent transition-colors ${
                       !notification.isRead ? "bg-primary/10" : ""
                     }`}

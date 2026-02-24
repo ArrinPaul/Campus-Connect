@@ -3,6 +3,7 @@
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { ListingCard } from '../../(components)/marketplace/ListingCard';
+import { CreateListingModal } from '@/components/marketplace/CreateListingModal';
 import Link from 'next/link';
 import { Search, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -12,6 +13,7 @@ const ListingCardSkeleton = () => <div className="p-4 border rounded-lg bg-card 
 export default function MarketplacePage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('all');
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
     const listings = useQuery(api.marketplace.getListings, { 
         // No direct query for search, will filter on client side if necessary, or backend needs an update
@@ -30,8 +32,7 @@ export default function MarketplacePage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <h1 className="text-3xl font-bold">Campus Marketplace</h1>
                 <div className="flex gap-2">
-                     {/* TODO: Create /marketplace/new page */}
-                    <button className="h-10 py-2 px-4 btn-press bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-semibold">
+                     <button onClick={() => setShowCreateModal(true)} className="h-10 py-2 px-4 btn-press bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-semibold">
                         Post Listing
                     </button>
                 </div>
@@ -79,6 +80,10 @@ export default function MarketplacePage() {
                     </div>
                 )}
             </div>
+
+            {showCreateModal && (
+                <CreateListingModal onClose={() => setShowCreateModal(false)} />
+            )}
         </div>
     );
 }

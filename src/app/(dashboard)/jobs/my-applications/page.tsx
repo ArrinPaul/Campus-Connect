@@ -7,7 +7,7 @@ import { ArrowLeft, CheckCircle, Clock, Eye, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
-const statusStyles = {
+const statusStyles: Record<string, { icon: typeof Clock; text: string; color: string; bg: string }> = {
     applied: { icon: Clock, text: 'Applied', color: 'text-blue-500', bg: 'bg-blue-500/10' },
     viewed: { icon: Eye, text: 'Viewed', color: 'text-purple-500', bg: 'bg-purple-500/10' },
     shortlisted: { icon: CheckCircle, text: 'Shortlisted', color: 'text-green-500', bg: 'bg-green-500/10' },

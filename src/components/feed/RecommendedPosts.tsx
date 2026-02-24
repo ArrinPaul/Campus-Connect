@@ -15,7 +15,8 @@ interface RecommendedPostsProps {
 }
 
 export function RecommendedPosts({ limit = 3, title = "Posts you might like" }: RecommendedPostsProps) {
-  const { isAuthenticated } = useConvexAuth()
+  const convexAuth = useConvexAuth()
+  const isAuthenticated = convexAuth?.isAuthenticated ?? false
   const recommended = useQuery(
     api.recommendations.getRecommendedPosts,
     isAuthenticated ? { limit } : "skip"
@@ -162,7 +163,8 @@ interface TrendingInSkillProps {
 }
 
 export function TrendingInSkill({ skill, limit = 5 }: TrendingInSkillProps) {
-  const { isAuthenticated } = useConvexAuth()
+  const convexAuth = useConvexAuth()
+  const isAuthenticated = convexAuth?.isAuthenticated ?? false
   const trending = useQuery(
     api.recommendations.getTrendingInSkill,
     isAuthenticated ? { skill, limit } : "skip"
@@ -238,7 +240,8 @@ interface PopularInUniversityProps {
 }
 
 export function PopularInUniversity({ limit = 5 }: PopularInUniversityProps) {
-  const { isAuthenticated } = useConvexAuth()
+  const convexAuth = useConvexAuth()
+  const isAuthenticated = convexAuth?.isAuthenticated ?? false
   const popular = useQuery(
     api.recommendations.getPopularInUniversity,
     isAuthenticated ? { limit } : "skip"

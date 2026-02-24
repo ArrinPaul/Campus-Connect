@@ -35,15 +35,23 @@ interface User {
 
 interface ProfileHeaderProps {
   user: User
-  isOwnProfile: boolean
+  isOwnProfile?: boolean
 }
 
-export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
+export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileHeaderProps) {
   const router = useRouter()
   const { isLoaded, isSignedIn } = useUser()
   const followUser = useMutation(api.follows.followUser)
   const unfollowUser = useMutation(api.follows.unfollowUser)
   const getOrCreateConversation = useMutation(api.conversations.getOrCreateConversation)
+
+  // Auto-detect isOwnProfile if not explicitly provided
+  const currentUser = useQuery(
+    api.users.getCurrentUser,
+    isLoaded && isSignedIn ? {} : "skip"
+  )
+  const isOwnProfile = isOwnProfileProp ?? (currentUser?._id === user._id)
+
   const isFollowingQuery = useQuery(
     api.follows.isFollowing,
     isLoaded && isSignedIn && !isOwnProfile ? { userId: user._id } : "skip"

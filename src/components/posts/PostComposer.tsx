@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"
-import { useMutation, useQuery, useAction } from "convex/react"
+import { useMutation, useQuery, useAction, useConvexAuth } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import dynamic from "next/dynamic"
@@ -53,6 +53,10 @@ interface PostComposerProps {
 }
 
 export function PostComposer({ onPostCreated }: PostComposerProps) {
+  const convexAuth = useConvexAuth()
+  const isAuthenticated = convexAuth?.isAuthenticated ?? false
+  const isAuthLoading = convexAuth?.isLoading ?? true
+  
   const createPost = useMutation(api.posts.createPost)
   const generateUploadUrl = useMutation(api.media.generateUploadUrl)
   const resolveStorageUrls = useMutation(api.media.resolveStorageUrls)
@@ -324,6 +328,13 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+
+    // Auth check - use Convex auth status which syncs with Clerk
+    if (!isAuthenticated) {
+      setError("You must be signed in to create a post")
+      toast.error("Sign in required", { description: "Please sign in to create a post" })
+      return
+    }
 
     // Client-side validation
     if (!content || content.trim().length === 0) {

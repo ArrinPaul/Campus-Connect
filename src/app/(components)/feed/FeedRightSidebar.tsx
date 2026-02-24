@@ -1,14 +1,15 @@
 'use client';
 
-import { useQuery, useMutation } from 'convex/react';
+import { useQuery, useMutation, useConvexAuth } from 'convex/react';
 import Image from 'next/image';
 import { api } from '@/convex/_generated/api';
 import Link from 'next/link';
 import { UserPlus } from 'lucide-react';
 
 export function FeedRightSidebar() {
+  const { isAuthenticated } = useConvexAuth();
   const trendingHashtags = useQuery(api.hashtags.getTrending, { limit: 6 });
-  const suggestions = useQuery(api.suggestions.getSuggestions, { limit: 3 });
+  const suggestions = useQuery(api.suggestions.getSuggestions, isAuthenticated ? { limit: 3 } : 'skip');
 
   return (
     <div className="sticky top-8 space-y-6">
@@ -104,9 +105,10 @@ export function FeedRightSidebar() {
 }
 
 function FollowButton({ userId }: { userId: string }) {
+  const { isAuthenticated } = useConvexAuth();
   const followUser = useMutation(api.follows.followUser);
   const unfollowUser = useMutation(api.follows.unfollowUser);
-  const isFollowing = useQuery(api.follows.isFollowing, { userId: userId as any });
+  const isFollowing = useQuery(api.follows.isFollowing, isAuthenticated ? { userId: userId as any } : 'skip');
 
   if (isFollowing === undefined) {
     return <div className="h-7 w-16 bg-muted rounded-full animate-pulse" />;

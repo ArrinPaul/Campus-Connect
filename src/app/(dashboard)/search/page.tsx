@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useQuery } from 'convex/react';
+import { useQuery, useConvexAuth } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { SearchBar } from '../../(components)/search/SearchBar';
 import { PostCard } from '../../(components)/feed/PostCard';
@@ -29,10 +29,14 @@ function SearchResultsContent() {
     const currentQuery = searchParams.get('q') || '';
     const [activeTab, setActiveTab] = useState<Tab>('all');
 
-    const { users, posts, hashtags } = useQuery(
+    const { isAuthenticated } = useConvexAuth();
+    const searchResult = useQuery(
         api.search.universalSearch,
-        currentQuery ? { query: currentQuery } : "skip"
-    ) || { users: [], posts: [], hashtags: [] };
+        isAuthenticated && currentQuery ? { query: currentQuery } : "skip"
+    );
+    const users = searchResult?.users ?? [];
+    const posts = searchResult?.posts ?? [];
+    const hashtags = searchResult?.hashtags ?? [];
 
     useEffect(() => {
         // Reset to 'all' tab if query changes

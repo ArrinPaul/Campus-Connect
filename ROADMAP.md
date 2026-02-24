@@ -1,0 +1,142 @@
+# Cluster Delta — Development Roadmap
+
+**Last Updated:** June 2025  
+**Current State:** All critical/high bugs fixed. Clean production build (48 routes, 0 TypeScript errors).
+
+---
+
+## Phase 1: Stability & Bug Fixes ✅ COMPLETE
+
+All CRITICAL and HIGH severity bugs have been resolved:
+
+- [x] Fix 30+ TypeScript compilation errors
+- [x] Fix auth guards on Stories, Search, NotificationBell, FeedRightSidebar, Q&A
+- [x] Fix Community page (Server → Client component for auth context)
+- [x] Wire CommunityHeader Join/Leave button to mutations
+- [x] Fix CommunityHeader `url(undefined)` banner
+- [x] Fix ChatWindow — add `markAsRead` call
+- [x] Fix NotificationBell — add `markAsRead` on click
+- [x] Fix PostCard — wrap comments in `showComments` conditional
+- [x] Fix Q&A view count infinite loop (useRef guard)
+- [x] Implement `searchUsers` backend (was a stub)
+- [x] Fix Profile page — try/catch for invalid IDs
+- [x] Swap to working ProfileHeader with follow/message mutations
+
+---
+
+## Phase 2: Feature Completion (Current Priority)
+
+### 2.1 — Notification System Polish
+- [x] Fix notification routing (message → `/messages`, event → `/events/...`, follow → `/profile/...`)
+- [x] Add missing notification icons for `message` and `event` types
+- [ ] Add "mark all as read" button to NotificationBell dropdown
+- [ ] Add push notification support (service worker is stubbed in `public/sw.js`)
+
+### 2.2 — Content Creation Flows
+- [x] Wire Marketplace "Post Listing" button to `CreateListingModal`
+- [x] Add "Create Story" button to Stories page with `StoryComposer`
+- [ ] Create `UploadResourceModal` component for Resources page
+- [ ] Add image/media upload to Q&A answers
+- [ ] Add rich text editor (Markdown) to post creation
+
+### 2.3 — Profile Enhancements
+- [x] Swap to working ProfileHeader with Follow/Message buttons
+- [x] Make profile tabs link to actual pages (Portfolio)
+- [ ] Add Activity tab content (recent likes, comments, shares)
+- [ ] Add profile editing from profile page (not just settings)
+- [ ] Add skill endorsements UI (backend `skill_endorsements.ts` exists)
+
+### 2.4 — Community Features
+- [x] Convert Community page to Client Component
+- [x] Wire Join/Leave buttons
+- [ ] Add community post creation (restrict to members only)
+- [ ] Add moderation tools (remove posts, ban users)
+- [ ] Add community invite system for private/secret communities
+- [ ] Add community search/discovery page improvements
+
+---
+
+## Phase 3: Performance & UX
+
+### 3.1 — Performance
+- [ ] Add virtual scrolling to main feed (VirtualizedFeed component exists but may need optimization)
+- [ ] Implement pagination for Comments (currently loads all)
+- [ ] Add image lazy loading and blur placeholders
+- [ ] Optimize Convex queries — add proper indexes for frequent queries
+- [ ] Add React Query or SWR caching layer for server components
+
+### 3.2 — UX Improvements
+- [ ] Add toast notifications for successful actions (follow, join, post, etc.)
+- [ ] Add confirmation dialogs for destructive actions (delete post, leave community)
+- [ ] Add empty state illustrations (not just text)
+- [ ] Add keyboard navigation support (accessibility)
+- [ ] Add dark/light mode toggle in settings
+- [ ] Improve mobile responsiveness across all pages
+
+### 3.3 — Search
+- [ ] Add full-text search index in Convex (replace in-memory filtering)
+- [ ] Add search history / recent searches
+- [ ] Add search suggestions/autocomplete
+- [ ] Add filters (date range, type, community)
+
+---
+
+## Phase 4: Advanced Features
+
+### 4.1 — Real-time Features
+- [ ] Add typing indicators in Chat
+- [ ] Add read receipts in Messages
+- [ ] Add real-time presence indicators (online/away/offline)
+- [ ] Add live comment counts on posts
+
+### 4.2 — Analytics & Admin
+- [ ] Build admin dashboard with user/content stats
+- [ ] Add content moderation queue
+- [ ] Add analytics for community growth
+- [ ] Add user engagement metrics
+
+### 4.3 — Social Features
+- [ ] Add group messaging (backend exists in conversations.ts)
+- [ ] Add user blocking/muting
+- [ ] Add content reporting system
+- [ ] Add hashtag following
+- [ ] Add suggested posts algorithm improvements
+
+### 4.4 — Monetization
+- [ ] Complete ads system (targeting, analytics, billing)
+- [ ] Add premium subscriptions (backend `subscriptions.ts` exists)
+- [ ] Add marketplace transaction flow (payment integration)
+
+---
+
+## Phase 5: Production Readiness
+
+### 5.1 — Testing
+- [ ] Add E2E tests with Playwright/Cypress for critical flows
+- [ ] Add integration tests for auth flows
+- [ ] Increase unit test coverage (property tests exist for several modules)
+- [ ] Add visual regression tests
+
+### 5.2 — Infrastructure
+- [ ] Set up CI/CD pipeline (GitHub Actions)
+- [ ] Configure Sentry error monitoring (config files exist)
+- [ ] Set up monitoring dashboards
+- [ ] Add rate limiting for mutations
+- [ ] Add input sanitization audit (sanitize.ts exists)
+
+### 5.3 — Security
+- [ ] Audit all mutations for proper authorization
+- [ ] Add CSRF protection
+- [ ] Review file upload security
+- [ ] Add content security policy headers
+- [ ] Rate limit authentication attempts
+
+---
+
+## Known Remaining Issues
+
+| # | Severity | Description | File |
+|---|----------|-------------|------|
+| 1 | MEDIUM | Resources "Upload" button has no handler | `resources/page.tsx` |
+| 2 | LOW | Profile Activity tab has no content | `profile/[id]/page.tsx` |
+| 3 | LOW | No community post restriction for non-members | `c/[slug]/page.tsx` |

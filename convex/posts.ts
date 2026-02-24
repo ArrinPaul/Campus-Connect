@@ -4,7 +4,8 @@ import { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 import { sanitizeMarkdown } from "./sanitize";
 import { POST_MAX_LENGTH } from "./validation_constants";
-import { checkRateLimit, RATE_LIMITS, getAuthenticatedUser, requireOnboarding } from "./_lib";
+import { checkRateLimit, RATE_LIMITS, getAuthenticatedUser, getAuthenticatedUserOrNull, requireOnboarding } from "./_lib";
+import { linkHashtagsToPost } from "./hashtags";
 
 export const getFeedPosts = query({
   args: {
@@ -12,7 +13,7 @@ export const getFeedPosts = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const user = await getAuthenticatedUser(ctx);
+    const user = await getAuthenticatedUserOrNull(ctx);
     if (!user) return { posts: [], hasMore: false, nextCursor: null };
 
     const limit = args.limit ?? 10;
@@ -69,7 +70,7 @@ export const createPost = mutation({
     communityId: v.optional(v.id("communities")),
   },
   handler: async (ctx, args) => {
-    const user = await requireOnboarding(ctx);
+    const user = await getAuthenticatedUser(ctx);
     await checkRateLimit(ctx, user._id, "createPost", RATE_LIMITS.createPost);
 
     if (!args.content.trim()) throw new Error("Post content cannot be empty");
@@ -94,6 +95,9 @@ export const createPost = mutation({
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
+
+    // Extract & link hashtags from post content
+    await linkHashtagsToPost(ctx, postId, sanitizedContent);
 
     await ctx.scheduler.runAfter(0, internal.posts.fanOutPost, {
       postId,

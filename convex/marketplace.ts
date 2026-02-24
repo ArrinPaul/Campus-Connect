@@ -201,7 +201,22 @@ export const getListings = query({
       return true
     })
 
-    return filtered.slice(0, limit)
+    const results = filtered.slice(0, limit)
+
+    // Enrich listings with seller data
+    const enriched = await Promise.all(
+      results.map(async (listing) => {
+        const seller = await ctx.db.get(listing.sellerId)
+        return {
+          ...listing,
+          seller: seller
+            ? { name: seller.name, username: seller.username, avatarUrl: seller.profilePicture }
+            : null,
+        }
+      })
+    )
+
+    return enriched
   },
 })
 

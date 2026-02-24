@@ -42,7 +42,7 @@ export function ListingCard({ listing }: Props) {
                 
                 <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mt-3">
                     <div className="flex items-center gap-1">
-                        <DollarSign className="h-3.5 w-3.5" /> {listing.price.toFixed(2)}
+                        <DollarSign className="h-3.5 w-3.5" /> {(listing.price / 100).toFixed(2)}
                     </div>
                     <div className="flex items-center gap-1">
                         <Tag className="h-3.5 w-3.5" /> {listing.category}

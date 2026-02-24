@@ -80,14 +80,54 @@ export default function RootLayout({
           colorText: "hsl(var(--foreground))",
           colorInputBackground: "hsl(var(--background))",
           colorInputText: "hsl(var(--foreground))",
+          colorDanger: "#ef4444",
+          colorSuccess: "#22c55e",
+          colorWarning: "#f59e0b",
           borderRadius: "0.5rem",
           fontFamily: "'Manrope', sans-serif",
+          fontSize: "0.9375rem",
         },
         elements: {
-          formButtonPrimary:
-            "bg-primary text-primary-foreground font-semibold shadow-sm transition-all duration-200 active:scale-[0.98] hover:brightness-110",
-          card: "shadow-lg border border-border/50 rounded-lg",
-          headerTitle: "font-display text-2xl font-bold text-foreground",
+          // Form and card styling
+          card: "shadow-xl border border-border/50 rounded-xl bg-card",
+          footer: "border-t border-border/30",
+          
+          // Header styling
+          headerTitle: "font-display text-3xl font-bold text-foreground",
+          headerSubtitle: "text-muted-foreground text-base",
+          
+          // Form elements
+          formFieldInput: "border border-border/50 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary rounded-lg",
+          formFieldLabel: "text-foreground font-medium text-sm",
+          
+          // Buttons
+          formButtonPrimary: "bg-primary text-primary-foreground font-semibold shadow-md transition-all duration-200 hover:bg-primary/90 active:scale-[0.98] rounded-lg",
+          formButtonSecondary: "border border-border/50 bg-background text-foreground hover:bg-accent transition-colors rounded-lg",
+          
+          // Social button styling
+          socialButtonsBlockButton: "border border-border/50 bg-background text-foreground hover:bg-accent/50 transition-colors rounded-lg font-medium",
+          
+          // Links
+          formLink: "text-primary hover:text-primary/80 underline",
+          
+          // Divider
+          dividerLine: "bg-border/30",
+          dividerText: "text-muted-foreground text-sm",
+          
+          // Other text
+          formFieldSuccessText: "text-green-600",
+          formFieldErrorText: "text-red-600",
+          
+          // Alternate methods button
+          alternativeMethodsBlockButton: "border border-border/50 text-foreground hover:bg-accent/50 rounded-lg",
+          
+          // Loading spinner
+          spinner: "text-primary",
+        },
+        layout: {
+          socialButtonsVariant: "blockButton",
+          // @ts-expect-error -- Clerk types don't include termsPageContent but it's valid
+          termsPageContent: "text-foreground",
         },
       }}
     >

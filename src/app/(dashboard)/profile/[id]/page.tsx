@@ -3,9 +3,10 @@ import { fetchQuery } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 import { ProfileSkeleton } from '../../../(components)/profile/skeletons';
-import { ProfileHeader } from '../../../(components)/profile/ProfileHeader';
+import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { UserPostList } from '../../../(components)/profile/UserPostList';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 
 type ProfilePageProps = {
     params: {
@@ -14,7 +15,12 @@ type ProfilePageProps = {
 };
 
 async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
-    const userProfile = await fetchQuery(api.users.getUserById, { userId });
+    let userProfile;
+    try {
+        userProfile = await fetchQuery(api.users.getUserById, { userId });
+    } catch {
+        notFound();
+    }
 
     if (!userProfile) {
         notFound();
@@ -22,13 +28,12 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
 
     return (
         <div>
-            <ProfileHeader profile={userProfile} />
+            <ProfileHeader user={userProfile as any} isOwnProfile={false} />
             <div className="px-4 sm:px-6 lg:px-8 mt-6">
                 <div className="border-b">
                     <nav className="flex gap-4" aria-label="Profile tabs">
-                        <button className="py-3 px-1 border-b-2 border-primary text-primary font-semibold">Posts</button>
-                        <button className="py-3 px-1 border-b-2 border-transparent text-muted-foreground hover:text-foreground">Portfolio</button>
-                        <button className="py-3 px-1 border-b-2 border-transparent text-muted-foreground hover:text-foreground">Activity</button>
+                        <span className="py-3 px-1 border-b-2 border-primary text-primary font-semibold cursor-default">Posts</span>
+                        <Link href={`/profile/${userId}/portfolio`} className="py-3 px-1 border-b-2 border-transparent text-muted-foreground hover:text-foreground">Portfolio</Link>
                     </nav>
                 </div>
 

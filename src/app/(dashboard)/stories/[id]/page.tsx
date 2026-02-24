@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, useEffect, useState, useRef, useCallback } from 'react';
-import { useQuery, useMutation } from 'convex/react';
+import { useQuery, useMutation, useConvexAuth } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 import { notFound, useRouter } from 'next/navigation';
@@ -29,13 +29,14 @@ const StoryViewerSkeleton = () => (
 
 function StoryViewerContent({ storyId }: { storyId: Id<'stories'> }) {
     const router = useRouter();
-    const story = useQuery(api.stories.getStoryById, { storyId });
+    const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
+    const story = useQuery(api.stories.getStoryById, isAuthenticated ? { storyId } : 'skip');
     const viewStory = useMutation(api.stories.viewStory);
     const deleteStory = useMutation(api.stories.deleteStory);
-    const currentUser = useQuery(api.users.getCurrentUser);
+    const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : 'skip');
 
     const [progress, setProgress] = useState(0);
-    const progressBarIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const progressBarIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const startProgressBar = useCallback(() => {
         if (progressBarIntervalRef.current) clearInterval(progressBarIntervalRef.current);
@@ -45,7 +46,7 @@ function StoryViewerContent({ storyId }: { storyId: Id<'stories'> }) {
             const newProgress = Math.min(100, (elapsed / STORY_DURATION_MS) * 100);
             setProgress(newProgress);
             if (elapsed >= STORY_DURATION_MS) {
-                clearInterval(progressBarIntervalRef.current);
+                if (progressBarIntervalRef.current) clearInterval(progressBarIntervalRef.current);
                 // For now, just close the viewer when story ends.
                 // In a real implementation, this would advance to the next story in the author's group.
                 router.back(); 
@@ -54,7 +55,7 @@ function StoryViewerContent({ storyId }: { storyId: Id<'stories'> }) {
     }, [router]);
 
     useEffect(() => {
-        if (story) {
+        if (story && isAuthenticated) {
             viewStory({ storyId }).catch(console.error); // Record view
             setProgress(0);
             startProgressBar();
@@ -62,7 +63,8 @@ function StoryViewerContent({ storyId }: { storyId: Id<'stories'> }) {
         return () => {
             if (progressBarIntervalRef.current) clearInterval(progressBarIntervalRef.current);
         };
-    }, [storyId, story, viewStory, startProgressBar]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [storyId, isAuthenticated]);
 
     const handleDelete = async () => {
         if (!story || !window.confirm("Are you sure you want to delete this story?")) return;

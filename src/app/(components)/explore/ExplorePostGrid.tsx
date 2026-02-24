@@ -21,33 +21,44 @@ export function ExplorePostGrid() {
     const [hasMore, setHasMore] = useState(true);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-    const { posts: newPosts, nextCursor, hasMore: newHasMore } = useQuery(
+    // Use raw result to distinguish "loading" (undefined) from "loaded empty" 
+    const queryResult = useQuery(
         api.posts.getExplorePosts,
         hasMore ? { cursor: cursor || undefined, limit: 9 } : "skip"
-    ) || { posts: [], nextCursor: null, hasMore: false };
+    );
+    
+    const isInitialLoading = queryResult === undefined && posts.length === 0;
 
     useEffect(() => {
-        if (newPosts && newPosts.length > 0 && isLoadingMore) {
-            setPosts(prev => [...prev, ...newPosts.map(post => ({
-                type: 'post' as const,
-                _id: post._id,
-                createdAt: post.createdAt,
-                post: post as any,
-            }))]);
-            setCursor(nextCursor);
-            setHasMore(newHasMore);
+        // Don't process while query is still loading (undefined)
+        if (queryResult === undefined) return;
+
+        const { posts: newPosts, nextCursor, hasMore: newHasMore } = queryResult;
+        
+        if (isLoadingMore) {
+            // Append new page to existing posts
+            if (newPosts && newPosts.length > 0) {
+                setPosts(prev => [...prev, ...newPosts.map(post => ({
+                    type: 'post' as const,
+                    _id: post._id,
+                    createdAt: post.createdAt,
+                    post: post as any,
+                }))]);
+            }
             setIsLoadingMore(false);
-        } else if (newPosts && !isLoadingMore && cursor === null) { // Initial load
-             setPosts(newPosts.map(post => ({
+        } else if (cursor === null && posts.length === 0) {
+            // Initial load
+            setPosts(newPosts.map(post => ({
                 type: 'post' as const,
                 _id: post._id,
                 createdAt: post.createdAt,
                 post: post as any,
             })));
-            setCursor(nextCursor);
-            setHasMore(newHasMore);
         }
-    }, [newPosts, nextCursor, newHasMore, isLoadingMore, cursor]);
+        
+        setCursor(nextCursor);
+        setHasMore(newHasMore);
+    }, [queryResult]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const observerTargetRef = useRef<HTMLDivElement>(null);
 
@@ -71,11 +82,11 @@ export function ExplorePostGrid() {
         };
     }, [hasMore, isLoadingMore]);
 
-    if (!posts.length && !hasMore && !isLoadingMore && newPosts === undefined) {
+    if (isInitialLoading) {
         return <ExplorePostGridSkeleton />;
     }
 
-    if (!posts.length && !hasMore && !isLoadingMore) {
+    if (posts.length === 0) {
         return (
             <div className="text-center py-16">
                 <h3 className="text-lg font-semibold">No posts to explore</h3>

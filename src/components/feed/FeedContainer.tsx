@@ -23,7 +23,8 @@ interface FeedContainerProps {
 
 export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
   const { isLoaded, isSignedIn } = useUser()
-  const { isAuthenticated } = useConvexAuth()
+  const convexAuth = useConvexAuth()
+  const isAuthenticated = convexAuth?.isAuthenticated ?? false
   const [allItems, setAllItems] = useState<ConvexFeedItem[]>([])
   const [cursor, setCursor] = useState<string | null>(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false)

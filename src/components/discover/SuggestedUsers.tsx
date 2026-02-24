@@ -19,7 +19,8 @@ interface SuggestedUsersProps {
 }
 
 export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersProps) {
-  const { isAuthenticated } = useConvexAuth()
+  const convexAuth = useConvexAuth()
+  const isAuthenticated = convexAuth?.isAuthenticated ?? false
   const suggestions = useQuery(
     api.suggestions.getSuggestions,
     isAuthenticated ? { limit } : "skip"

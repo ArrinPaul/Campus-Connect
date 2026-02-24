@@ -1,6 +1,6 @@
 'use client';
 
-import { OnboardingData } from '../../(onboarding)/page';
+import { OnboardingData } from '../../(onboarding)/onboarding/page';
 
 // A temporary v2 button.
 const TempButton = ({ children, onClick, disabled=false, variant='primary' }: { children: React.ReactNode, onClick: () => void, disabled?: boolean, variant?: 'primary' | 'outline' }) => {
@@ -26,6 +26,13 @@ const Input = ({ label, value, onChange, name, placeholder }: { label: string, v
     </div>
 );
 
+
+type Props = {
+    data: OnboardingData;
+    updateFormData: (data: Partial<OnboardingData>) => void;
+    nextStep: () => void;
+    prevStep: () => void;
+};
 
 export function ProfileStep({ data, updateFormData, nextStep, prevStep }: Props) {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

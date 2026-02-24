@@ -41,6 +41,7 @@ interface StoryComposerProps {
 export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps) {
   const createStory = useMutation(api.stories.createStory)
   const generateUploadUrl = useMutation(api.media.generateUploadUrl)
+  const resolveStorageUrls = useMutation(api.media.resolveStorageUrls)
 
   const [mode, setMode] = useState<Mode>("text")
   const [text, setText] = useState("")
@@ -132,10 +133,10 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
         if (!res.ok) throw new Error("Image upload failed")
         const { storageId } = await res.json()
 
-        // Resolve to public URL — for stories, we embed the storageId URL directly
-        // The story will store the URL after resolution
-        mediaUrl = `https://cdn.convex.cloud/${storageId}` // placeholder; real URL from Convex
-        // Note: In production, use api.media.resolveStorageUrls to get the public URL
+        // Resolve storageId to a real public URL via Convex
+        const urls = await resolveStorageUrls({ storageIds: [storageId] })
+        if (!urls || !urls[0]) throw new Error("Failed to resolve storage URL")
+        mediaUrl = urls[0]
       }
 
       await createStory({

@@ -3,14 +3,31 @@
 import { useQuery, useConvexAuth } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { PostCard } from './PostCard';
+import { FeedSkeleton } from './skeletons';
 import type { FeedItem } from './types';
 
 export function FeedList() {
-    const { isAuthenticated } = useConvexAuth();
+    const { isLoading, isAuthenticated } = useConvexAuth();
     const result = useQuery(api.posts.getFeedPosts, isAuthenticated ? {} : 'skip');
     const posts = result?.posts ?? [];
 
-    if (!result || posts.length === 0) {
+    // Show skeleton while auth is loading or query is in flight
+    if (isLoading || (isAuthenticated && result === undefined)) {
+        return <FeedSkeleton />;
+    }
+
+    if (!isAuthenticated) {
+        return (
+            <div className="rounded-lg border bg-card p-8 text-center">
+                <h3 className="text-lg font-semibold">Sign in to see your feed</h3>
+                <p className="text-muted-foreground mt-2">
+                    Create an account or sign in to start following people.
+                </p>
+            </div>
+        );
+    }
+
+    if (posts.length === 0) {
         return (
             <div className="rounded-lg border bg-card p-8 text-center">
                 <h3 className="text-lg font-semibold">Your feed is empty</h3>
@@ -36,4 +53,3 @@ export function FeedList() {
         </div>
     );
 }
-

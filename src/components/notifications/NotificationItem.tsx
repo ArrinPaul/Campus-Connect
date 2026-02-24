@@ -6,7 +6,7 @@ import { useMutation } from "convex/react"
 import { api } from "@/../convex/_generated/api"
 import { Id } from "@/../convex/_generated/dataModel"
 import { formatDistanceToNow } from "date-fns"
-import { Heart, MessageCircle, AtSign, UserPlus, MessageSquare } from "lucide-react"
+import { Heart, MessageCircle, AtSign, UserPlus, MessageSquare, Calendar } from "lucide-react"
 
 interface NotificationItemProps {
   notification: {
@@ -47,15 +47,14 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
     }
 
     // Navigate to the referenced content
-    if (notification.referenceId) {
-      if (notification.type === "follow") {
-        router.push(`/profile/${notification.actorId}`)
-      } else {
-        // For posts/comments, navigate to the post
-        router.push(`/feed?post=${notification.referenceId}`)
-      }
-    } else if (notification.type === "follow") {
+    if (notification.type === "follow") {
       router.push(`/profile/${notification.actorId}`)
+    } else if (notification.type === "message") {
+      router.push('/messages')
+    } else if (notification.type === "event" && notification.referenceId) {
+      router.push(`/events/${notification.referenceId}`)
+    } else if (notification.referenceId) {
+      router.push(`/feed?post=${notification.referenceId}`)
     }
   }
 
@@ -72,6 +71,10 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
         return <UserPlus className="w-5 h-5 text-success" />
       case "reply":
         return <MessageSquare className="w-5 h-5 text-indigo-500" />
+      case "message":
+        return <MessageSquare className="w-5 h-5 text-blue-500" />
+      case "event":
+        return <Calendar className="w-5 h-5 text-orange-500" />
       default:
         return null
     }

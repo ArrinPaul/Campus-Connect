@@ -363,8 +363,47 @@ export const searchUsers = query({
     ),
     skills: v.optional(v.array(v.string())),
   },
-  handler: async () => {
-    return []
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return [];
+
+    const currentUser = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q: any) => q.eq("clerkId", identity.subject))
+      .unique();
+
+    const searchTerm = args.query?.trim().toLowerCase() ?? "";
+    if (!searchTerm) return [];
+
+    // Fetch a pool of users and filter in memory (replace with search index for scale)
+    const allUsers = await ctx.db.query("users").take(500);
+    
+    let results = allUsers.filter((user) => {
+      if (currentUser && user._id === currentUser._id) return false;
+      const nameMatch = user.name?.toLowerCase().includes(searchTerm);
+      const usernameMatch = user.username?.toLowerCase().includes(searchTerm);
+      return nameMatch || usernameMatch;
+    });
+
+    if (args.role) {
+      results = results.filter((u) => u.role === args.role);
+    }
+
+    if (args.skills && args.skills.length > 0) {
+      results = results.filter((u) =>
+        u.skills?.some((s: string) => args.skills!.includes(s))
+      );
+    }
+
+    return results.slice(0, 20).map((u) => ({
+      _id: u._id,
+      name: u.name,
+      username: u.username,
+      profilePicture: u.profilePicture,
+      bio: u.bio,
+      role: u.role,
+      university: u.university,
+    }));
   },
 })
 

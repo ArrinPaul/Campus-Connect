@@ -9,7 +9,7 @@ import { Plus } from 'lucide-react';
 const AdCardSkeleton = () => <div className="p-4 border rounded-lg bg-card h-64 animate-pulse" />;
 
 export default function AdsDashboardPage() {
-    const ads = useQuery(api.ads.getAdAnalytics);
+    const ads = useQuery(api.ads.getAdAnalytics, {});
 
     return (
         <div className="max-w-6xl mx-auto py-8 px-4">
