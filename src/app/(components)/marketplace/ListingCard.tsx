@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import type { Doc } from '@/convex/_generated/dataModel';
 import { Tag, DollarSign, MapPin, Package, Clock, User as UserIcon } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -26,7 +26,7 @@ export function ListingCard({ listing }: Props) {
         <Link href={`/marketplace/${listing._id}`} className="block p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors">
             <div className="relative h-40 w-full rounded-md bg-muted overflow-hidden">
                 {listing.images && listing.images.length > 0 ? (
-                    <Image src={listing.images[0]} alt={listing.title} fill className="object-cover" />
+                    <OptimizedImage src={listing.images[0]} alt={listing.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 400px" />
                 ) : (
                     <div className="flex items-center justify-center h-full text-muted-foreground">No Image</div>
                 )}
@@ -59,7 +59,7 @@ export function ListingCard({ listing }: Props) {
 
                 <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground border-t pt-3">
                     {sellerAvatar ? (
-                        <Image src={sellerAvatar} alt={sellerName} width={20} height={20} className="h-5 w-5 rounded-full object-cover" />
+                        <OptimizedImage src={sellerAvatar} alt={sellerName} width={20} height={20} isAvatar className="h-5 w-5 rounded-full object-cover" />
                     ) : (
                         <UserIcon className="h-4 w-4" />
                     )}

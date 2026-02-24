@@ -143,7 +143,7 @@ export const findExperts = query({
         // Count endorsements for matched skills
         const endorsements = await ctx.db
           .query("skillEndorsements")
-          .filter((q) => q.eq(q.field("userId"), user._id))
+          .withIndex("by_user_skill", (q) => q.eq("userId", user._id))
           .collect()
 
         const matchedEndorsements = endorsements.filter((e) =>
@@ -298,7 +298,7 @@ export const findMentors = query({
         // Get total endorsement count for shared skills
         const endorsements = await ctx.db
           .query("skillEndorsements")
-          .filter((q) => q.eq(q.field("userId"), user._id))
+          .withIndex("by_user_skill", (q) => q.eq("userId", user._id))
           .collect()
 
         const matchedEndorsements = endorsements.filter((e) =>

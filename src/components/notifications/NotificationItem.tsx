@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import Image from "next/image"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { useMutation } from "convex/react"
 import { api } from "@/../convex/_generated/api"
 import { Id } from "@/../convex/_generated/dataModel"
@@ -95,11 +95,12 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
         {/* Actor Avatar */}
         <div className="flex-shrink-0">
           {notification.actor?.profilePicture ? (
-            <Image
+            <OptimizedImage
               src={notification.actor.profilePicture}
               alt={notification.actor.name}
               width={48}
               height={48}
+              isAvatar
               className="w-12 h-12 rounded-full"
             />
           ) : (

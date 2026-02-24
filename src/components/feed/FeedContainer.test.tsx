@@ -13,11 +13,20 @@ jest.mock("convex/react", () => ({
   useQuery: jest.fn((fn: any, args?: any) => {
     if (fn === "users:getCurrentUser") return mockGetCurrentUser()
     if (fn === "posts:hasUserLikedPost") return mockHasUserLikedPost()
-    if (fn.toString().includes("getUnifiedFeed") || fn.toString().includes("getFeedPosts")) {
+    if (fn.toString().includes("getFeedPosts") || fn.toString().includes("getUnifiedFeed") || fn.toString().includes("getRankedFeed") || fn.toString().includes("getTrendingFeed")) {
       // Handle multiple queries for pagination
       const result = mockQueryResults[queryCallCount] || mockQueryResults[0]
       if (args !== "skip") {
         queryCallCount++
+      }
+      if (!result) return result // undefined/null = loading state
+      // Convert items-format to posts-format for getFeedPosts queries
+      if (fn.toString().includes("getFeedPosts") && result?.items !== undefined) {
+        return {
+          posts: result.items.map((item: any) => item.post ?? item),
+          nextCursor: result.nextCursor ?? null,
+          hasMore: result.hasMore ?? false,
+        }
       }
       return result
     }
@@ -56,6 +65,15 @@ jest.mock("@/components/posts/PostCard", () => ({
       <div>{author?.name}</div>
     </div>
   )),
+}))
+
+// Mock SuggestedUsers and TrendingHashtags
+jest.mock("@/components/discover/SuggestedUsers", () => ({
+  SuggestedUsers: () => <div data-testid="suggested-users" />,
+}))
+
+jest.mock("@/components/trending/TrendingHashtags", () => ({
+  TrendingHashtags: () => <div data-testid="trending-hashtags" />,
 }))
 
 // Mock VirtualizedFeed to render items directly (jsdom has no layout engine)

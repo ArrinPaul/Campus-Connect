@@ -1,83 +1,33 @@
 import { render, screen } from "@testing-library/react"
 import FeedPage from "./page"
 
-// Mock the components
-jest.mock("@/components/posts/PostComposer", () => ({
-  PostComposer: () => <div data-testid="post-composer">PostComposer</div>,
+// Mock the v2 feed components using @/ alias paths
+jest.mock("@/app/(components)/feed/Feed", () => ({
+  Feed: () => <div data-testid="feed">Feed</div>,
 }))
 
-jest.mock("@/components/feed/FeedContainer", () => ({
-  FeedContainer: () => <div data-testid="feed-container">FeedContainer</div>,
+jest.mock("@/app/(components)/feed/FeedRightSidebar", () => ({
+  FeedRightSidebar: () => <div data-testid="feed-right-sidebar">FeedRightSidebar</div>,
 }))
 
-jest.mock("@/components/error-boundary", () => ({
-  ErrorBoundary: ({ children }: any) => <div>{children}</div>,
-}))
-
-jest.mock("@/components/trending/TrendingHashtags", () => ({
-  TrendingHashtags: () => <div data-testid="trending-hashtags">TrendingHashtags</div>,
-}))
-
-jest.mock("@/components/stories/StoryRow", () => ({
-  StoryRow: () => <div data-testid="story-row">StoryRow</div>,
-}))
-
-jest.mock("@/components/discover/SuggestedUsers", () => ({
-  SuggestedUsers: () => <div data-testid="suggested-users">SuggestedUsers</div>,
-}))
-
-jest.mock("@/components/feed/RecommendedPosts", () => ({
-  RecommendedPosts: () => <div data-testid="recommended-posts">RecommendedPosts</div>,
-  TrendingInSkill: () => <div data-testid="trending-in-skill">TrendingInSkill</div>,
-}))
-
-jest.mock("convex/react", () => ({
-  useQuery: jest.fn(() => null),
-  useMutation: jest.fn(() => jest.fn()),
-  useConvexAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false })),
+jest.mock("@/app/(components)/feed/skeletons", () => ({
+  FeedSkeleton: () => <div data-testid="feed-skeleton">Loading...</div>,
 }))
 
 describe("FeedPage", () => {
-  it("should render PostComposer at the top", () => {
+  it("should render the Feed component", () => {
     render(<FeedPage />)
-    
-    const postComposer = screen.getByTestId("post-composer")
-    expect(postComposer).toBeInTheDocument()
+    expect(screen.getByTestId("feed")).toBeInTheDocument()
   })
 
-  it("should render FeedContainer below PostComposer", () => {
+  it("should render the FeedRightSidebar component", () => {
     render(<FeedPage />)
-    
-    const feedContainer = screen.getByTestId("feed-container")
-    expect(feedContainer).toBeInTheDocument()
+    expect(screen.getByTestId("feed-right-sidebar")).toBeInTheDocument()
   })
 
-  it("should render both components in correct order", () => {
+  it("should have a grid layout container", () => {
     const { container } = render(<FeedPage />)
-    
-    const postComposer = screen.getByTestId("post-composer")
-    const feedContainer = screen.getByTestId("feed-container")
-    
-    // Check that PostComposer appears before FeedContainer in the DOM
-    const postComposerIndex = Array.from(container.querySelectorAll("[data-testid]")).indexOf(postComposer)
-    const feedContainerIndex = Array.from(container.querySelectorAll("[data-testid]")).indexOf(feedContainer)
-    
-    expect(postComposerIndex).toBeLessThan(feedContainerIndex)
-  })
-
-  it("should have proper layout structure", () => {
-    render(<FeedPage />)
-    
-    // Check for the main container with proper responsive classes
-    const mainContainer = document.querySelector(".max-w-7xl")
-    expect(mainContainer).toBeInTheDocument()
-  })
-
-  it("should display 'Create a Post' heading", () => {
-    render(<FeedPage />)
-    
-    const heading = screen.getByText("Create a Post")
-    expect(heading).toBeInTheDocument()
-    expect(heading.tagName).toBe("H2")
+    const grid = container.querySelector(".grid")
+    expect(grid).toBeInTheDocument()
   })
 })

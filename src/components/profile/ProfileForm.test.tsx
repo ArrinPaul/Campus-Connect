@@ -1,6 +1,18 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { ProfileForm } from "./ProfileForm"
 
+// Mock FileReader so image preview works in jsdom
+const mockFileReaderResult = "data:image/png;base64,fakepreview"
+const mockFileReader = {
+  readAsDataURL: jest.fn(function (this: any) {
+    this.result = mockFileReaderResult
+    this.onload?.({ target: this } as any)
+  }),
+  onload: null as any,
+  result: null as any,
+}
+global.FileReader = jest.fn(() => mockFileReader) as any
+
 // Mock Convex
 jest.mock("convex/react", () => ({
   useMutation: jest.fn(() => jest.fn()),

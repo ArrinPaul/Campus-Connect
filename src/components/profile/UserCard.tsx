@@ -1,7 +1,7 @@
 "use client"
 
 import { memo } from "react"
-import Image from "next/image"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import Link from "next/link"
 import { Id } from "@/convex/_generated/dataModel"
 
@@ -25,10 +25,11 @@ export const UserCard = memo(function UserCard({ user }: UserCardProps) {
         {/* Avatar */}
         <div className="relative h-10 w-10 flex-shrink-0 sm:h-12 sm:w-12">
           {user.profilePicture ? (
-            <Image
+            <OptimizedImage
               src={user.profilePicture}
               alt={user.name}
               fill
+              isAvatar
               sizes="(max-width: 640px) 40px, 48px"
               className="rounded-full object-cover"
             />

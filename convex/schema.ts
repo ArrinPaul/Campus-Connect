@@ -140,7 +140,9 @@ export default defineSchema({
     userId: v.id("users"), // The user whose feed this is
     postId: v.id("posts"), // The post appearing in the feed
     createdAt: v.number(),
-  }).index("by_user", ["userId", "createdAt"]),
+  })
+    .index("by_user", ["userId", "createdAt"])
+    .index("by_post", ["postId"]),
 
   likes: defineTable({
     userId: v.id("users"),
@@ -221,7 +223,8 @@ export default defineSchema({
   })
     .index("by_tag", ["tag"])
     .index("by_post_count", ["postCount"])
-    .index("by_trending_score", ["trendingScore"]),
+    .index("by_trending_score", ["trendingScore"])
+    .index("by_lastUsedAt", ["lastUsedAt"]),
 
   postHashtags: defineTable({
     postId: v.id("posts"),
@@ -253,7 +256,8 @@ export default defineSchema({
     .index("by_recipient", ["recipientId"])
     .index("by_recipient_unread", ["recipientId", "isRead"])
     .index("by_recipient_created", ["recipientId", "createdAt"])
-    .index("by_actor", ["actorId"]),   // enables indexed cleanup when actor is deleted
+    .index("by_actor", ["actorId"])   // enables indexed cleanup when actor is deleted
+    .index("by_referenceId", ["referenceId"]),
 
   reposts: defineTable({
     userId: v.id("users"), // user who reposted
@@ -307,7 +311,8 @@ export default defineSchema({
     updatedAt: v.optional(v.number()), // for edited messages
   })
     .index("by_conversation", ["conversationId", "createdAt"])
-    .index("by_sender", ["senderId"]),
+    .index("by_sender", ["senderId"])
+    .index("by_createdAt", ["createdAt"]),
 
   conversationParticipants: defineTable({
     conversationId: v.id("conversations"),
@@ -670,7 +675,8 @@ export default defineSchema({
     createdAt: v.number(),
   })
     .index("by_asked_by", ["askedBy"])
-    .index("by_created", ["createdAt"]),
+    .index("by_created", ["createdAt"])
+    .index("by_course", ["course"]),
 
   answers: defineTable({
     questionId: v.id("questions"),
@@ -769,7 +775,8 @@ export default defineSchema({
     userId: v.id("users"),
     clickedAt: v.number(),
   })
-    .index("by_ad", ["adId"]),
+    .index("by_ad", ["adId"])
+    .index("by_user_ad", ["userId", "adId"]),
 
   // Phase 7.3 — Marketplace
   listings: defineTable({
@@ -799,7 +806,8 @@ export default defineSchema({
   })
     .index("by_seller", ["sellerId"])
     .index("by_category", ["category"])
-    .index("by_status", ["status"]),
+    .index("by_status", ["status"])
+    .index("by_createdAt", ["createdAt"]),
 
   // Marketplace transactions (purchase flow)
   marketplaceTransactions: defineTable({
@@ -819,7 +827,8 @@ export default defineSchema({
   })
     .index("by_buyer", ["buyerId"])
     .index("by_seller", ["sellerId"])
-    .index("by_listing", ["listingId"]),
+    .index("by_listing", ["listingId"])
+    .index("by_listing_buyer", ["listingId", "buyerId"]),
 
   // Phase 7.4 — Push Notifications
   pushSubscriptions: defineTable({
@@ -829,7 +838,8 @@ export default defineSchema({
     auth: v.string(),
     createdAt: v.number(),
   })
-    .index("by_user", ["userId"]),
+    .index("by_user", ["userId"])
+    .index("by_user_endpoint", ["userId", "endpoint"]),
 
   // Rate limiting — sliding-window counters per user/action
   rateLimits: defineTable({

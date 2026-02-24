@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useConvexAuth } from 'convex/react';
-import Image from 'next/image';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { api } from '@/convex/_generated/api';
 import Link from 'next/link';
 import { UserPlus } from 'lucide-react';
@@ -67,11 +67,12 @@ export function FeedRightSidebar() {
                 <div key={s._id} className="flex items-center gap-3">
                   <Link href={`/profile/${s.user._id}`} className="flex-shrink-0">
                     {s.user.profilePicture ? (
-                      <Image
+                      <OptimizedImage
                         src={s.user.profilePicture}
                         alt={s.user.name ?? ''}
                         width={40}
                         height={40}
+                        isAvatar
                         className="h-10 w-10 rounded-full object-cover"
                       />
                     ) : (
