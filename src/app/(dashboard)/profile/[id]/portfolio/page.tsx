@@ -2,6 +2,7 @@
 
 import { Suspense } from 'react';
 import { useQuery } from 'convex/react';
+import { useUser } from '@clerk/nextjs';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 import { notFound } from 'next/navigation';
@@ -33,9 +34,16 @@ const PortfolioPageSkeleton = () => (
 );
 
 function PortfolioPageContent({ userId }: { userId: Id<'users'> }) {
+    const { isLoaded, isSignedIn } = useUser();
     const user = useQuery(api.users.getUserById, { userId });
+    const currentUser = useQuery(
+        api.users.getCurrentUser,
+        isLoaded && isSignedIn ? {} : 'skip'
+    );
     const projects = useQuery(api.portfolio.getProjects, { userId });
     const timeline = useQuery(api.portfolio.getTimeline, { userId });
+    
+    const isOwner = currentUser?._id === userId;
 
     if (user === undefined || projects === undefined || timeline === undefined) {
         return <PortfolioPageSkeleton />;
@@ -57,10 +65,11 @@ function PortfolioPageContent({ userId }: { userId: Id<'users'> }) {
             <section className="mb-8">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-2xl font-bold">Projects</h2>
-                    {/* TODO: Add 'Add Project' button if currentUser is owner */}
-                    <button className="h-9 px-3 btn-press bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-semibold flex items-center gap-2">
-                        <Plus className="h-4 w-4" /> Add Project
-                    </button>
+                    {isOwner && (
+                        <button className="h-9 px-3 btn-press bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-semibold flex items-center gap-2">
+                            <Plus className="h-4 w-4" /> Add Project
+                        </button>
+                    )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {projects.length === 0 ? (
@@ -74,10 +83,11 @@ function PortfolioPageContent({ userId }: { userId: Id<'users'> }) {
             <section>
                  <div className="flex justify-between items-center mb-4">
                     <h2 className="text-2xl font-bold">Timeline</h2>
-                    {/* TODO: Add 'Add Timeline Item' button if currentUser is owner */}
-                    <button className="h-9 px-3 btn-press bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-semibold flex items-center gap-2">
-                        <Plus className="h-4 w-4" /> Add Event
-                    </button>
+                    {isOwner && (
+                        <button className="h-9 px-3 btn-press bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-semibold flex items-center gap-2">
+                            <Plus className="h-4 w-4" /> Add Event
+                        </button>
+                    )}
                 </div>
                 <div className="space-y-4">
                     {timeline.length === 0 ? (

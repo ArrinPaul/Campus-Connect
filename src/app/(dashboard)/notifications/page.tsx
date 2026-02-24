@@ -1,17 +1,40 @@
 'use client';
 
-import { useQuery, useMutation } from 'convex/react';
+import { useQuery, useMutation, useConvexAuth } from 'convex/react';
 import { api } from '@/../convex/_generated/api';
 import { NotificationItem } from '@/components/notifications/NotificationItem';
 import { Bell, CheckCheck } from 'lucide-react';
 
 export default function NotificationsPage() {
-  const data = useQuery(api.notifications.getNotifications, {});
+  const { isLoading, isAuthenticated } = useConvexAuth();
+  const data = useQuery(api.notifications.getNotifications, isAuthenticated ? {} : 'skip');
   const markAllAsRead = useMutation(api.notifications.markAllAsRead);
 
   // Backend returns { notifications: [...], cursor: null }, not a plain array
   const notifications = data?.notifications;
   const unreadCount = notifications?.filter((n) => !n.isRead).length ?? 0;
+
+  if (isLoading) {
+    return (
+      <div className="max-w-2xl mx-auto py-8 px-4">
+        <div className="space-y-3">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="border rounded-lg bg-card p-4 h-20 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="max-w-2xl mx-auto py-8 px-4 text-center">
+        <Bell className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-30" />
+        <h2 className="text-xl font-semibold">Sign in to view notifications</h2>
+        <p className="text-sm text-muted-foreground mt-1">You need to be signed in to see your notifications.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">

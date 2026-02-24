@@ -3,12 +3,14 @@
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { JobCard } from '../../(components)/jobs/JobCard';
+import { PostJobModal } from '@/components/jobs/PostJobModal';
 import Link from 'next/link';
+import { useState } from 'react';
 
 const JobCardSkeleton = () => <div className="p-4 border rounded-lg bg-card h-[116px] animate-pulse" />;
 
 export default function JobsPage() {
-    // TODO: Add state for search and filters
+    const [showPostModal, setShowPostModal] = useState(false);
     const jobs = useQuery(api.jobs.searchJobs, {});
 
     return (
@@ -21,8 +23,10 @@ export default function JobsPage() {
                             My Applications
                         </button>
                     </Link>
-                    {/* TODO: Create /jobs/new page */}
-                    <button className="h-10 py-2 px-4 btn-press bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-semibold">
+                    <button
+                        onClick={() => setShowPostModal(true)}
+                        className="h-10 py-2 px-4 btn-press bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-semibold"
+                    >
                         Post a Job
                     </button>
                 </div>
@@ -46,6 +50,10 @@ export default function JobsPage() {
                     </div>
                 )}
             </div>
+
+            {showPostModal && (
+                <PostJobModal onClose={() => setShowPostModal(false)} />
+            )}
         </div>
     );
 }

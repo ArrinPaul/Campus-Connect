@@ -3,6 +3,7 @@
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { QuestionCard } from '../../(components)/q-and-a/QuestionCard';
+import { AskQuestionModal } from '@/components/q-and-a/AskQuestionModal';
 import Link from 'next/link';
 import { Search, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -11,12 +12,13 @@ const QuestionCardSkeleton = () => <div className="p-4 border rounded-lg bg-card
 
 export default function QuestionsPage() {
     const [searchQuery, setSearchQuery] = useState('');
-    const [sortOption, setSortOption] = useState('newest'); // 'newest', 'votes', 'unanswered'
+    const [sortOption, setSortOption] = useState('newest');
     const [tagFilter, setTagFilter] = useState('');
+    const [showAskModal, setShowAskModal] = useState(false);
 
     const questions = useQuery(api.questions.getQuestions, { 
         query: searchQuery || undefined, 
-        sort: sortOption as any, // Cast to any because the exact literal types can be tricky
+        sort: sortOption as any,
         tag: tagFilter || undefined,
     });
 
@@ -25,8 +27,10 @@ export default function QuestionsPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <h1 className="text-3xl font-bold">Questions & Answers</h1>
                 <div className="flex gap-2">
-                     {/* TODO: Create /q-and-a/ask page */}
-                    <button className="h-10 py-2 px-4 btn-press bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-semibold">
+                    <button
+                        onClick={() => setShowAskModal(true)}
+                        className="h-10 py-2 px-4 btn-press bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-semibold"
+                    >
                         Ask a Question
                     </button>
                 </div>
@@ -78,6 +82,10 @@ export default function QuestionsPage() {
                     </div>
                 )}
             </div>
+
+            {showAskModal && (
+                <AskQuestionModal onClose={() => setShowAskModal(false)} />
+            )}
         </div>
     );
 }

@@ -29,7 +29,7 @@ export function NewConversationModal({ onClose }: NewConversationModalProps) {
     try {
       const conversationId = await getOrCreateConversation({ otherUserId: userId });
       onClose();
-      router.push(`/messages?conversation=${conversationId}`);
+      router.push(`/messages?c=${conversationId}`);
     } catch (err) {
       console.error('Failed to create conversation:', err);
     } finally {

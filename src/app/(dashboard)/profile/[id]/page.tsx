@@ -28,7 +28,7 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
 
     return (
         <div>
-            <ProfileHeader user={userProfile as any} isOwnProfile={false} />
+            <ProfileHeader user={userProfile as any} />
             <div className="px-4 sm:px-6 lg:px-8 mt-6">
                 <div className="border-b">
                     <nav className="flex gap-4" aria-label="Profile tabs">

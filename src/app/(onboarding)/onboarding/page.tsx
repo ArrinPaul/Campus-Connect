@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useRouter } from 'next/navigation';
@@ -28,13 +28,24 @@ export default function OnboardingPage() {
     
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState<OnboardingData>({
-        name: currentUser?.name ?? '',
-        username: currentUser?.username ?? '',
+        name: '',
+        username: '',
         bio: '',
         university: '',
         role: 'Student',
         skills: [],
     });
+
+    // Update form data when currentUser loads (useState initializer only runs once)
+    useEffect(() => {
+        if (currentUser) {
+            setFormData(prev => ({
+                ...prev,
+                name: prev.name || currentUser.name || '',
+                username: prev.username || currentUser.username || '',
+            }));
+        }
+    }, [currentUser]);
 
     const nextStep = () => setStep(prev => Math.min(prev + 1, TOTAL_STEPS));
     const prevStep = () => setStep(prev => Math.max(prev - 1, 1));

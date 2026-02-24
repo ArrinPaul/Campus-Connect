@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from 'convex/react';
+import { useConvexAuth } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { AdCard } from '../../../(components)/ads/AdCard';
 import Link from 'next/link';
@@ -9,7 +10,8 @@ import { Plus } from 'lucide-react';
 const AdCardSkeleton = () => <div className="p-4 border rounded-lg bg-card h-64 animate-pulse" />;
 
 export default function AdsDashboardPage() {
-    const ads = useQuery(api.ads.getAdAnalytics, {});
+    const { isAuthenticated } = useConvexAuth();
+    const ads = useQuery(api.ads.getAdAnalytics, isAuthenticated ? {} : 'skip');
 
     return (
         <div className="max-w-6xl mx-auto py-8 px-4">
@@ -29,7 +31,7 @@ export default function AdsDashboardPage() {
                     [...Array(3)].map((_, i) => <AdCardSkeleton key={i} />)
                 )}
                 {ads?.map(ad => (
-                    <AdCard key={ad.adId} ad={ad as any} />
+                    <AdCard key={ad._id} ad={ad as any} />
                 ))}
                 {ads?.length === 0 && (
                     <div className="text-center py-16 col-span-full">

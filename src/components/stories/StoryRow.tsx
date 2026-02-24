@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useQuery } from "convex/react"
+import { useConvexAuth } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { useRouter } from "next/navigation"
 import { StoryRingRow, type StoryRingUser, type StoryRingStory } from "./StoryRing"
@@ -13,8 +14,9 @@ import { StoryComposer } from "./StoryComposer"
  */
 export function StoryRow() {
   const router = useRouter()
-  const allStories = useQuery(api.stories.getStories)
-  const currentUser = useQuery(api.users.getCurrentUser)
+  const { isAuthenticated } = useConvexAuth()
+  const allStories = useQuery(api.stories.getStories, isAuthenticated ? {} : 'skip')
+  const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : 'skip')
   const [composerOpen, setComposerOpen] = useState(false)
 
   if (!allStories || allStories.length === 0 || !currentUser) {

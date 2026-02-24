@@ -47,6 +47,7 @@ export function ProfileStep({ data, updateFormData, nextStep, prevStep }: Props)
             <div className="space-y-4">
                  <Input label="Full Name" name="name" value={data.name} onChange={handleChange} placeholder="e.g. Jane Doe" />
                  <Input label="Username" name="username" value={data.username} onChange={handleChange} placeholder="e.g. jane_doe" />
+                 <Input label="University" name="university" value={data.university} onChange={handleChange} placeholder="e.g. MIT, Stanford University" />
                 <div>
                     <label htmlFor="bio" className="block text-sm font-medium text-foreground mb-1">Bio</label>
                     <textarea 

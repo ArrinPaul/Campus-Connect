@@ -45,6 +45,8 @@ export function ExplorePostGrid() {
                     post: post as any,
                 }))]);
             }
+            setCursor(nextCursor);
+            setHasMore(newHasMore);
             setIsLoadingMore(false);
         } else if (cursor === null && posts.length === 0) {
             // Initial load
@@ -54,10 +56,10 @@ export function ExplorePostGrid() {
                 createdAt: post.createdAt,
                 post: post as any,
             })));
+            setCursor(nextCursor);
+            setHasMore(newHasMore);
         }
         
-        setCursor(nextCursor);
-        setHasMore(newHasMore);
     }, [queryResult]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const observerTargetRef = useRef<HTMLDivElement>(null);

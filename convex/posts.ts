@@ -178,6 +178,11 @@ export const deletePostAction = internalAction({
             ctx.runMutation(internal.posts.cleanupPostReactions, { postId: args.postId }),
             ctx.runMutation(internal.posts.cleanupPostReposts, { postId: args.postId }),
             ctx.runMutation(internal.posts.cleanupPostBookmarks, { postId: args.postId }),
+            ctx.runMutation(internal.posts.cleanupPostLikes, { postId: args.postId }),
+            ctx.runMutation(internal.posts.cleanupPostHashtags, { postId: args.postId }),
+            ctx.runMutation(internal.posts.cleanupPostPolls, { postId: args.postId }),
+            ctx.runMutation(internal.posts.cleanupPostNotifications, { postId: args.postId }),
+            ctx.runMutation(internal.posts.cleanupPostFeedEntries, { postId: args.postId }),
         ]);
 
         await ctx.runMutation(internal.posts.deletePostDocument, { postId: args.postId });
@@ -220,6 +225,72 @@ export const cleanupPostBookmarks = internalMutation({
         const bookmarks = await ctx.db.query("bookmarks").withIndex("by_post", q => q.eq("postId", args.postId)).collect();
         for(const bookmark of bookmarks) {
             await ctx.db.delete(bookmark._id);
+        }
+    }
+})
+
+export const cleanupPostLikes = internalMutation({
+    args: { postId: v.id("posts") },
+    handler: async (ctx, args) => {
+        const likes = await ctx.db.query("likes").withIndex("by_post", q => q.eq("postId", args.postId)).collect();
+        for (const like of likes) {
+            await ctx.db.delete(like._id);
+        }
+    }
+})
+
+export const cleanupPostHashtags = internalMutation({
+    args: { postId: v.id("posts") },
+    handler: async (ctx, args) => {
+        const postHashtags = await ctx.db.query("postHashtags").withIndex("by_post", q => q.eq("postId", args.postId)).collect();
+        for (const ph of postHashtags) {
+            // Decrement hashtag postCount
+            const hashtag = await ctx.db.get(ph.hashtagId);
+            if (hashtag && hashtag.postCount > 0) {
+                await ctx.db.patch(hashtag._id, { postCount: hashtag.postCount - 1 });
+            }
+            await ctx.db.delete(ph._id);
+        }
+    }
+})
+
+export const cleanupPostPolls = internalMutation({
+    args: { postId: v.id("posts") },
+    handler: async (ctx, args) => {
+        const polls = await ctx.db.query("polls").withIndex("by_post", q => q.eq("postId", args.postId)).collect();
+        for (const poll of polls) {
+            // Delete poll votes first
+            const votes = await ctx.db.query("pollVotes").withIndex("by_poll", q => q.eq("pollId", poll._id)).collect();
+            for (const vote of votes) {
+                await ctx.db.delete(vote._id);
+            }
+            await ctx.db.delete(poll._id);
+        }
+    }
+})
+
+export const cleanupPostNotifications = internalMutation({
+    args: { postId: v.id("posts") },
+    handler: async (ctx, args) => {
+        // notifications.referenceId is a string, matching postId
+        const postIdStr = args.postId as string;
+        const notifications = await ctx.db.query("notifications").collect();
+        for (const notif of notifications) {
+            if (notif.referenceId === postIdStr) {
+                await ctx.db.delete(notif._id);
+            }
+        }
+    }
+})
+
+export const cleanupPostFeedEntries = internalMutation({
+    args: { postId: v.id("posts") },
+    handler: async (ctx, args) => {
+        const entries = await ctx.db.query("userFeed")
+            .filter(q => q.eq(q.field("postId"), args.postId))
+            .collect();
+        for (const entry of entries) {
+            await ctx.db.delete(entry._id);
         }
     }
 })

@@ -49,6 +49,10 @@ export function ConversationList({ selectedConversationId }: Props) {
                     />
                 ))}
             </div>
+
+            {showNewModal && (
+                <NewConversationModal onClose={() => setShowNewModal(false)} />
+            )}
         </div>
     );
 }

@@ -290,13 +290,8 @@ export const getAdAnalytics = query({
       if (!ad) throw new Error("Ad not found")
       if (ad.advertiserId.toString() !== user._id.toString()) throw new Error("Unauthorized")
       return [{
-        adId: ad._id,
-        title: ad.title,
-        status: ad.status,
-        impressions: ad.impressions,
-        clicks: ad.clicks,
+        ...ad,
         ctr: calcCtr(ad.impressions, ad.clicks),
-        budget: ad.budget,
       }]
     }
 
@@ -307,13 +302,8 @@ export const getAdAnalytics = query({
       .collect()
 
     return ads.map((ad) => ({
-      adId: ad._id,
-      title: ad.title,
-      status: ad.status,
-      impressions: ad.impressions,
-      clicks: ad.clicks,
+      ...ad,
       ctr: calcCtr(ad.impressions, ad.clicks),
-      budget: ad.budget,
     }))
   },
 })
