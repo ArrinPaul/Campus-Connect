@@ -6,6 +6,7 @@ import { ProfileSkeleton } from '../../../(components)/profile/skeletons';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { UserPostList } from '../../../(components)/profile/UserPostList';
 import { ProfileSkillsSection } from '../../../(components)/profile/ProfileSkillsSection';
+import { ProfileBadges } from '../../../(components)/profile/ProfileBadges';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
@@ -32,6 +33,9 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
             <ProfileHeader user={userProfile as any} />
             <div className="px-4 sm:px-6 lg:px-8">
                 <ProfileSkillsSection userId={userId} skills={(userProfile as any).skills || []} />
+            </div>
+            <div className="px-4 sm:px-6 lg:px-8 mt-4">
+                <ProfileBadges userId={userId} />
             </div>
             <div className="px-4 sm:px-6 lg:px-8 mt-6">
                 <div className="border-b">

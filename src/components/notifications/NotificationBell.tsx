@@ -83,6 +83,9 @@ export function NotificationBell() {
       case 'event':
         router.push(`/events/${notification.referenceId}`);
         break;
+      case 'achievement':
+        router.push(`/profile/${notification.actorId}`);
+        break;
       default:
         if (notification.referenceId) {
           router.push(`/feed?post=${notification.referenceId}`);

@@ -1,29 +1,37 @@
 import "@testing-library/jest-dom"
 import { render, screen } from "@testing-library/react"
-import { useQuery } from "convex/react"
 import SettingsPage from "./page"
 
-// Mock Convex
-jest.mock("convex/react", () => ({
-  useQuery: jest.fn(),
-  useMutation: jest.fn(() => jest.fn()),
+// Mock next/navigation (settings page uses useSearchParams)
+jest.mock("next/navigation", () => ({
+  useSearchParams: jest.fn(() => ({ get: jest.fn().mockReturnValue(null) })),
+  useRouter: jest.fn(() => ({ push: jest.fn() })),
+  usePathname: jest.fn(() => "/settings"),
 }))
 
-// Mock ProfileForm
-jest.mock("@/components/profile/ProfileForm", () => ({
-  ProfileForm: ({ initialData }: { initialData: unknown }) => (
-    <div data-testid="profile-form">ProfileForm: {JSON.stringify(initialData)}</div>
-  ),
+// Mock the v2 settings sub-components
+jest.mock("../../(components)/settings/SettingsNav", () => ({
+  SettingsNav: () => <nav data-testid="settings-nav">Settings Navigation</nav>,
 }))
 
-// Mock ThemeToggle
-jest.mock("@/components/theme/theme-toggle", () => ({
-  ThemeToggle: () => <div data-testid="theme-toggle">ThemeToggle</div>,
+jest.mock("../../(components)/settings/ProfileSettings", () => ({
+  ProfileSettings: () => <div data-testid="profile-settings">Profile Settings</div>,
 }))
 
-// Mock LoadingSpinner
-jest.mock("@/components/ui/loading-skeleton", () => ({
-  LoadingSpinner: () => <div data-testid="loading-spinner">Loading...</div>,
+jest.mock("../../(components)/settings/AccountSettings", () => ({
+  AccountSettings: () => <div data-testid="account-settings">Account Settings</div>,
+}))
+
+jest.mock("../../(components)/settings/PrivacySettings", () => ({
+  PrivacySettings: () => <div data-testid="privacy-settings">Privacy Settings</div>,
+}))
+
+jest.mock("../../(components)/settings/NotificationSettings", () => ({
+  NotificationSettings: () => <div data-testid="notification-settings">Notification Settings</div>,
+}))
+
+jest.mock("../../(components)/settings/BillingSettings", () => ({
+  BillingSettings: () => <div data-testid="billing-settings">Billing Settings</div>,
 }))
 
 describe("SettingsPage", () => {
@@ -31,87 +39,58 @@ describe("SettingsPage", () => {
     jest.clearAllMocks()
   })
 
-  it("should render loading skeleton when user is loading", () => {
-    ;(useQuery as jest.Mock).mockReturnValue(undefined)
-
-    const { container } = render(<SettingsPage />)
-
-    // Should show skeleton placeholders (animated bg divs)
-    const skeletonDivs = container.querySelectorAll(".bg-muted")
-    expect(skeletonDivs.length).toBeGreaterThan(0)
-  })
-
-  it("should show not authenticated message when user is null", () => {
-    ;(useQuery as jest.Mock).mockReturnValue(null)
+  it("should render settings navigation", () => {
+    const { useSearchParams } = require("next/navigation")
+    useSearchParams.mockReturnValue({ get: jest.fn().mockReturnValue(null) })
 
     render(<SettingsPage />)
 
-    expect(screen.getByText("Not Authenticated")).toBeInTheDocument()
-    expect(
-      screen.getByText("Please sign in to access settings.")
-    ).toBeInTheDocument()
+    expect(screen.getByTestId("settings-nav")).toBeInTheDocument()
   })
 
-  it("should render settings page with title when user is loaded", () => {
-    ;(useQuery as jest.Mock).mockReturnValue({
-      _id: "user123",
-      name: "Test User",
-      role: "Student",
-      experienceLevel: "Beginner",
-    })
+  it("should render profile settings by default (no tab param)", () => {
+    const { useSearchParams } = require("next/navigation")
+    useSearchParams.mockReturnValue({ get: jest.fn().mockReturnValue(null) })
 
     render(<SettingsPage />)
 
-    expect(screen.getByText("Settings")).toBeInTheDocument()
+    expect(screen.getByTestId("profile-settings")).toBeInTheDocument()
   })
 
-  it("should render appearance section with theme toggle", () => {
-    ;(useQuery as jest.Mock).mockReturnValue({
-      _id: "user123",
-      name: "Test User",
-      role: "Student",
-      experienceLevel: "Beginner",
-    })
+  it("should render account settings when tab=account", () => {
+    const { useSearchParams } = require("next/navigation")
+    useSearchParams.mockReturnValue({ get: jest.fn().mockReturnValue("account") })
 
     render(<SettingsPage />)
 
-    expect(screen.getByText("Appearance")).toBeInTheDocument()
-    expect(screen.getByText("Theme")).toBeInTheDocument()
-    expect(
-      screen.getByText("Choose your preferred theme")
-    ).toBeInTheDocument()
-    expect(screen.getByTestId("theme-toggle")).toBeInTheDocument()
+    expect(screen.getByTestId("account-settings")).toBeInTheDocument()
   })
 
-  it("should render profile information section with ProfileForm", () => {
-    const mockUser = {
-      _id: "user123",
-      name: "Test User",
-      role: "Student",
-      experienceLevel: "Beginner",
-    }
-    ;(useQuery as jest.Mock).mockReturnValue(mockUser)
+  it("should render privacy settings when tab=privacy", () => {
+    const { useSearchParams } = require("next/navigation")
+    useSearchParams.mockReturnValue({ get: jest.fn().mockReturnValue("privacy") })
 
     render(<SettingsPage />)
 
-    expect(screen.getByText("Profile Information")).toBeInTheDocument()
-    expect(screen.getByTestId("profile-form")).toBeInTheDocument()
+    expect(screen.getByTestId("privacy-settings")).toBeInTheDocument()
   })
 
-  it("should pass current user data to ProfileForm", () => {
-    const mockUser = {
-      _id: "user123",
-      name: "Test User",
-      role: "Faculty",
-      experienceLevel: "Expert",
-      bio: "A test bio",
-    }
-    ;(useQuery as jest.Mock).mockReturnValue(mockUser)
+  it("should render notification settings when tab=notifications", () => {
+    const { useSearchParams } = require("next/navigation")
+    useSearchParams.mockReturnValue({ get: jest.fn().mockReturnValue("notifications") })
 
     render(<SettingsPage />)
 
-    const profileForm = screen.getByTestId("profile-form")
-    expect(profileForm.textContent).toContain("Test User")
-    expect(profileForm.textContent).toContain("Faculty")
+    expect(screen.getByTestId("notification-settings")).toBeInTheDocument()
+  })
+
+  it("should render billing settings when tab=billing", () => {
+    const { useSearchParams } = require("next/navigation")
+    useSearchParams.mockReturnValue({ get: jest.fn().mockReturnValue("billing") })
+
+    render(<SettingsPage />)
+
+    expect(screen.getByTestId("billing-settings")).toBeInTheDocument()
   })
 })
+

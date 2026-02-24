@@ -86,8 +86,8 @@ describe("StoriesPage", () => {
     const StoriesPage = (await import("@/app/(dashboard)/stories/page")).default
     render(<StoriesPage />)
 
-    // Should render a loading spinner (div with animate-spin class)
-    const spinner = document.querySelector(".animate-spin")
+    // Should render a loading skeleton (div with animate-pulse class)
+    const spinner = document.querySelector(".animate-pulse")
     expect(spinner).not.toBeNull()
   })
 

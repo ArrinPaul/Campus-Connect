@@ -31,6 +31,7 @@ jest.mock("convex/react", () => ({
   useMutation: jest.fn(() => jest.fn()),
   useAction: jest.fn(() => jest.fn()),
   useQuery: jest.fn(() => null),
+  useConvexAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false })),
 }))
 
 // Mock Next.js Image
@@ -70,6 +71,9 @@ jest.mock("lucide-react", () => ({
   Hash: (props: any) => <svg {...props} />,
   AtSign: (props: any) => <svg {...props} />,
   MessageCircle: (props: any) => <svg {...props} />,
+  MoreHorizontal: (props: any) => <svg {...props} />,
+  Heart: (props: any) => <svg {...props} />,
+  Bookmark: (props: any) => <svg {...props} />,
   // New icons used by PostComposer
   Image: (props: any) => <svg {...props} />,
   Video: (props: any) => <svg {...props} />,
@@ -90,6 +94,21 @@ jest.mock("lucide-react", () => ({
 jest.mock("@/components/posts/PollCard", () => ({
   PollCard: () => <div data-testid="poll-card">PollCard</div>,
 }))
+
+jest.mock("@/components/posts/MediaGallery", () => ({
+  MediaGallery: () => null,
+}))
+
+jest.mock("@/components/posts/LinkPreviewCard", () => ({
+  LinkPreviewCard: () => null,
+}))
+
+jest.mock("@/components/ui/OnlineStatusDot", () => ({
+  AvatarWithStatus: ({ children }: any) => <div>{children}</div>,
+  OnlineStatusDot: () => null,
+}))
+
+
 
 describe("Responsive Component Behavior", () => {
   describe("PostCard - Responsive Design", () => {

@@ -66,6 +66,29 @@ jest.mock("lucide-react", () => ({
   Share2: (props: any) => <svg data-testid="share-icon" {...props} />,
   Copy: (props: any) => <svg {...props} />,
   Repeat2: (props: any) => <svg {...props} />,
+  MessageCircle: (props: any) => <svg {...props} />,
+  Trash2: (props: any) => <svg {...props} />,
+  MoreHorizontal: (props: any) => <svg {...props} />,
+  Heart: (props: any) => <svg {...props} />,
+  Bookmark: (props: any) => <svg {...props} />,
+}))
+
+// Mock components with complex dependencies
+jest.mock("@/components/posts/MediaGallery", () => ({
+  MediaGallery: () => null,
+}))
+
+jest.mock("@/components/posts/LinkPreviewCard", () => ({
+  LinkPreviewCard: () => null,
+}))
+
+jest.mock("@/components/posts/PollCard", () => ({
+  PollCard: () => null,
+}))
+
+jest.mock("@/components/ui/OnlineStatusDot", () => ({
+  AvatarWithStatus: ({ children }: any) => <div>{children}</div>,
+  OnlineStatusDot: () => null,
 }))
 
 // Mock window.confirm

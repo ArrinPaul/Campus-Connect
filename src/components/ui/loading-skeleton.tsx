@@ -1,6 +1,6 @@
 export function PostSkeleton() {
   return (
-    <div className="rounded-xl border border-border/50 bg-card p-5 shadow-elevation-1 sm:p-6">
+    <div className="rounded-xl border border-border/50 bg-card p-5 shadow-elevation-1 sm:p-6 animate-pulse">
       <div className="flex items-start gap-3">
         <div className="h-10 w-10 rounded-full bg-muted animate-shimmer flex-shrink-0" />
         <div className="flex-1 space-y-3">
@@ -25,7 +25,7 @@ export function PostSkeleton() {
 
 export function UserCardSkeleton() {
   return (
-    <div className="rounded-xl border border-border/50 bg-card p-4 shadow-elevation-1">
+    <div className="rounded-xl border border-border/50 bg-card p-4 shadow-elevation-1 animate-pulse">
       <div className="flex items-center gap-3">
         <div className="h-11 w-11 rounded-full bg-muted animate-shimmer flex-shrink-0" />
         <div className="flex-1 space-y-2">
@@ -43,7 +43,7 @@ export function UserCardSkeleton() {
 
 export function ProfileHeaderSkeleton() {
   return (
-    <div className="rounded-xl border border-border/50 bg-card p-6 shadow-elevation-1">
+    <div className="rounded-xl border border-border/50 bg-card p-6 shadow-elevation-1 animate-pulse">
       <div className="flex flex-col items-center gap-4 sm:flex-row">
         <div className="h-24 w-24 rounded-full bg-muted animate-shimmer" />
         <div className="flex-1 space-y-3">
@@ -79,7 +79,7 @@ export function LoadingSpinner({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
 
 export function CommentSkeleton() {
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-3 animate-pulse">
       <div className="h-8 w-8 rounded-full bg-muted animate-shimmer flex-shrink-0" />
       <div className="flex-1 space-y-2">
         <div className="rounded-xl bg-muted/60 px-4 py-3 space-y-2">
@@ -95,7 +95,7 @@ export function CommentSkeleton() {
 
 export function FullPageLoadingSpinner() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <div className="flex min-h-screen items-center justify-center" role="status">
       <div className="flex flex-col items-center gap-4">
         <div className="relative">
           <div className="h-10 w-10 animate-spin rounded-full border-[3px] border-border border-t-primary" />

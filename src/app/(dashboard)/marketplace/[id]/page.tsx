@@ -4,12 +4,13 @@ import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, Tag, DollarSign, MapPin, Package, Clock, User as UserIcon, CheckCircle, MessageSquare, Loader2, ShoppingCart, XCircle, Check, X } from 'lucide-react';
+import { ArrowLeft, Tag, DollarSign, MapPin, Package, Clock, User as UserIcon, CheckCircle, MessageSquare, Loader2, ShoppingCart, XCircle, Check, X, Pencil, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { EditListingModal } from '@/components/marketplace/EditListingModal';
 
 type PageProps = {
     params: {
@@ -28,7 +29,10 @@ export default function ListingDetailPage({ params }: PageProps) {
     const [showPurchaseForm, setShowPurchaseForm] = useState(false);
     const [purchaseMessage, setPurchaseMessage] = useState('');
     const [processingTx, setProcessingTx] = useState<string | null>(null);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const currentUser = useQuery(api.users.getCurrentUser);
+    const deleteListing = useMutation(api.marketplace.deleteListing);
 
     // Get transactions for seller view
     const isSeller = currentUser?._id === listing?.sellerId;
@@ -208,7 +212,13 @@ export default function ListingDetailPage({ params }: PageProps) {
                     )}
 
                     {isSeller && (
-                        <div className="flex gap-4">
+                        <div className="flex gap-3 flex-wrap">
+                            <button
+                                onClick={() => setShowEditModal(true)}
+                                className="h-10 px-4 btn-press border rounded-md text-sm font-semibold flex items-center gap-2 hover:bg-muted"
+                            >
+                                <Pencil className="h-4 w-4" /> Edit Listing
+                            </button>
                             <button 
                                 onClick={handleMarkAsSold} 
                                 disabled={listing.status === 'sold' || isMarkingSold}
@@ -216,6 +226,29 @@ export default function ListingDetailPage({ params }: PageProps) {
                             >
                                 {isMarkingSold && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 <CheckCircle className="h-4 w-4" /> Mark as Sold
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    if (!confirm('Delete this listing? This cannot be undone.')) return;
+                                    setIsDeleting(true);
+                                    try {
+                                        await deleteListing({ listingId: listing._id });
+                                        toast.success('Listing deleted');
+                                        window.location.href = '/marketplace';
+                                    } catch (err: any) {
+                                        toast.error(err.message || 'Failed to delete');
+                                        setIsDeleting(false);
+                                    }
+                                }}
+                                disabled={isDeleting}
+                                className="h-10 px-4 btn-press border border-red-200 dark:border-red-900/50 text-red-600 rounded-md text-sm font-semibold flex items-center gap-2 hover:bg-red-500/10 disabled:opacity-50"
+                            >
+                                {isDeleting ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                    <Trash2 className="h-4 w-4" />
+                                )}
+                                Delete
                             </button>
                         </div>
                     )}
@@ -293,6 +326,14 @@ export default function ListingDetailPage({ params }: PageProps) {
                     </div>
                 )}
             </div>
+
+            {/* Edit Modal */}
+            {showEditModal && (
+                <EditListingModal
+                    listing={listing}
+                    onClose={() => setShowEditModal(false)}
+                />
+            )}
         </div>
     );
 }

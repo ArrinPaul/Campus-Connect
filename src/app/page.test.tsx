@@ -26,6 +26,9 @@ jest.mock("framer-motion", () => {
     h2: element("h2"),
     p: element("p"),
     span: element("span"),
+    button: element("button"),
+    a: element("a"),
+    section: element("section"),
   }
   return {
     motion: m,

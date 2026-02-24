@@ -24,6 +24,7 @@ jest.mock("convex/react", () => ({
     return null
   }),
   useMutation: jest.fn(() => jest.fn()),
+  useConvexAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false })),
 }))
 
 // Mock Next.js Image component

@@ -6,14 +6,14 @@ import { useMutation } from "convex/react"
 import { api } from "@/../convex/_generated/api"
 import { Id } from "@/../convex/_generated/dataModel"
 import { formatDistanceToNow } from "date-fns"
-import { Heart, MessageCircle, AtSign, UserPlus, MessageSquare, Calendar } from "lucide-react"
+import { Heart, MessageCircle, AtSign, UserPlus, MessageSquare, Calendar, Award } from "lucide-react"
 
 interface NotificationItemProps {
   notification: {
     _id: Id<"notifications">
     recipientId: Id<"users">
     actorId: Id<"users">
-    type: "reaction" | "comment" | "mention" | "follow" | "reply" | "message" | "event"
+    type: "reaction" | "comment" | "mention" | "follow" | "reply" | "message" | "event" | "achievement"
     referenceId?: string
     message: string
     isRead: boolean
@@ -53,6 +53,8 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
       router.push('/messages')
     } else if (notification.type === "event" && notification.referenceId) {
       router.push(`/events/${notification.referenceId}`)
+    } else if (notification.type === "achievement") {
+      router.push(`/profile/${notification.actorId}`)
     } else if (notification.referenceId) {
       router.push(`/feed?post=${notification.referenceId}`)
     }
@@ -75,6 +77,8 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
         return <MessageSquare className="w-5 h-5 text-blue-500" />
       case "event":
         return <Calendar className="w-5 h-5 text-orange-500" />
+      case "achievement":
+        return <Award className="w-5 h-5 text-yellow-500" />
       default:
         return null
     }

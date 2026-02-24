@@ -4,7 +4,11 @@ import { useQuery } from "convex/react"
 import { useRouter } from "next/navigation"
 
 // Mock dependencies
-jest.mock("convex/react")
+jest.mock("convex/react", () => ({
+  useQuery: jest.fn(),
+  useMutation: jest.fn(() => jest.fn()),
+  useConvexAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false })),
+}))
 jest.mock("next/navigation")
 jest.mock("date-fns", () => ({
   formatDistanceToNow: jest.fn(() => "2 minutes ago"),
@@ -16,6 +20,10 @@ jest.mock("../../../../convex/_generated/api", () => ({
       getRecentNotifications: {},
     },
   },
+}))
+jest.mock("@/components/accessibility/LiveRegion", () => ({
+  useLiveRegion: jest.fn(() => ({ announce: jest.fn() })),
+  LiveRegion: ({ children }: any) => children,
 }))
 
 const mockUseQuery = useQuery as jest.MockedFunction<typeof useQuery>

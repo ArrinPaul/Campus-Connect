@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { internalMutation } from "./_generated/server";
+import { internalMutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
 
 // ────────────────────────────────────────────
@@ -83,4 +83,28 @@ export const updateSubscriptionStatus = internalMutation({
             await ctx.db.patch(user._id, { isPro });
         }
     }
+});
+
+// ── Public queries for billing UI ─────────────────────────
+export const getMySubscription = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .first();
+    if (!user) return null;
+    const subscription = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .first();
+    return {
+      isPro: user.isPro ?? false,
+      plan: subscription?.plan ?? "free",
+      status: subscription?.status ?? null,
+      currentPeriodEnd: subscription?.currentPeriodEnd ?? null,
+      cancelAtPeriodEnd: subscription?.cancelAtPeriodEnd ?? false,
+    };
+  },
 });

@@ -669,3 +669,56 @@ export const getOnboardingStatus = query({
     }
   },
 })
+
+// ── Privacy Settings ──────────────────────────────────────
+export const getPrivacySettings = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .first();
+    if (!user) throw new Error("User not found");
+    return {
+      profileVisibility: user.profileVisibility ?? "public",
+      showOnlineStatus: user.showOnlineStatus ?? true,
+      showEmail: user.showEmail ?? false,
+      allowMessages: user.allowMessages ?? "everyone",
+      allowFollowRequests: user.allowFollowRequests ?? true,
+      showActivity: user.showActivity ?? true,
+      searchVisible: user.searchVisible ?? true,
+    };
+  },
+});
+
+export const updatePrivacySettings = mutation({
+  args: {
+    profileVisibility: v.optional(v.union(v.literal("public"), v.literal("connections"), v.literal("private"))),
+    showOnlineStatus: v.optional(v.boolean()),
+    showEmail: v.optional(v.boolean()),
+    allowMessages: v.optional(v.union(v.literal("everyone"), v.literal("connections"), v.literal("nobody"))),
+    allowFollowRequests: v.optional(v.boolean()),
+    showActivity: v.optional(v.boolean()),
+    searchVisible: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .first();
+    if (!user) throw new Error("User not found");
+    const updates: Record<string, unknown> = { updatedAt: Date.now() };
+    if (args.profileVisibility !== undefined) updates.profileVisibility = args.profileVisibility;
+    if (args.showOnlineStatus !== undefined) updates.showOnlineStatus = args.showOnlineStatus;
+    if (args.showEmail !== undefined) updates.showEmail = args.showEmail;
+    if (args.allowMessages !== undefined) updates.allowMessages = args.allowMessages;
+    if (args.allowFollowRequests !== undefined) updates.allowFollowRequests = args.allowFollowRequests;
+    if (args.showActivity !== undefined) updates.showActivity = args.showActivity;
+    if (args.searchVisible !== undefined) updates.searchVisible = args.searchVisible;
+    await ctx.db.patch(user._id, updates);
+    return user._id;
+  },
+});

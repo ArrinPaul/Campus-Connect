@@ -57,6 +57,7 @@ jest.mock("convex/react", () => ({
     return jest.fn()
   }),
   useQuery: jest.fn(() => mockUseQuery()),
+  useConvexAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false })),
 }))
 
 // Mock the Convex API

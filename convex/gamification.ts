@@ -88,6 +88,14 @@ export const awardReputation = internalMutation({
       level: newLevel,
     })
 
+    // Log reputation event for period-based leaderboard
+    await ctx.db.insert("reputationEvents", {
+      userId: args.userId,
+      action: args.action,
+      amount: points,
+      createdAt: Date.now(),
+    })
+
     return { reputation: newReputation, level: newLevel }
   },
 })
@@ -248,7 +256,7 @@ export const checkAchievements = internalMutation({
       if (endorsements.length >= 5) newAchievements.push("endorsed")
     }
 
-    // Insert new achievements
+    // Insert new achievements and send notifications
     for (const badge of newAchievements) {
       const def = ACHIEVEMENT_DEFINITIONS.find((d) => d.badge === badge)
       if (def) {
@@ -258,6 +266,17 @@ export const checkAchievements = internalMutation({
           name: def.name,
           description: def.description,
           earnedAt: Date.now(),
+        })
+
+        // Create achievement notification
+        await ctx.db.insert("notifications", {
+          recipientId: args.userId,
+          actorId: args.userId, // self-triggered
+          type: "achievement",
+          referenceId: badge,
+          message: `You earned the "${def.name}" badge! ${def.description}`,
+          isRead: false,
+          createdAt: Date.now(),
         })
       }
     }
@@ -306,7 +325,71 @@ export const getLeaderboard = query({
   },
   handler: async (ctx, args) => {
     const limit = Math.min(args.limit ?? 20, 100)
+    const period = args.period ?? "all"
 
+    // For period-based filtering, aggregate from reputationEvents
+    if (period === "weekly" || period === "monthly") {
+      const now = Date.now()
+      const cutoff = period === "weekly"
+        ? now - 7 * 24 * 60 * 60 * 1000
+        : now - 30 * 24 * 60 * 60 * 1000
+
+      // Get all events within the time window
+      const events = await ctx.db
+        .query("reputationEvents")
+        .withIndex("by_created")
+        .filter((q: any) => q.gte(q.field("createdAt"), cutoff))
+        .collect()
+
+      // Aggregate reputation by user
+      const userRepMap = new Map<string, number>()
+      for (const event of events) {
+        const current = userRepMap.get(event.userId) ?? 0
+        userRepMap.set(event.userId, current + event.amount)
+      }
+
+      // Sort by period reputation
+      const sortedEntries = [...userRepMap.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, limit)
+
+      // Fetch user details
+      const results = await Promise.all(
+        sortedEntries.map(async ([userId, periodRep], index) => {
+          const user = await ctx.db.get(userId as any)
+          if (!user) return null
+
+          // Apply university filter
+          if (args.university) {
+            const uni = args.university.toLowerCase()
+            if (!user.university || !user.university.toLowerCase().includes(uni)) return null
+          }
+
+          const achievements = await ctx.db
+            .query("achievements")
+            .withIndex("by_user", (q: any) => q.eq("userId", user._id))
+            .collect()
+
+          return {
+            rank: index + 1,
+            _id: user._id,
+            name: user.name,
+            username: user.username,
+            profilePicture: user.profilePicture,
+            university: user.university,
+            reputation: periodRep,
+            level: user.level ?? 1,
+            achievementCount: achievements.length,
+          }
+        })
+      )
+
+      // Filter nulls and re-rank
+      const filtered = results.filter(Boolean) as NonNullable<(typeof results)[number]>[]
+      return filtered.map((entry, i) => ({ ...entry, rank: i + 1 }))
+    }
+
+    // All-time: use user.reputation directly
     let users = await ctx.db.query("users").collect()
 
     // Filter by university

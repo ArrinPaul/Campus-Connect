@@ -63,6 +63,13 @@ export default defineSchema({
     // Phase 7.4 — Email prefs
     emailDigestFrequency: v.optional(v.union(v.literal("daily"), v.literal("weekly"), v.literal("never"))),
     emailNotifications: v.optional(v.boolean()),
+    // Privacy settings
+    profileVisibility: v.optional(v.union(v.literal("public"), v.literal("connections"), v.literal("private"))),
+    showEmail: v.optional(v.boolean()),
+    allowMessages: v.optional(v.union(v.literal("everyone"), v.literal("connections"), v.literal("nobody"))),
+    allowFollowRequests: v.optional(v.boolean()),
+    showActivity: v.optional(v.boolean()),
+    searchVisible: v.optional(v.boolean()),
     // Onboarding
     onboardingComplete: v.optional(v.boolean()),
     // Admin flag
@@ -234,7 +241,8 @@ export default defineSchema({
       v.literal("follow"), // someone followed you
       v.literal("reply"), // someone replied to your comment
       v.literal("event"), // event-related notification
-      v.literal("message") // direct message notification
+      v.literal("message"), // direct message notification
+      v.literal("achievement") // achievement/badge unlocked
     ),
     referenceId: v.optional(v.string()), // postId, commentId, etc.
     message: v.string(), // e.g., "John Doe liked your post"
@@ -695,6 +703,16 @@ export default defineSchema({
     earnedAt: v.number(),
   })
     .index("by_user", ["userId"]),
+
+  // Reputation event log (for period-based leaderboard filtering)
+  reputationEvents: defineTable({
+    userId: v.id("users"),
+    action: v.string(),
+    amount: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_created", ["createdAt"]),
 
   // Phase 7.1 — Subscriptions
   subscriptions: defineTable({
