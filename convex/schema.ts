@@ -479,6 +479,22 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_community_user", ["communityId", "userId"]),
 
+  communityInvites: defineTable({
+    communityId: v.id("communities"),
+    invitedUserId: v.id("users"),
+    invitedBy: v.id("users"),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("accepted"),
+      v.literal("declined"),
+      v.literal("revoked")
+    ),
+    createdAt: v.number(),
+  })
+    .index("by_community", ["communityId"])
+    .index("by_invited_user", ["invitedUserId"])
+    .index("by_community_user", ["communityId", "invitedUserId"]),
+
   // Phase 5.3 — Events & Scheduling
   events: defineTable({
     title: v.string(),
@@ -654,6 +670,7 @@ export default defineSchema({
     upvotes: v.number(),
     downvotes: v.number(),
     isAccepted: v.boolean(),
+    mediaUrls: v.optional(v.array(v.string())),
     createdAt: v.number(),
   })
     .index("by_question", ["questionId"])
@@ -764,6 +781,26 @@ export default defineSchema({
     .index("by_seller", ["sellerId"])
     .index("by_category", ["category"])
     .index("by_status", ["status"]),
+
+  // Marketplace transactions (purchase flow)
+  marketplaceTransactions: defineTable({
+    listingId: v.id("listings"),
+    buyerId: v.id("users"),
+    sellerId: v.id("users"),
+    amount: v.number(),                 // price at time of purchase
+    status: v.union(
+      v.literal("pending"),
+      v.literal("completed"),
+      v.literal("cancelled"),
+      v.literal("disputed")
+    ),
+    message: v.optional(v.string()),    // buyer message to seller
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_buyer", ["buyerId"])
+    .index("by_seller", ["sellerId"])
+    .index("by_listing", ["listingId"]),
 
   // Phase 7.4 — Push Notifications
   pushSubscriptions: defineTable({

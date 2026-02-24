@@ -170,85 +170,83 @@ export const getRankedFeed = query({
       .filter((q) => q.gte(q.field("createdAt"), cutoffTime))
       .take(200) // Pool of candidates
 
-    // 2. Precompute relationship data: viewer's reactions/comments on each author
+    // 2. Fetch viewer interaction signals + precompute relationship data (both in parallel)
+    const [myReactions, myComments] = await Promise.all([
+      ctx.db
+        .query("reactions")
+        .withIndex("by_user", (q) => q.eq("userId", user._id))
+        .take(200),
+      ctx.db
+        .query("comments")
+        .withIndex("by_author", (q) => q.eq("authorId", user._id))
+        .take(200),
+    ])
+
+    // Precompute relationship data — parallel batch fetches instead of sequential loops
     const interactionsByAuthor = new Map<string, number>()
 
-    // Get viewer's recent reactions
-    const myReactions = await ctx.db
-      .query("reactions")
-      .withIndex("by_user", (q) => q.eq("userId", user._id))
-      .take(200)
-
-    for (const reaction of myReactions) {
-      if (reaction.targetType === "post") {
-        // Look up the post to get its author
-        const post = await ctx.db.get(reaction.targetId as Id<"posts">)
-        if (post) {
-          const authorId = post.authorId as string
-          interactionsByAuthor.set(
-            authorId,
-            (interactionsByAuthor.get(authorId) ?? 0) + 1
-          )
-        }
-      }
-    }
-
-    // Get viewer's recent comments and count per post author
-    const myComments = await ctx.db
-      .query("comments")
-      .withIndex("by_author", (q) => q.eq("authorId", user._id))
-      .take(200)
-
-    for (const comment of myComments) {
-      const post = await ctx.db.get(comment.postId)
+    // Resolve posts from reactions in parallel (was sequential for-loop)
+    const reactionPostResults = await Promise.all(
+      myReactions
+        .filter((r) => r.targetType === "post")
+        .map((r) => ctx.db.get(r.targetId as Id<"posts">))
+    )
+    for (const post of reactionPostResults) {
       if (post) {
         const authorId = post.authorId as string
-        interactionsByAuthor.set(
-          authorId,
-          (interactionsByAuthor.get(authorId) ?? 0) + 1
-        )
+        interactionsByAuthor.set(authorId, (interactionsByAuthor.get(authorId) ?? 0) + 1)
       }
     }
 
-    // 3. Score each post
-    const scoredPosts = await Promise.all(
-      recentPosts.map(async (post) => {
-        const author = await ctx.db.get(post.authorId)
-        if (!author) return null
+    // Resolve posts from comments in parallel (was sequential for-loop)
+    const commentPostResults = await Promise.all(
+      myComments.map((c) => ctx.db.get(c.postId))
+    )
+    for (const post of commentPostResults) {
+      if (post) {
+        const authorId = post.authorId as string
+        interactionsByAuthor.set(authorId, (interactionsByAuthor.get(authorId) ?? 0) + 1)
+      }
+    }
 
-        const recency = recencyScore(post.createdAt, now)
-        const relevance = relevanceScore(user.skills, author.skills)
-        const engagement = engagementScore(
-          post.reactionCounts as any,
-          post.commentCount,
-          post.shareCount
-        )
-        const relationship = relationshipScore(
-          interactionsByAuthor.get(post.authorId as string) ?? 0
-        )
-
-        const score = computeFeedScore({
-          recency,
-          relevance,
-          engagement,
-          relationship,
-        })
-
-        return {
-          type: "post" as const,
-          _id: post._id,
-          createdAt: post.createdAt,
-          authorId: post.authorId as string,
-          score,
-          post: {
-            ...post,
-            author,
-          },
-        }
-      })
+    // 3. Pre-batch-load all unique authors so scoring is synchronous (no per-post DB call)
+    const uniqueAuthorIds = [...new Set(recentPosts.map((p) => p.authorId as string))]
+    const authorsArr = await Promise.all(
+      uniqueAuthorIds.map((id) => ctx.db.get(id as Id<"users">))
+    )
+    const authorMap = new Map<string, Doc<"users">>(
+      uniqueAuthorIds
+        .map((id, i) => [id, authorsArr[i]] as [string, Doc<"users"> | null])
+        .filter((entry): entry is [string, Doc<"users">] => entry[1] != null)
     )
 
-    // Filter nulls, sort by score
+    // 3. Score each post synchronously using authorMap (zero extra DB calls)
+    const scoredPosts = recentPosts.map((post) => {
+      const author = authorMap.get(post.authorId as string)
+      if (!author) return null
+
+      const recency = recencyScore(post.createdAt, now)
+      const relevance = relevanceScore(user.skills, author.skills)
+      const engagement = engagementScore(
+        post.reactionCounts as any,
+        post.commentCount,
+        post.shareCount
+      )
+      const relationship = relationshipScore(
+        interactionsByAuthor.get(post.authorId as string) ?? 0
+      )
+
+      const score = computeFeedScore({ recency, relevance, engagement, relationship })
+
+      return {
+        type: "post" as const,
+        _id: post._id,
+        createdAt: post.createdAt,
+        authorId: post.authorId as string,
+        score,
+        post: { ...post, author },
+      }
+    })
     const validPosts = scoredPosts.filter((p) => p !== null) as NonNullable<
       (typeof scoredPosts)[number]
     >[]
@@ -329,37 +327,52 @@ export const getChronologicalFeed = query({
 
     const reposts = await repostsQuery.take(limit * 2)
 
-    // Combine
-    const postItems = await Promise.all(
-      posts.map(async (post) => {
-        const author = await ctx.db.get(post.authorId)
-        return {
-          type: "post" as const,
-          _id: post._id,
-          createdAt: post.createdAt,
-          post: { ...post, author: author || null },
-        }
-      })
+    // Batch-load all data needed for hydration — zero sequential awaits in loops
+    const [originalPostsArr, repostersArr] = await Promise.all([
+      Promise.all(reposts.map((r) => ctx.db.get(r.originalPostId))),
+      Promise.all(reposts.map((r) => ctx.db.get(r.userId))),
+    ])
+
+    // Collect all unique author IDs from both posts and original repost posts
+    const postAuthorIds = [...new Set(posts.map((p) => p.authorId as string))]
+    const repostOriginalAuthorIds = originalPostsArr
+      .filter((p): p is NonNullable<typeof p> => p !== null)
+      .map((p) => p.authorId as string)
+    const allAuthorIds = [...new Set([...postAuthorIds, ...repostOriginalAuthorIds])]
+    const authorsArr = await Promise.all(allAuthorIds.map((id) => ctx.db.get(id as Id<"users">)))
+    const authorMap = new Map<string, Doc<"users">>(
+      allAuthorIds
+        .map((id, i) => [id, authorsArr[i]] as [string, Doc<"users"> | null])
+        .filter((e): e is [string, Doc<"users">] => e[1] != null)
     )
 
-    const repostItems = await Promise.all(
-      reposts.map(async (repost) => {
-        const reposter = await ctx.db.get(repost.userId)
-        const originalPost = await ctx.db.get(repost.originalPostId)
+    // Build items synchronously from pre-loaded maps
+    const postItems = posts.map((post) => ({
+      type: "post" as const,
+      _id: post._id,
+      createdAt: post.createdAt,
+      post: { ...post, author: authorMap.get(post.authorId as string) ?? null },
+    }))
+
+    const repostItems = reposts
+      .map((repost, i) => {
+        const originalPost = originalPostsArr[i]
         if (!originalPost) return null
-        const originalAuthor = await ctx.db.get(originalPost.authorId)
         return {
           type: "repost" as const,
           _id: repost._id,
           createdAt: repost.createdAt,
-          reposter: reposter || null,
+          reposter: repostersArr[i] ?? null,
           quoteContent: repost.quoteContent,
-          post: { ...originalPost, author: originalAuthor || null },
+          post: {
+            ...originalPost,
+            author: authorMap.get(originalPost.authorId as string) ?? null,
+          },
         }
       })
-    )
+      .filter((i): i is NonNullable<typeof i> => i !== null)
 
-    const allItems = [...postItems, ...repostItems.filter((i) => i !== null)]
+    const allItems = [...postItems, ...repostItems]
       .sort((a, b) => b.createdAt - a.createdAt)
       .slice(0, limit + 1)
 
@@ -406,31 +419,40 @@ export const getTrendingFeed = query({
       .filter((q) => q.gte(q.field("createdAt"), cutoff48h))
       .take(200)
 
-    // Score by engagement + slight recency boost
-    const scored = await Promise.all(
-      recentPosts.map(async (post) => {
-        const author = await ctx.db.get(post.authorId)
-        if (!author) return null
-
-        const eng = engagementScore(
-          post.reactionCounts as any,
-          post.commentCount,
-          post.shareCount
-        )
-        const rec = recencyScore(post.createdAt, now)
-        // Trending score: 70% engagement + 30% recency
-        const trendingScore = 0.7 * eng + 0.3 * rec
-
-        return {
-          type: "post" as const,
-          _id: post._id,
-          createdAt: post.createdAt,
-          authorId: post.authorId as string,
-          score: trendingScore,
-          post: { ...post, author },
-        }
-      })
+    // Pre-batch-load all unique authors so scoring is synchronous
+    const trendUniqueAuthorIds = [...new Set(recentPosts.map((p) => p.authorId as string))]
+    const trendAuthorsArr = await Promise.all(
+      trendUniqueAuthorIds.map((id) => ctx.db.get(id as Id<"users">))
     )
+    const trendAuthorMap = new Map<string, Doc<"users">>(
+      trendUniqueAuthorIds
+        .map((id, i) => [id, trendAuthorsArr[i]] as [string, Doc<"users"> | null])
+        .filter((e): e is [string, Doc<"users">] => e[1] != null)
+    )
+
+    // Score by engagement + slight recency boost — synchronous, zero extra DB calls
+    const scored = recentPosts.map((post) => {
+      const author = trendAuthorMap.get(post.authorId as string)
+      if (!author) return null
+
+      const eng = engagementScore(
+        post.reactionCounts as any,
+        post.commentCount,
+        post.shareCount
+      )
+      const rec = recencyScore(post.createdAt, now)
+      // Trending score: 70% engagement + 30% recency
+      const trendingScore = 0.7 * eng + 0.3 * rec
+
+      return {
+        type: "post" as const,
+        _id: post._id,
+        createdAt: post.createdAt,
+        authorId: post.authorId as string,
+        score: trendingScore,
+        post: { ...post, author },
+      }
+    })
 
     const valid = scored.filter((p) => p !== null) as NonNullable<
       (typeof scored)[number]

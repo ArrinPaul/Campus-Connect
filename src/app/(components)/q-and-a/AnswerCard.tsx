@@ -17,6 +17,7 @@ type Answer = Doc<'answers'> & {
     } | null;
     score: number;
     viewerVotes?: Record<string, 'up' | 'down'>;
+    mediaUrls?: string[];
 };
 
 type Props = {
@@ -62,6 +63,21 @@ export function AnswerCard({ answer, isQuestionOwner, onAccept }: Props) {
                 </div>
                 <div className="flex-1">
                     <p className="text-sm text-muted-foreground mb-2 whitespace-pre-wrap">{answer.content}</p>
+                    {answer.mediaUrls && answer.mediaUrls.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-3">
+                            {answer.mediaUrls.map((url, index) => (
+                                <a key={index} href={url} target="_blank" rel="noopener noreferrer">
+                                    <Image
+                                        src={url}
+                                        alt={`Answer attachment ${index + 1}`}
+                                        width={200}
+                                        height={200}
+                                        className="rounded-lg border object-cover max-h-48 hover:opacity-90 transition-opacity"
+                                    />
+                                </a>
+                            ))}
+                        </div>
+                    )}
                     <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
                         <div className="flex items-center gap-1">
                             {answererAvatar ? (

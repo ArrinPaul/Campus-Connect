@@ -253,3 +253,201 @@ export const getMyListings = query({
       .collect()
   },
 })
+
+// ──────────────────────────────────────────────
+// Marketplace Transactions / Purchase Flow
+// ──────────────────────────────────────────────
+
+/**
+ * Initiate a purchase (buyer sends purchase request to seller).
+ */
+export const purchaseListing = mutation({
+  args: {
+    listingId: v.id("listings"),
+    message: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const buyer = await getAuthUser(ctx)
+    const listing = await ctx.db.get(args.listingId)
+    if (!listing) throw new Error("Listing not found")
+    if (listing.status !== "active") throw new Error("This listing is no longer available")
+    if (listing.sellerId === buyer._id) throw new Error("You cannot purchase your own listing")
+
+    // Check for existing pending transaction by this buyer
+    const existing = await ctx.db
+      .query("marketplaceTransactions")
+      .withIndex("by_listing", (q: any) => q.eq("listingId", args.listingId))
+      .filter((q: any) =>
+        q.and(
+          q.eq(q.field("buyerId"), buyer._id),
+          q.eq(q.field("status"), "pending")
+        )
+      )
+      .unique()
+    if (existing) throw new Error("You already have a pending purchase for this listing")
+
+    const now = Date.now()
+    const txId = await ctx.db.insert("marketplaceTransactions", {
+      listingId: args.listingId,
+      buyerId: buyer._id,
+      sellerId: listing.sellerId,
+      amount: listing.price,
+      status: "pending",
+      message: args.message?.trim() || undefined,
+      createdAt: now,
+      updatedAt: now,
+    })
+
+    return txId
+  },
+})
+
+/**
+ * Complete a transaction (seller confirms the sale).
+ */
+export const completeTransaction = mutation({
+  args: { transactionId: v.id("marketplaceTransactions") },
+  handler: async (ctx, args) => {
+    const user = await getAuthUser(ctx)
+    const tx = await ctx.db.get(args.transactionId)
+    if (!tx) throw new Error("Transaction not found")
+    if (tx.sellerId !== user._id) throw new Error("Only the seller can complete this transaction")
+    if (tx.status !== "pending") throw new Error("Transaction is no longer pending")
+
+    await ctx.db.patch(args.transactionId, { status: "completed", updatedAt: Date.now() })
+
+    // Mark listing as sold
+    await ctx.db.patch(tx.listingId, { status: "sold" })
+  },
+})
+
+/**
+ * Cancel a transaction (buyer or seller can cancel while pending).
+ */
+export const cancelTransaction = mutation({
+  args: { transactionId: v.id("marketplaceTransactions") },
+  handler: async (ctx, args) => {
+    const user = await getAuthUser(ctx)
+    const tx = await ctx.db.get(args.transactionId)
+    if (!tx) throw new Error("Transaction not found")
+    if (tx.status !== "pending") throw new Error("Transaction is no longer pending")
+    if (tx.buyerId !== user._id && tx.sellerId !== user._id) {
+      throw new Error("Only the buyer or seller can cancel")
+    }
+
+    await ctx.db.patch(args.transactionId, { status: "cancelled", updatedAt: Date.now() })
+  },
+})
+
+/**
+ * Get transactions for a listing (seller view).
+ */
+export const getListingTransactions = query({
+  args: { listingId: v.id("listings") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) return []
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q: any) => q.eq("clerkId", identity.subject))
+      .unique()
+    if (!user) return []
+
+    const listing = await ctx.db.get(args.listingId)
+    if (!listing || listing.sellerId !== user._id) return []
+
+    const transactions = await ctx.db
+      .query("marketplaceTransactions")
+      .withIndex("by_listing", (q: any) => q.eq("listingId", args.listingId))
+      .order("desc")
+      .collect()
+
+    return Promise.all(
+      transactions.map(async (tx) => {
+        const buyer = await ctx.db.get(tx.buyerId)
+        return {
+          ...tx,
+          buyer: buyer
+            ? { _id: buyer._id, name: buyer.name, profilePicture: buyer.profilePicture }
+            : null,
+        }
+      })
+    )
+  },
+})
+
+/**
+ * Get the current user's purchases.
+ */
+export const getMyPurchases = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) return []
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q: any) => q.eq("clerkId", identity.subject))
+      .unique()
+    if (!user) return []
+
+    const transactions = await ctx.db
+      .query("marketplaceTransactions")
+      .withIndex("by_buyer", (q: any) => q.eq("buyerId", user._id))
+      .order("desc")
+      .collect()
+
+    return Promise.all(
+      transactions.map(async (tx) => {
+        const listing = await ctx.db.get(tx.listingId)
+        const seller = listing ? await ctx.db.get(listing.sellerId) : null
+        return {
+          ...tx,
+          listing: listing
+            ? { title: listing.title, images: listing.images, status: listing.status }
+            : null,
+          seller: seller
+            ? { name: seller.name, profilePicture: seller.profilePicture }
+            : null,
+        }
+      })
+    )
+  },
+})
+
+/**
+ * Get the current user's sales (as seller).
+ */
+export const getMySales = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) return []
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q: any) => q.eq("clerkId", identity.subject))
+      .unique()
+    if (!user) return []
+
+    const transactions = await ctx.db
+      .query("marketplaceTransactions")
+      .withIndex("by_seller", (q: any) => q.eq("sellerId", user._id))
+      .order("desc")
+      .collect()
+
+    return Promise.all(
+      transactions.map(async (tx) => {
+        const listing = await ctx.db.get(tx.listingId)
+        const buyer = await ctx.db.get(tx.buyerId)
+        return {
+          ...tx,
+          listing: listing
+            ? { title: listing.title, images: listing.images, status: listing.status }
+            : null,
+          buyer: buyer
+            ? { _id: buyer._id, name: buyer.name, profilePicture: buyer.profilePicture }
+            : null,
+        }
+      })
+    )
+  },
+})

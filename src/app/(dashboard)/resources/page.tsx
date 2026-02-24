@@ -6,12 +6,14 @@ import { ResourceCard } from '../../(components)/resources/ResourceCard';
 import Link from 'next/link';
 import { Search, Plus } from 'lucide-react';
 import { useState } from 'react';
+import { UploadResourceModal } from '@/components/resources/UploadResourceModal';
 
 const ResourceCardSkeleton = () => <div className="p-4 border rounded-lg bg-card h-48 animate-pulse" />;
 
 export default function ResourcesPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [courseFilter, setCourseFilter] = useState('');
+    const [showUploadModal, setShowUploadModal] = useState(false);
 
     const resources = useQuery(api.resources.getResources, { 
         query: searchQuery || undefined, 
@@ -23,12 +25,18 @@ export default function ResourcesPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <h1 className="text-3xl font-bold">Study Resources</h1>
                 <div className="flex gap-2">
-                     {/* TODO: Create /resources/upload page */}
-                    <button className="h-10 py-2 px-4 btn-press bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-semibold">
+                    <button
+                        onClick={() => setShowUploadModal(true)}
+                        className="h-10 py-2 px-4 btn-press bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-semibold"
+                    >
                         Upload Resource
                     </button>
                 </div>
             </div>
+
+            {showUploadModal && (
+                <UploadResourceModal onClose={() => setShowUploadModal(false)} />
+            )}
 
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
                 <div className="relative flex-1">

@@ -232,3 +232,33 @@ export const deleteComment = mutation({
     return { success: true };
   },
 });
+
+/**
+ * Get comments by a specific user (for activity tab)
+ */
+export const getCommentsByUser = query({
+  args: {
+    userId: v.id("users"),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const limit = Math.min(args.limit ?? 20, 50);
+    const comments = await ctx.db
+      .query("comments")
+      .withIndex("by_author", (q) => q.eq("authorId", args.userId))
+      .order("desc")
+      .take(limit);
+
+    const enriched = await Promise.all(
+      comments.map(async (comment) => {
+        const post = await ctx.db.get(comment.postId);
+        return {
+          ...comment,
+          postTitle: post?.content?.slice(0, 100) || "Deleted post",
+        };
+      })
+    );
+
+    return enriched;
+  },
+});

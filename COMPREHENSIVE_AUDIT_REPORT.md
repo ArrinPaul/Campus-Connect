@@ -1,4 +1,4 @@
-# Cluster Delta — Comprehensive Feature Audit Report (Session 2)
+# Cluster Delta — Comprehensive Feature Audit Report (Sessions 2 & 3)
 
 **Date:** June 2025  
 **Build Status:** CLEAN (0 TypeScript errors, 48 routes compiled)
@@ -7,7 +7,7 @@
 
 ## Executive Summary
 
-Conducted a full feature-by-feature audit across all 30+ features covering frontend, backend, schema, and integration. Identified **102+ issues** across all features. **Fixed 19 CRITICAL and HIGH priority issues** in this session. The remaining items are documented in the roadmap for future sprints.
+Conducted a full feature-by-feature audit across all 30+ features covering frontend, backend, schema, and integration. Identified **102+ issues** across all features. **Fixed 24 CRITICAL and HIGH priority issues** across sessions 2 and 3. The remaining items are documented in the roadmap for future sprints.
 
 ---
 
@@ -125,7 +125,67 @@ Conducted a full feature-by-feature audit across all 30+ features covering front
 
 ---
 
-## Files Modified This Session
+## Session 3 — Verification & Additional Fixes
+
+### 18. PROF-05: isOwnProfile Auto-Detect Defeated by Explicit `false`
+- **Severity:** CRITICAL
+- **Impact:** Profile page passed `isOwnProfile={false}` explicitly, which `??` does not override (only null/undefined). Users could never see own-profile controls.
+- **Fix:** Removed explicit `isOwnProfile={false}` prop — auto-detection now works correctly.
+- **Files:** `src/app/(dashboard)/profile/[id]/page.tsx`
+
+### 19. MSG-04: NewConversationModal Wrong Query Parameter
+- **Severity:** HIGH
+- **Impact:** After creating a conversation, modal navigated to `/messages?conversation=X` but the messages page reads `searchParams.get('c')`. New conversation was never selected after redirect.
+- **Fix:** Changed to `router.push(\`/messages?c=\${conversationId}\`)`
+- **Files:** `src/app/(components)/messages/NewConversationModal.tsx`
+
+### 20. ADS-02: Ads Dashboard Missing Auth Guard
+- **Severity:** HIGH
+- **Impact:** `getAdAnalytics` throws `Unauthorized` if no identity. Page crashed for unauthenticated users.
+- **Fix:** Added `useConvexAuth()` + skip pattern
+- **Files:** `src/app/(dashboard)/ads/dashboard/page.tsx`
+
+### 21. EXP-05: ExplorePostGrid Runaway Pagination
+- **Severity:** HIGH
+- **Impact:** `setCursor(nextCursor)` was called outside both conditional branches, triggering a cascade of fetches. All pages were fetched on initial load without displaying them.
+- **Fix:** Moved `setCursor` and `setHasMore` inside the conditional branches that process data.
+- **Files:** `src/app/(components)/explore/ExplorePostGrid.tsx`
+
+### 22. POST-06: Delete Post Missing userFeed Cleanup
+- **Severity:** MEDIUM
+- **Impact:** Orphaned `userFeed` entries accumulated after post deletion. Handled gracefully at read time but never cleaned up.
+- **Fix:** Added `cleanupPostFeedEntries` internal mutation and added it to the delete cascade.
+- **Files:** `convex/posts.ts`
+
+### 23. PROF-06: Profile/Me No Error State for Unauthenticated
+- **Severity:** MEDIUM
+- **Impact:** `/profile/me` showed a permanent spinner if auth failed (currentUser was null).
+- **Fix:** Added `useConvexAuth` skip pattern and sign-in redirect for unauthenticated users.
+- **Files:** `src/app/(dashboard)/profile/me/page.tsx`
+
+### 24. STORY-05: StoryRow Missing Skip Pattern
+- **Severity:** LOW
+- **Impact:** Brief flash of empty story row during auth loading.
+- **Fix:** Added `useConvexAuth` + skip pattern for both `getStories` and `getCurrentUser` queries.
+- **Files:** `src/components/stories/StoryRow.tsx`
+
+---
+
+## Files Modified This Session (Session 3)
+
+| File | Change |
+|------|--------|
+| `src/app/(dashboard)/profile/[id]/page.tsx` | Removed explicit `isOwnProfile={false}` |
+| `src/app/(components)/messages/NewConversationModal.tsx` | Fixed query param `conversation` → `c` |
+| `src/app/(dashboard)/ads/dashboard/page.tsx` | Added auth guard with skip pattern |
+| `src/app/(components)/explore/ExplorePostGrid.tsx` | Fixed runaway pagination |
+| `convex/posts.ts` | Added `cleanupPostFeedEntries` mutation |
+| `src/app/(dashboard)/profile/me/page.tsx` | Added auth guard + sign-in redirect |
+| `src/components/stories/StoryRow.tsx` | Added skip pattern |
+
+---
+
+## Files Modified (Session 2)
 
 | File | Change |
 |------|--------|

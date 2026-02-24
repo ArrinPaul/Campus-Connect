@@ -50,9 +50,10 @@ const MAX_IMAGES_PER_POST = 10
 
 interface PostComposerProps {
   onPostCreated?: () => void
+  communityId?: Id<"communities">
 }
 
-export function PostComposer({ onPostCreated }: PostComposerProps) {
+export function PostComposer({ onPostCreated, communityId }: PostComposerProps) {
   const convexAuth = useConvexAuth()
   const isAuthenticated = convexAuth?.isAuthenticated ?? false
   const isAuthLoading = convexAuth?.isLoading ?? true
@@ -439,6 +440,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
         mediaFileNames,
         linkPreview: linkPreviewData ?? undefined,
         ...(pollId ? { pollId: pollId as Id<"polls"> } : {}),
+        ...(communityId ? { communityId } : {}),
       })
       postId = createdPost as string | undefined
 

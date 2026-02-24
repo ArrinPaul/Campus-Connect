@@ -5,6 +5,7 @@ import type { Id } from '@/convex/_generated/dataModel';
 import { ProfileSkeleton } from '../../../(components)/profile/skeletons';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { UserPostList } from '../../../(components)/profile/UserPostList';
+import { ProfileSkillsSection } from '../../../(components)/profile/ProfileSkillsSection';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
@@ -29,10 +30,14 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
     return (
         <div>
             <ProfileHeader user={userProfile as any} />
+            <div className="px-4 sm:px-6 lg:px-8">
+                <ProfileSkillsSection userId={userId} skills={(userProfile as any).skills || []} />
+            </div>
             <div className="px-4 sm:px-6 lg:px-8 mt-6">
                 <div className="border-b">
                     <nav className="flex gap-4" aria-label="Profile tabs">
                         <span className="py-3 px-1 border-b-2 border-primary text-primary font-semibold cursor-default">Posts</span>
+                        <Link href={`/profile/${userId}/activity`} className="py-3 px-1 border-b-2 border-transparent text-muted-foreground hover:text-foreground">Activity</Link>
                         <Link href={`/profile/${userId}/portfolio`} className="py-3 px-1 border-b-2 border-transparent text-muted-foreground hover:text-foreground">Portfolio</Link>
                     </nav>
                 </div>

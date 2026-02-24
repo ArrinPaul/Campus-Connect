@@ -5,6 +5,8 @@ import { api } from '@/convex/_generated/api';
 import { toast } from 'sonner';
 import { useState, useEffect, type FC } from 'react';
 import { SettingsSection, FormButton } from './SettingComponents';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { Bell, BellOff } from 'lucide-react';
 
 // A temporary, self-contained v2 Switch component.
 const TempSwitch: FC<{ checked: boolean; onCheckedChange: (checked: boolean) => void }> = ({ checked, onCheckedChange }) => (
@@ -35,6 +37,62 @@ const SwitchItem: FC<{ title: string; description: string; checked: boolean; onT
         <TempSwitch checked={checked} onCheckedChange={onToggle} />
     </div>
 );
+
+function PushNotificationSection() {
+    const { isSupported, isSubscribed, isLoading, permission, toggle } = usePushNotifications();
+    const [toggling, setToggling] = useState(false);
+
+    const handleToggle = async () => {
+        setToggling(true);
+        const success = await toggle();
+        setToggling(false);
+        if (success) {
+            toast.success(isSubscribed ? 'Push notifications disabled' : 'Push notifications enabled!');
+        } else if (permission === 'denied') {
+            toast.error('Notifications blocked', { description: 'Please enable them in your browser settings.' });
+        }
+    };
+
+    if (!isSupported) {
+        return (
+            <SettingsSection title="Browser Push Notifications" description="Push to this device.">
+                <p className="text-sm text-muted-foreground">Your browser doesn&apos;t support push notifications.</p>
+            </SettingsSection>
+        );
+    }
+
+    return (
+        <SettingsSection title="Browser Push Notifications" description="Get notified even when the app isn't open.">
+            <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
+                <div className="flex items-center gap-3">
+                    {isSubscribed ? <Bell className="h-5 w-5 text-primary" /> : <BellOff className="h-5 w-5 text-muted-foreground" />}
+                    <div>
+                        <p className="font-medium text-sm">{isSubscribed ? 'Notifications enabled' : 'Notifications disabled'}</p>
+                        <p className="text-xs text-muted-foreground">
+                            {permission === 'denied'
+                                ? 'Blocked by browser — update in browser settings'
+                                : isSubscribed
+                                    ? 'You\'ll receive push notifications on this device'
+                                    : 'Enable to get real-time push notifications'}
+                        </p>
+                    </div>
+                </div>
+                <button
+                    type="button"
+                    onClick={handleToggle}
+                    disabled={isLoading || toggling || permission === 'denied'}
+                    className={`px-4 py-2 text-sm font-medium rounded-md transition-colors disabled:opacity-50 ${
+                        isSubscribed
+                            ? 'bg-muted text-foreground hover:bg-muted/80'
+                            : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                    }`}
+                >
+                    {toggling ? 'Updating...' : isSubscribed ? 'Disable' : 'Enable'}
+                </button>
+            </div>
+        </SettingsSection>
+    );
+}
 
 export function NotificationSettings() {
     const currentUser = useQuery(api.users.getCurrentUser);
@@ -76,6 +134,9 @@ export function NotificationSettings() {
     return (
         <form onSubmit={handleSubmit}>
             <h2 className="text-2xl font-bold mb-6">Notifications</h2>
+
+            <PushNotificationSection />
+
             <SettingsSection
                 title="Push Notifications"
                 description="Select which activities you want to be notified about."

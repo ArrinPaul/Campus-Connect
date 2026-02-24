@@ -107,63 +107,74 @@ export const getRecommendedPosts = query({
     const limit = Math.min(args.limit ?? 10, 50)
     const now = Date.now()
 
-    // 1. Gather viewer context: hashtags they've interacted with + authors they interact with
-    // -- Viewer's own posts' hashtags (topic fingerprint)
-    const myPosts = await ctx.db
-      .query("posts")
-      .withIndex("by_author", (q) => q.eq("authorId", user._id))
-      .order("desc")
-      .take(50)
+    // 1. Gather viewer context — all fetches parallelised, no sequential awaits
+
+    // Fetch my posts, my reactions, and my comments in parallel
+    const [myPosts, myReactions, myComments] = await Promise.all([
+      ctx.db
+        .query("posts")
+        .withIndex("by_author", (q) => q.eq("authorId", user._id))
+        .order("desc")
+        .take(50),
+      ctx.db
+        .query("reactions")
+        .withIndex("by_user", (q) => q.eq("userId", user._id))
+        .take(200),
+      ctx.db
+        .query("comments")
+        .withIndex("by_author", (q) => q.eq("authorId", user._id))
+        .take(200),
+    ])
 
     const myPostIds = new Set(myPosts.map((p) => p._id as string))
-
     const viewerHashtagSet = new Set<string>()
-    for (const post of myPosts) {
-      const links = await ctx.db
-        .query("postHashtags")
-        .withIndex("by_post", (q) => q.eq("postId", post._id))
-        .collect()
-      for (const link of links) {
-        viewerHashtagSet.add(link.hashtagId as string)
-      }
-    }
-
-    // -- Viewer's reactions → figure out which authors & hashtags they engage with
-    const myReactions = await ctx.db
-      .query("reactions")
-      .withIndex("by_user", (q) => q.eq("userId", user._id))
-      .take(200)
-
     const interactionsByAuthor = new Map<string, number>()
     const reactedPostIds = new Set<string>()
 
-    for (const reaction of myReactions) {
-      if (reaction.targetType === "post") {
-        const post = await ctx.db.get(reaction.targetId as Id<"posts">)
-        if (post) {
-          reactedPostIds.add(post._id as string)
-          const authorId = post.authorId as string
-          interactionsByAuthor.set(authorId, (interactionsByAuthor.get(authorId) ?? 0) + 1)
-          // Also gather hashtags from posts user liked
-          const links = await ctx.db
-            .query("postHashtags")
-            .withIndex("by_post", (q) => q.eq("postId", post._id))
-            .collect()
-          for (const link of links) {
-            viewerHashtagSet.add(link.hashtagId as string)
-          }
-        }
-      }
+    // Batch-fetch postHashtags for all my posts in parallel (was sequential for-loop)
+    const myPostHashtagLinks = await Promise.all(
+      myPosts.map((post) =>
+        ctx.db
+          .query("postHashtags")
+          .withIndex("by_post", (q) => q.eq("postId", post._id))
+          .collect()
+      )
+    )
+    for (const links of myPostHashtagLinks) {
+      for (const link of links) viewerHashtagSet.add(link.hashtagId as string)
     }
 
-    // -- Viewer's comments → author interaction counts
-    const myComments = await ctx.db
-      .query("comments")
-      .withIndex("by_author", (q) => q.eq("authorId", user._id))
-      .take(200)
+    // Batch-fetch the actual posts for reactions in parallel (was sequential for-loop)
+    const reactionTargetPosts = await Promise.all(
+      myReactions
+        .filter((r) => r.targetType === "post")
+        .map((r) => ctx.db.get(r.targetId as Id<"posts">))
+    )
 
-    for (const comment of myComments) {
-      const post = await ctx.db.get(comment.postId)
+    // Batch-fetch postHashtags for all reacted posts in parallel
+    const validReactionPosts = reactionTargetPosts.filter(
+      (p): p is NonNullable<typeof p> => p !== null
+    )
+    const reactionPostHashtagLinks = await Promise.all(
+      validReactionPosts.map((post) =>
+        ctx.db
+          .query("postHashtags")
+          .withIndex("by_post", (q) => q.eq("postId", post._id))
+          .collect()
+      )
+    )
+    for (const post of validReactionPosts) {
+      reactedPostIds.add(post._id as string)
+      const authorId = post.authorId as string
+      interactionsByAuthor.set(authorId, (interactionsByAuthor.get(authorId) ?? 0) + 1)
+    }
+    for (const links of reactionPostHashtagLinks) {
+      for (const link of links) viewerHashtagSet.add(link.hashtagId as string)
+    }
+
+    // Batch-fetch posts for comments in parallel (was sequential for-loop)
+    const commentPosts = await Promise.all(myComments.map((c) => ctx.db.get(c.postId)))
+    for (const post of commentPosts) {
       if (post) {
         const authorId = post.authorId as string
         interactionsByAuthor.set(authorId, (interactionsByAuthor.get(authorId) ?? 0) + 1)
@@ -191,51 +202,56 @@ export const getRecommendedPosts = query({
       (p) => !reactedPostIds.has(p._id as string) && !myPostIds.has(p._id as string)
     )
 
-    // 3. Score each post
-    const scoredPosts = await Promise.all(
-      unseenCandidates.map(async (post) => {
-        const author = await ctx.db.get(post.authorId)
-        if (!author) return null
-
-        // Topic affinity
-        const postLinks = await ctx.db
-          .query("postHashtags")
-          .withIndex("by_post", (q) => q.eq("postId", post._id))
-          .collect()
-        const postHashtagIds = postLinks.map((l) => l.hashtagId as string)
-        const topic = topicAffinity(viewerHashtags, postHashtagIds)
-
-        // Author affinity
-        const authorAff = authorAffinity(
-          interactionsByAuthor.get(post.authorId as string) ?? 0
+    // 3. Pre-batch-load all unique authors AND all postHashtags for candidates in parallel
+    const uniqueCandidateAuthorIds = [
+      ...new Set(unseenCandidates.map((p) => p.authorId as string)),
+    ]
+    const [candidateAuthorsArr, candidatePostHashtagLinks] = await Promise.all([
+      Promise.all(uniqueCandidateAuthorIds.map((id) => ctx.db.get(id as Id<"users">))),
+      Promise.all(
+        unseenCandidates.map((post) =>
+          ctx.db
+            .query("postHashtags")
+            .withIndex("by_post", (q) => q.eq("postId", post._id))
+            .collect()
         )
-
-        // Freshness
-        const freshness = freshnessBoost(post.createdAt, now)
-
-        // Engagement quality
-        const engQuality = engagementQuality(
-          post.reactionCounts as any,
-          post.commentCount
-        )
-
-        const score = computeRecommendationScore({
-          topicAffinity: topic,
-          authorAffinity: authorAff,
-          freshness,
-          engagementQuality: engQuality,
-        })
-
-        return {
-          type: "post" as const,
-          _id: post._id,
-          createdAt: post.createdAt,
-          authorId: post.authorId as string,
-          score,
-          post: { ...post, author },
-        }
-      })
+      ),
+    ])
+    const candidateAuthorMap = new Map<string, Doc<"users">>(
+      uniqueCandidateAuthorIds
+        .map((id, i) => [id, candidateAuthorsArr[i]] as [string, Doc<"users"> | null])
+        .filter((e): e is [string, Doc<"users">] => e[1] != null)
     )
+
+    // 4. Score each candidate synchronously — no DB calls here
+    const scoredPosts = unseenCandidates.map((post, i) => {
+      const author = candidateAuthorMap.get(post.authorId as string)
+      if (!author) return null
+
+      const postHashtagIds = candidatePostHashtagLinks[i].map((l) => l.hashtagId as string)
+      const topic = topicAffinity(viewerHashtags, postHashtagIds)
+      const authorAff = authorAffinity(
+        interactionsByAuthor.get(post.authorId as string) ?? 0
+      )
+      const freshness = freshnessBoost(post.createdAt, now)
+      const engQuality = engagementQuality(post.reactionCounts as any, post.commentCount)
+
+      const score = computeRecommendationScore({
+        topicAffinity: topic,
+        authorAffinity: authorAff,
+        freshness,
+        engagementQuality: engQuality,
+      })
+
+      return {
+        type: "post" as const,
+        _id: post._id,
+        createdAt: post.createdAt,
+        authorId: post.authorId as string,
+        score,
+        post: { ...post, author },
+      }
+    })
 
     const valid = scoredPosts.filter((p) => p !== null) as NonNullable<(typeof scoredPosts)[number]>[]
     valid.sort((a, b) => b.score - a.score)
@@ -283,17 +299,20 @@ export const getSimilarPosts = query({
       return { items: [], hasMore: false }
     }
 
-    // 2. For each reactor, find other posts they reacted to
+    // 2. For each reactor, find other posts they reacted to — parallel, not sequential
     const coReactedPostCounts = new Map<string, number>()
 
-    for (const reactorId of reactorIds.slice(0, 30)) {
-      // limit to 30 reactors for performance
-      const theirReactions = await ctx.db
-        .query("reactions")
-        .withIndex("by_user", (q) => q.eq("userId", reactorId))
-        .filter((q) => q.eq(q.field("targetType"), "post"))
-        .take(100)
+    const allReactorReactions = await Promise.all(
+      reactorIds.slice(0, 30).map((reactorId) =>
+        ctx.db
+          .query("reactions")
+          .withIndex("by_user", (q) => q.eq("userId", reactorId))
+          .filter((q) => q.eq(q.field("targetType"), "post"))
+          .take(100)
+      )
+    )
 
+    for (const theirReactions of allReactorReactions) {
       for (const reaction of theirReactions) {
         const targetPostId = reaction.targetId
         if (targetPostId !== (args.postId as string)) {
@@ -373,43 +392,50 @@ export const getTrendingInSkill = query({
       .filter((q) => q.gte(q.field("createdAt"), cutoff))
       .take(300)
 
-    // Score each: does the author have the target skill + engagement
-    const scored = await Promise.all(
-      recentPosts.map(async (post) => {
-        const author = await ctx.db.get(post.authorId)
-        if (!author) return null
-
-        const authorSkillsLower = author.skills.map((s) => s.toLowerCase())
-        const matchingSkills = targetSkills.filter((s) =>
-          authorSkillsLower.includes(s)
-        )
-        if (matchingSkills.length === 0) return null
-
-        const totalReactions = post.reactionCounts
-          ? post.reactionCounts.like +
-            post.reactionCounts.love +
-            post.reactionCounts.laugh +
-            post.reactionCounts.wow +
-            post.reactionCounts.sad +
-            post.reactionCounts.scholarly
-          : 0
-        const engScore =
-          Math.log2(1 + totalReactions + 2 * post.commentCount + 3 * post.shareCount) /
-          Math.log2(101)
-
-        const recScore = freshnessBoost(post.createdAt, now)
-        const trendingScore = 0.7 * Math.min(1, engScore) + 0.3 * recScore
-
-        return {
-          type: "post" as const,
-          _id: post._id,
-          createdAt: post.createdAt,
-          matchingSkills,
-          score: trendingScore,
-          post: { ...post, author },
-        }
-      })
+    // Pre-batch unique authors so scoring is synchronous
+    const skillUniqueAuthorIds = [...new Set(recentPosts.map((p) => p.authorId as string))]
+    const skillAuthorsArr = await Promise.all(
+      skillUniqueAuthorIds.map((id) => ctx.db.get(id as Id<"users">))
     )
+    const skillAuthorMap = new Map<string, Doc<"users">>(
+      skillUniqueAuthorIds
+        .map((id, i) => [id, skillAuthorsArr[i]] as [string, Doc<"users"> | null])
+        .filter((e): e is [string, Doc<"users">] => e[1] != null)
+    )
+
+    // Score each: does the author have the target skill + engagement
+    const scored = recentPosts.map((post) => {
+      const author = skillAuthorMap.get(post.authorId as string)
+      if (!author) return null
+
+      const authorSkillsLower = author.skills.map((s) => s.toLowerCase())
+      const matchingSkills = targetSkills.filter((s) => authorSkillsLower.includes(s))
+      if (matchingSkills.length === 0) return null
+
+      const totalReactions = post.reactionCounts
+        ? post.reactionCounts.like +
+          post.reactionCounts.love +
+          post.reactionCounts.laugh +
+          post.reactionCounts.wow +
+          post.reactionCounts.sad +
+          post.reactionCounts.scholarly
+        : 0
+      const engScore =
+        Math.log2(1 + totalReactions + 2 * post.commentCount + 3 * post.shareCount) /
+        Math.log2(101)
+
+      const recScore = freshnessBoost(post.createdAt, now)
+      const trendingScore = 0.7 * Math.min(1, engScore) + 0.3 * recScore
+
+      return {
+        type: "post" as const,
+        _id: post._id,
+        createdAt: post.createdAt,
+        matchingSkills,
+        score: trendingScore,
+        post: { ...post, author },
+      }
+    })
 
     const valid = scored.filter((p) => p !== null) as NonNullable<(typeof scored)[number]>[]
     valid.sort((a, b) => b.score - a.score)
@@ -461,34 +487,43 @@ export const getPopularInUniversity = query({
       .filter((q) => q.gte(q.field("createdAt"), cutoff))
       .take(300)
 
-    // Filter by university match
-    const scored = await Promise.all(
-      recentPosts.map(async (post) => {
-        const author = await ctx.db.get(post.authorId)
-        if (!author) return null
-        if ((author.university ?? "").toLowerCase() !== targetUniversity) return null
-
-        const totalReactions = post.reactionCounts
-          ? post.reactionCounts.like +
-            post.reactionCounts.love +
-            post.reactionCounts.laugh +
-            post.reactionCounts.wow +
-            post.reactionCounts.sad +
-            post.reactionCounts.scholarly
-          : 0
-        const engScore =
-          Math.log2(1 + totalReactions + 2 * post.commentCount + 3 * post.shareCount) /
-          Math.log2(101)
-
-        return {
-          type: "post" as const,
-          _id: post._id,
-          createdAt: post.createdAt,
-          score: engScore,
-          post: { ...post, author },
-        }
-      })
+    // Pre-batch unique authors then filter/score synchronously
+    const uniUniqueAuthorIds = [...new Set(recentPosts.map((p) => p.authorId as string))]
+    const uniAuthorsArr = await Promise.all(
+      uniUniqueAuthorIds.map((id) => ctx.db.get(id as Id<"users">))
     )
+    const uniAuthorMap = new Map<string, Doc<"users">>(
+      uniUniqueAuthorIds
+        .map((id, i) => [id, uniAuthorsArr[i]] as [string, Doc<"users"> | null])
+        .filter((e): e is [string, Doc<"users">] => e[1] != null)
+    )
+
+    // Filter by university match and score
+    const scored = recentPosts.map((post) => {
+      const author = uniAuthorMap.get(post.authorId as string)
+      if (!author) return null
+      if ((author.university ?? "").toLowerCase() !== targetUniversity) return null
+
+      const totalReactions = post.reactionCounts
+        ? post.reactionCounts.like +
+          post.reactionCounts.love +
+          post.reactionCounts.laugh +
+          post.reactionCounts.wow +
+          post.reactionCounts.sad +
+          post.reactionCounts.scholarly
+        : 0
+      const engScore =
+        Math.log2(1 + totalReactions + 2 * post.commentCount + 3 * post.shareCount) /
+        Math.log2(101)
+
+      return {
+        type: "post" as const,
+        _id: post._id,
+        createdAt: post.createdAt,
+        score: engScore,
+        post: { ...post, author },
+      }
+    })
 
     const valid = scored.filter((p) => p !== null) as NonNullable<(typeof scored)[number]>[]
     valid.sort((a, b) => b.score - a.score)

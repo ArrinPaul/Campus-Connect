@@ -9,9 +9,10 @@ import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 import { OnlineStatusDot, formatLastSeen } from "@/components/ui/OnlineStatusDot"
-import { MessageSquare } from "lucide-react"
+import { MessageSquare, Pencil, X } from "lucide-react"
 import { createLogger } from "@/lib/logger"
 import { toast } from "sonner"
+import { ProfileForm } from "@/components/profile/ProfileForm"
 
 const log = createLogger("ProfileHeader")
 
@@ -60,6 +61,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
   const [optimisticFollowing, setOptimisticFollowing] = useState<boolean | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isMessageLoading, setIsMessageLoading] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
   
   // Use optimistic state if available, otherwise use query result
   const isFollowing = optimisticFollowing !== null ? optimisticFollowing : (isFollowingQuery ?? false)
@@ -256,7 +258,51 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
             </button>
           </div>
         )}
+
+        {/* Edit Profile Button (own profile only) */}
+        {isOwnProfile && (
+          <div className="flex-shrink-0 w-full sm:w-auto">
+            <button
+              onClick={() => setShowEditModal(true)}
+              className="w-full rounded-md px-6 py-2 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 sm:w-auto flex items-center justify-center gap-2"
+              style={{ minHeight: "44px" }}
+            >
+              <Pencil className="h-4 w-4" />
+              Edit Profile
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* Edit Profile Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowEditModal(false)}>
+          <div
+            className="bg-card border rounded-xl shadow-lg w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-lg font-semibold">Edit Profile</h2>
+              <button onClick={() => setShowEditModal(false)} className="p-1 rounded-lg hover:bg-muted">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="p-4">
+              <ProfileForm
+                initialData={{
+                  bio: user.bio,
+                  university: user.university,
+                  role: user.role,
+                  experienceLevel: user.experienceLevel,
+                  profilePicture: user.profilePicture,
+                  socialLinks: user.socialLinks,
+                }}
+                onSave={() => setShowEditModal(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

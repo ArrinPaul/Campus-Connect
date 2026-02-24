@@ -6,11 +6,13 @@ import { ResearchPaperCard } from '../../(components)/research/ResearchPaperCard
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
+import { UploadPaperModal } from '@/components/research/UploadPaperModal';
 
 const ResearchPaperCardSkeleton = () => <div className="p-4 border rounded-lg bg-card h-48 animate-pulse" />;
 
 export default function ResearchPage() {
     const [searchQuery, setSearchQuery] = useState('');
+    const [showUploadModal, setShowUploadModal] = useState(false);
     // TODO: Add state for search and filters
     const papers = useQuery(api.papers.searchPapers, { query: searchQuery || undefined });
 
@@ -19,12 +21,18 @@ export default function ResearchPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <h1 className="text-3xl font-bold">Research Papers</h1>
                 <div className="flex gap-2">
-                     {/* TODO: Create /research/upload page */}
-                    <button className="h-10 py-2 px-4 btn-press bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-semibold">
+                    <button
+                        onClick={() => setShowUploadModal(true)}
+                        className="h-10 py-2 px-4 btn-press bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-semibold"
+                    >
                         Upload Paper
                     </button>
                 </div>
             </div>
+
+            {showUploadModal && (
+                <UploadPaperModal onClose={() => setShowUploadModal(false)} />
+            )}
 
             <div className="relative mb-6">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />

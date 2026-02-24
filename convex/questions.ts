@@ -120,6 +120,7 @@ export const answerQuestion = mutation({
   args: {
     questionId: v.id("questions"),
     content: v.string(),
+    mediaUrls: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const user = await getAuthUser(ctx)
@@ -131,6 +132,7 @@ export const answerQuestion = mutation({
 
     if (!args.content.trim()) throw new Error("Answer cannot be empty")
     if (args.content.length > 10000) throw new Error("Answer must not exceed 10000 characters")
+    if (args.mediaUrls && args.mediaUrls.length > 5) throw new Error("Maximum 5 images per answer")
 
     const answerId = await ctx.db.insert("answers", {
       questionId: args.questionId,
@@ -139,6 +141,7 @@ export const answerQuestion = mutation({
       upvotes: 0,
       downvotes: 0,
       isAccepted: false,
+      mediaUrls: args.mediaUrls,
       createdAt: Date.now(),
     })
 

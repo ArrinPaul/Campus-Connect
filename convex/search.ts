@@ -69,7 +69,8 @@ export function searchRelevanceScore(query: string, text: string): number {
   const q = query.trim().toLowerCase();
   const t = text.trim().toLowerCase();
 
-  if (!q) return t === "" ? 1.0 : 0;
+  // An empty query is a valid prefix of every non-empty string (JS: "hello".startsWith("") === true)
+  if (!q) return t === "" ? 1.0 : 0.9;
   if (!t) return 0;
 
   if (t === q) return 1.0;
@@ -163,14 +164,18 @@ export const universalSearch = query({
       .withSearchIndex("by_content", (search) => search.search("content", q))
       .take(limitPerCategory);
     
-    // Enrich and filter posts for visibility
-    const visiblePosts = [];
-    for (const post of posts) {
-      if (await isPostVisibleToUser(ctx, post, user?._id)) {
-        const author = await ctx.db.get(post.authorId);
-        visiblePosts.push({ ...post, author: author ? projectUser(author) : null });
-      }
-    }
+    // Enrich and filter posts for visibility — parallel (no sequential await in loop)
+    const enrichedPosts = await Promise.all(
+      posts.map(async (post) => {
+        const [visible, author] = await Promise.all([
+          isPostVisibleToUser(ctx, post, user?._id),
+          ctx.db.get(post.authorId),
+        ]);
+        if (!visible) return null;
+        return { ...post, author: author ? projectUser(author) : null };
+      })
+    );
+    const visiblePosts = enrichedPosts.filter((p): p is NonNullable<typeof p> => p !== null);
 
     // --- Search Hashtags (remains a filter-based approach for now) ---
     const hashtags = await ctx.db
@@ -211,14 +216,18 @@ export const searchPosts = query({
         .withSearchIndex("by_content", (search) => search.search("content", q))
         .take(50);
     
-    // Enrich and filter posts for visibility
-    const results = [];
-    for (const post of posts) {
-        if (await isPostVisibleToUser(ctx, post, user?._id)) {
-            const author = await ctx.db.get(post.authorId);
-            results.push({ ...post, author: author ? projectUser(author) : null });
-        }
-    }
+    // Enrich and filter posts for visibility — parallel
+    const enrichedPosts = await Promise.all(
+      posts.map(async (post) => {
+        const [visible, author] = await Promise.all([
+          isPostVisibleToUser(ctx, post, user?._id),
+          ctx.db.get(post.authorId),
+        ]);
+        if (!visible) return null;
+        return { ...post, author: author ? projectUser(author) : null };
+      })
+    );
+    const results = enrichedPosts.filter((p): p is NonNullable<typeof p> => p !== null);
 
     return results;
   }

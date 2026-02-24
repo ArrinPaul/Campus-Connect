@@ -78,6 +78,19 @@ export const createPost = mutation({
       throw new Error(`Post content must not exceed ${POST_MAX_LENGTH} characters`);
     }
 
+    // Verify community membership if posting to a community
+    if (args.communityId) {
+      const membership = await ctx.db
+        .query("communityMembers")
+        .withIndex("by_community_user", (q: any) =>
+          q.eq("communityId", args.communityId).eq("userId", user._id)
+        )
+        .unique();
+      if (!membership || membership.role === "pending") {
+        throw new Error("You must be a member of this community to post");
+      }
+    }
+
     const sanitizedContent = sanitizeMarkdown(args.content);
 
     const postId = await ctx.db.insert("posts", {

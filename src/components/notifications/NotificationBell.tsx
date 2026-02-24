@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import { Bell } from "lucide-react"
+import { Bell, CheckCheck } from "lucide-react"
 import { useQuery, useConvexAuth, useMutation } from "convex/react"
 import { api } from "@/../convex/_generated/api"
 import type { Id } from "@/../convex/_generated/dataModel"
@@ -56,6 +56,19 @@ export function NotificationBell() {
   }, [unreadCount, announce])
 
   const markNotificationAsRead = useMutation(api.notifications.markAsRead);
+  const markAllAsRead = useMutation(api.notifications.markAllAsRead);
+  const [isMarkingAll, setIsMarkingAll] = useState(false);
+
+  const handleMarkAllAsRead = async () => {
+    setIsMarkingAll(true);
+    try {
+      await markAllAsRead({});
+    } catch {
+      // silently fail
+    } finally {
+      setIsMarkingAll(false);
+    }
+  };
 
   const handleNotificationClick = (notification: { _id: string; type?: string; actorId?: string; referenceId?: string }) => {
     setIsOpen(false)
@@ -117,13 +130,26 @@ export function NotificationBell() {
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <h3 className="font-semibold text-foreground">Notifications</h3>
-            <Link
-              href="/notifications"
-              className="text-sm text-primary hover:underline"
-              onClick={() => setIsOpen(false)}
-            >
-              View All
-            </Link>
+            <div className="flex items-center gap-2">
+              {unreadCount !== undefined && unreadCount > 0 && (
+                <button
+                  onClick={handleMarkAllAsRead}
+                  disabled={isMarkingAll}
+                  className="text-xs text-primary hover:underline flex items-center gap-1 disabled:opacity-50"
+                  title="Mark all as read"
+                >
+                  <CheckCheck className="w-3.5 h-3.5" />
+                  {isMarkingAll ? "Marking..." : "Read all"}
+                </button>
+              )}
+              <Link
+                href="/notifications"
+                className="text-sm text-primary hover:underline"
+                onClick={() => setIsOpen(false)}
+              >
+                View All
+              </Link>
+            </div>
           </div>
 
           {/* Notifications List */}

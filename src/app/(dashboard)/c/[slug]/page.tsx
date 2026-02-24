@@ -39,8 +39,18 @@ function CommunityPageContent({ slug }: { slug: string }) {
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <div className="grid grid-cols-12 gap-8">
                     <main className="col-span-12 md:col-span-8">
-                        {/* Pass communityId to CreatePost so new posts are associated with this community */}
-                        <CreatePost communityId={community._id} />
+                        {/* Only show post creation for active community members */}
+                        {(community as any).viewerRole && (community as any).viewerRole !== 'pending' ? (
+                            <CreatePost communityId={community._id} />
+                        ) : (
+                            <div className="rounded-lg border bg-card p-4 mb-4 text-center">
+                                <p className="text-sm text-muted-foreground">
+                                    {(community as any).viewerRole === 'pending'
+                                        ? 'Your membership is pending approval. You can post once approved.'
+                                        : 'Join this community to create posts.'}
+                                </p>
+                            </div>
+                        )}
                         <CommunityPostFeed communityId={community._id} />
                     </main>
                     <aside className="hidden md:block md:col-span-4">
