@@ -7,7 +7,7 @@ import { Users, Rss, Settings, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { useConvexAuth } from 'convex/react';
+import { useUser } from '@clerk/nextjs';
 
 // Manually defining type based on getCommunity query
 type Community = Doc<'communities'> & {
@@ -19,7 +19,8 @@ type Props = {
 };
 
 export function CommunityHeader({ community }: Props) {
-    const { isAuthenticated } = useConvexAuth();
+    const { isSignedIn } = useUser();
+    const isAuthenticated = isSignedIn ?? false;
     const joinCommunity = useMutation(api.communities.joinCommunity);
     const leaveCommunity = useMutation(api.communities.leaveCommunity);
     const [isLoading, setIsLoading] = useState(false);

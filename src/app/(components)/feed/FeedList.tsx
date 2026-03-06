@@ -1,13 +1,16 @@
 'use client';
 
-import { useQuery, useConvexAuth } from 'convex/react';
+import { useQuery } from 'convex/react';
+import { useUser } from '@clerk/nextjs';
 import { api } from '@/convex/_generated/api';
 import { PostCard } from './PostCard';
 import { FeedSkeleton } from './skeletons';
 import type { FeedItem } from './types';
 
 export function FeedList() {
-    const { isLoading, isAuthenticated } = useConvexAuth();
+    const { isSignedIn, isLoaded } = useUser();
+    const isLoading = !isLoaded;
+    const isAuthenticated = isSignedIn ?? false;
     const result = useQuery(api.posts.getFeedPosts, isAuthenticated ? {} : 'skip');
     const posts = result?.posts ?? [];
 

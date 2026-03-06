@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from 'react';
 import { useQuery, useMutation } from 'convex/react';
-import { useConvexAuth } from 'convex/react';
+import { useUser } from '@clerk/nextjs';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 import { notFound } from 'next/navigation';
@@ -76,7 +76,8 @@ function ResourceDetailSkeleton() {
 }
 
 function ResourceDetailContent({ id }: { id: string }) {
-    const { isAuthenticated } = useConvexAuth();
+    const { isSignedIn } = useUser();
+    const isAuthenticated = isSignedIn ?? false;
     const resource = useQuery(
         api.resources.getResource,
         isAuthenticated ? { resourceId: id as Id<'resources'> } : 'skip'

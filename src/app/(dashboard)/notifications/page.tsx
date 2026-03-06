@@ -1,12 +1,15 @@
 'use client';
 
-import { useQuery, useMutation, useConvexAuth } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
+import { useUser } from '@clerk/nextjs';
 import { api } from '@/../convex/_generated/api';
 import { NotificationItem } from '@/components/notifications/NotificationItem';
 import { Bell, CheckCheck } from 'lucide-react';
 
 export default function NotificationsPage() {
-  const { isLoading, isAuthenticated } = useConvexAuth();
+  const { isSignedIn, isLoaded } = useUser();
+  const isLoading = !isLoaded;
+  const isAuthenticated = isSignedIn ?? false;
   const data = useQuery(api.notifications.getNotifications, isAuthenticated ? {} : 'skip');
   const markAllAsRead = useMutation(api.notifications.markAllAsRead);
 

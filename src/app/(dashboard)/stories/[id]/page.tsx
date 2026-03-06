@@ -1,7 +1,8 @@
 'use client';
 
 import { Suspense, useEffect, useState, useRef, useCallback } from 'react';
-import { useQuery, useMutation, useConvexAuth } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
+import { useUser } from '@clerk/nextjs';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 import { notFound, useRouter } from 'next/navigation';
@@ -29,7 +30,9 @@ const StoryViewerSkeleton = () => (
 
 function StoryViewerContent({ storyId }: { storyId: Id<'stories'> }) {
     const router = useRouter();
-    const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
+    const { isSignedIn, isLoaded } = useUser();
+    const isAuthenticated = isSignedIn ?? false;
+    const authLoading = !isLoaded;
     const story = useQuery(api.stories.getStoryById, isAuthenticated ? { storyId } : 'skip');
     const viewStory = useMutation(api.stories.viewStory);
     const deleteStory = useMutation(api.stories.deleteStory);

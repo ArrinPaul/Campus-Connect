@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"
-import { useMutation, useQuery, useAction, useConvexAuth } from "convex/react"
+import { useMutation, useQuery, useAction } from "convex/react"
+import { useUser } from "@clerk/nextjs"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import dynamic from "next/dynamic"
@@ -54,9 +55,9 @@ interface PostComposerProps {
 }
 
 export function PostComposer({ onPostCreated, communityId }: PostComposerProps) {
-  const convexAuth = useConvexAuth()
-  const isAuthenticated = convexAuth?.isAuthenticated ?? false
-  const isAuthLoading = convexAuth?.isLoading ?? true
+  const { isSignedIn, isLoaded } = useUser()
+  const isAuthenticated = isSignedIn ?? false
+  const isAuthLoading = !isLoaded
   
   const createPost = useMutation(api.posts.createPost)
   const generateUploadUrl = useMutation(api.media.generateUploadUrl)

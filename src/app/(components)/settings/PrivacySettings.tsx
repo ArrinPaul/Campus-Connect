@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'convex/react';
-import { useConvexAuth } from 'convex/react';
+import { useUser } from '@clerk/nextjs';
 import { api } from '@/convex/_generated/api';
 import { Shield, Eye, Mail, MessageSquare, UserPlus, Activity, Search, Loader2, CheckCircle } from 'lucide-react';
 
@@ -20,7 +20,8 @@ interface PrivacyState {
 }
 
 export function PrivacySettings() {
-  const { isAuthenticated } = useConvexAuth();
+  const { isSignedIn } = useUser();
+  const isAuthenticated = isSignedIn ?? false;
   const settings = useQuery(api.users.getPrivacySettings, isAuthenticated ? undefined : 'skip');
   const updatePrivacy = useMutation(api.users.updatePrivacySettings);
 

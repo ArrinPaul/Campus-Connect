@@ -2,7 +2,8 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useQuery, useConvexAuth } from 'convex/react';
+import { useQuery } from 'convex/react';
+import { useUser } from '@clerk/nextjs';
 import { api } from '@/convex/_generated/api';
 import { SearchBar } from '../../(components)/search/SearchBar';
 import { PostCard } from '../../(components)/feed/PostCard';
@@ -29,7 +30,8 @@ function SearchResultsContent() {
     const currentQuery = searchParams.get('q') || '';
     const [activeTab, setActiveTab] = useState<Tab>('all');
 
-    const { isAuthenticated } = useConvexAuth();
+    const { isSignedIn } = useUser();
+    const isAuthenticated = isSignedIn ?? false;
     const searchResult = useQuery(
         api.search.universalSearch,
         isAuthenticated && currentQuery ? { query: currentQuery } : "skip"

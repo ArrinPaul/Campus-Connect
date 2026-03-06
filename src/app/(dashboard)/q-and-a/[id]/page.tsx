@@ -1,7 +1,8 @@
 'use client';
 
 import { Suspense, useEffect, useRef } from 'react';
-import { useQuery, useMutation, useConvexAuth } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
+import { useUser } from '@clerk/nextjs';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 import { notFound } from 'next/navigation';
@@ -34,7 +35,8 @@ const QuestionDetailPageSkeleton = () => (
 );
 
 function QuestionDetailPageContent({ questionId }: { questionId: Id<'questions'> }) {
-    const { isAuthenticated } = useConvexAuth();
+    const { isSignedIn } = useUser();
+    const isAuthenticated = isSignedIn ?? false;
     const question = useQuery(api.questions.getQuestion, { questionId });
     const incrementViewCount = useMutation(api.questions.incrementViewCount);
     const vote = useMutation(api.questions.vote);

@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from 'convex/react';
-import { useConvexAuth } from 'convex/react';
+import { useUser } from '@clerk/nextjs';
 import { api } from '@/convex/_generated/api';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -11,7 +11,9 @@ import { useEffect } from 'react';
  */
 export default function MyProfileRedirect() {
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useConvexAuth();
+  const { isSignedIn, isLoaded } = useUser();
+  const isAuthenticated = isSignedIn ?? false;
+  const isLoading = !isLoaded;
   const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : 'skip');
 
   useEffect(() => {

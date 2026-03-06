@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from 'convex/react';
-import { useConvexAuth } from 'convex/react';
+import { useUser } from '@clerk/nextjs';
 import { api } from '@/convex/_generated/api';
 import { AdCard } from '../../../(components)/ads/AdCard';
 import Link from 'next/link';
@@ -10,7 +10,8 @@ import { Plus } from 'lucide-react';
 const AdCardSkeleton = () => <div className="p-4 border rounded-lg bg-card h-64 animate-pulse" />;
 
 export default function AdsDashboardPage() {
-    const { isAuthenticated } = useConvexAuth();
+    const { isSignedIn } = useUser();
+    const isAuthenticated = isSignedIn ?? false;
     const ads = useQuery(api.ads.getAdAnalytics, isAuthenticated ? {} : 'skip');
 
     return (

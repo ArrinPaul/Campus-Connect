@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { Bell, CheckCheck } from "lucide-react"
-import { useQuery, useConvexAuth, useMutation } from "convex/react"
+import { useQuery, useMutation } from "convex/react"
+import { useUser } from "@clerk/nextjs"
 import { api } from "@/../convex/_generated/api"
 import type { Id } from "@/../convex/_generated/dataModel"
 import { useRouter } from "next/navigation"
@@ -23,7 +24,8 @@ export function NotificationBell() {
   const router = useRouter()
   const { announce } = useLiveRegion()
 
-  const { isAuthenticated } = useConvexAuth()
+  const { isSignedIn } = useUser()
+  const isAuthenticated = isSignedIn ?? false
   const unreadCount = useQuery(api.notifications.getUnreadCount, isAuthenticated ? {} : 'skip')
   const recentNotifications = useQuery(api.notifications.getRecentNotifications, isAuthenticated ? {} : 'skip')
 

@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useUser } from "@clerk/nextjs"
-import { useQuery, useConvexAuth } from "convex/react"
+import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { PostCard } from "@/components/posts/PostCard"
 import { InfiniteScrollTrigger } from "./InfiniteScrollTrigger"
@@ -23,8 +23,7 @@ interface FeedContainerProps {
 
 export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
   const { isLoaded, isSignedIn } = useUser()
-  const convexAuth = useConvexAuth()
-  const isAuthenticated = convexAuth?.isAuthenticated ?? false
+  const isAuthenticated = isSignedIn ?? false
   const [allItems, setAllItems] = useState<ConvexFeedItem[]>([])
   const [cursor, setCursor] = useState<string | null>(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false)

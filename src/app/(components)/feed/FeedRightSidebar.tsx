@@ -1,13 +1,15 @@
 'use client';
 
-import { useQuery, useMutation, useConvexAuth } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
+import { useUser } from '@clerk/nextjs';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { api } from '@/convex/_generated/api';
 import Link from 'next/link';
 import { UserPlus } from 'lucide-react';
 
 export function FeedRightSidebar() {
-  const { isAuthenticated } = useConvexAuth();
+  const { isSignedIn } = useUser();
+  const isAuthenticated = isSignedIn ?? false;
   const trendingHashtags = useQuery(api.hashtags.getTrending, { limit: 6 });
   const suggestions = useQuery(api.suggestions.getSuggestions, isAuthenticated ? { limit: 3 } : 'skip');
 
@@ -106,7 +108,8 @@ export function FeedRightSidebar() {
 }
 
 function FollowButton({ userId }: { userId: string }) {
-  const { isAuthenticated } = useConvexAuth();
+  const { isSignedIn } = useUser();
+  const isAuthenticated = isSignedIn ?? false;
   const followUser = useMutation(api.follows.followUser);
   const unfollowUser = useMutation(api.follows.unfollowUser);
   const isFollowing = useQuery(api.follows.isFollowing, isAuthenticated ? { userId: userId as any } : 'skip');

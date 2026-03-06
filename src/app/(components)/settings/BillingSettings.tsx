@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from 'convex/react';
-import { useConvexAuth } from 'convex/react';
+import { useUser } from '@clerk/nextjs';
 import { api } from '@/convex/_generated/api';
 import {
   CreditCard,
@@ -30,7 +30,8 @@ const PRO_FEATURES = [
 ];
 
 export function BillingSettings() {
-  const { isAuthenticated } = useConvexAuth();
+  const { isSignedIn } = useUser();
+  const isAuthenticated = isSignedIn ?? false;
   const subscription = useQuery(api.subscriptions.getMySubscription, isAuthenticated ? undefined : 'skip');
 
   if (subscription === undefined) {

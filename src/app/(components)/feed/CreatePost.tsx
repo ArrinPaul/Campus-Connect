@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { useQuery, useMutation, useConvexAuth } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
+import { useUser } from '@clerk/nextjs';
 import { api } from '@/convex/_generated/api';
 import { Send, Image as ImageIcon, ChartBar, File, Loader2, LogIn } from 'lucide-react';
 import { toast } from 'sonner';
@@ -15,9 +16,9 @@ type Props = {
 };
 
 export function CreatePost({ communityId }: Props) {
-  const convexAuth = useConvexAuth();
-  const isAuthenticated = convexAuth?.isAuthenticated ?? false;
-  const isLoading = convexAuth?.isLoading ?? true;
+  const { isSignedIn, isLoaded } = useUser();
+  const isAuthenticated = isSignedIn ?? false;
+  const isLoading = !isLoaded;
   
   const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : "skip");
   const createPost = useMutation(api.posts.createPost);

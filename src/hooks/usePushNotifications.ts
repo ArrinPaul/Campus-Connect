@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useMutation, useQuery, useConvexAuth } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
+import { useUser } from '@clerk/nextjs';
 import { api } from '@/convex/_generated/api';
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
@@ -16,7 +17,8 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 }
 
 export function usePushNotifications() {
-  const { isAuthenticated } = useConvexAuth();
+  const { isSignedIn } = useUser();
+  const isAuthenticated = isSignedIn ?? false;
   const [isSupported, setIsSupported] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
