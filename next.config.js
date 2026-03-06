@@ -1,4 +1,4 @@
-const { withSentryConfig } = require("@sentry/nextjs")
+
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 })
@@ -56,7 +56,7 @@ const nextConfig = {
     const isDev = process.env.NODE_ENV === "development"
     const cspDirectives = [
       "default-src 'self'",
-      `script-src 'self' ${isDev ? "'unsafe-eval' 'unsafe-inline'" : "'unsafe-inline'"} https://clerk.campus-connect.app https://*.clerk.accounts.dev https://challenges.cloudflare.com`,
+      `script-src 'self' 'blob:' ${isDev ? "'unsafe-eval' 'unsafe-inline'" : "'unsafe-inline'"} https://clerk.campus-connect.app https://*.clerk.accounts.dev https://challenges.cloudflare.com`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: blob: https://*.convex.cloud https://img.clerk.com https://images.unsplash.com",
       "font-src 'self' https://fonts.gstatic.com",
@@ -143,28 +143,4 @@ const nextConfig = {
   },
 }
 
-module.exports = withBundleAnalyzer(withSentryConfig(nextConfig, {
-  // For all available options, see:
-  // https://github.com/getsentry/sentry-webpack-plugin#options
-
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-
-  // Only print logs for uploading source maps in CI
-  silent: !process.env.CI,
-
-  // Upload a larger set of source maps for prettier stack traces (increases build time)
-  widenClientFileUpload: true,
-
-  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers
-  tunnelRoute: "/monitoring",
-
-  // Hides source maps from generated client bundles
-  hideSourceMaps: true,
-
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
-
-  // Enables automatic instrumentation of Vercel Cron Monitors (does not yet work with ISR)
-  automaticVercelMonitors: true,
-}))
+module.exports = withBundleAnalyzer(nextConfig)

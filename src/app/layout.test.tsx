@@ -37,13 +37,7 @@ jest.mock("@/components/providers/theme-provider", () => ({
   ),
 }))
 
-// Mock Vercel Analytics & Speed Insights
-jest.mock("@vercel/analytics/react", () => ({
-  Analytics: () => <div data-testid="vercel-analytics" />,
-}))
-jest.mock("@vercel/speed-insights/next", () => ({
-  SpeedInsights: () => <div data-testid="speed-insights" />,
-}))
+
 
 // Mock PostHog
 jest.mock("@/components/providers/posthog-provider", () => ({

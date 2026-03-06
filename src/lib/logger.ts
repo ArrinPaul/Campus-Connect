@@ -11,7 +11,7 @@
  *   log.error("Failed to delete post", error, { postId })
  */
 
-import * as Sentry from "@sentry/nextjs"
+
 
 export type LogLevel = "debug" | "info" | "warn" | "error"
 
@@ -101,26 +101,12 @@ function emit(
     return
   }
 
-  // ── Browser production — structured JSON + Sentry for error/warn ──────────
+  // ── Browser production — structured JSON ────────────────────────────────
   const out = JSON.stringify(payload)
   if (level === "error") {
     console.error(out)
-    Sentry.withScope((scope_) => {
-      scope_.setTag("scope", scope)
-      scope_.setExtras(context ?? {})
-      if (error instanceof Error) {
-        Sentry.captureException(error)
-      } else {
-        Sentry.captureMessage(message, "error")
-      }
-    })
   } else if (level === "warn") {
     console.warn(out)
-    Sentry.withScope((scope_) => {
-      scope_.setTag("scope", scope)
-      scope_.setExtras(context ?? {})
-      Sentry.captureMessage(message, "warning")
-    })
   } else {
     console.log(out)
   }
