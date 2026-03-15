@@ -11,7 +11,7 @@ jest.mock("@/components/theme/theme-toggle", () => ({
   ThemeToggle: () => <div data-testid="theme-toggle">Theme Toggle</div>,
 }))
 
-// Mock Convex
+// Mock app data client
 jest.mock("@/lib/api", () => ({
   useQuery: jest.fn(() => 0),
 }))

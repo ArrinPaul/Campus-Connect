@@ -7,13 +7,13 @@ import { InfiniteScrollTrigger } from "./InfiniteScrollTrigger"
 import { Repeat2 } from "lucide-react"
 import type { FeedItem } from "@/app/(components)/feed/types"
 
-type ConvexFeedItem = FeedItem & {
+type FeedQueryItem = FeedItem & {
   reposter?: { name?: string; username?: string } | null
   quoteContent?: string | null
 }
 
 interface VirtualizedFeedProps {
-  items: ConvexFeedItem[]
+  items: FeedQueryItem[]
   hasMore: boolean
   isLoadingMore: boolean
   onLoadMore: () => void

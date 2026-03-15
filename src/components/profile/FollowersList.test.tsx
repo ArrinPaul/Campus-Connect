@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react"
 import { FollowersList } from "./FollowersList"
 import { Id } from "@/lib/api"
 
-// Mock Convex hooks
+// Mock data hooks
 const mockGetFollowers = jest.fn()
 
 jest.mock("@/lib/api", () => ({

@@ -33,7 +33,7 @@ import {
   Trash2,
 } from "lucide-react"
 
-// Client-side file type / size constants (mirrored from convex/media.ts)
+// Client-side file type / size constants (mirrored from backend media limits)
 import imageCompression from "browser-image-compression"
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"]
 const VIDEO_TYPES = ["video/mp4", "video/webm"]
@@ -331,7 +331,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
     e.preventDefault()
     setError("")
 
-    // Auth check - use Convex auth status which syncs with Clerk
+    // Auth check - use app auth status which syncs with Clerk
     if (!isAuthenticated) {
       setError("You must be signed in to create a post")
       toast.error("Sign in required", { description: "Please sign in to create a post" })
@@ -435,7 +435,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
       }
 
       const createdPost = await createPost({
-        content: content.trim() || " ", // Convex requires non-empty, use space if media-only
+        content: content.trim() || " ", // Backend requires non-empty content; use space for media-only posts
         mediaUrls,
         mediaType: finalMediaType,
         mediaFileNames,

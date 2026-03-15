@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react"
 import { SkillsManager } from "./SkillsManager"
 
-// Mock Convex
+// Mock app data client
 const mockAddSkill = jest.fn()
 const mockRemoveSkill = jest.fn()
 

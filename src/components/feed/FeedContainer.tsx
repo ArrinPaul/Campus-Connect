@@ -15,7 +15,7 @@ import type { FeedItem } from "@/app/(components)/feed/types"
 
 type FeedType = "following" | "for-you" | "trending"
 
-type ConvexFeedItem = FeedItem
+type FeedQueryItem = FeedItem
 
 interface FeedContainerProps {
   feedType?: FeedType
@@ -24,7 +24,7 @@ interface FeedContainerProps {
 export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
   const { isLoaded, isSignedIn } = useUser()
   const isAuthenticated = isSignedIn ?? false
-  const [allItems, setAllItems] = useState<ConvexFeedItem[]>([])
+  const [allItems, setAllItems] = useState<FeedQueryItem[]>([])
   const [cursor, setCursor] = useState<string | null>(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const hasInitializedRef = useRef(false)
@@ -37,7 +37,7 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
       ? { limit: 20, cursor }
       : ("skip" as const)
 
-  // Queries for each feed type (Convex requires static query references)
+  // Queries for each feed type (static references are required)
   const followingDataRaw = useQuery(
     api.posts.getFeedPosts,
     feedType === "following" ? queryArgs : "skip"
@@ -125,14 +125,14 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
     if (!feedData) return
     
     if (!hasInitializedRef.current) {
-      setAllItems(feedData.items as ConvexFeedItem[])
+      setAllItems(feedData.items as FeedQueryItem[])
       setCursor(feedData.nextCursor)
       hasInitializedRef.current = true
     } else if (!isLoadingMore) {
       // Handle real-time updates for the initial batch
       setAllItems((prev) => {
         const existingIds = new Set(prev.map((item) => item._id))
-        const newItems = (feedData.items as ConvexFeedItem[]).filter((item) => !existingIds.has(item._id))
+        const newItems = (feedData.items as FeedQueryItem[]).filter((item) => !existingIds.has(item._id))
         return [...newItems, ...prev]
       })
       setCursor(feedData.nextCursor)
@@ -142,7 +142,7 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
   // Update allItems when more data loads
   useEffect(() => {
     if (moreFeedData && isLoadingMore) {
-      setAllItems((prev) => [...prev, ...(moreFeedData.items as ConvexFeedItem[])])
+      setAllItems((prev) => [...prev, ...(moreFeedData.items as FeedQueryItem[])])
       setCursor(moreFeedData.nextCursor)
       setIsLoadingMore(false)
     }

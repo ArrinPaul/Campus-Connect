@@ -62,7 +62,7 @@ export function CreatePost({ communityId }: Props) {
   };
 
   if (isLoading) {
-    // Show loading skeleton while Convex auth is initializing
+    // Show loading skeleton while auth is initializing
     return (
       <div className="rounded-lg border bg-card p-3 sm:p-4 mb-4 animate-pulse">
         <div className="flex items-start gap-3">

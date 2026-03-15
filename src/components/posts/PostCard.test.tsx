@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { PostCard } from "./PostCard"
 import { Id } from "@/lib/api"
 
-// Mock Convex hooks
+// Mock data hooks
 const mockDeletePost = jest.fn()
 const mockLikePost = jest.fn()
 const mockUnlikePost = jest.fn()

@@ -13,7 +13,7 @@ const mockFileReader = {
 }
 global.FileReader = jest.fn(() => mockFileReader) as any
 
-// Mock Convex
+// Mock app data client
 jest.mock("@/lib/api", () => ({
   useMutation: jest.fn(() => jest.fn()),
 }))

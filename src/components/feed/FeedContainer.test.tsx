@@ -3,7 +3,7 @@ import { FeedContainer } from "./FeedContainer"
 import { useQuery } from "@/lib/api"
 import { Id } from "@/lib/api"
 
-// Mock Convex hooks
+// Mock data hooks
 const mockGetCurrentUser = jest.fn()
 const mockHasUserLikedPost = jest.fn()
 let queryCallCount = 0
@@ -311,7 +311,7 @@ describe("FeedContainer", () => {
       },
     ]
 
-    // Force re-render to simulate Convex real-time update
+    // Force re-render to simulate real-time update
     rerender(<FeedContainer />)
 
     // Wait for the new post to appear

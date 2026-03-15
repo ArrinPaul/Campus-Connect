@@ -1,7 +1,7 @@
 "use client"
 
 /**
- * Convex-compatibility layer for Neo4j migration.
+ * Legacy data-client compatibility layer for Neo4j migration.
  *
  * Drop-in replacement for:
  *   import { useQuery, useMutation } from '@/lib/api'
@@ -45,8 +45,8 @@ function ep(
 
 // ─── useQuery ────────────────────────────────────────────────────────────────
 /**
- * Mimics Convex useQuery: returns `undefined` while loading, data when done.
- * Pass `null` as the endpoint to disable (mirrors Convex's skip pattern).
+ * Legacy-compatible useQuery: returns `undefined` while loading, data when done.
+ * Pass `null` as the endpoint to disable (mirrors the old skip pattern).
  */
 export function useQuery<T = unknown>(
   endpoint: Endpoint | null | undefined,
@@ -87,7 +87,7 @@ export function useQuery<T = unknown>(
 
 // ─── useMutation ─────────────────────────────────────────────────────────────
 /**
- * Mimics Convex useMutation: returns an async function that sends the request.
+ * Legacy-compatible useMutation: returns an async function that sends the request.
  */
 export function useMutation<A = Record<string, unknown>, T = unknown>(
   endpoint: Endpoint
@@ -117,7 +117,7 @@ export function useMutation<A = Record<string, unknown>, T = unknown>(
   return (args?: A) => mutation.mutateAsync(args)
 }
 
-// Convex auth compatibility used by existing UI/tests.
+// Legacy auth compatibility used by existing UI/tests.
 export function useConvexAuth() {
   const { isLoaded, userId } = useAuth()
   return { isLoading: !isLoaded, isAuthenticated: Boolean(userId) }
@@ -132,7 +132,7 @@ export function ConvexProvider({ children }: { children: ReactNode; client?: unk
   return children as unknown as ReactNode
 }
 
-// ─── api object (mirrors convex/_generated/api) ──────────────────────────────
+// ─── api object (mirrors legacy generated api shape) ─────────────────────────
 
 export const api = {
   // ── users ──────────────────────────────────────────────────────────────────

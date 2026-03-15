@@ -13,7 +13,7 @@ jest.mock("@clerk/nextjs", () => ({
   ClerkProvider: ({ children }: any) => <div>{children}</div>,
 }))
 
-// Mock Convex
+// Mock app data client
 jest.mock("@/lib/api", () => ({
   useQuery: jest.fn(),
   useMutation: jest.fn(),
@@ -57,7 +57,7 @@ describe("User Flow Integration Tests", () => {
 
       // This test validates that:
       // 1. User can authenticate
-      // 2. User record is created in Convex
+      // 2. User record is created in the data store
       // 3. Profile is initialized with default values
       expect(useUser().isSignedIn).toBe(true)
       expect(useUser().user).toBeDefined()

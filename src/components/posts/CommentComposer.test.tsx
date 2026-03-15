@@ -46,7 +46,7 @@ jest.mock("@/lib/api", () => ({
   useMutation: jest.fn(() => mockCreateComment),
 }))
 
-// Mock the Convex API
+// Mock the app API descriptors
 jest.mock("@/lib/api", () => ({
   api: {
     comments: {

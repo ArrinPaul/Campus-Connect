@@ -17,7 +17,7 @@ function toNumber(value: number | Integer | null | undefined): number {
 function parseCandidateUser(candidate: Record<string, unknown>): GraphUser {
   return {
     clerkId: String(candidate.clerkId),
-    convexUserId: (candidate.convexUserId as string | undefined) ?? null,
+    appUserId: (candidate.appUserId as string | undefined) ?? null,
     name: (candidate.name as string | undefined) ?? null,
     username: (candidate.username as string | undefined) ?? null,
     profilePicture: (candidate.profilePicture as string | undefined) ?? null,
@@ -109,7 +109,7 @@ export async function getSuggestions(viewerClerkId: string, limit = 5): Promise<
       RETURN
         candidate {
           .clerkId,
-          .convexUserId,
+          .appUserId,
           .name,
           .username,
           .profilePicture,
@@ -246,7 +246,7 @@ export async function getPostRecommendations(
         } AS post,
         author {
           .clerkId,
-          .convexUserId,
+          .appUserId,
           .name,
           .username,
           .profilePicture,
@@ -282,7 +282,7 @@ export async function getPostRecommendations(
 
 interface UpsertGraphUserInput {
   clerkId: string
-  convexUserId?: string | null
+  appUserId?: string | null
   name?: string | null
   username?: string | null
   profilePicture?: string | null
@@ -306,7 +306,7 @@ export async function upsertGraphUser(input: UpsertGraphUserInput): Promise<void
       `
       MERGE (u:User {clerkId: $clerkId})
       SET
-        u.convexUserId = $convexUserId,
+        u.appUserId = $appUserId,
         u.name = $name,
         u.username = $username,
         u.profilePicture = $profilePicture,
@@ -317,7 +317,7 @@ export async function upsertGraphUser(input: UpsertGraphUserInput): Promise<void
       `,
       {
         clerkId: input.clerkId,
-        convexUserId: input.convexUserId ?? null,
+        appUserId: input.appUserId ?? null,
         name: input.name ?? null,
         username: input.username ?? null,
         profilePicture: input.profilePicture ?? null,

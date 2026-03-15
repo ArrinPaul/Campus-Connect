@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { ReactionPicker, reactionEmojis } from "./ReactionPicker"
 
-// Mock Convex hooks
+// Mock data hooks
 jest.mock("@/lib/api", () => ({
   useMutation: jest.fn(() => jest.fn()),
   useQuery: jest.fn(() => null),

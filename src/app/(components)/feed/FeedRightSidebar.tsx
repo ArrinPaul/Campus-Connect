@@ -67,7 +67,8 @@ export function FeedRightSidebar() {
             {suggestions.map((s) => {
               if (!s.user) return null;
               const displayName = s.user.name ?? s.user.username ?? 'User';
-              const profileHref = s.user.convexUserId ? `/profile/${s.user.convexUserId}` : '/profile/me';
+              const profileUserId = s.user.appUserId;
+              const profileHref = profileUserId ? `/profile/${profileUserId}` : '/profile/me';
               return (
                 <div key={s._id} className="flex items-center gap-3">
                   <Link href={profileHref} className="flex-shrink-0">
@@ -96,7 +97,7 @@ export function FeedRightSidebar() {
                       <p className="text-xs text-muted-foreground truncate">{s.reasons[0]}</p>
                     )}
                   </div>
-                  <FollowButton convexUserId={s.user.convexUserId ?? undefined} targetClerkId={s.user.clerkId} />
+                  <FollowButton profileUserId={profileUserId ?? undefined} targetClerkId={s.user.clerkId} />
                 </div>
               );
             })}
@@ -110,31 +111,31 @@ export function FeedRightSidebar() {
   );
 }
 
-function FollowButton({ convexUserId, targetClerkId }: { convexUserId?: string; targetClerkId: string }) {
+function FollowButton({ profileUserId, targetClerkId }: { profileUserId?: string; targetClerkId: string }) {
   const { isSignedIn } = useUser();
   const isAuthenticated = isSignedIn ?? false;
-  const hasConvexUserId = !!convexUserId;
+  const hasProfileUserId = !!profileUserId;
   const followUser = useMutation(api.follows.followUser);
   const unfollowUser = useMutation(api.follows.unfollowUser);
   const graphFollowMutation = useGraphFollowMutation(3);
   const isFollowing = useQuery(
     api.follows.isFollowing,
-    isAuthenticated && hasConvexUserId ? { userId: convexUserId as any } : 'skip'
+    isAuthenticated && hasProfileUserId ? { userId: profileUserId as any } : 'skip'
   );
 
-  if (hasConvexUserId && isFollowing === undefined) {
+  if (hasProfileUserId && isFollowing === undefined) {
     return <div className="h-7 w-16 bg-muted rounded-full animate-pulse" />;
   }
 
-  const following = hasConvexUserId ? !!isFollowing : false;
+  const following = hasProfileUserId ? !!isFollowing : false;
 
   return (
     <button
       onClick={() =>
-        hasConvexUserId
+        hasProfileUserId
           ? following
-            ? unfollowUser({ userId: convexUserId as any })
-            : followUser({ userId: convexUserId as any })
+            ? unfollowUser({ userId: profileUserId as any })
+            : followUser({ userId: profileUserId as any })
           : graphFollowMutation.mutate({ targetClerkId, action: 'follow' })
       }
       className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition-colors ${

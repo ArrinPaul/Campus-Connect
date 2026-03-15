@@ -2,7 +2,7 @@
  * Tests for reactions backend logic.
  *
  * Pure handler logic tests using mock ctx objects
- * (same pattern as other convex tests).
+ * (same pattern as other backend tests).
  */
 
 const makeUser = (overrides = {}) => ({

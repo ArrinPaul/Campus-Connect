@@ -60,7 +60,7 @@ jest.mock("@/lib/api", () => ({
   useConvexAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false })),
 }))
 
-// Mock the Convex API
+// Mock the app API descriptors
 jest.mock("@/lib/api", () => ({
   api: {
     posts: {

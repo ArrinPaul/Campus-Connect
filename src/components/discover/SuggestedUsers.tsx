@@ -37,7 +37,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
   const graphFollowUser = useGraphFollowMutation(limit)
   const refreshSuggestions = useRefreshGraphSuggestions(limit)
 
-  // Keep Convex follow relation in sync while graph migration is in progress.
+  // Keep the primary follow relation in sync while graph suggestions are used.
   const followUser = useMutation(api.follows.followUser)
 
   const [loadingFollow, setLoadingFollow] = useState<Set<string>>(new Set())
@@ -49,7 +49,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
       params: {
         suggestionId: string
         targetClerkId: string
-        convexUserId?: string | null
+        profileUserId?: string | null
       }
     ) => {
       setLoadingFollow((prev) => new Set(prev).add(params.suggestionId))
@@ -59,8 +59,8 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
           action: "follow",
         })
 
-        if (params.convexUserId) {
-          await followUser({ userId: params.convexUserId as Id<"users"> })
+        if (params.profileUserId) {
+          await followUser({ userId: params.profileUserId as Id<"users"> })
         }
 
         // Auto-dismiss after following
@@ -181,7 +181,8 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
           const isFollowing = loadingFollow.has(suggestion._id)
           const isDismissingThis = dismissing.has(suggestion._id)
           const displayName = user.name ?? user.username ?? "User"
-          const profileHref = user.convexUserId ? `/profile/${user.convexUserId}` : "/profile/me"
+          const profileUserId = user.appUserId
+          const profileHref = profileUserId ? `/profile/${profileUserId}` : "/profile/me"
 
           return (
             <div
@@ -233,7 +234,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
                     handleFollow({
                       suggestionId: suggestion._id,
                       targetClerkId: user.clerkId,
-                      convexUserId: user.convexUserId,
+                      profileUserId,
                     })
                   }
                   disabled={isFollowing}

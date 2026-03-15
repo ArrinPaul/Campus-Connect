@@ -119,7 +119,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
       let mediaUrl: string | undefined
 
       if (mode === "image" && imageFile) {
-        // Upload image to Convex storage
+        // Upload image to managed storage
         const uploadUrl = await generateUploadUrl({
           fileType: imageFile.type,
           fileSize: imageFile.size,
@@ -133,7 +133,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
         if (!res.ok) throw new Error("Image upload failed")
         const { storageId } = await res.json()
 
-        // Resolve storageId to a real public URL via Convex
+        // Resolve storageId to a real public URL
         const urls = await resolveStorageUrls({ storageIds: [storageId] })
         if (!urls || !urls[0]) throw new Error("Failed to resolve storage URL")
         mediaUrl = urls[0]

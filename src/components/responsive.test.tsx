@@ -26,7 +26,7 @@ jest.mock("@/components/editor/MarkdownRenderer", () => ({
   MarkdownRenderer: ({ content }: any) => <div>{content}</div>,
 }))
 
-// Mock Convex
+// Mock app data client
 jest.mock("@/lib/api", () => ({
   useMutation: jest.fn(() => jest.fn()),
   useAction: jest.fn(() => jest.fn()),

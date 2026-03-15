@@ -1,6 +1,6 @@
 export interface GraphUser {
   clerkId: string
-  convexUserId?: string | null
+  appUserId?: string | null
   name?: string | null
   username?: string | null
   profilePicture?: string | null

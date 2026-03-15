@@ -1,11 +1,7 @@
 /**
  * Shared validation constants (frontend copy).
- * Mirrors convex/validation_constants.ts — kept in sync manually.
- * Do NOT import from @/convex/validation_constants in frontend code;
- * import from this file instead to avoid pulling convex files into the
- * root TypeScript compilation unit.
- *
- * If you update convex/validation_constants.ts, update this file too.
+ * Keep this file as the frontend-safe source of truth.
+ * Import from here in browser code to avoid server-only coupling.
  */
 
 // ── Content length limits ────────────────────────────────────────────────────

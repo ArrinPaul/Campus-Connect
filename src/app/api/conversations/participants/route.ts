@@ -4,7 +4,7 @@ const notImplemented = () =>
   NextResponse.json(
     {
       error: "Not implemented",
-      message: "Endpoint scaffolded during Convex -> Neo4j migration. Implement business logic as needed.",
+      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
     },
     { status: 501 }
   )

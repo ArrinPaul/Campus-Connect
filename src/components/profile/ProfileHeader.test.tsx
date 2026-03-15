@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { ProfileHeader } from "./ProfileHeader"
 import { Id } from "@/lib/api"
 
-// Mock Convex hooks
+// Mock data hooks
 const mockFollowUser = jest.fn()
 const mockUnfollowUser = jest.fn()
 const mockIsFollowing = jest.fn()
