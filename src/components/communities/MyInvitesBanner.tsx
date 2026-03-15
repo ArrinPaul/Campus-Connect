@@ -1,8 +1,8 @@
 'use client';
 
-import { useQuery, useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
-import type { Id } from '@/convex/_generated/dataModel';
+import { useQuery, useMutation } from '@/lib/api';
+import { api } from '@/lib/api';
+import type { Id } from '@/lib/api';
 import { useState } from 'react';
 import { Mail, Check, X, Loader2, Users } from 'lucide-react';
 import Image from 'next/image';

@@ -1,7 +1,7 @@
 'use client';
 
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useQuery } from '@/lib/api';
+import { api } from '@/lib/api';
 import { LeaderboardItem } from '../../(components)/leaderboard/LeaderboardItem';
 import { useState } from 'react';
 import { GraduationCap, Award } from 'lucide-react';

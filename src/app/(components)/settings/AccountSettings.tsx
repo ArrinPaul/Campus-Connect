@@ -1,7 +1,7 @@
 'use client';
 
-import { useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useMutation } from '@/lib/api';
+import { api } from '@/lib/api';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { SettingsSection } from './SettingComponents';

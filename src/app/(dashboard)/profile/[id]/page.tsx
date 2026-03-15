@@ -1,7 +1,6 @@
 import React, { Suspense } from 'react';
-import { fetchQuery } from 'convex/nextjs';
-import { api } from '@/convex/_generated/api';
-import type { Id } from '@/convex/_generated/dataModel';
+import type { Id } from '@/lib/api';
+import { getUserById } from '@/server/db/users';
 import { ProfileSkeleton } from '../../../(components)/profile/skeletons';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { UserPostList } from '../../../(components)/profile/UserPostList';
@@ -19,7 +18,7 @@ type ProfilePageProps = {
 async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
     let userProfile;
     try {
-        userProfile = await fetchQuery(api.users.getUserById, { userId });
+        userProfile = await getUserById(userId);
     } catch {
         notFound();
     }

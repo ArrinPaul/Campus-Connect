@@ -8,15 +8,8 @@ const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
-    // Convex generated mocks (must come before generic convex mapping)
-    '^@/convex/_generated/(.*)$': '<rootDir>/__mocks__/convex/$1',
-    // Convex source files (e.g. @/convex/validation_constants)
-    '^@/convex/(.*)$': '<rootDir>/convex/$1',
     // All other @/ imports map to src/
     '^@/(.*)$': '<rootDir>/src/$1',
-    // Legacy relative imports in test files
-    '../../convex/_generated/api': '<rootDir>/__mocks__/convex/api.js',
-    '../../convex/_generated/dataModel': '<rootDir>/__mocks__/convex/dataModel.ts',
     // Fix wrong-depth relative imports mistakenly using 3 levels up instead of 2
     '\\.\\./\\.\\./\\.\\./lib/validations': '<rootDir>/src/lib/validations',
   },

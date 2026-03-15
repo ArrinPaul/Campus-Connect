@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import type { Doc } from '@/convex/_generated/dataModel';
+import type { Doc } from '@/lib/api';
 import { MapPin, Briefcase, DollarSign, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 

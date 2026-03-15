@@ -1,7 +1,7 @@
 'use client';
 
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useQuery } from '@/lib/api';
+import { api } from '@/lib/api';
 import { JobCard } from '../../(components)/jobs/JobCard';
 import { PostJobModal } from '@/components/jobs/PostJobModal';
 import Link from 'next/link';

@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { useQuery, useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
-import type { Id } from '@/convex/_generated/dataModel';
+import { useQuery, useMutation } from '@/lib/api';
+import { api } from '@/lib/api';
+import type { Id } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Calendar, MapPin, Users, Video, Globe, User as UserIcon, CheckCircle, Clock, XCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';

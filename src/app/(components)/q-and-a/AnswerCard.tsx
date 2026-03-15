@@ -1,14 +1,14 @@
 'use client';
 
-import type { Doc } from '@/convex/_generated/dataModel';
+import type { Doc } from '@/lib/api';
 import { User as UserIcon, ArrowUp, ArrowDown, CheckCircle } from 'lucide-react';
 import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useMutation } from '@/lib/api';
+import { api } from '@/lib/api';
 
 type Answer = Doc<'answers'> & {
     answerer: {

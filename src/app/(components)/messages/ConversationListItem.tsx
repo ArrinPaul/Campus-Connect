@@ -1,6 +1,6 @@
 'use client';
 
-import type { Doc } from '@/convex/_generated/dataModel';
+import type { Doc } from '@/lib/api';
 import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';

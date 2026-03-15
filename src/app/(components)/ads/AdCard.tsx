@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import type { Doc } from '@/convex/_generated/dataModel';
+import type { Doc } from '@/lib/api';
 import { TrendingUp, MousePointerClick, DollarSign, Target, PlayCircle, PauseCircle, Trash2, Loader2, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { useState } from 'react';
-import { useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useMutation } from '@/lib/api';
+import { api } from '@/lib/api';
 import { toast } from 'sonner';
 
 type Ad = Doc<'ads'>; // Simplified for display on dashboard

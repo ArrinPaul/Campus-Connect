@@ -18,10 +18,9 @@
       }
     ],
     "paths": {
-      "@/convex/*": ["./convex/*"],
       "@/*": ["./src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "convex"]
+  "exclude": ["node_modules"]
 }

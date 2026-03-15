@@ -3,7 +3,7 @@
 import { memo } from "react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import Link from "next/link"
-import { Id } from "@/convex/_generated/dataModel"
+import { Id } from "@/lib/api"
 
 interface User {
   _id: Id<"users">

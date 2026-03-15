@@ -1,7 +1,7 @@
 'use client';
 
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useQuery } from '@/lib/api';
+import { api } from '@/lib/api';
 import { PostCard } from '../../(components)/feed/PostCard';
 import { FeedItem } from '../../(components)/feed/types';
 import { useEffect, useRef, useState } from 'react';

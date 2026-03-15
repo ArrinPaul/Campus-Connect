@@ -1,8 +1,8 @@
 'use client';
 
-import { useQuery } from 'convex/react';
+import { useQuery } from '@/lib/api';
 import { useUser } from '@clerk/nextjs';
-import { api } from '@/convex/_generated/api';
+import { api } from '@/lib/api';
 import { PostCard } from './PostCard';
 import { FeedSkeleton } from './skeletons';
 import type { FeedItem } from './types';

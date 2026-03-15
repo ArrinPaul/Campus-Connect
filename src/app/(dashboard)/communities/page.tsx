@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useQuery } from '@/lib/api';
+import { api } from '@/lib/api';
 import { CommunityCard } from '../../(components)/communities/CommunityCard';
 import { MyInvitesBanner } from '@/components/communities/MyInvitesBanner';
 import Link from 'next/link';

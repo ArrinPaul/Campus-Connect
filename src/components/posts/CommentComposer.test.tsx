@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { CommentComposer } from "./CommentComposer"
-import { Id } from "@/convex/_generated/dataModel"
+import { Id } from "@/lib/api"
 
 // Mock the RichTextEditor module to avoid ESM/TipTap issues in Jest
 jest.mock("@/components/editor/RichTextEditor", () => ({
@@ -40,14 +40,14 @@ jest.mock("@/components/editor/RichTextEditor", () => ({
   ),
 }))
 
-// Mock convex/react
+// Mock @/lib/api
 const mockCreateComment = jest.fn()
-jest.mock("convex/react", () => ({
+jest.mock("@/lib/api", () => ({
   useMutation: jest.fn(() => mockCreateComment),
 }))
 
 // Mock the Convex API
-jest.mock("../../../convex/_generated/api", () => ({
+jest.mock("@/lib/api", () => ({
   api: {
     comments: {
       createComment: "comments:createComment",

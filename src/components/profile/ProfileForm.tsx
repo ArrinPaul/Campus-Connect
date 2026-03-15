@@ -2,8 +2,8 @@
 
 import { useState, useRef } from "react"
 import Image from "next/image"
-import { useMutation } from "convex/react"
-import { api } from "@/convex/_generated/api"
+import { useMutation } from "@/lib/api"
+import { api } from "@/lib/api"
 import imageCompression from "browser-image-compression"
 import {
   validateBio,

@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { useQuery } from "convex/react"
-import { api } from "@/convex/_generated/api"
+import { useQuery } from "@/lib/api"
+import { api } from "@/lib/api"
 import { TrendingUp, Hash } from "lucide-react"
 import { getHashtagDisplay } from "@/lib/hashtag-utils"
 

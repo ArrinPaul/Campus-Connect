@@ -1,7 +1,7 @@
 'use client';
 
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useQuery } from '@/lib/api';
+import { api } from '@/lib/api';
 import { EventCard } from '../../(components)/events/EventCard';
 import { CreateEventModal } from '@/components/events/CreateEventModal';
 import Link from 'next/link';

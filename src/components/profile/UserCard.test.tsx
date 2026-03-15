@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { UserCard } from "./UserCard"
-import { Id } from "@/convex/_generated/dataModel"
+import { Id } from "@/lib/api"
 
 // Mock Next.js Image component
 jest.mock("next/image", () => ({

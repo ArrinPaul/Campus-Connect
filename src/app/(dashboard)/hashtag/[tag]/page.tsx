@@ -1,8 +1,8 @@
 'use client';
 
 import { Suspense } from 'react';
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useQuery } from '@/lib/api';
+import { api } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Hash } from 'lucide-react';
 import Link from 'next/link';

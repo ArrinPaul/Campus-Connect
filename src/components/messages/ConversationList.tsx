@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react"
 import Image from "next/image"
-import { Id } from "@/../convex/_generated/dataModel"
+import { Id } from "@/lib/api"
 import { Search, Plus, Users, MessageSquare } from "lucide-react"
 import { OnlineStatusDot } from "@/components/ui/OnlineStatusDot"
 

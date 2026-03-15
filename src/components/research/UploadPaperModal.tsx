@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useMutation } from '@/lib/api';
+import { api } from '@/lib/api';
 import { X, Upload, FileText, Loader2, Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import { Id } from '@/convex/_generated/dataModel';
+import { Id } from '@/lib/api';
 
 interface UploadPaperModalProps {
   onClose: () => void;

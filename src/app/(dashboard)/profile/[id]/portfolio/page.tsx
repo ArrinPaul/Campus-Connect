@@ -1,10 +1,10 @@
 'use client';
 
 import { Suspense } from 'react';
-import { useQuery } from 'convex/react';
+import { useQuery } from '@/lib/api';
 import { useUser } from '@clerk/nextjs';
-import { api } from '@/convex/_generated/api';
-import type { Id } from '@/convex/_generated/dataModel';
+import { api } from '@/lib/api';
+import type { Id } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Plus } from 'lucide-react';

@@ -1,9 +1,9 @@
 import { render, screen, fireEvent } from "@testing-library/react"
 import NotificationsPage from "./page"
-import { useQuery, useMutation, useConvexAuth } from "convex/react"
+import { useQuery, useMutation, useConvexAuth } from "@/lib/api"
 
 // Mock dependencies
-jest.mock("convex/react", () => ({
+jest.mock("@/lib/api", () => ({
   useQuery: jest.fn(),
   useMutation: jest.fn(() => jest.fn()),
   useConvexAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false })),
@@ -13,7 +13,7 @@ jest.mock("@/components/notifications/NotificationItem", () => ({
     <div data-testid="notification-item">{notification.message}</div>
   ),
 }))
-jest.mock("../../../../convex/_generated/api", () => ({
+jest.mock("@/lib/api", () => ({
   api: {
     notifications: {
       getNotifications: {},

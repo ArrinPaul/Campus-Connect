@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react"
 import { FollowingList } from "./FollowingList"
-import { Id } from "@/convex/_generated/dataModel"
+import { Id } from "@/lib/api"
 
 // Mock Convex hooks
 const mockGetFollowing = jest.fn()
 
-jest.mock("convex/react", () => ({
+jest.mock("@/lib/api", () => ({
   useQuery: jest.fn((apiFunction) => {
     if (apiFunction === "follows:getFollowing") {
       return mockGetFollowing()

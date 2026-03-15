@@ -2,13 +2,19 @@
 
 import { useState, useCallback } from "react"
 import { useUser } from "@clerk/nextjs"
-import { useQuery, useMutation } from "convex/react"
-import { api } from "@/convex/_generated/api"
+import { useMutation } from "@/lib/api"
+import { api } from "@/lib/api"
 import Image from "next/image"
 import Link from "next/link"
 import { X, RefreshCw, UserPlus, ChevronRight, Sparkles } from "lucide-react"
-import { Id } from "@/convex/_generated/dataModel"
+import { Id } from "@/lib/api"
 import { createLogger } from "@/lib/logger"
+import {
+  useDismissGraphSuggestion,
+  useGraphFollowMutation,
+  useGraphSuggestions,
+  useRefreshGraphSuggestions,
+} from "@/hooks/useGraphSuggestions"
 
 const log = createLogger("SuggestedUsers")
 
@@ -22,49 +28,67 @@ interface SuggestedUsersProps {
 export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersProps) {
   const { isSignedIn } = useUser()
   const isAuthenticated = isSignedIn ?? false
-  const suggestions = useQuery(
-    api.suggestions.getSuggestions,
-    isAuthenticated ? { limit } : "skip"
-  )
-  const dismissSuggestion = useMutation(api.suggestions.dismissSuggestion)
+
+  const {
+    data: suggestions,
+    isLoading: suggestionsLoading,
+  } = useGraphSuggestions(limit, isAuthenticated)
+  const dismissSuggestion = useDismissGraphSuggestion(limit)
+  const graphFollowUser = useGraphFollowMutation(limit)
+  const refreshSuggestions = useRefreshGraphSuggestions(limit)
+
+  // Keep Convex follow relation in sync while graph migration is in progress.
   const followUser = useMutation(api.follows.followUser)
-  const refreshSuggestions = useMutation(api.suggestions.refreshSuggestions)
 
   const [loadingFollow, setLoadingFollow] = useState<Set<string>>(new Set())
   const [dismissing, setDismissing] = useState<Set<string>>(new Set())
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   const handleFollow = useCallback(
-    async (userId: Id<"users">, suggestionId: Id<"suggestions">) => {
-      setLoadingFollow((prev) => new Set(prev).add(suggestionId as string))
+    async (
+      params: {
+        suggestionId: string
+        targetClerkId: string
+        convexUserId?: string | null
+      }
+    ) => {
+      setLoadingFollow((prev) => new Set(prev).add(params.suggestionId))
       try {
-        await followUser({ userId })
+        await graphFollowUser.mutateAsync({
+          targetClerkId: params.targetClerkId,
+          action: "follow",
+        })
+
+        if (params.convexUserId) {
+          await followUser({ userId: params.convexUserId as Id<"users"> })
+        }
+
         // Auto-dismiss after following
-        await dismissSuggestion({ suggestionId })
+        await dismissSuggestion.mutateAsync(params.targetClerkId)
       } catch (err) {
         log.error("Failed to follow user", err)
       } finally {
         setLoadingFollow((prev) => {
           const next = new Set(prev)
-          next.delete(suggestionId as string)
+          next.delete(params.suggestionId)
           return next
         })
       }
     },
-    [followUser, dismissSuggestion]
+    [dismissSuggestion, followUser, graphFollowUser]
   )
 
   const handleDismiss = useCallback(
-    async (suggestionId: Id<"suggestions">) => {
-      setDismissing((prev) => new Set(prev).add(suggestionId as string))
+    async (params: { suggestionId: string; targetClerkId: string }) => {
+      setDismissing((prev) => new Set(prev).add(params.suggestionId))
       try {
-        await dismissSuggestion({ suggestionId })
+        await dismissSuggestion.mutateAsync(params.targetClerkId)
       } catch (err) {
         log.error("Failed to dismiss suggestion", err)
       } finally {
         setDismissing((prev) => {
           const next = new Set(prev)
-          next.delete(suggestionId as string)
+          next.delete(params.suggestionId)
           return next
         })
       }
@@ -75,7 +99,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true)
     try {
-      await refreshSuggestions({})
+      await refreshSuggestions.mutateAsync()
     } catch (err) {
       log.error("Failed to refresh suggestions", err)
     } finally {
@@ -84,7 +108,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
   }, [refreshSuggestions])
 
   // Loading skeleton
-  if (suggestions === undefined || suggestions === null) {
+  if (suggestionsLoading || suggestions === undefined || suggestions === null) {
     return (
       <div className="rounded-lg border border-border bg-card p-4">
         <div className="flex items-center justify-between mb-3">
@@ -154,8 +178,10 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
       <div className="space-y-3">
         {suggestions.map((suggestion) => {
           const user = suggestion.user!
-          const isFollowing = loadingFollow.has(suggestion._id as string)
-          const isDismissingThis = dismissing.has(suggestion._id as string)
+          const isFollowing = loadingFollow.has(suggestion._id)
+          const isDismissingThis = dismissing.has(suggestion._id)
+          const displayName = user.name ?? user.username ?? "User"
+          const profileHref = user.convexUserId ? `/profile/${user.convexUserId}` : "/profile/me"
 
           return (
             <div
@@ -165,19 +191,19 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
               }`}
             >
               {/* Avatar */}
-              <Link href={`/profile/${user._id}`} className="flex-shrink-0">
+              <Link href={profileHref} className="flex-shrink-0">
                 <div className="relative h-10 w-10">
                   {user.profilePicture ? (
                     <Image
                       src={user.profilePicture}
-                      alt={user.name}
+                      alt={displayName}
                       fill
                       sizes="40px"
                       className="rounded-full object-cover"
                     />
                   ) : (
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-                      {user.name.charAt(0).toUpperCase()}
+                      {displayName.charAt(0).toUpperCase()}
                     </div>
                   )}
                 </div>
@@ -186,10 +212,10 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <Link
-                  href={`/profile/${user._id}`}
+                  href={profileHref}
                   className="text-sm font-medium text-foreground hover:underline truncate block"
                 >
-                  {user.name}
+                  {displayName}
                 </Link>
 
                 {/* Reasons tooltip */}
@@ -203,7 +229,13 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
 
                 {/* Follow button */}
                 <button
-                  onClick={() => handleFollow(user._id, suggestion._id)}
+                  onClick={() =>
+                    handleFollow({
+                      suggestionId: suggestion._id,
+                      targetClerkId: user.clerkId,
+                      convexUserId: user.convexUserId,
+                    })
+                  }
                   disabled={isFollowing}
                   className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
                 >
@@ -214,7 +246,12 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
 
               {/* Dismiss button */}
               <button
-                onClick={() => handleDismiss(suggestion._id)}
+                onClick={() =>
+                  handleDismiss({
+                    suggestionId: suggestion._id,
+                    targetClerkId: user.clerkId,
+                  })
+                }
                 disabled={isDismissingThis}
                 className="flex-shrink-0 rounded p-1 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-muted-foreground dark:hover:text-muted-foreground transition-all"
                 title="Dismiss suggestion"

@@ -12,7 +12,7 @@ jest.mock("@/components/theme/theme-toggle", () => ({
 }))
 
 // Mock Convex
-jest.mock("convex/react", () => ({
+jest.mock("@/lib/api", () => ({
   useQuery: jest.fn(() => 0),
 }))
 

@@ -2,8 +2,8 @@ import React from "react"
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { PollCard } from "./PollCard"
 
-// Mock convex/react
-jest.mock("convex/react", () => ({
+// Mock @/lib/api
+jest.mock("@/lib/api", () => ({
   useQuery: jest.fn(),
   useMutation: jest.fn(() => jest.fn()),
 }))
@@ -13,7 +13,7 @@ jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: jest.fn() }),
 }))
 
-jest.mock("../../../../convex/_generated/api", () => ({
+jest.mock("@/lib/api", () => ({
   api: {
     polls: {
       getPollResults: "polls:getPollResults",
@@ -23,7 +23,7 @@ jest.mock("../../../../convex/_generated/api", () => ({
   },
 }))
 
-import { useQuery, useMutation } from "convex/react"
+import { useQuery, useMutation } from "@/lib/api"
 
 const mockPollId = "poll_001" as any
 

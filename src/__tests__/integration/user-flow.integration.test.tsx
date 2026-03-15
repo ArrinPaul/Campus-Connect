@@ -14,7 +14,7 @@ jest.mock("@clerk/nextjs", () => ({
 }))
 
 // Mock Convex
-jest.mock("convex/react", () => ({
+jest.mock("@/lib/api", () => ({
   useQuery: jest.fn(),
   useMutation: jest.fn(),
   ConvexProvider: ({ children }: any) => <div>{children}</div>,
@@ -67,7 +67,7 @@ describe("User Flow Integration Tests", () => {
   describe("Post Creation, Engagement, and Feed Display Flow", () => {
     it("should allow creating a post, liking it, and seeing it in feed", async () => {
       // Test Requirements: 4.1, 5.1
-      const { useQuery, useMutation } = require("convex/react")
+      const { useQuery, useMutation } = require("@/lib/api")
       
       // Mock current user
       useQuery.mockReturnValue({
@@ -94,7 +94,7 @@ describe("User Flow Integration Tests", () => {
   describe("User Discovery, Following, and Feed Filtering Flow", () => {
     it("should allow discovering users, following them, and seeing filtered feed", async () => {
       // Test Requirements: 7.1
-      const { useQuery, useMutation } = require("convex/react")
+      const { useQuery, useMutation } = require("@/lib/api")
       
       // Mock search results
       useQuery.mockReturnValue([

@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
-import type { Id } from '@/convex/_generated/dataModel';
+import { useMutation } from '@/lib/api';
+import { api } from '@/lib/api';
+import type { Id } from '@/lib/api';
 import { SendHorizontal, Plus, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 

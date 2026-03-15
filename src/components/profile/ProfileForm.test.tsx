@@ -14,7 +14,7 @@ const mockFileReader = {
 global.FileReader = jest.fn(() => mockFileReader) as any
 
 // Mock Convex
-jest.mock("convex/react", () => ({
+jest.mock("@/lib/api", () => ({
   useMutation: jest.fn(() => jest.fn()),
 }))
 
@@ -140,7 +140,7 @@ describe("ProfileForm", () => {
   })
 
   it("should call onSave callback after successful submission", async () => {
-    const { useMutation } = require("convex/react")
+    const { useMutation } = require("@/lib/api")
     const mockUpdateProfile = jest.fn().mockResolvedValue(undefined)
     useMutation.mockReturnValue(mockUpdateProfile)
 
@@ -156,7 +156,7 @@ describe("ProfileForm", () => {
   })
 
   it("should display success message after successful submission", async () => {
-    const { useMutation } = require("convex/react")
+    const { useMutation } = require("@/lib/api")
     const mockUpdateProfile = jest.fn().mockResolvedValue(undefined)
     useMutation.mockReturnValue(mockUpdateProfile)
 
@@ -171,7 +171,7 @@ describe("ProfileForm", () => {
   })
 
   it("should disable submit button while submitting", async () => {
-    const { useMutation } = require("convex/react")
+    const { useMutation } = require("@/lib/api")
     const mockUpdateProfile = jest
       .fn()
       .mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 100)))

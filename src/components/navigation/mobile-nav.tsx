@@ -24,10 +24,10 @@ import {
   GraduationCap,
 } from "lucide-react"
 import { UserButton } from "@clerk/nextjs"
-import { useQuery } from "convex/react"
-import { api } from "@/convex/_generated/api"
+import { useQuery } from "@/lib/api"
+import { api } from "@/lib/api"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
-import { Id } from "@/convex/_generated/dataModel"
+import { Id } from "@/lib/api"
 import { cn } from "@/lib/utils"
 
 interface MobileNavProps {

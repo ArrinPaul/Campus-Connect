@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import type { Doc } from '@/convex/_generated/dataModel';
+import type { Doc } from '@/lib/api';
 import { Users } from 'lucide-react';
 
 // Manually defining type based on getCommunities query

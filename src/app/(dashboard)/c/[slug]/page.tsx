@@ -1,8 +1,8 @@
 'use client';
 
 import React, { Suspense } from 'react';
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useQuery } from '@/lib/api';
+import { api } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import { CommunityHeader } from '../../../(components)/communities/CommunityHeader';
 import { CommunityPostFeed } from '../../../(components)/communities/CommunityPostFeed';

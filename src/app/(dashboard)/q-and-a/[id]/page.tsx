@@ -1,10 +1,10 @@
 'use client';
 
 import { Suspense, useEffect, useRef } from 'react';
-import { useQuery, useMutation } from 'convex/react';
+import { useQuery, useMutation } from '@/lib/api';
 import { useUser } from '@clerk/nextjs';
-import { api } from '@/convex/_generated/api';
-import type { Id } from '@/convex/_generated/dataModel';
+import { api } from '@/lib/api';
+import type { Id } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, User as UserIcon, MessageCircle, Eye, ArrowUp, ArrowDown, CheckCircle, Loader2, Calendar, BookOpen } from 'lucide-react';
 import Link from 'next/link';

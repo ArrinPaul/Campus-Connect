@@ -1,5 +1,5 @@
 /**
- * Tests for convex/reactions.ts backend logic.
+ * Tests for reactions backend logic.
  *
  * Pure handler logic tests using mock ctx objects
  * (same pattern as other convex tests).

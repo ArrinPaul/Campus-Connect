@@ -1,10 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { useMutation } from "convex/react"
+import { useMutation } from "@/lib/api"
 import { useRouter } from "next/navigation"
-import { api } from "@/convex/_generated/api"
-import { Id } from "@/convex/_generated/dataModel"
+import { api } from "@/lib/api"
+import { Id } from "@/lib/api"
 import { X, Calendar, MapPin, Video, Globe } from "lucide-react"
 
 interface CreateEventModalProps {

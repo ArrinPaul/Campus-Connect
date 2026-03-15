@@ -1,6 +1,6 @@
 'use client';
 
-import type { Doc } from '@/convex/_generated/dataModel';
+import type { Doc } from '@/lib/api';
 import { Calendar, GraduationCap, Award, BookOpen, Star } from 'lucide-react';
 import { format } from 'date-fns';
 

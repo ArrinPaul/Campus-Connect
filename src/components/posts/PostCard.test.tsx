@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { PostCard } from "./PostCard"
-import { Id } from "@/convex/_generated/dataModel"
+import { Id } from "@/lib/api"
 
 // Mock Convex hooks
 const mockDeletePost = jest.fn()
@@ -9,7 +9,7 @@ const mockUnlikePost = jest.fn()
 const mockGetCurrentUser = jest.fn()
 const mockHasUserLikedPost = jest.fn()
 
-jest.mock("convex/react", () => ({
+jest.mock("@/lib/api", () => ({
   useMutation: jest.fn((fn: any) => {
     if (fn === "posts:deletePost") return mockDeletePost
     if (fn === "posts:likePost") return mockLikePost

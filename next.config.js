@@ -5,8 +5,7 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Skip TypeScript type errors during build - Convex generated types are stale
-  // Run `npx convex dev` to regenerate types from deployment
+  // Skip TypeScript type errors during build
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -16,10 +15,6 @@ const nextConfig = {
 
     // Remote image domains (add your CDN/storage domains)
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "**.convex.cloud",
-      },
       {
         protocol: "https",
         hostname: "img.clerk.com",
@@ -58,9 +53,9 @@ const nextConfig = {
       "default-src 'self'",
       `script-src 'self' 'blob:' ${isDev ? "'unsafe-eval' 'unsafe-inline'" : "'unsafe-inline'"} https://clerk.campus-connect.app https://*.clerk.accounts.dev https://challenges.cloudflare.com`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "img-src 'self' data: blob: https://*.convex.cloud https://img.clerk.com https://images.unsplash.com",
+      "img-src 'self' data: blob: https://img.clerk.com https://images.unsplash.com",
       "font-src 'self' https://fonts.gstatic.com",
-      `connect-src 'self' https://*.convex.cloud https://*.clerk.accounts.dev wss://*.convex.cloud ${isDev ? "ws://localhost:*" : ""} https://*.posthog.com https://*.sentry.io https://clerk.campus-connect.app`,
+      `connect-src 'self' https://*.clerk.accounts.dev ${isDev ? "ws://localhost:*" : ""} https://*.posthog.com https://*.sentry.io https://clerk.campus-connect.app`,
       "frame-src 'self' https://*.clerk.accounts.dev https://challenges.cloudflare.com",
       "object-src 'none'",
       "base-uri 'self'",

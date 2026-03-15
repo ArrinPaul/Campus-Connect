@@ -1,13 +1,13 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { RepostModal } from "./RepostModal"
-import { useMutation } from "convex/react"
+import { useMutation } from "@/lib/api"
 
 // Mock dependencies
-jest.mock("convex/react")
+jest.mock("@/lib/api")
 jest.mock("lucide-react", () => ({
   X: () => <div data-testid="x-icon">X</div>,
 }))
-jest.mock("../../../../convex/_generated/api", () => ({
+jest.mock("@/lib/api", () => ({
   api: {
     reposts: {
       createRepost: {},

@@ -5,7 +5,7 @@ import { SkillsManager } from "./SkillsManager"
 const mockAddSkill = jest.fn()
 const mockRemoveSkill = jest.fn()
 
-jest.mock("convex/react", () => ({
+jest.mock("@/lib/api", () => ({
   useMutation: jest.fn((api) => {
     if (api.toString().includes("addSkill")) {
       return mockAddSkill

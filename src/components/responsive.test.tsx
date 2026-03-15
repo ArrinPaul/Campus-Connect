@@ -27,7 +27,7 @@ jest.mock("@/components/editor/MarkdownRenderer", () => ({
 }))
 
 // Mock Convex
-jest.mock("convex/react", () => ({
+jest.mock("@/lib/api", () => ({
   useMutation: jest.fn(() => jest.fn()),
   useAction: jest.fn(() => jest.fn()),
   useQuery: jest.fn(() => null),

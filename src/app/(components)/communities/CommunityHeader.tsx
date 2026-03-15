@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import type { Doc } from '@/convex/_generated/dataModel';
+import type { Doc } from '@/lib/api';
 import { Users, Rss, Settings, Lock } from 'lucide-react';
 import Link from 'next/link';
-import { useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useMutation } from '@/lib/api';
+import { api } from '@/lib/api';
 import { useUser } from '@clerk/nextjs';
 
 // Manually defining type based on getCommunity query

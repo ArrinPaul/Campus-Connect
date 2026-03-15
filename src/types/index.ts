@@ -3,7 +3,7 @@
  * Import these instead of using inline `any` or locally-redefined interfaces.
  */
 
-import type { Id } from "@/convex/_generated/dataModel"
+import type { Id } from "@/lib/api"
 
 // ─── Reaction Types ───────────────────────────────────────────────────────────
 

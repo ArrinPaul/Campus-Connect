@@ -1,8 +1,8 @@
 'use client';
 
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
-import type { Id } from '@/convex/_generated/dataModel';
+import { useQuery } from '@/lib/api';
+import { api } from '@/lib/api';
+import type { Id } from '@/lib/api';
 import { Award, Lock, Star, MessageSquare, TrendingUp, HelpCircle, BookOpen, Share2, Users, ThumbsUp, Zap } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 

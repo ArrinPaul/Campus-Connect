@@ -1,9 +1,9 @@
 'use client';
 
 import { Suspense, useState } from 'react';
-import { useQuery, useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
-import type { Id } from '@/convex/_generated/dataModel';
+import { useQuery, useMutation } from '@/lib/api';
+import { api } from '@/lib/api';
+import type { Id } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';

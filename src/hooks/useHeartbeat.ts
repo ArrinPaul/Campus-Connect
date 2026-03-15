@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useRef, useCallback } from "react"
-import { useMutation } from "convex/react"
-import { api } from "@/convex/_generated/api"
+import { useMutation } from "@/lib/api"
+import { api } from "@/lib/api"
 
 const HEARTBEAT_INTERVAL = 60000 // 60 seconds
 

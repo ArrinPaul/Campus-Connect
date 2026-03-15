@@ -1,10 +1,10 @@
 "use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"
-import { useMutation, useQuery, useAction } from "convex/react"
+import { useMutation, useQuery, useAction } from "@/lib/api"
 import { useUser } from "@clerk/nextjs"
-import { api } from "@/convex/_generated/api"
-import { Id } from "@/convex/_generated/dataModel"
+import { api } from "@/lib/api"
+import { Id } from "@/lib/api"
 import dynamic from "next/dynamic"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 import { MentionAutocomplete } from "./MentionAutocomplete"

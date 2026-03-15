@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation } from 'convex/react';
+import { useQuery, useMutation } from '@/lib/api';
 import { useUser } from '@clerk/nextjs';
-import { api } from '@/convex/_generated/api';
+import { api } from '@/lib/api';
 import { Shield, Eye, Mail, MessageSquare, UserPlus, Activity, Search, Loader2, CheckCircle } from 'lucide-react';
 
 type ProfileVisibility = 'public' | 'connections' | 'private';

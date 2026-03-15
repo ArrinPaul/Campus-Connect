@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { ReactionPicker, reactionEmojis } from "./ReactionPicker"
 
 // Mock Convex hooks
-jest.mock("convex/react", () => ({
+jest.mock("@/lib/api", () => ({
   useMutation: jest.fn(() => jest.fn()),
   useQuery: jest.fn(() => null),
 }))
@@ -23,7 +23,7 @@ describe("ReactionPicker", () => {
     jest.clearAllMocks()
     // Set desktop width so hover picker shows
     Object.defineProperty(window, 'innerWidth', { value: 1024, writable: true, configurable: true })
-    const { useMutation, useQuery } = require("convex/react")
+    const { useMutation, useQuery } = require("@/lib/api")
     
     useMutation.mockImplementation((api: any) => {
       if (api?.toString().includes("addReaction")) {
@@ -121,7 +121,7 @@ describe("ReactionPicker", () => {
   })
 
   it("displays user's current reaction", () => {
-    const { useQuery } = require("convex/react")
+    const { useQuery } = require("@/lib/api")
     useQuery.mockImplementation((api: any) => {
       if (api.toString().includes("getUserReaction")) {
         return "love"
@@ -155,7 +155,7 @@ describe("ReactionPicker", () => {
   })
 
   it("calls removeReaction when clicking same reaction again", async () => {
-    const { useQuery } = require("convex/react")
+    const { useQuery } = require("@/lib/api")
     useQuery.mockImplementation((api: any) => {
       if (api.toString().includes("getUserReaction")) {
         return "like"
@@ -205,7 +205,7 @@ describe("ReactionPicker", () => {
   })
 
   it("displays total reaction count", () => {
-    const { useQuery } = require("convex/react")
+    const { useQuery } = require("@/lib/api")
     useQuery.mockImplementation((api: any) => {
       if (api.toString().includes("getUserReaction")) {
         return null

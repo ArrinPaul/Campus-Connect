@@ -5,10 +5,9 @@ import { useVirtualizer } from "@tanstack/react-virtual"
 import { PostCard } from "@/components/posts/PostCard"
 import { InfiniteScrollTrigger } from "./InfiniteScrollTrigger"
 import { Repeat2 } from "lucide-react"
-import { api } from "@/convex/_generated/api"
-import type { FunctionReturnType } from "convex/server"
+import type { FeedItem } from "@/app/(components)/feed/types"
 
-type ConvexFeedItem = NonNullable<FunctionReturnType<typeof api.feed_ranking.getRankedFeed>>["items"][number] & {
+type ConvexFeedItem = FeedItem & {
   reposter?: { name?: string; username?: string } | null
   quoteContent?: string | null
 }

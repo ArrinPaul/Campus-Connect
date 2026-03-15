@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MentionAutocomplete } from './MentionAutocomplete'
 
-// Mock convex/react
-jest.mock('convex/react', () => ({
+// Mock @/lib/api
+jest.mock('@/lib/api', () => ({
   useQuery: jest.fn(),
   useMutation: jest.fn(() => jest.fn()),
   ConvexProvider: ({ children }: any) => children,
@@ -15,7 +15,7 @@ jest.mock('next/image', () => ({
   default: ({ src, alt, ...props }: any) => <img src={src} alt={alt} {...props} />,
 }))
 
-import { useQuery, ConvexProvider, ConvexReactClient } from 'convex/react'
+import { useQuery, ConvexProvider, ConvexReactClient } from '@/lib/api'
 const mockUseQuery = useQuery as jest.MockedFunction<typeof useQuery>
 const mockConvexClient = new (ConvexReactClient as any)()
 

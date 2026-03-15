@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react"
 import { CommentList } from "./CommentList"
-import { Id } from "@/convex/_generated/dataModel"
+import { Id } from "@/lib/api"
 
-// Mock convex/react
-jest.mock("convex/react", () => ({
+// Mock @/lib/api
+jest.mock("@/lib/api", () => ({
   useMutation: jest.fn(() => jest.fn()),
   useQuery: jest.fn(() => null),
 }))

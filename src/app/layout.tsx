@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Syne, Manrope } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 
-import { ConvexClientProvider } from "@/components/providers/convex-provider";
+import { AppQueryProvider } from "@/components/providers/query-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { PostHogProvider } from "@/components/providers/posthog-provider";
 import { PostHogPageView } from "@/components/analytics/posthog-pageview";
@@ -143,14 +143,14 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <ConvexClientProvider>
+            <AppQueryProvider>
               <PostHogProvider>
                 <LiveRegionProvider>
                   <PostHogPageView />
                   {children}
                 </LiveRegionProvider>
               </PostHogProvider>
-            </ConvexClientProvider>
+            </AppQueryProvider>
           </ThemeProvider>
 
           <Toaster richColors position="bottom-right" closeButton />

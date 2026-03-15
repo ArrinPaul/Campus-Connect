@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useMutation } from 'convex/react';
+import { useMutation } from '@/lib/api';
 import { useRouter } from 'next/navigation';
-import { api } from '@/convex/_generated/api';
+import { api } from '@/lib/api';
 import { X } from 'lucide-react';
 import { toast } from 'sonner';
 

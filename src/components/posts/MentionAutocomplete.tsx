@@ -1,7 +1,7 @@
 "use client"
 
-import { useQuery } from "convex/react"
-import { api } from "@/convex/_generated/api"
+import { useQuery } from "@/lib/api"
+import { api } from "@/lib/api"
 import Image from "next/image"
 import { User } from "lucide-react"
 import { useState, useEffect } from "react"

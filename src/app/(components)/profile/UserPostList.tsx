@@ -1,8 +1,8 @@
 'use client';
 
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
-import type { Id } from '@/convex/_generated/dataModel';
+import { useQuery } from '@/lib/api';
+import { api } from '@/lib/api';
+import type { Id } from '@/lib/api';
 import { PostCard } from '../../(components)/feed/PostCard';
 import type { FeedItem } from '../../(components)/feed/types';
 

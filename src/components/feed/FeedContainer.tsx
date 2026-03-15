@@ -3,19 +3,19 @@
 import { useState, useCallback, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useUser } from "@clerk/nextjs"
-import { useQuery } from "convex/react"
-import { api } from "@/convex/_generated/api"
+import { useQuery } from "@/lib/api"
+import { api } from "@/lib/api"
 import { PostCard } from "@/components/posts/PostCard"
 import { InfiniteScrollTrigger } from "./InfiniteScrollTrigger"
 import { VirtualizedFeed } from "./VirtualizedFeed"
 import { Repeat2 } from "lucide-react"
 import { SuggestedUsers } from "@/components/discover/SuggestedUsers"
 import { TrendingHashtags } from "@/components/trending/TrendingHashtags"
-import type { FunctionReturnType } from "convex/server"
+import type { FeedItem } from "@/app/(components)/feed/types"
 
 type FeedType = "following" | "for-you" | "trending"
 
-type ConvexFeedItem = NonNullable<FunctionReturnType<typeof api.feed_ranking.getRankedFeed>>["items"][number]
+type ConvexFeedItem = FeedItem
 
 interface FeedContainerProps {
   feedType?: FeedType

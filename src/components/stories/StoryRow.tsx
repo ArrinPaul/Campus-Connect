@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { useQuery } from "convex/react"
+import { useQuery } from "@/lib/api"
 import { useUser } from "@clerk/nextjs"
-import { api } from "@/convex/_generated/api"
+import { api } from "@/lib/api"
 import { useRouter } from "next/navigation"
 import { StoryRingRow, type StoryRingUser, type StoryRingStory } from "./StoryRing"
 import { StoryComposer } from "./StoryComposer"

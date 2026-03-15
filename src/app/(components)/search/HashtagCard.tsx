@@ -1,6 +1,6 @@
 'use client';
 
-import type { Doc } from '@/convex/_generated/dataModel';
+import type { Doc } from '@/lib/api';
 import Link from 'next/link';
 import { Hash } from 'lucide-react';
 

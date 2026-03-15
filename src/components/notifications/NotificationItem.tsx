@@ -2,9 +2,9 @@
 
 import { useRouter } from "next/navigation"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
-import { useMutation } from "convex/react"
-import { api } from "@/../convex/_generated/api"
-import { Id } from "@/../convex/_generated/dataModel"
+import { useMutation } from "@/lib/api"
+import { api } from "@/lib/api"
+import { Id } from "@/lib/api"
 import { formatDistanceToNow } from "date-fns"
 import { Heart, MessageCircle, AtSign, UserPlus, MessageSquare, Calendar, Award } from "lucide-react"
 

@@ -1,6 +1,6 @@
 'use client';
 
-import type { Doc } from '@/convex/_generated/dataModel';
+import type { Doc } from '@/lib/api';
 import { Link as LinkIcon, Calendar, Code, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 

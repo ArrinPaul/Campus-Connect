@@ -4,7 +4,7 @@
 import React from "react"
 import { render, screen } from "@testing-library/react"
 
-jest.mock("convex/react", () => ({
+jest.mock("@/lib/api", () => ({
   useQuery: jest.fn(),
   useMutation: jest.fn(() => jest.fn()),
 }))
@@ -22,7 +22,7 @@ jest.mock("next/image", () => ({
   ),
 }))
 
-import { useQuery } from "convex/react"
+import { useQuery } from "@/lib/api"
 
 const mockUseQuery = useQuery as jest.Mock
 
@@ -99,10 +99,9 @@ describe("StoriesPage", () => {
 
     // Re-import to get fresh module after mock setup
     jest.resetModules()
-    jest.mock("convex/react", () => ({ useQuery: jest.fn(), useMutation: jest.fn(() => jest.fn()) }))
+    jest.mock("@/lib/api", () => ({ useQuery: jest.fn(), useMutation: jest.fn(() => jest.fn()) }))
     jest.mock("next/navigation", () => ({ useRouter: () => ({ push: jest.fn() }), useSearchParams: () => ({ get: jest.fn().mockReturnValue(null) }) }))
-    jest.mock("@/convex/_generated/api", () => require("../../../__mocks__/convex/api"))
-    const { useQuery: freshUseQuery } = require("convex/react")
+    const { useQuery: freshUseQuery } = require("@/lib/api")
     ;(freshUseQuery as jest.Mock).mockReturnValue([])
 
     // Just test the grouping logic produces empty array

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useMutation, useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useMutation, useQuery } from '@/lib/api';
+import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { MultiStepLayout } from '../../(components)/onboarding/MultiStepLayout';
 import { WelcomeStep } from '../../(components)/onboarding/WelcomeStep';

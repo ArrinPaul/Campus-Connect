@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useMutation, useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useMutation, useQuery } from '@/lib/api';
+import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ArrowLeft, Loader2 } from 'lucide-react';
@@ -10,7 +10,7 @@ import Link from 'next/link';
 
 // Reusing form components
 import { Input, Textarea, FormButton, SettingsSection } from '../../../(components)/settings/SettingComponents';
-import { Id } from '@/convex/_generated/dataModel';
+import { Id } from '@/lib/api';
 
 export default function CreateAdPage() {
     const router = useRouter();

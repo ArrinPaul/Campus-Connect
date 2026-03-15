@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react"
 import { FeedContainer } from "./FeedContainer"
-import { useQuery } from "convex/react"
-import { Id } from "@/convex/_generated/dataModel"
+import { useQuery } from "@/lib/api"
+import { Id } from "@/lib/api"
 
 // Mock Convex hooks
 const mockGetCurrentUser = jest.fn()
@@ -9,7 +9,7 @@ const mockHasUserLikedPost = jest.fn()
 let queryCallCount = 0
 let mockQueryResults: any[] = []
 
-jest.mock("convex/react", () => ({
+jest.mock("@/lib/api", () => ({
   useQuery: jest.fn((fn: any, args?: any) => {
     if (fn === "users:getCurrentUser") return mockGetCurrentUser()
     if (fn === "posts:hasUserLikedPost") return mockHasUserLikedPost()

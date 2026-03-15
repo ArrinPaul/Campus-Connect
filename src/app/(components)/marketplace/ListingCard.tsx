@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
-import type { Doc } from '@/convex/_generated/dataModel';
+import type { Doc } from '@/lib/api';
 import { Tag, DollarSign, MapPin, Package, Clock, User as UserIcon } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 

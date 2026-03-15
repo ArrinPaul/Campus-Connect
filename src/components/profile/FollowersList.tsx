@@ -1,9 +1,9 @@
 "use client"
 
 import { useUser } from "@clerk/nextjs"
-import { useQuery } from "convex/react"
-import { api } from "@/convex/_generated/api"
-import { Id } from "@/convex/_generated/dataModel"
+import { useQuery } from "@/lib/api"
+import { api } from "@/lib/api"
+import { Id } from "@/lib/api"
 import { UserCard } from "./UserCard"
 
 interface FollowersListProps {

@@ -23,10 +23,10 @@ jest.mock("@clerk/nextjs", () => ({
   ),
 }))
 
-// Mock Convex provider
-jest.mock("@/components/providers/convex-provider", () => ({
-  ConvexClientProvider: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="convex-provider">{children}</div>
+// Mock query provider
+jest.mock("@/components/providers/query-provider", () => ({
+  AppQueryProvider: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="query-provider">{children}</div>
   ),
 }))
 
@@ -60,14 +60,14 @@ describe("RootLayout", () => {
     expect(getByTestId("clerk-provider")).toBeInTheDocument()
   })
 
-  it("should wrap app with ConvexClientProvider", () => {
+  it("should wrap app with AppQueryProvider", () => {
     const { getByTestId } = render(
       <RootLayout>
         <div>Test Content</div>
       </RootLayout>
     )
 
-    expect(getByTestId("convex-provider")).toBeInTheDocument()
+    expect(getByTestId("query-provider")).toBeInTheDocument()
   })
 
   it("should render children", () => {

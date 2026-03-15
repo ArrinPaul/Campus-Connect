@@ -39,13 +39,13 @@ jest.mock("@/components/editor/RichTextEditor", () => ({
   ),
 }))
 
-// Mock convex/react
+// Mock @/lib/api
 const mockCreatePost = jest.fn()
 const mockGenerateUploadUrl = jest.fn()
 const mockResolveStorageUrls = jest.fn()
 const mockFetchLinkPreview = jest.fn()
 const mockUseQuery = jest.fn(() => undefined)
-jest.mock("convex/react", () => ({
+jest.mock("@/lib/api", () => ({
   useMutation: jest.fn((ref: string) => {
     if (ref === "posts:createPost") return mockCreatePost
     if (ref === "media:generateUploadUrl") return mockGenerateUploadUrl
@@ -61,7 +61,7 @@ jest.mock("convex/react", () => ({
 }))
 
 // Mock the Convex API
-jest.mock("../../../convex/_generated/api", () => ({
+jest.mock("@/lib/api", () => ({
   api: {
     posts: {
       createPost: "posts:createPost",

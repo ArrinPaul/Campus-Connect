@@ -1,6 +1,6 @@
 "use client"
 
-import { Id } from "@/../convex/_generated/dataModel"
+import { Id } from "@/lib/api"
 
 interface TypingUser {
   _id: Id<"users">

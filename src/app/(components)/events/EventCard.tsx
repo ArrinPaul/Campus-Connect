@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import type { Doc } from '@/convex/_generated/dataModel';
+import type { Doc } from '@/lib/api';
 import { Calendar, MapPin, Users, Video, Globe, User as UserIcon } from 'lucide-react';
 import { format, isToday, isTomorrow } from 'date-fns';
 

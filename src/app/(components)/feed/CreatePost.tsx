@@ -2,14 +2,14 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { useQuery, useMutation } from 'convex/react';
+import { useQuery, useMutation } from '@/lib/api';
 import { useUser } from '@clerk/nextjs';
-import { api } from '@/convex/_generated/api';
+import { api } from '@/lib/api';
 import { Send, Image as ImageIcon, ChartBar, File, Loader2, LogIn } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
-import type { Id } from '@/convex/_generated/dataModel';
+import type { Id } from '@/lib/api';
 
 type Props = {
     communityId?: Id<'communities'>;

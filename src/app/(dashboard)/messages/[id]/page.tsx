@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import type { Id } from '@/convex/_generated/dataModel';
+import type { Id } from '@/lib/api';
 import { ChatWindow } from '../../../(components)/messages/ChatWindow';
 import { MessagesSkeleton } from '../../../(components)/messages/skeletons';
 

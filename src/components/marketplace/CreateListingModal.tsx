@@ -1,7 +1,7 @@
 "use client"
 
-import { useMutation } from "convex/react"
-import { api } from "@/convex/_generated/api"
+import { useMutation } from "@/lib/api"
+import { api } from "@/lib/api"
 import { useState } from "react"
 
 const CATEGORIES = ["books", "electronics", "furniture", "services", "other"] as const

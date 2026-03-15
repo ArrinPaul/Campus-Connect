@@ -1,10 +1,10 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { NotificationBell } from "./NotificationBell"
-import { useQuery } from "convex/react"
+import { useQuery } from "@/lib/api"
 import { useRouter } from "next/navigation"
 
 // Mock dependencies
-jest.mock("convex/react", () => ({
+jest.mock("@/lib/api", () => ({
   useQuery: jest.fn(),
   useMutation: jest.fn(() => jest.fn()),
   useConvexAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false })),
@@ -13,7 +13,7 @@ jest.mock("next/navigation")
 jest.mock("date-fns", () => ({
   formatDistanceToNow: jest.fn(() => "2 minutes ago"),
 }))
-jest.mock("../../../../convex/_generated/api", () => ({
+jest.mock("@/lib/api", () => ({
   api: {
     notifications: {
       getUnreadCount: {},

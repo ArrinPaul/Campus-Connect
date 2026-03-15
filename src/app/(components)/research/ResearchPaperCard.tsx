@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import type { Doc } from '@/convex/_generated/dataModel';
+import type { Doc } from '@/lib/api';
 import { FileText, User as UserIcon, Calendar, BookOpen, ExternalLink, Hash, GitPullRequest } from 'lucide-react';
 import { format } from 'date-fns';
 

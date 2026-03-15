@@ -1,17 +1,18 @@
 'use client';
 
-import { useQuery, useMutation } from 'convex/react';
+import { useQuery, useMutation } from '@/lib/api';
 import { useUser } from '@clerk/nextjs';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
-import { api } from '@/convex/_generated/api';
+import { api } from '@/lib/api';
 import Link from 'next/link';
 import { UserPlus } from 'lucide-react';
+import { useGraphFollowMutation, useGraphSuggestions } from '@/hooks/useGraphSuggestions';
 
 export function FeedRightSidebar() {
   const { isSignedIn } = useUser();
   const isAuthenticated = isSignedIn ?? false;
   const trendingHashtags = useQuery(api.hashtags.getTrending, { limit: 6 });
-  const suggestions = useQuery(api.suggestions.getSuggestions, isAuthenticated ? { limit: 3 } : 'skip');
+  const { data: suggestions, isLoading: suggestionsLoading } = useGraphSuggestions(3, isAuthenticated);
 
   return (
     <div className="sticky top-8 space-y-6">
@@ -47,7 +48,7 @@ export function FeedRightSidebar() {
       {/* Who to Follow */}
       <div className="rounded-lg border bg-card p-4">
         <h3 className="font-bold text-lg mb-4">Who to Follow</h3>
-        {suggestions === undefined ? (
+        {suggestionsLoading || suggestions === undefined ? (
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="flex items-center gap-3">
@@ -65,13 +66,15 @@ export function FeedRightSidebar() {
           <div className="space-y-4">
             {suggestions.map((s) => {
               if (!s.user) return null;
+              const displayName = s.user.name ?? s.user.username ?? 'User';
+              const profileHref = s.user.convexUserId ? `/profile/${s.user.convexUserId}` : '/profile/me';
               return (
                 <div key={s._id} className="flex items-center gap-3">
-                  <Link href={`/profile/${s.user._id}`} className="flex-shrink-0">
+                  <Link href={profileHref} className="flex-shrink-0">
                     {s.user.profilePicture ? (
                       <OptimizedImage
                         src={s.user.profilePicture}
-                        alt={s.user.name ?? ''}
+                        alt={displayName}
                         width={40}
                         height={40}
                         isAvatar
@@ -80,20 +83,20 @@ export function FeedRightSidebar() {
                     ) : (
                       <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
                         <span className="text-sm font-bold text-primary">
-                          {(s.user.name ?? '?')[0].toUpperCase()}
+                          {displayName[0].toUpperCase()}
                         </span>
                       </div>
                     )}
                   </Link>
                   <div className="flex-1 min-w-0">
-                    <Link href={`/profile/${s.user._id}`} className="font-semibold text-sm hover:underline truncate block">
-                      {s.user.name}
+                    <Link href={profileHref} className="font-semibold text-sm hover:underline truncate block">
+                      {displayName}
                     </Link>
                     {s.reasons?.[0] && (
                       <p className="text-xs text-muted-foreground truncate">{s.reasons[0]}</p>
                     )}
                   </div>
-                  <FollowButton userId={s.user._id} />
+                  <FollowButton convexUserId={s.user.convexUserId ?? undefined} targetClerkId={s.user.clerkId} />
                 </div>
               );
             })}
@@ -107,32 +110,41 @@ export function FeedRightSidebar() {
   );
 }
 
-function FollowButton({ userId }: { userId: string }) {
+function FollowButton({ convexUserId, targetClerkId }: { convexUserId?: string; targetClerkId: string }) {
   const { isSignedIn } = useUser();
   const isAuthenticated = isSignedIn ?? false;
+  const hasConvexUserId = !!convexUserId;
   const followUser = useMutation(api.follows.followUser);
   const unfollowUser = useMutation(api.follows.unfollowUser);
-  const isFollowing = useQuery(api.follows.isFollowing, isAuthenticated ? { userId: userId as any } : 'skip');
+  const graphFollowMutation = useGraphFollowMutation(3);
+  const isFollowing = useQuery(
+    api.follows.isFollowing,
+    isAuthenticated && hasConvexUserId ? { userId: convexUserId as any } : 'skip'
+  );
 
-  if (isFollowing === undefined) {
+  if (hasConvexUserId && isFollowing === undefined) {
     return <div className="h-7 w-16 bg-muted rounded-full animate-pulse" />;
   }
+
+  const following = hasConvexUserId ? !!isFollowing : false;
 
   return (
     <button
       onClick={() =>
-        isFollowing
-          ? unfollowUser({ userId: userId as any })
-          : followUser({ userId: userId as any })
+        hasConvexUserId
+          ? following
+            ? unfollowUser({ userId: convexUserId as any })
+            : followUser({ userId: convexUserId as any })
+          : graphFollowMutation.mutate({ targetClerkId, action: 'follow' })
       }
       className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
-        isFollowing
+        following
           ? 'border border-border text-muted-foreground hover:border-destructive hover:text-destructive'
           : 'bg-primary text-primary-foreground hover:bg-primary/90'
       }`}
     >
-      {!isFollowing && <UserPlus className="h-3 w-3" />}
-      {isFollowing ? 'Following' : 'Follow'}
+      {!following && <UserPlus className="h-3 w-3" />}
+      {following ? 'Following' : 'Follow'}
     </button>
   );
 }

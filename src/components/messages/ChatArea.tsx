@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import Image from "next/image"
-import { useQuery, useMutation } from "convex/react"
-import { api } from "@/../convex/_generated/api"
-import { Id } from "@/../convex/_generated/dataModel"
+import { useQuery, useMutation } from "@/lib/api"
+import { api } from "@/lib/api"
+import { Id } from "@/lib/api"
 import { MessageBubble } from "@/components/messages/MessageBubble"
 import { MessageComposer } from "@/components/messages/MessageComposer"
 import { TypingIndicator } from "@/components/messages/TypingIndicator"

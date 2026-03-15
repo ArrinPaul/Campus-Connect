@@ -1,10 +1,10 @@
-﻿'use client';
+'use client';
 
 import { Home, Compass, MessageSquare, Bell, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useQuery } from '@/lib/api';
+import { api } from '@/lib/api';
 
 export function MobileBottomNav() {
   const pathname = usePathname();

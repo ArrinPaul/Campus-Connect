@@ -1,7 +1,7 @@
 'use client';
 
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useQuery } from '@/lib/api';
+import { api } from '@/lib/api';
 import { ResearchPaperCard } from '../../(components)/research/ResearchPaperCard';
 import Link from 'next/link';
 import { Search } from 'lucide-react';

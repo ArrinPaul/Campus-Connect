@@ -1,8 +1,8 @@
 'use client';
 
 import { Suspense, useState } from 'react';
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useQuery } from '@/lib/api';
+import { api } from '@/lib/api';
 import { StoryPreviewCard } from '../../(components)/stories/StoryPreviewCard';
 import { StoryComposer } from '@/components/stories/StoryComposer';
 import { Loader2, Plus } from 'lucide-react';

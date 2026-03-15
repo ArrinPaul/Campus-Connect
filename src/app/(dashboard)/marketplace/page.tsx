@@ -1,7 +1,7 @@
 'use client';
 
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useQuery } from '@/lib/api';
+import { api } from '@/lib/api';
 import { ListingCard } from '../../(components)/marketplace/ListingCard';
 import { CreateListingModal } from '@/components/marketplace/CreateListingModal';
 import Link from 'next/link';

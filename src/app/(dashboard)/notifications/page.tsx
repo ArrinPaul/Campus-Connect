@@ -1,8 +1,8 @@
 'use client';
 
-import { useQuery, useMutation } from 'convex/react';
+import { useQuery, useMutation } from '@/lib/api';
 import { useUser } from '@clerk/nextjs';
-import { api } from '@/../convex/_generated/api';
+import { api } from '@/lib/api';
 import { NotificationItem } from '@/components/notifications/NotificationItem';
 import { Bell, CheckCheck } from 'lucide-react';
 

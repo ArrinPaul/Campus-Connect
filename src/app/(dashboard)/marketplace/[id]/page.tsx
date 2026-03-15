@@ -1,8 +1,8 @@
 'use client';
 
-import { useQuery, useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
-import type { Id } from '@/convex/_generated/dataModel';
+import { useQuery, useMutation } from '@/lib/api';
+import { api } from '@/lib/api';
+import type { Id } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Tag, DollarSign, MapPin, Package, Clock, User as UserIcon, CheckCircle, MessageSquare, Loader2, ShoppingCart, XCircle, Check, X, Pencil, Trash2 } from 'lucide-react';
 import Link from 'next/link';

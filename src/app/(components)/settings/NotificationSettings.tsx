@@ -1,7 +1,7 @@
 'use client';
 
-import { useQuery, useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useQuery, useMutation } from '@/lib/api';
+import { api } from '@/lib/api';
 import { toast } from 'sonner';
 import { useState, useEffect, type FC } from 'react';
 import { SettingsSection, FormButton } from './SettingComponents';

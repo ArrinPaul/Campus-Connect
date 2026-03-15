@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { MessagesSkeleton } from '../../(components)/messages/skeletons';
 import { ConversationList } from '../../(components)/messages/ConversationList';
 import { ChatWindow } from '../../(components)/messages/ChatWindow';
-import type { Id } from '@/convex/_generated/dataModel';
+import type { Id } from '@/lib/api';
 import { MessageSquare } from 'lucide-react';
 
 function MessagesPageContent() {

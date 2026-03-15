@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import Image from "next/image"
-import { useMutation, useQuery } from "convex/react"
-import { api } from "@/../convex/_generated/api"
-import { Id } from "@/../convex/_generated/dataModel"
+import { useMutation, useQuery } from "@/lib/api"
+import { api } from "@/lib/api"
+import { Id } from "@/lib/api"
 import {
   Phone,
   PhoneOff,

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { ProfileHeader } from "./ProfileHeader"
-import { Id } from "@/convex/_generated/dataModel"
+import { Id } from "@/lib/api"
 
 // Mock Convex hooks
 const mockFollowUser = jest.fn()
@@ -8,7 +8,7 @@ const mockUnfollowUser = jest.fn()
 const mockIsFollowing = jest.fn()
 const mockGetOrCreateConversation = jest.fn().mockResolvedValue("conv123")
 
-jest.mock("convex/react", () => ({
+jest.mock("@/lib/api", () => ({
   useMutation: jest.fn((apiFunction) => {
     if (apiFunction === "follows:followUser") {
       return mockFollowUser

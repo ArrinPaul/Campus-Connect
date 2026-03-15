@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useRef, useCallback } from "react"
-import { useMutation } from "convex/react"
-import { api } from "@/convex/_generated/api"
+import { useMutation } from "@/lib/api"
+import { api } from "@/lib/api"
 import { X, Image as ImageIcon, Type, Check, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { createLogger } from "@/lib/logger"
