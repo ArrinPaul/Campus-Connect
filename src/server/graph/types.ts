@@ -14,9 +14,10 @@ export interface GraphSuggestion {
 }
 
 export interface GraphPostRecommendation {
+  _id?: string
   postId: string
   score: number
-  reasons: string[]
+  reasons?: string[]
   createdAt?: number | null
   content?: string | null
   author?: GraphUser

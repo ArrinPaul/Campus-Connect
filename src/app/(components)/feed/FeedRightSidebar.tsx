@@ -136,7 +136,7 @@ function FollowButton({ profileUserId, targetAuthId }: { profileUserId?: string;
           ? following
             ? unfollowUser({ userId: profileUserId as any })
             : followUser({ userId: profileUserId as any })
-          : graphFollowMutation.mutate({ targetAuthId, action: 'follow' })
+          : graphFollowMutation.mutateAsync({ targetAuthId, action: 'follow' })
       }
       className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
         following

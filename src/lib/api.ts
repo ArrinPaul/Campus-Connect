@@ -15,7 +15,7 @@ import type { ReactNode } from "react"
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
 
 export type Id<_T extends string = string> = string
-export type Doc<_T extends string = string> = Record<string, unknown>
+export type Doc<_T extends string = string> = any
 
 export interface Endpoint {
   readonly _path: string

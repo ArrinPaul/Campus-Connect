@@ -54,11 +54,11 @@ export function ReactionModal({
     return null
   }
 
-  const availableReactions = Object.entries(reactions.counts)
-    .filter(([_, count]) => count > 0)
+  const availableReactions = Object.entries(reactions.counts as Record<string, number>)
+    .filter(([_, count]) => Number(count) > 0)
     .map(([type, count]) => ({
       type: type as ReactionType,
-      count,
+      count: Number(count),
     }))
     .sort((a, b) => b.count - a.count)
 

@@ -9,13 +9,15 @@ export async function POST(req: Request) {
 
   try {
     const now = Date.now()
-    const result = await runWrite(
-      `MATCH (s:Story)
-       WHERE coalesce(s.expiresAt, 0) > 0 AND s.expiresAt < $now
-       WITH s LIMIT 500
-       DETACH DELETE s
-       RETURN count(*) AS deleted`,
-      { now }
+    const result = await runWrite((session) =>
+      session.run(
+        `MATCH (s:Story)
+         WHERE coalesce(s.expiresAt, 0) > 0 AND s.expiresAt < $now
+         WITH s LIMIT 500
+         DETACH DELETE s
+         RETURN count(*) AS deleted`,
+        { now }
+      )
     )
 
     const deleted = Number(result.records[0]?.get("deleted") ?? 0)

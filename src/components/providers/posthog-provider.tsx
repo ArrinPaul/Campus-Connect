@@ -50,9 +50,8 @@ export function usePostHogIdentify() {
   useEffect(() => {
     if (userId && user) {
       posthog.identify(userId, {
-        email: user.primaryEmailAddress?.emailAddress,
+        email: user.emailAddresses?.[0]?.emailAddress,
         name: user.fullName,
-        username: user.username,
         imageUrl: user.imageUrl,
       })
     }

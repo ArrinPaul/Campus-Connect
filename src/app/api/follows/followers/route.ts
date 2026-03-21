@@ -13,9 +13,7 @@ export async function GET(req: Request) {
     if (!userId) return NextResponse.json({ error: "userId required" }, { status: 400 })
 
     const limit = Number(searchParams.get("limit") ?? "20")
-    const cursor = searchParams.get("cursor") ?? undefined
-
-    const result = await getFollowers(userId, limit, cursor)
+    const result = await getFollowers(userId, limit)
     return NextResponse.json(result)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

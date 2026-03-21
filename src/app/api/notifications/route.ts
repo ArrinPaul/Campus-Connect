@@ -11,10 +11,11 @@ export async function GET(req: Request) {
 
     const me = await requireDbUser(authId)
     const { searchParams } = new URL(req.url)
+    const filter = searchParams.get("filter") ?? undefined
     const limit = Number(searchParams.get("limit") ?? "20")
     const cursor = searchParams.get("cursor") ?? undefined
 
-    const result = await getNotifications(me.id as string, limit, cursor)
+    const result = await getNotifications(me.authId as string, filter, limit, cursor)
     return NextResponse.json(result)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

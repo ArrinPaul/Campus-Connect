@@ -9,6 +9,7 @@ import {
   RATE_LIMITS,
   USER_ACTION_LIMITS,
   PRO_LIMIT_MULTIPLIER,
+  type RateLimitResult,
   type RouteType,
   type UserAction,
 } from "./rate-limit"
@@ -280,7 +281,7 @@ describe("Rate Limiter Edge Cases", () => {
     const ip = "192.168.1.200"
 
     // Simulate concurrent requests
-    const results = []
+    const results: RateLimitResult[] = []
     for (let i = 0; i < 5; i++) {
       results.push(limiter.check(ip, "default"))
     }

@@ -8,10 +8,9 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url)
     const limit = Number(searchParams.get("limit") ?? "20")
-    const cursor = searchParams.get("cursor") ?? undefined
     const tag = searchParams.get("tag") ?? undefined
 
-    const result = await getPapers(limit, cursor, tag)
+    const result = await getPapers({ search: tag, field: tag }, limit)
     return NextResponse.json(result)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

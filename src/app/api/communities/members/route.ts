@@ -9,9 +9,7 @@ export async function GET(req: Request) {
     if (!communityId) return NextResponse.json({ error: "communityId required" }, { status: 400 })
 
     const limit = Number(searchParams.get("limit") ?? "20")
-    const cursor = searchParams.get("cursor") ?? undefined
-
-    const result = await getCommunityMembers(communityId, limit, cursor)
+    const result = await getCommunityMembers(communityId, limit)
     return NextResponse.json(result)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

@@ -7,9 +7,9 @@ import { requireDbUser } from "@/server/db/client"
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url)
-    const placement = searchParams.get("placement") ?? undefined
+    const limit = Number(searchParams.get("limit") ?? "3")
 
-    const ads = await getActiveAds(placement)
+    const ads = await getActiveAds(limit)
     return NextResponse.json(ads)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
