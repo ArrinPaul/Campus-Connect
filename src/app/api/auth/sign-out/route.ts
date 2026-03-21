@@ -1,0 +1,24 @@
+import { NextResponse } from "next/server"
+import { getSessionCookieName } from "@/lib/auth/session"
+
+export async function POST() {
+  const response = NextResponse.json({ ok: true })
+
+  response.cookies.set(getSessionCookieName(), "", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    expires: new Date(0),
+  })
+
+  response.cookies.set("cc_user_id", "", {
+    httpOnly: false,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    expires: new Date(0),
+  })
+
+  return response
+}

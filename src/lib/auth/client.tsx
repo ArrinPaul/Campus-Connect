@@ -59,6 +59,10 @@ export function useAuthActions(): { signOut: (options?: { redirectUrl?: string }
   const router = useRouter()
   return {
     signOut: async (options) => {
+      await fetch("/api/auth/sign-out", {
+        method: "POST",
+        credentials: "include",
+      }).catch(() => null)
       document.cookie = "cc_user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
       router.push(options?.redirectUrl || "/sign-in")
       router.refresh()
@@ -97,70 +101,166 @@ export function UserButton(_props: Record<string, unknown>) {
 }
 
 export function SignIn(_props: Record<string, unknown>) {
-  const [uid, setUid] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!uid.trim()) return
-    document.cookie = `cc_user_id=${encodeURIComponent(uid.trim())}; path=/; max-age=31536000`
-    router.push("/feed")
-    router.refresh()
+    setError("")
+
+    if (!email.trim() || !password) {
+      setError("Email and password are required")
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const response = await fetch("/api/auth/sign-in", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email: email.trim(), password }),
+      })
+
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setError(typeof payload?.error === "string" ? payload.error : "Unable to sign in")
+        return
+      }
+
+      await fetch("/api/users/me", { credentials: "include" }).catch(() => null)
+      router.push("/feed")
+      router.refresh()
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
     <form onSubmit={handleSignIn} className="space-y-4 w-full">
       <div className="space-y-2">
-        <label className="text-sm font-medium">User ID</label>
+        <label className="text-sm font-medium">Email</label>
         <input
-          type="text"
-          value={uid}
-          onChange={(e) => setUid(e.target.value)}
-          placeholder="Enter any user ID (e.g. user_123)"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
           className="w-full px-3 py-2 border rounded-md bg-background"
           required
         />
       </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Password</label>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Enter your password"
+          className="w-full px-3 py-2 border rounded-md bg-background"
+          required
+        />
+      </div>
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
       <button
         type="submit"
+        disabled={isSubmitting}
         className="w-full py-2 bg-primary text-primary-foreground rounded-md font-medium hover:bg-primary/90 transition-colors"
       >
-        Sign In
+        {isSubmitting ? "Signing In..." : "Sign In"}
       </button>
     </form>
   )
 }
 
 export function SignUp(_props: Record<string, unknown>) {
-  const [uid, setUid] = useState("")
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
 
-  const handleSignUp = (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!uid.trim()) return
-    document.cookie = `cc_user_id=${encodeURIComponent(uid.trim())}; path=/; max-age=31536000`
-    router.push("/onboarding")
-    router.refresh()
+    setError("")
+
+    if (!email.trim() || !password) {
+      setError("Email and password are required")
+      return
+    }
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters")
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const response = await fetch("/api/auth/sign-up", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), password }),
+      })
+
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setError(typeof payload?.error === "string" ? payload.error : "Unable to sign up")
+        return
+      }
+
+      await fetch("/api/users/me", { credentials: "include" }).catch(() => null)
+      router.push("/onboarding")
+      router.refresh()
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
     <form onSubmit={handleSignUp} className="space-y-4 w-full">
       <div className="space-y-2">
-        <label className="text-sm font-medium">Desired User ID</label>
+        <label className="text-sm font-medium">Name</label>
         <input
           type="text"
-          value={uid}
-          onChange={(e) => setUid(e.target.value)}
-          placeholder="e.g. student_hero"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Your name"
+          className="w-full px-3 py-2 border rounded-md bg-background"
+        />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Email</label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
           className="w-full px-3 py-2 border rounded-md bg-background"
           required
         />
       </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Password</label>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Minimum 8 characters"
+          className="w-full px-3 py-2 border rounded-md bg-background"
+          required
+        />
+      </div>
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
       <button
         type="submit"
+        disabled={isSubmitting}
         className="w-full py-2 bg-primary text-primary-foreground rounded-md font-medium hover:bg-primary/90 transition-colors"
       >
-        Create Account
+        {isSubmitting ? "Creating Account..." : "Create Account"}
       </button>
     </form>
   )

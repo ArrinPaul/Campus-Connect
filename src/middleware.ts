@@ -64,6 +64,7 @@ export default async function middleware(request: NextRequest) {
   if (!isPublicRoute(request)) {
     const userId =
       request.headers.get("x-user-id") ||
+      request.cookies.get("cc_session")?.value ||
       request.cookies.get("cc_user_id")?.value ||
       process.env.DEV_USER_ID ||
       null

@@ -24,6 +24,15 @@ export interface DbUser {
   isVerified?: boolean
   createdAt?: number
   updatedAt?: number
+  authProvider?: string
+  passwordHash?: string
+}
+
+export interface DbAuthUser {
+  authId: string
+  email: string
+  name: string
+  passwordHash?: string
 }
 
 // ─── Create / Upsert ─────────────────────────────────────────────────────────
@@ -82,6 +91,76 @@ export async function getUserByAuthId(authId: string): Promise<DbUser | null> {
       { authId }
     )
     if (!result.records.length) return null
+    return toPlain(result.records[0].get("u").properties) as unknown as DbUser
+  })
+}
+
+export async function getAuthUserByEmail(email: string): Promise<DbAuthUser | null> {
+  return runRead(async (session) => {
+    const normalizedEmail = email.trim().toLowerCase()
+    const result = await session.run(
+      `MATCH (u:User {email: $email})
+       RETURN u.authId AS authId, u.email AS email, u.name AS name, u.passwordHash AS passwordHash
+       LIMIT 1`,
+      { email: normalizedEmail }
+    )
+
+    if (result.records.length === 0) return null
+    const record = result.records[0]
+    return {
+      authId: record.get("authId") as string,
+      email: record.get("email") as string,
+      name: (record.get("name") as string) || "User",
+      passwordHash: (record.get("passwordHash") as string | null) ?? undefined,
+    }
+  })
+}
+
+export async function upsertPasswordUser(data: {
+  email: string
+  name: string
+  passwordHash: string
+}): Promise<DbUser> {
+  return runWrite(async (session) => {
+    const now = Date.now()
+    const normalizedEmail = data.email.trim().toLowerCase()
+    const displayName = data.name.trim() || "User"
+
+    const result = await session.run(
+      `MERGE (u:User {email: $email})
+       ON CREATE SET
+         u.id = $id,
+         u.authId = $authId,
+         u.name = $name,
+         u.profilePicture = null,
+         u.bio = '',
+         u.university = '',
+         u.role = 'Student',
+         u.experienceLevel = 'Beginner',
+         u.skills = [],
+         u.socialLinks = '{}',
+         u.followerCount = 0,
+         u.followingCount = 0,
+         u.onboardingCompleted = false,
+         u.createdAt = $now,
+         u.updatedAt = $now
+       ON MATCH SET
+         u.name = CASE WHEN coalesce(u.name, '') = '' THEN $name ELSE u.name END,
+         u.updatedAt = $now
+       SET
+         u.passwordHash = $passwordHash,
+         u.authProvider = 'password'
+       RETURN u`,
+      {
+        id: randomUUID(),
+        authId: `local_${randomUUID()}`,
+        email: normalizedEmail,
+        name: displayName,
+        passwordHash: data.passwordHash,
+        now,
+      }
+    )
+
     return toPlain(result.records[0].get("u").properties) as unknown as DbUser
   })
 }

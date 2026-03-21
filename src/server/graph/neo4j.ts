@@ -67,10 +67,8 @@ export function getNeo4jDriver(): Driver {
 }
 
 async function withSession<T>(mode: "READ" | "WRITE", fn: (session: Session) => Promise<T>): Promise<T> {
-  const configuredDb = process.env.NEO4J_DATABASE
-  const execute = async (database?: string): Promise<T> => {
+  const execute = async (): Promise<T> => {
     const session = getNeo4jDriver().session({
-      ...(database ? { database } : {}),
       defaultAccessMode: mode === "READ" ? neo4j.session.READ : neo4j.session.WRITE,
     })
 
@@ -81,39 +79,14 @@ async function withSession<T>(mode: "READ" | "WRITE", fn: (session: Session) => 
     }
   }
 
-  const candidates = [configuredDb, "neo4j", undefined]
-  const tried = new Set<string>()
-  let lastError: unknown
-
-  for (const candidate of candidates) {
-    const key = candidate ?? "__default__"
-    if (tried.has(key)) continue
-    tried.add(key)
-
-    try {
-      return await execute(candidate)
-    } catch (error) {
-      lastError = error
-
-      if (isRoutingDiscoveryError(error) && switchToDirectDriver()) {
-        try {
-          return await execute(candidate)
-        } catch (retryError) {
-          lastError = retryError
-          if (!isDatabaseNotFoundError(retryError)) {
-            throw retryError
-          }
-        }
-        continue
-      }
-
-      if (!isDatabaseNotFoundError(error)) {
-        throw error
-      }
+  try {
+    return await execute()
+  } catch (error) {
+    if ((isRoutingDiscoveryError(error) || isDatabaseNotFoundError(error)) && switchToDirectDriver()) {
+      return execute()
     }
+    throw error
   }
-
-  throw lastError instanceof Error ? lastError : new Error("Neo4j query failed")
 }
 
 export function runRead<T>(fn: (session: Session) => Promise<T>): Promise<T> {

@@ -1,12 +1,22 @@
 import type { NextRequest } from "next/server"
 import { cookies, headers } from "next/headers"
+import { getSessionCookieName, verifySessionToken } from "@/lib/auth/session"
 
 function getFallbackUserId(): string | null {
   const value = process.env.DEV_USER_ID
   return value && value.trim().length > 0 ? value.trim() : null
 }
 
+function readUserIdFromToken(token?: string | null): string | null {
+  if (!token) return null
+  return verifySessionToken(token)?.userId ?? null
+}
+
 function fromRequest(request: NextRequest): string | null {
+  const sessionToken = request.cookies.get(getSessionCookieName())?.value
+  const tokenUserId = readUserIdFromToken(sessionToken)
+  if (tokenUserId) return tokenUserId
+
   const headerUserId = request.headers.get("x-user-id")
   const cookieUserId = request.cookies.get("cc_user_id")?.value
   return headerUserId || cookieUserId || getFallbackUserId()
@@ -16,7 +26,9 @@ export async function auth(): Promise<{ userId: string | null }> {
   try {
     const h = await headers()
     const c = await cookies()
-    const userId = h.get("x-user-id") || c.get("cc_user_id")?.value || getFallbackUserId()
+    const sessionToken = c.get(getSessionCookieName())?.value
+    const tokenUserId = readUserIdFromToken(sessionToken)
+    const userId = tokenUserId || h.get("x-user-id") || c.get("cc_user_id")?.value || getFallbackUserId()
     return { userId }
   } catch {
     return { userId: getFallbackUserId() }
