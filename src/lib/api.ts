@@ -416,6 +416,12 @@ export const api = {
     getSkillEndorsements: ep("/api/skills/endorsements"),
   },
 
+  // ── feed_ranking ──────────────────────────────────────────────────────────
+  feed_ranking: {
+    getRankedFeed: ep("/api/graph/recommendations"),
+    getTrendingFeed: ep("/api/posts/explore"),
+  },
+
   // ── search ─────────────────────────────────────────────────────────────────
   search: {
     universalSearch: ep("/api/search"),

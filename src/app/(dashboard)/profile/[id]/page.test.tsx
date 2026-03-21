@@ -7,7 +7,7 @@ import { describe, it, expect, jest } from "@jest/globals"
  * Validates: Requirements 2.9
  * 
  * Note: These tests verify the logic patterns used in the profile page
- * without importing the actual component due to Clerk ESM module issues in Jest
+ * without importing the actual component due to Auth ESM module issues in Jest
  */
 
 describe("ProfilePage Logic", () => {

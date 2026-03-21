@@ -145,7 +145,7 @@ describe("FeedContainer", () => {
   const makeAuthor = (overrides: any = {}) => ({
     _id: (overrides._id || "user1") as Id<"users">,
     _creationTime: Date.now(),
-    authId: overrides.authId || "clerk1",
+    authId: overrides.authId || "auth1",
     email: overrides.email || "user1@test.com",
     name: overrides.name || "User One",
     role: overrides.role || ("Student" as const),
@@ -204,7 +204,7 @@ describe("FeedContainer", () => {
 
   it("should display posts when data is available", () => {
     const post1 = makePost({ _id: "post1", content: "Test post 1", authorId: "user1", author: makeAuthor({ _id: "user1", name: "User One" }) })
-    const post2 = makePost({ _id: "post2", content: "Test post 2", authorId: "user2", author: makeAuthor({ _id: "user2", authId: "clerk2", email: "user2@test.com", name: "User Two", role: "Faculty", experienceLevel: "Expert" }) })
+    const post2 = makePost({ _id: "post2", content: "Test post 2", authorId: "user2", author: makeAuthor({ _id: "user2", authId: "auth2", email: "user2@test.com", name: "User Two", role: "Faculty", experienceLevel: "Expert" }) })
 
     mockQueryResults = [
       {
@@ -287,7 +287,7 @@ describe("FeedContainer", () => {
 
   it("should handle real-time post updates", async () => {
     const initialPost = makePost({ _id: "post1", content: "Initial post", author: makeAuthor({ name: "User One" }) })
-    const newPost = makePost({ _id: "post2", content: "New real-time post", likeCount: 0, commentCount: 0, authorId: "user2", author: makeAuthor({ _id: "user2", authId: "clerk2", email: "user2@test.com", name: "User Two", role: "Faculty", experienceLevel: "Expert" }) })
+    const newPost = makePost({ _id: "post2", content: "New real-time post", likeCount: 0, commentCount: 0, authorId: "user2", author: makeAuthor({ _id: "user2", authId: "auth2", email: "user2@test.com", name: "User Two", role: "Faculty", experienceLevel: "Expert" }) })
 
     // Initial data
     mockQueryResults = [

@@ -8,7 +8,7 @@ jest.mock("@/lib/api", () => ({
   useQuery: jest.fn(() => null),
 }))
 
-// Mock Clerk
+// Mock Auth
 jest.mock("@/lib/auth/client", () => ({
   useUser: jest.fn(() => ({ isLoaded: true, isSignedIn: false })),
 }))
