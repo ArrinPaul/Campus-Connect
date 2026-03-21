@@ -1,20 +1,28 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { checkRateLimit, checkRateLimitAuto } from "@/lib/rate-limit"
+import { checkRateLimitAuto } from "@/lib/rate-limit"
 import type { RouteType } from "@/lib/rate-limit"
 
 // ─── Route Matchers ───────────────────────────────────────────────────────────
 
-const isPublicRoute = createRouteMatcher([
-  "/",
-  "/sign-in(.*)",
-  "/sign-up(.*)",
-  "/api/webhooks(.*)",
-])
+function isPublicRoute(request: NextRequest): boolean {
+  const pathname = request.nextUrl.pathname
+  return (
+    pathname === "/" ||
+    pathname.startsWith("/sign-in") ||
+    pathname.startsWith("/sign-up") ||
+    pathname.startsWith("/api/webhooks")
+  )
+}
 
-const isAuthRoute = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"])
-const isApiRoute  = createRouteMatcher(["/api/(.*)"])
+function isAuthRoute(request: NextRequest): boolean {
+  const pathname = request.nextUrl.pathname
+  return pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up")
+}
+
+function isApiRoute(request: NextRequest): boolean {
+  return request.nextUrl.pathname.startsWith("/api/")
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -28,7 +36,7 @@ function getClientIp(request: NextRequest): string {
 
 // ─── Middleware ────────────────────────────────────────────────────────────────
 
-export default clerkMiddleware(async (auth, request) => {
+export default async function middleware(request: NextRequest) {
   const ip = getClientIp(request)
   const routeType: RouteType = isAuthRoute(request) ? "auth" : isApiRoute(request) ? "api" : "default"
   const { allowed, limit, remaining, reset } = await checkRateLimitAuto(ip, routeType)
@@ -52,11 +60,31 @@ export default clerkMiddleware(async (auth, request) => {
     )
   }
 
-  // Protect all non-public routes via Clerk
+  // Protect all non-public routes using local auth markers.
   if (!isPublicRoute(request)) {
-    await auth.protect()
+    const userId =
+      request.headers.get("x-user-id") ||
+      request.cookies.get("cc_user_id")?.value ||
+      process.env.DEV_USER_ID ||
+      null
+
+    if (!userId) {
+      if (isApiRoute(request)) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      }
+
+      const signInUrl = new URL("/sign-in", request.url)
+      signInUrl.searchParams.set("redirect_url", request.nextUrl.pathname)
+      return NextResponse.redirect(signInUrl)
+    }
   }
-})
+
+  const response = NextResponse.next()
+  response.headers.set("X-RateLimit-Limit", String(limit))
+  response.headers.set("X-RateLimit-Remaining", String(remaining))
+  response.headers.set("X-RateLimit-Reset", String(reset))
+  return response
+}
 
 export const config = {
   matcher: [

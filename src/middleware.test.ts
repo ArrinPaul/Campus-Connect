@@ -31,12 +31,9 @@ jest.mock("next/server", () => {
   }
 })
 
-// Mock Clerk middleware
-const mockProtect = jest.fn()
-const mockClerkMiddleware = jest.fn((handler) => handler)
+// Mock auth helper module used by route matcher tests
 
 jest.mock("@clerk/nextjs/server", () => ({
-  clerkMiddleware: (handler: any) => mockClerkMiddleware(handler),
   createRouteMatcher: (routes: string[]) => {
     return (request: NextRequest) => {
       const path = request.nextUrl.pathname
@@ -293,14 +290,12 @@ describe("Middleware - Authentication Flows", () => {
   })
 
   describe("Authentication Flow", () => {
-    it("should call clerkMiddleware with handler function", () => {
+    it("should export middleware as a function", () => {
       // Re-import to trigger middleware creation
       jest.isolateModules(() => {
-        require("./middleware")
+        const middleware = require("./middleware")
+        expect(typeof middleware.default).toBe("function")
       })
-
-      expect(mockClerkMiddleware).toHaveBeenCalled()
-      expect(typeof mockClerkMiddleware.mock.calls[0][0]).toBe("function")
     })
   })
 })

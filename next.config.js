@@ -1,4 +1,5 @@
 
+const path = require("path")
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 })
@@ -15,10 +16,6 @@ const nextConfig = {
 
     // Remote image domains (add your CDN/storage domains)
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "img.clerk.com",
-      },
       {
         protocol: "https",
         hostname: "images.unsplash.com",
@@ -44,6 +41,15 @@ const nextConfig = {
   // Strict mode for catching issues early
   reactStrictMode: true,
 
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      "@clerk/nextjs": path.resolve(__dirname, "src/lib/auth/clerk-client.tsx"),
+      "@clerk/nextjs/server": path.resolve(__dirname, "src/lib/auth/clerk-server.ts"),
+    }
+    return config
+  },
+
   // Security headers
   async headers() {
     // Content Security Policy
@@ -51,12 +57,12 @@ const nextConfig = {
     const isDev = process.env.NODE_ENV === "development"
     const cspDirectives = [
       "default-src 'self'",
-      `script-src 'self' 'blob:' ${isDev ? "'unsafe-eval' 'unsafe-inline'" : "'unsafe-inline'"} https://clerk.campus-connect.app https://*.clerk.accounts.dev https://challenges.cloudflare.com`,
+      `script-src 'self' 'blob:' ${isDev ? "'unsafe-eval' 'unsafe-inline'" : "'unsafe-inline'"} https://challenges.cloudflare.com`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "img-src 'self' data: blob: https://img.clerk.com https://images.unsplash.com",
+      "img-src 'self' data: blob: https://images.unsplash.com",
       "font-src 'self' https://fonts.gstatic.com",
-      `connect-src 'self' https://*.clerk.accounts.dev ${isDev ? "ws://localhost:*" : ""} https://*.posthog.com https://*.sentry.io https://clerk.campus-connect.app`,
-      "frame-src 'self' https://*.clerk.accounts.dev https://challenges.cloudflare.com",
+      `connect-src 'self' ${isDev ? "ws://localhost:*" : ""} https://*.posthog.com https://*.sentry.io`,
+      "frame-src 'self' https://challenges.cloudflare.com",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",

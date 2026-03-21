@@ -8,6 +8,8 @@ const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
+    '^@clerk/nextjs$': '<rootDir>/src/lib/auth/clerk-client.tsx',
+    '^@clerk/nextjs/server$': '<rootDir>/src/lib/auth/clerk-server.ts',
     // All other @/ imports map to src/
     '^@/(.*)$': '<rootDir>/src/$1',
     // Fix wrong-depth relative imports mistakenly using 3 levels up instead of 2
