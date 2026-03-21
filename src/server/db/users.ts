@@ -193,8 +193,14 @@ export async function completeOnboarding(
   }
 ): Promise<DbUser> {
   return runWrite(async (session) => {
+    const now = Date.now()
     const result = await session.run(
-      `MATCH (u:User {authId: $authId})
+      `MERGE (u:User {authId: $authId})
+       ON CREATE SET
+           u.id = $id,
+           u.createdAt = $now,
+           u.name = CASE WHEN $username <> '' THEN $username ELSE 'User' END,
+           u.email = ''
        SET u.username = $username,
            u.bio = $bio,
            u.university = $university,
@@ -204,9 +210,15 @@ export async function completeOnboarding(
            u.onboardingCompleted = true,
            u.updatedAt = $now
        RETURN u`,
-      { authId, ...data, now: Date.now() }
+      { authId, ...data, id: randomUUID(), now }
     )
-    return toPlain(result.records[0].get("u").properties) as unknown as DbUser
+
+    const record = result.records[0]
+    if (!record) {
+      throw new Error("Failed to complete onboarding")
+    }
+
+    return toPlain(record.get("u").properties) as unknown as DbUser
   })
 }
 

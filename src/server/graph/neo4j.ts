@@ -3,6 +3,7 @@ import "server-only"
 import neo4j, { Driver, Session } from "neo4j-driver"
 
 let driver: Driver | null = null
+let activeUri: string | null = null
 
 function getNeo4jEnv() {
   const uri = process.env.NEO4J_URI
@@ -16,6 +17,43 @@ function getNeo4jEnv() {
   return { uri, username, password }
 }
 
+function toDirectBoltUri(uri: string): string {
+  if (uri.startsWith("neo4j+s://")) return `bolt+s://${uri.slice("neo4j+s://".length)}`
+  if (uri.startsWith("neo4j+ssc://")) return `bolt+ssc://${uri.slice("neo4j+ssc://".length)}`
+  if (uri.startsWith("neo4j://")) return `bolt://${uri.slice("neo4j://".length)}`
+  return uri
+}
+
+function isRoutingDiscoveryError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false
+  return /could not perform discovery|no routing servers available/i.test(error.message)
+}
+
+function isDatabaseNotFoundError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false
+  return /database .* not found|database does not exist/i.test(error.message)
+}
+
+function switchToDirectDriver(): boolean {
+  const { uri, username, password } = getNeo4jEnv()
+  const directUri = toDirectBoltUri(uri)
+
+  if (directUri === uri || activeUri === directUri) {
+    return false
+  }
+
+  void driver?.close().catch(() => {
+    // Ignore close errors during fallback; we'll try opening a fresh driver.
+  })
+
+  driver = neo4j.driver(directUri, neo4j.auth.basic(username, password), {
+    maxConnectionLifetime: 60 * 60 * 1000,
+    maxConnectionPoolSize: 50,
+  })
+  activeUri = directUri
+  return true
+}
+
 export function getNeo4jDriver(): Driver {
   if (driver) return driver
 
@@ -24,21 +62,58 @@ export function getNeo4jDriver(): Driver {
     maxConnectionLifetime: 60 * 60 * 1000,
     maxConnectionPoolSize: 50,
   })
+  activeUri = uri
   return driver
 }
 
 async function withSession<T>(mode: "READ" | "WRITE", fn: (session: Session) => Promise<T>): Promise<T> {
-  const db = process.env.NEO4J_DATABASE || "neo4j"
-  const session = getNeo4jDriver().session({
-    database: db,
-    defaultAccessMode: mode === "READ" ? neo4j.session.READ : neo4j.session.WRITE,
-  })
+  const configuredDb = process.env.NEO4J_DATABASE
+  const execute = async (database?: string): Promise<T> => {
+    const session = getNeo4jDriver().session({
+      ...(database ? { database } : {}),
+      defaultAccessMode: mode === "READ" ? neo4j.session.READ : neo4j.session.WRITE,
+    })
 
-  try {
-    return await fn(session)
-  } finally {
-    await session.close()
+    try {
+      return await fn(session)
+    } finally {
+      await session.close()
+    }
   }
+
+  const candidates = [configuredDb, "neo4j", undefined]
+  const tried = new Set<string>()
+  let lastError: unknown
+
+  for (const candidate of candidates) {
+    const key = candidate ?? "__default__"
+    if (tried.has(key)) continue
+    tried.add(key)
+
+    try {
+      return await execute(candidate)
+    } catch (error) {
+      lastError = error
+
+      if (isRoutingDiscoveryError(error) && switchToDirectDriver()) {
+        try {
+          return await execute(candidate)
+        } catch (retryError) {
+          lastError = retryError
+          if (!isDatabaseNotFoundError(retryError)) {
+            throw retryError
+          }
+        }
+        continue
+      }
+
+      if (!isDatabaseNotFoundError(error)) {
+        throw error
+      }
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error("Neo4j query failed")
 }
 
 export function runRead<T>(fn: (session: Session) => Promise<T>): Promise<T> {
