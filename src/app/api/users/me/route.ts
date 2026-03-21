@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/lib/auth/server"
 import { NextResponse } from "next/server"
 import { getUserByClerkId, updateUser, updatePrivacySettings, updateNotificationPreferences, deleteUserAccount, completeOnboarding, updateProfilePicture, addSkill, removeSkill } from "@/server/db/users"
 

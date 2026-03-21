@@ -104,7 +104,7 @@ self.addEventListener("fetch", (event) => {
   const { request } = event
   const url = new URL(request.url)
 
-  // Skip non-GET and cross-origin API requests (Convex, Clerk, etc.)
+  // Skip non-GET and cross-origin API requests (Convex, analytics, etc.)
   if (request.method !== "GET") return
   if (url.origin !== self.location.origin && !isImageCDN(url)) return
 
@@ -201,7 +201,6 @@ async function staleWhileRevalidate(request) {
 function isImageCDN(url) {
   return (
     url.hostname.endsWith(".convex.cloud") ||
-    url.hostname.endsWith(".clerk.dev") ||
     url.hostname === "images.unsplash.com"
   )
 }

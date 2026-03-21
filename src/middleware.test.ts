@@ -33,7 +33,7 @@ jest.mock("next/server", () => {
 
 // Mock auth helper module used by route matcher tests
 
-jest.mock("@clerk/nextjs/server", () => ({
+jest.mock("@/lib/auth/server", () => ({
   createRouteMatcher: (routes: string[]) => {
     return (request: NextRequest) => {
       const path = request.nextUrl.pathname
@@ -65,7 +65,7 @@ describe("Middleware - Authentication Flows", () => {
 
   describe("Public Routes", () => {
     it("should define public routes correctly", () => {
-      const { createRouteMatcher } = require("@clerk/nextjs/server")
+      const { createRouteMatcher } = require("@/lib/auth/server")
       const isPublicRoute = createRouteMatcher([
         "/",
         "/sign-in(.*)",
@@ -94,13 +94,13 @@ describe("Middleware - Authentication Flows", () => {
 
       expect(
         isPublicRoute({
-          nextUrl: { pathname: "/api/webhooks/clerk" },
+          nextUrl: { pathname: "/api/webhooks/auth" },
         } as NextRequest)
       ).toBe(true)
     })
 
     it("should allow access to sign-in page without authentication", () => {
-      const { createRouteMatcher } = require("@clerk/nextjs/server")
+      const { createRouteMatcher } = require("@/lib/auth/server")
       const isPublicRoute = createRouteMatcher([
         "/",
         "/sign-in(.*)",
@@ -122,7 +122,7 @@ describe("Middleware - Authentication Flows", () => {
     })
 
     it("should allow access to sign-up page without authentication", () => {
-      const { createRouteMatcher } = require("@clerk/nextjs/server")
+      const { createRouteMatcher } = require("@/lib/auth/server")
       const isPublicRoute = createRouteMatcher([
         "/",
         "/sign-in(.*)",
@@ -144,7 +144,7 @@ describe("Middleware - Authentication Flows", () => {
     })
 
     it("should allow access to webhook endpoints without authentication", () => {
-      const { createRouteMatcher } = require("@clerk/nextjs/server")
+      const { createRouteMatcher } = require("@/lib/auth/server")
       const isPublicRoute = createRouteMatcher([
         "/",
         "/sign-in(.*)",
@@ -154,7 +154,7 @@ describe("Middleware - Authentication Flows", () => {
 
       expect(
         isPublicRoute({
-          nextUrl: { pathname: "/api/webhooks/clerk" },
+          nextUrl: { pathname: "/api/webhooks/auth" },
         } as NextRequest)
       ).toBe(true)
 
@@ -168,7 +168,7 @@ describe("Middleware - Authentication Flows", () => {
 
   describe("Protected Routes", () => {
     it("should identify protected routes correctly", () => {
-      const { createRouteMatcher } = require("@clerk/nextjs/server")
+      const { createRouteMatcher } = require("@/lib/auth/server")
       const isPublicRoute = createRouteMatcher([
         "/",
         "/sign-in(.*)",
@@ -209,7 +209,7 @@ describe("Middleware - Authentication Flows", () => {
     })
 
     it("should protect profile routes", () => {
-      const { createRouteMatcher } = require("@clerk/nextjs/server")
+      const { createRouteMatcher } = require("@/lib/auth/server")
       const isPublicRoute = createRouteMatcher([
         "/",
         "/sign-in(.*)",
@@ -231,7 +231,7 @@ describe("Middleware - Authentication Flows", () => {
     })
 
     it("should protect API routes except webhooks", () => {
-      const { createRouteMatcher } = require("@clerk/nextjs/server")
+      const { createRouteMatcher } = require("@/lib/auth/server")
       const isPublicRoute = createRouteMatcher([
         "/",
         "/sign-in(.*)",
@@ -255,7 +255,7 @@ describe("Middleware - Authentication Flows", () => {
       // Public webhook routes
       expect(
         isPublicRoute({
-          nextUrl: { pathname: "/api/webhooks/clerk" },
+          nextUrl: { pathname: "/api/webhooks/auth" },
         } as NextRequest)
       ).toBe(true)
     })

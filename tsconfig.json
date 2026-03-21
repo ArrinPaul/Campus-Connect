@@ -18,9 +18,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@clerk/nextjs": ["./src/lib/auth/clerk-client"],
-      "@clerk/nextjs/server": ["./src/lib/auth/clerk-server"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/lib/auth/server"
 import { NextResponse } from "next/server"
 import { getCommunities, createCommunity, getCommunityBySlug } from "@/server/db/communities"
 import { requireDbUser } from "@/server/db/client"

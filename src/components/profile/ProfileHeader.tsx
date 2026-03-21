@@ -3,7 +3,7 @@
 import Image from "next/image"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useUser } from "@clerk/nextjs"
+import { useUser } from "@/lib/auth/client"
 import { useMutation, useQuery } from "@/lib/api"
 import { api } from "@/lib/api"
 import { Id } from "@/lib/api"

@@ -1,6 +1,6 @@
 # Campus Connect
 
-A next-generation academic social platform built with Next.js 14, Clerk, Convex, Neo4j, and Redis.
+A next-generation academic social platform built with Next.js 14, local auth shims, Convex, Neo4j, and Redis.
 
 ## Getting Started
 
@@ -12,7 +12,7 @@ npm install
 2. Set up environment variables:
 ```bash
 cp .env.example .env.local
-# Add your Clerk, Convex, Neo4j, and Redis API keys
+# Add your local auth, Convex, Neo4j, and Redis environment values
 ```
 
 3. Run the development server:
@@ -27,7 +27,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
 - **Next.js 14** - React framework with App Router
 - **TypeScript** - Type safety
 - **Tailwind CSS** - Styling
-- **Clerk** - Authentication
+- **Local Auth Shim** - Header/cookie/dev-user based authentication compatibility layer
 - **Convex** - Real-time database
 - **Neo4j** - Graph relationships for suggestions/recommendations
 - **Redis (Upstash)** - Caching recommendation and suggestion payloads

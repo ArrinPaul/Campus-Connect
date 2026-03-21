@@ -3,7 +3,7 @@
 import posthog from "posthog-js"
 import { PostHogProvider as PHProvider } from "posthog-js/react"
 import { useEffect } from "react"
-import { useAuth, useUser } from "@clerk/nextjs"
+import { useAuth, useUser } from "@/lib/auth/client"
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -40,7 +40,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * Hook to identify users in PostHog when they sign in via Clerk.
+ * Hook to identify users in PostHog when they sign in.
  * Use this in the dashboard layout or a top-level authenticated component.
  */
 export function usePostHogIdentify() {

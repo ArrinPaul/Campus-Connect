@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { SignUp } from "@clerk/nextjs"
+import { SignUp } from "@/lib/auth/client"
 import { GraduationCap } from "lucide-react"
 
 export const metadata: Metadata = {

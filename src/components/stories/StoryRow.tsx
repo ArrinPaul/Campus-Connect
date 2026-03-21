@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useQuery } from "@/lib/api"
-import { useUser } from "@clerk/nextjs"
+import { useUser } from "@/lib/auth/client"
 import { api } from "@/lib/api"
 import { useRouter } from "next/navigation"
 import { StoryRingRow, type StoryRingUser, type StoryRingStory } from "./StoryRing"

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react"
 import Link from "next/link"
-import { useUser } from "@clerk/nextjs"
+import { useUser } from "@/lib/auth/client"
 import { useQuery } from "@/lib/api"
 import { api } from "@/lib/api"
 import { PostCard } from "@/components/posts/PostCard"

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import {
   Home, MessageSquare, Compass, Bell, User, Settings, LogOut,
@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useClerk } from '@clerk/nextjs';
+import { useClerk } from '@/lib/auth/client';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 type NavItem = { href: string; icon: React.ElementType; label: string };

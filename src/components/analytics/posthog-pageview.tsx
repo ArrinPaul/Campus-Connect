@@ -9,7 +9,7 @@ function PostHogPageViewInner() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  // Identify user in PostHog from Clerk
+  // Identify user in PostHog using the local auth shim
   usePostHogIdentify()
 
   useEffect(() => {

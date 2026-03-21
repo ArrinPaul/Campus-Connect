@@ -18,7 +18,7 @@ import {
   useMutation as useTanstackMutation,
   useQueryClient,
 } from "@tanstack/react-query"
-import { useAuth } from "@clerk/nextjs"
+import { useAuth } from "@/lib/auth/client"
 import type { ReactNode } from "react"
 
 // ─── Type compatibility shims ────────────────────────────────────────────────

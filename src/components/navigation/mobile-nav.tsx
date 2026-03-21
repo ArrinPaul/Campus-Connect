@@ -23,7 +23,7 @@ import {
   Trophy,
   GraduationCap,
 } from "lucide-react"
-import { UserButton } from "@clerk/nextjs"
+import { UserButton } from "@/lib/auth/client"
 import { useQuery } from "@/lib/api"
 import { api } from "@/lib/api"
 import { ThemeToggle } from "@/components/theme/theme-toggle"

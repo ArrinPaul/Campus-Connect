@@ -7,7 +7,7 @@ import { Users, Rss, Settings, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useMutation } from '@/lib/api';
 import { api } from '@/lib/api';
-import { useUser } from '@clerk/nextjs';
+import { useUser } from '@/lib/auth/client';
 
 // Manually defining type based on getCommunity query
 type Community = Doc<'communities'> & {

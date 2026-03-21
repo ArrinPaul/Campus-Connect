@@ -1,6 +1,6 @@
 "use client"
 
-import { useUser } from "@clerk/nextjs"
+import { useUser } from "@/lib/auth/client"
 import { useQuery } from "@/lib/api"
 import { api } from "@/lib/api"
 import { Id } from "@/lib/api"

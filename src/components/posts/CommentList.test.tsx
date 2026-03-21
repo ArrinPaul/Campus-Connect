@@ -9,7 +9,7 @@ jest.mock("@/lib/api", () => ({
 }))
 
 // Mock Clerk
-jest.mock("@clerk/nextjs", () => ({
+jest.mock("@/lib/auth/client", () => ({
   useUser: jest.fn(() => ({ isLoaded: true, isSignedIn: false })),
 }))
 

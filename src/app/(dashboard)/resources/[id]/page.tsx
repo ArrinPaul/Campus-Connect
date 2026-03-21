@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from 'react';
 import { useQuery, useMutation } from '@/lib/api';
-import { useUser } from '@clerk/nextjs';
+import { useUser } from '@/lib/auth/client';
 import { api } from '@/lib/api';
 import type { Id } from '@/lib/api';
 import { notFound } from 'next/navigation';

@@ -40,7 +40,7 @@ export function createRouteMatcher(patterns: string[]) {
   }
 }
 
-export function clerkMiddleware(
+export function authMiddleware(
   handler: (
     authHelpers: { protect: () => Promise<void>; userId: string | null },
     request: NextRequest
@@ -60,3 +60,5 @@ export function clerkMiddleware(
     return result
   }
 }
+
+export const clerkMiddleware = authMiddleware

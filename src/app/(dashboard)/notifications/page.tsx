@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation } from '@/lib/api';
-import { useUser } from '@clerk/nextjs';
+import { useUser } from '@/lib/auth/client';
 import { api } from '@/lib/api';
 import { NotificationItem } from '@/components/notifications/NotificationItem';
 import { Bell, CheckCheck } from 'lucide-react';

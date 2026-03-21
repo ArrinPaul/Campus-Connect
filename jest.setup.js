@@ -29,9 +29,9 @@ jest.mock("next/dynamic", () => {
   }
 })
 
-// Global mock for @clerk/nextjs to avoid ESM parse errors
-// Individual tests can override with jest.mock("@clerk/nextjs", ...) as needed
-jest.mock("@clerk/nextjs", () => ({
+// Global mock for local auth client to avoid ESM parse errors
+// Individual tests can override with jest.mock("@/lib/auth/client", ...) as needed
+jest.mock("@/lib/auth/client", () => ({
   useUser: jest.fn(() => ({ isLoaded: true, isSignedIn: true, user: { id: "test-user-id", fullName: "Test User", imageUrl: "/test.jpg" } })),
   useAuth: jest.fn(() => ({ isLoaded: true, isSignedIn: true, userId: "test-user-id" })),
   useClerk: jest.fn(() => ({ signOut: jest.fn() })),
@@ -45,10 +45,11 @@ jest.mock("@clerk/nextjs", () => ({
   auth: jest.fn(() => ({ userId: "test-user-id" })),
 }))
 
-// Global mock for @clerk/nextjs/server to avoid ESM parse errors
-jest.mock("@clerk/nextjs/server", () => ({
+// Global mock for local auth server to avoid ESM parse errors
+jest.mock("@/lib/auth/server", () => ({
   auth: jest.fn(() => ({ userId: "test-user-id" })),
   currentUser: jest.fn(),
+  authMiddleware: jest.fn(() => (req) => req),
   clerkMiddleware: jest.fn(() => (req) => req),
   createRouteMatcher: jest.fn(() => () => false),
 }))

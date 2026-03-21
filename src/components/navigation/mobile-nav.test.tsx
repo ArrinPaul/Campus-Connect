@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { MobileNav } from "./mobile-nav"
 
-// Mock Clerk's UserButton
-jest.mock("@clerk/nextjs", () => ({
+// Mock auth user menu button
+jest.mock("@/lib/auth/client", () => ({
   UserButton: () => <div data-testid="user-button">User Button</div>,
 }))
 

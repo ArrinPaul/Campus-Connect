@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
-import { useUser } from "@clerk/nextjs"
+import { useUser } from "@/lib/auth/client"
 import { useMutation, useQuery } from "@/lib/api"
 import { api } from "@/lib/api"
 import { Id } from "@/lib/api"

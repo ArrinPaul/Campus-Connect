@@ -2,7 +2,7 @@
 
 import { useState, memo, useRef, useEffect } from "react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
-import { useUser } from "@clerk/nextjs"
+import { useUser } from "@/lib/auth/client"
 import { useMutation, useQuery } from "@/lib/api"
 import { api } from "@/lib/api"
 import { Id } from "@/lib/api"

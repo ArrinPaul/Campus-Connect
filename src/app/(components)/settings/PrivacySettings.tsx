@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@/lib/api';
-import { useUser } from '@clerk/nextjs';
+import { useUser } from '@/lib/auth/client';
 import { api } from '@/lib/api';
 import { Shield, Eye, Mail, MessageSquare, UserPlus, Activity, Search, Loader2, CheckCircle } from 'lucide-react';
 

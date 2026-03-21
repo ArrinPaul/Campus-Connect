@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useMutation, useQuery } from '@/lib/api';
-import { useUser } from '@clerk/nextjs';
+import { useUser } from '@/lib/auth/client';
 import { api } from '@/lib/api';
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {

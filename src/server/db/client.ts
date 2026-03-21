@@ -1,9 +1,9 @@
 /**
  * Shared Neo4j helper — re-exports connection utilities and provides
- * a Clerk-to-user lookup helper used across all service modules.
+ * an auth-id-to-user lookup helper used across all service modules.
  */
 import "server-only"
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/lib/auth/server"
 import { runRead, runWrite } from "@/server/graph/neo4j"
 import { randomUUID } from "crypto"
 

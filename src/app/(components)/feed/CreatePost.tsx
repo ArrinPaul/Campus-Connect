@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useQuery, useMutation } from '@/lib/api';
-import { useUser } from '@clerk/nextjs';
+import { useUser } from '@/lib/auth/client';
 import { api } from '@/lib/api';
 import { Send, Image as ImageIcon, ChartBar, File, Loader2, LogIn } from 'lucide-react';
 import { toast } from 'sonner';

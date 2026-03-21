@@ -1,5 +1,4 @@
 
-const path = require("path")
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 })
@@ -40,15 +39,6 @@ const nextConfig = {
 
   // Strict mode for catching issues early
   reactStrictMode: true,
-
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...(config.resolve.alias || {}),
-      "@clerk/nextjs": path.resolve(__dirname, "src/lib/auth/clerk-client.tsx"),
-      "@clerk/nextjs/server": path.resolve(__dirname, "src/lib/auth/clerk-server.ts"),
-    }
-    return config
-  },
 
   // Security headers
   async headers() {
