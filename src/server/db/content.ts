@@ -18,7 +18,7 @@ export interface DbStory {
 }
 
 export async function createStory(
-  clerkId: string,
+  authId: string,
   data: { mediaUrl: string; mediaType: "image" | "video" | "text"; textContent?: string; backgroundColor?: string }
 ): Promise<DbStory> {
   return runWrite(async (session) => {
@@ -26,7 +26,7 @@ export async function createStory(
     const now = Date.now()
     const expiresAt = now + 24 * 60 * 60 * 1000
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})
+      `MATCH (u:User {authId: $authId})
        CREATE (s:Story {
          id: $id, authorId: u.id, mediaUrl: $mediaUrl, mediaType: $mediaType,
          textContent: $textContent, backgroundColor: $backgroundColor,
@@ -34,23 +34,23 @@ export async function createStory(
        })
        CREATE (u)-[:CREATED_STORY]->(s)
        RETURN s, u`,
-      { clerkId, id, ...data, textContent: data.textContent ?? null, backgroundColor: data.backgroundColor ?? null, expiresAt, now }
+      { authId, id, ...data, textContent: data.textContent ?? null, backgroundColor: data.backgroundColor ?? null, expiresAt, now }
     )
     return { ...toPlain(result.records[0].get("s").properties), author: toPlain(result.records[0].get("u").properties) } as unknown as DbStory
   })
 }
 
-export async function getActiveStories(clerkId: string): Promise<{ user: Record<string, unknown>; stories: DbStory[] }[]> {
+export async function getActiveStories(authId: string): Promise<{ user: Record<string, unknown>; stories: DbStory[] }[]> {
   return runRead(async (session) => {
     const now = Date.now()
     const result = await session.run(
-      `MATCH (me:User {clerkId: $clerkId})-[:FOLLOWS]->(u:User)-[:CREATED_STORY]->(s:Story)
+      `MATCH (me:User {authId: $authId})-[:FOLLOWS]->(u:User)-[:CREATED_STORY]->(s:Story)
        WHERE s.expiresAt > $now
        OPTIONAL MATCH (me)-[:VIEWED_STORY]->(s)
        WITH u, s, count(me) > 0 AS hasViewed
        ORDER BY u.id, s.createdAt
        RETURN u, collect({story: s, hasViewed: hasViewed}) AS stories`,
-      { clerkId, now }
+      { authId, now }
     )
     return result.records.map((r) => ({
       user: toPlain(r.get("u").properties),
@@ -62,13 +62,13 @@ export async function getActiveStories(clerkId: string): Promise<{ user: Record<
   })
 }
 
-export async function viewStory(clerkId: string, storyId: string): Promise<void> {
+export async function viewStory(authId: string, storyId: string): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (u:User {clerkId: $clerkId}), (s:Story {id: $storyId})
+      `MATCH (u:User {authId: $authId}), (s:Story {id: $storyId})
        MERGE (u)-[:VIEWED_STORY]->(s)
        ON CREATE SET s.viewCount = coalesce(s.viewCount, 0) + 1`,
-      { clerkId, storyId }
+      { authId, storyId }
     )
   })
 }
@@ -101,14 +101,14 @@ export interface DbAnswer {
 }
 
 export async function createQuestion(
-  clerkId: string,
+  authId: string,
   data: { title: string; body: string; tags?: string[] }
 ): Promise<DbQuestion> {
   return runWrite(async (session) => {
     const id = randomUUID()
     const now = Date.now()
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})
+      `MATCH (u:User {authId: $authId})
        CREATE (q:Question {
          id: $id, title: $title, body: $body, tags: $tags,
          authorId: u.id, answerCount: 0, voteCount: 0, viewCount: 0,
@@ -116,7 +116,7 @@ export async function createQuestion(
        })
        CREATE (u)-[:ASKED]->(q)
        RETURN q, u`,
-      { clerkId, id, ...data, tags: data.tags ?? [], now }
+      { authId, id, ...data, tags: data.tags ?? [], now }
     )
     return { ...toPlain(result.records[0].get("q").properties), author: toPlain(result.records[0].get("u").properties) } as unknown as DbQuestion
   })
@@ -147,18 +147,18 @@ export async function getQuestionById(id: string): Promise<DbQuestion | null> {
   })
 }
 
-export async function answerQuestion(clerkId: string, questionId: string, body: string): Promise<DbAnswer> {
+export async function answerQuestion(authId: string, questionId: string, body: string): Promise<DbAnswer> {
   return runWrite(async (session) => {
     const id = randomUUID()
     const now = Date.now()
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId}), (q:Question {id: $questionId})
+      `MATCH (u:User {authId: $authId}), (q:Question {id: $questionId})
        CREATE (a:Answer { id: $id, questionId: $questionId, body: $body, authorId: u.id, voteCount: 0, isAccepted: false, createdAt: $now })
        CREATE (u)-[:ANSWERED]->(a)
        CREATE (a)-[:ANSWERS]->(q)
        SET q.answerCount = coalesce(q.answerCount, 0) + 1
        RETURN a, u`,
-      { clerkId, questionId, id, body, now }
+      { authId, questionId, id, body, now }
     )
     return { ...toPlain(result.records[0].get("a").properties), author: toPlain(result.records[0].get("u").properties) } as unknown as DbAnswer
   })
@@ -194,14 +194,14 @@ export interface DbResource {
 }
 
 export async function uploadResource(
-  clerkId: string,
+  authId: string,
   data: { title: string; description?: string; fileUrl: string; fileType: string; fileSize?: number; category?: string; tags?: string[] }
 ): Promise<DbResource> {
   return runWrite(async (session) => {
     const id = randomUUID()
     const now = Date.now()
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})
+      `MATCH (u:User {authId: $authId})
        CREATE (r:Resource {
          id: $id, title: $title, description: $description,
          fileUrl: $fileUrl, fileType: $fileType, fileSize: $fileSize,
@@ -210,7 +210,7 @@ export async function uploadResource(
        })
        CREATE (u)-[:UPLOADED]->(r)
        RETURN r, u`,
-      { clerkId, id, ...data, description: data.description ?? "", category: data.category ?? "", tags: data.tags ?? [], fileSize: data.fileSize ?? 0, now }
+      { authId, id, ...data, description: data.description ?? "", category: data.category ?? "", tags: data.tags ?? [], fileSize: data.fileSize ?? 0, now }
     )
     return { ...toPlain(result.records[0].get("r").properties), uploader: toPlain(result.records[0].get("u").properties) } as unknown as DbResource
   })
@@ -247,14 +247,14 @@ export interface DbPaper {
 }
 
 export async function uploadPaper(
-  clerkId: string,
+  authId: string,
   data: { title: string; abstract?: string; authors?: string[]; fileUrl: string; tags?: string[]; field?: string }
 ): Promise<DbPaper> {
   return runWrite(async (session) => {
     const id = randomUUID()
     const now = Date.now()
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})
+      `MATCH (u:User {authId: $authId})
        CREATE (p:ResearchPaper {
          id: $id, title: $title, abstract: $abstract, authors: $authors,
          fileUrl: $fileUrl, tags: $tags, field: $field, voteCount: 0,
@@ -262,7 +262,7 @@ export async function uploadPaper(
        })
        CREATE (u)-[:UPLOADED]->(p)
        RETURN p, u`,
-      { clerkId, id, ...data, abstract: data.abstract ?? "", authors: data.authors ?? [], tags: data.tags ?? [], field: data.field ?? "", now }
+      { authId, id, ...data, abstract: data.abstract ?? "", authors: data.authors ?? [], tags: data.tags ?? [], field: data.field ?? "", now }
     )
     return { ...toPlain(result.records[0].get("p").properties), uploader: toPlain(result.records[0].get("u").properties) } as unknown as DbPaper
   })

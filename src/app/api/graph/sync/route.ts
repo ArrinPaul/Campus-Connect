@@ -12,7 +12,7 @@ type SyncPayload =
   | {
       type: "user"
       user: {
-        clerkId: string
+        authId: string
         appUserId?: string | null
         name?: string | null
         username?: string | null
@@ -24,15 +24,15 @@ type SyncPayload =
     }
   | {
       type: "follow"
-      followerClerkId: string
-      followingClerkId: string
+      followerAuthId: string
+      followingAuthId: string
       action: "follow" | "unfollow"
     }
   | {
       type: "post"
       post: {
         postId: string
-        authorClerkId: string
+        authorAuthId: string
         createdAt?: number
         content?: string | null
         hashtags?: string[]
@@ -42,7 +42,7 @@ type SyncPayload =
   | {
       type: "interaction"
       interaction: {
-        viewerClerkId: string
+        viewerAuthId: string
         postId: string
         interactionType: "view" | "like" | "comment" | "share"
         weight?: number
@@ -74,8 +74,8 @@ export async function POST(request: Request) {
 
     if (payload.type === "follow") {
       await syncFollowRelation(
-        payload.followerClerkId,
-        payload.followingClerkId,
+        payload.followerAuthId,
+        payload.followingAuthId,
         payload.action
       )
       return NextResponse.json({ ok: true })

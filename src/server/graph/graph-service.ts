@@ -16,16 +16,12 @@ function toNumber(value: number | Integer | null | undefined): number {
 
 function parseCandidateUser(candidate: Record<string, unknown>): GraphUser {
   return {
-    clerkId: String(candidate.clerkId),
-    appUserId: (candidate.appUserId as string | undefined) ?? null,
-    name: (candidate.name as string | undefined) ?? null,
-    username: (candidate.username as string | undefined) ?? null,
-    profilePicture: (candidate.profilePicture as string | undefined) ?? null,
-    university: (candidate.university as string | undefined) ?? null,
-    role: (candidate.role as string | undefined) ?? null,
-    skills: Array.isArray(candidate.skills)
-      ? (candidate.skills as string[])
-      : [],
+    authId: String(candidate.authId),
+    id: (candidate.id as string | undefined) ?? "",
+    name: (candidate.name as string | undefined) ?? "",
+    username: (candidate.username as string | undefined) ?? "",
+    profilePicture: (candidate.profilePicture as string | undefined) ?? undefined,
+    bio: (candidate.bio as string | undefined) ?? undefined,
   }
 }
 
@@ -56,17 +52,17 @@ function buildSuggestionReasons(params: {
   return reasons
 }
 
-function suggestionsCacheKey(viewerClerkId: string, limit: number): string {
-  return `graph:suggestions:${viewerClerkId}:${limit}`
+function suggestionsCacheKey(viewerAuthId: string, limit: number): string {
+  return `graph:suggestions:${viewerAuthId}:${limit}`
 }
 
-function recommendationsCacheKey(viewerClerkId: string, limit: number): string {
-  return `graph:recommendations:${viewerClerkId}:${limit}`
+function recommendationsCacheKey(viewerAuthId: string, limit: number): string {
+  return `graph:recommendations:${viewerAuthId}:${limit}`
 }
 
-export async function getSuggestions(viewerClerkId: string, limit = 5): Promise<GraphSuggestion[]> {
+export async function getSuggestions(viewerAuthId: string, limit = 5): Promise<GraphSuggestion[]> {
   const safeLimit = Math.min(Math.max(1, limit), 20)
-  const cacheKey = suggestionsCacheKey(viewerClerkId, safeLimit)
+  const cacheKey = suggestionsCacheKey(viewerAuthId, safeLimit)
 
   const cached = await getJson<GraphSuggestion[]>(cacheKey)
   if (cached) return cached
@@ -74,9 +70,9 @@ export async function getSuggestions(viewerClerkId: string, limit = 5): Promise<
   const suggestions = await runRead(async (session) => {
     const result = await session.run(
       `
-      MATCH (me:User {clerkId: $viewerClerkId})
+      MATCH (me:User {authId: $viewerAuthId})
       MATCH (candidate:User)
-      WHERE candidate.clerkId <> me.clerkId
+      WHERE candidate.authId <> me.authId
         AND NOT (me)-[:FOLLOWS]->(candidate)
         AND NOT (me)-[:DISMISSED_SUGGESTION]->(candidate)
       OPTIONAL MATCH (me)-[:FOLLOWS]->(:User)-[:FOLLOWS]->(candidate)
@@ -108,8 +104,8 @@ export async function getSuggestions(viewerClerkId: string, limit = 5): Promise<
       LIMIT $limit
       RETURN
         candidate {
-          .clerkId,
-          .appUserId,
+          .authId,
+          .id,
           .name,
           .username,
           .profilePicture,
@@ -123,7 +119,7 @@ export async function getSuggestions(viewerClerkId: string, limit = 5): Promise<
         sameUniversity,
         sameRole
       `,
-      { viewerClerkId, limit: safeLimit }
+      { viewerAuthId, limit: safeLimit }
     )
 
     return result.records.map((record) => {
@@ -135,10 +131,8 @@ export async function getSuggestions(viewerClerkId: string, limit = 5): Promise<
       const sameRole = Boolean(record.get("sameRole"))
 
       const user = parseCandidateUser(candidate)
-      const suggestionId = `${viewerClerkId}:${user.clerkId}`
 
       return {
-        _id: suggestionId,
         score,
         reasons: buildSuggestionReasons({
           mutualCount,
@@ -155,65 +149,65 @@ export async function getSuggestions(viewerClerkId: string, limit = 5): Promise<
   return suggestions
 }
 
-export async function dismissSuggestion(viewerClerkId: string, targetClerkId: string): Promise<void> {
+export async function dismissSuggestion(viewerAuthId: string, targetAuthId: string): Promise<void> {
   await runWrite(async (session) => {
     await session.run(
       `
-      MATCH (me:User {clerkId: $viewerClerkId})
-      MATCH (target:User {clerkId: $targetClerkId})
+      MATCH (me:User {authId: $viewerAuthId})
+      MATCH (target:User {authId: $targetAuthId})
       MERGE (me)-[:DISMISSED_SUGGESTION]->(target)
       `,
-      { viewerClerkId, targetClerkId }
+      { viewerAuthId, targetAuthId }
     )
     return undefined
   })
 
-  await clearSuggestionCache(viewerClerkId)
+  await clearSuggestionCache(viewerAuthId)
 }
 
-export async function followUser(viewerClerkId: string, targetClerkId: string): Promise<void> {
+export async function followUser(viewerAuthId: string, targetAuthId: string): Promise<void> {
   await runWrite(async (session) => {
     await session.run(
       `
-      MATCH (me:User {clerkId: $viewerClerkId})
-      MATCH (target:User {clerkId: $targetClerkId})
+      MATCH (me:User {authId: $viewerAuthId})
+      MATCH (target:User {authId: $targetAuthId})
       MERGE (me)-[:FOLLOWS {createdAt: timestamp()}]->(target)
       `,
-      { viewerClerkId, targetClerkId }
+      { viewerAuthId, targetAuthId }
     )
     return undefined
   })
 
-  await clearSuggestionCache(viewerClerkId)
+  await clearSuggestionCache(viewerAuthId)
 }
 
-export async function unfollowUser(viewerClerkId: string, targetClerkId: string): Promise<void> {
+export async function unfollowUser(viewerAuthId: string, targetAuthId: string): Promise<void> {
   await runWrite(async (session) => {
     await session.run(
       `
-      MATCH (me:User {clerkId: $viewerClerkId})-[r:FOLLOWS]->(target:User {clerkId: $targetClerkId})
+      MATCH (me:User {authId: $viewerAuthId})-[r:FOLLOWS]->(target:User {authId: $targetAuthId})
       DELETE r
       `,
-      { viewerClerkId, targetClerkId }
+      { viewerAuthId, targetAuthId }
     )
     return undefined
   })
 
-  await clearSuggestionCache(viewerClerkId)
+  await clearSuggestionCache(viewerAuthId)
 }
 
-export async function clearSuggestionCache(viewerClerkId: string): Promise<void> {
+export async function clearSuggestionCache(viewerAuthId: string): Promise<void> {
   for (let i = 1; i <= 20; i += 1) {
-    await delKey(suggestionsCacheKey(viewerClerkId, i))
+    await delKey(suggestionsCacheKey(viewerAuthId, i))
   }
 }
 
 export async function getPostRecommendations(
-  viewerClerkId: string,
+  viewerAuthId: string,
   limit = 10
 ): Promise<GraphPostRecommendation[]> {
   const safeLimit = Math.min(Math.max(1, limit), 50)
-  const cacheKey = recommendationsCacheKey(viewerClerkId, safeLimit)
+  const cacheKey = recommendationsCacheKey(viewerAuthId, safeLimit)
 
   const cached = await getJson<GraphPostRecommendation[]>(cacheKey)
   if (cached) return cached
@@ -221,9 +215,9 @@ export async function getPostRecommendations(
   const recommendations = await runRead(async (session) => {
     const result = await session.run(
       `
-      MATCH (me:User {clerkId: $viewerClerkId})
+      MATCH (me:User {authId: $viewerAuthId})
       MATCH (post:Post)<-[:AUTHORED]-(author:User)
-      WHERE author.clerkId <> me.clerkId
+      WHERE author.authId <> me.authId
         AND NOT (me)-[:INTERACTED_WITH]->(post)
       OPTIONAL MATCH (me)-[:INTERACTED_WITH]->(:Post)<-[:INTERACTED_WITH]-(peer:User)-[:INTERACTED_WITH]->(post)
       WITH me, post, author, count(DISTINCT peer) AS collaborativeScore
@@ -245,8 +239,8 @@ export async function getPostRecommendations(
           .content
         } AS post,
         author {
-          .clerkId,
-          .appUserId,
+          .authId,
+          .id,
           .name,
           .username,
           .profilePicture,
@@ -256,7 +250,7 @@ export async function getPostRecommendations(
         } AS author,
         score
       `,
-      { viewerClerkId, limit: safeLimit }
+      { viewerAuthId, limit: safeLimit }
     )
 
     return result.records.map((record) => {
@@ -281,8 +275,8 @@ export async function getPostRecommendations(
 }
 
 interface UpsertGraphUserInput {
-  clerkId: string
-  appUserId?: string | null
+  authId: string
+  id?: string | null
   name?: string | null
   username?: string | null
   profilePicture?: string | null
@@ -293,7 +287,7 @@ interface UpsertGraphUserInput {
 
 interface UpsertGraphPostInput {
   postId: string
-  authorClerkId: string
+  authorAuthId: string
   createdAt?: number
   content?: string | null
   hashtags?: string[]
@@ -304,9 +298,9 @@ export async function upsertGraphUser(input: UpsertGraphUserInput): Promise<void
   await runWrite(async (session) => {
     await session.run(
       `
-      MERGE (u:User {clerkId: $clerkId})
+      MERGE (u:User {authId: $authId})
       SET
-        u.appUserId = $appUserId,
+        u.id = $id,
         u.name = $name,
         u.username = $username,
         u.profilePicture = $profilePicture,
@@ -316,8 +310,8 @@ export async function upsertGraphUser(input: UpsertGraphUserInput): Promise<void
         u.updatedAt = timestamp()
       `,
       {
-        clerkId: input.clerkId,
-        appUserId: input.appUserId ?? null,
+        authId: input.authId,
+        id: input.id ?? null,
         name: input.name ?? null,
         username: input.username ?? null,
         profilePicture: input.profilePicture ?? null,
@@ -331,48 +325,48 @@ export async function upsertGraphUser(input: UpsertGraphUserInput): Promise<void
 }
 
 export async function syncFollowRelation(
-  followerClerkId: string,
-  followingClerkId: string,
+  followerAuthId: string,
+  followingAuthId: string,
   action: "follow" | "unfollow"
 ): Promise<void> {
   await runWrite(async (session) => {
     await session.run(
       `
-      MERGE (follower:User {clerkId: $followerClerkId})
-      MERGE (following:User {clerkId: $followingClerkId})
+      MERGE (follower:User {authId: $followerAuthId})
+      MERGE (following:User {authId: $followingAuthId})
       `,
-      { followerClerkId, followingClerkId }
+      { followerAuthId, followingAuthId }
     )
 
     if (action === "unfollow") {
       await session.run(
         `
-        MATCH (follower:User {clerkId: $followerClerkId})-[r:FOLLOWS]->(following:User {clerkId: $followingClerkId})
+        MATCH (follower:User {authId: $followerAuthId})-[r:FOLLOWS]->(following:User {authId: $followingAuthId})
         DELETE r
         `,
-        { followerClerkId, followingClerkId }
+        { followerAuthId, followingAuthId }
       )
     } else {
       await session.run(
         `
-        MATCH (follower:User {clerkId: $followerClerkId})
-        MATCH (following:User {clerkId: $followingClerkId})
+        MATCH (follower:User {authId: $followerAuthId})
+        MATCH (following:User {authId: $followingAuthId})
         MERGE (follower)-[:FOLLOWS {createdAt: timestamp()}]->(following)
         `,
-        { followerClerkId, followingClerkId }
+        { followerAuthId, followingAuthId }
       )
     }
     return undefined
   })
 
-  await clearSuggestionCache(followerClerkId)
+  await clearSuggestionCache(followerAuthId)
 }
 
 export async function upsertGraphPost(input: UpsertGraphPostInput): Promise<void> {
   await runWrite(async (session) => {
     await session.run(
       `
-      MERGE (author:User {clerkId: $authorClerkId})
+      MERGE (author:User {authId: $authorAuthId})
       MERGE (post:Post {postId: $postId})
       SET
         post.createdAt = $createdAt,
@@ -384,7 +378,7 @@ export async function upsertGraphPost(input: UpsertGraphPostInput): Promise<void
       `,
       {
         postId: input.postId,
-        authorClerkId: input.authorClerkId,
+        authorAuthId: input.authorAuthId,
         createdAt: input.createdAt ?? Date.now(),
         content: input.content ?? null,
         hashtags: input.hashtags ?? [],
@@ -396,7 +390,7 @@ export async function upsertGraphPost(input: UpsertGraphPostInput): Promise<void
 }
 
 export async function recordGraphInteraction(params: {
-  viewerClerkId: string
+  viewerAuthId: string
   postId: string
   interactionType: "view" | "like" | "comment" | "share"
   weight?: number
@@ -404,7 +398,7 @@ export async function recordGraphInteraction(params: {
   await runWrite(async (session) => {
     await session.run(
       `
-      MERGE (viewer:User {clerkId: $viewerClerkId})
+      MERGE (viewer:User {authId: $viewerAuthId})
       MERGE (post:Post {postId: $postId})
       MERGE (viewer)-[r:INTERACTED_WITH]->(post)
       SET
@@ -413,7 +407,7 @@ export async function recordGraphInteraction(params: {
         r.updatedAt = timestamp()
       `,
       {
-        viewerClerkId: params.viewerClerkId,
+        viewerAuthId: params.viewerAuthId,
         postId: params.postId,
         interactionType: params.interactionType,
         weight: params.weight ?? 1,

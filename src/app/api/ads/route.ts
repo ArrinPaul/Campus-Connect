@@ -19,10 +19,10 @@ export async function GET(req: Request) {
 // POST /api/ads  body: ad data
 export async function POST(req: Request) {
   try {
-    const { userId: clerkId } = await auth()
-    if (!clerkId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId: authId } = await auth()
+    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const me = await requireDbUser(clerkId)
+    const me = await requireDbUser(authId)
     const body = await req.json()
     const ad = await createAd(me.id as string, body)
     return NextResponse.json(ad)
@@ -30,3 +30,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
+

@@ -5,14 +5,14 @@ import { getUserById, searchUsers } from "@/server/db/users"
 // GET /api/users/profile?id=xxx  OR  /api/users/search?query=xxx
 export async function GET(req: Request) {
   try {
-    const { userId: clerkId } = await auth()
+    const { userId: authId } = await auth()
     const url = new URL(req.url)
     const id = url.searchParams.get("id")
     const query = url.searchParams.get("query")
     const limit = parseInt(url.searchParams.get("limit") ?? "10")
 
     if (query) {
-      const users = await searchUsers(query, limit, clerkId ?? undefined)
+      const users = await searchUsers(query, limit, authId ?? undefined)
       return NextResponse.json(users)
     }
 
@@ -26,3 +26,4 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
+

@@ -5,7 +5,7 @@ import { dismissSuggestion } from "@/server/graph/graph-service"
 export const runtime = "nodejs"
 
 interface DismissBody {
-  targetClerkId?: string
+  targetauthId?: string
 }
 
 export async function POST(request: Request) {
@@ -15,15 +15,16 @@ export async function POST(request: Request) {
   }
 
   const body = (await request.json()) as DismissBody
-  if (!body.targetClerkId) {
-    return NextResponse.json({ error: "targetClerkId is required" }, { status: 400 })
+  if (!body.targetauthId) {
+    return NextResponse.json({ error: "targetauthId is required" }, { status: 400 })
   }
 
   try {
-    await dismissSuggestion(userId, body.targetClerkId)
+    await dismissSuggestion(userId, body.targetauthId)
     return NextResponse.json({ ok: true })
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to dismiss suggestion"
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
+

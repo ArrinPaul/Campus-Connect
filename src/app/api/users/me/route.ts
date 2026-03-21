@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth/server"
 import { NextResponse } from "next/server"
-import { getUserByClerkId, updateUser, updatePrivacySettings, updateNotificationPreferences, deleteUserAccount, completeOnboarding, updateProfilePicture, addSkill, removeSkill } from "@/server/db/users"
+import { getUserByAuthId, updateUser, updatePrivacySettings, updateNotificationPreferences, deleteUserAccount, completeOnboarding, updateProfilePicture, addSkill, removeSkill } from "@/server/db/users"
 
 // GET /api/users/me
 export async function GET() {
@@ -8,7 +8,7 @@ export async function GET() {
     const { userId } = await auth()
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const user = await getUserByClerkId(userId)
+    const user = await getUserByAuthId(userId)
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 })
 
     // Parse stored JSON strings back to objects

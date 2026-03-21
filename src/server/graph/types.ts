@@ -1,26 +1,20 @@
 export interface GraphUser {
-  clerkId: string
-  appUserId?: string | null
-  name?: string | null
-  username?: string | null
-  profilePicture?: string | null
-  university?: string | null
-  role?: string | null
-  skills?: string[]
+  id: string
+  authId: string
+  name: string
+  username: string
+  profilePicture?: string
+  bio?: string
 }
 
 export interface GraphSuggestion {
-  _id: string
-  score: number
-  reasons: string[]
   user: GraphUser
+  reasons: string[]
+  score: number
 }
 
-export interface GraphPostRecommendation {
-  _id: string
-  score: number
+export interface GraphRecommendation {
   postId: string
-  author: GraphUser
-  createdAt?: number | null
-  content?: string | null
+  score: number
+  reasons: string[]
 }

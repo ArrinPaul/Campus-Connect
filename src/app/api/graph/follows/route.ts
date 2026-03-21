@@ -5,7 +5,7 @@ import { followUser, unfollowUser } from "@/server/graph/graph-service"
 export const runtime = "nodejs"
 
 interface FollowBody {
-  targetClerkId?: string
+  targetauthId?: string
   action?: "follow" | "unfollow"
 }
 
@@ -16,17 +16,17 @@ export async function POST(request: Request) {
   }
 
   const body = (await request.json()) as FollowBody
-  if (!body.targetClerkId) {
-    return NextResponse.json({ error: "targetClerkId is required" }, { status: 400 })
+  if (!body.targetauthId) {
+    return NextResponse.json({ error: "targetauthId is required" }, { status: 400 })
   }
 
   const action = body.action ?? "follow"
 
   try {
     if (action === "unfollow") {
-      await unfollowUser(userId, body.targetClerkId)
+      await unfollowUser(userId, body.targetauthId)
     } else {
-      await followUser(userId, body.targetClerkId)
+      await followUser(userId, body.targetauthId)
     }
 
     return NextResponse.json({ ok: true })
@@ -35,3 +35,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
+

@@ -32,35 +32,35 @@ export interface DbMessage {
 // ─── Conversations ────────────────────────────────────────────────────────────
 
 export async function getOrCreateDMConversation(
-  clerkId: string,
+  authId: string,
   otherUserId: string
 ): Promise<string> {
   return runWrite(async (session) => {
     // Check for existing DM
     const existing = await session.run(
-      `MATCH (u1:User {clerkId: $clerkId})-[:PARTICIPANT_IN]->(c:Conversation {type: 'direct'})<-[:PARTICIPANT_IN]-(u2:User)
-       WHERE u2.id = $otherUserId OR u2.clerkId = $otherUserId
+      `MATCH (u1:User {authId: $authId})-[:PARTICIPANT_IN]->(c:Conversation {type: 'direct'})<-[:PARTICIPANT_IN]-(u2:User)
+       WHERE u2.id = $otherUserId OR u2.authId = $otherUserId
        RETURN c.id AS id LIMIT 1`,
-      { clerkId, otherUserId }
+      { authId, otherUserId }
     )
     if (existing.records.length) return existing.records[0].get("id") as string
 
     const id = randomUUID()
     await session.run(
-      `MATCH (u1:User {clerkId: $clerkId})
-       MATCH (u2:User) WHERE u2.id = $otherUserId OR u2.clerkId = $otherUserId
+      `MATCH (u1:User {authId: $authId})
+       MATCH (u2:User) WHERE u2.id = $otherUserId OR u2.authId = $otherUserId
        CREATE (c:Conversation {id: $id, type: 'direct', createdAt: $now})
        CREATE (u1)-[:PARTICIPANT_IN {isMuted: false, joinedAt: $now}]->(c)
        CREATE (u2)-[:PARTICIPANT_IN {isMuted: false, joinedAt: $now}]->(c)
        RETURN c.id AS id`,
-      { clerkId, otherUserId, id, now: Date.now() }
+      { authId, otherUserId, id, now: Date.now() }
     )
     return id
   })
 }
 
 export async function createGroupConversation(
-  clerkId: string,
+  authId: string,
   participantUserIds: string[],
   name: string
 ): Promise<string> {
@@ -68,16 +68,16 @@ export async function createGroupConversation(
     const id = randomUUID()
     const now = Date.now()
     await session.run(
-      `MATCH (creator:User {clerkId: $clerkId})
+      `MATCH (creator:User {authId: $authId})
        CREATE (c:Conversation {id: $id, type: 'group', name: $name, createdAt: $now, createdBy: creator.id})
        CREATE (creator)-[:PARTICIPANT_IN {isMuted: false, joinedAt: $now, role: 'admin'}]->(c)
        RETURN c`,
-      { clerkId, id, name, now }
+      { authId, id, name, now }
     )
 
     for (const uid of participantUserIds) {
       await session.run(
-        `MATCH (u:User) WHERE u.id = $uid OR u.clerkId = $uid
+        `MATCH (u:User) WHERE u.id = $uid OR u.authId = $uid
          MATCH (c:Conversation {id: $id})
          CREATE (u)-[:PARTICIPANT_IN {isMuted: false, joinedAt: $now}]->(c)`,
         { uid, id, now }
@@ -89,19 +89,19 @@ export async function createGroupConversation(
 }
 
 export async function getConversations(
-  clerkId: string,
+  authId: string,
   limit = 50
 ): Promise<DbConversation[]> {
   return runRead(async (session) => {
     const result = await session.run(
-      `MATCH (me:User {clerkId: $clerkId})-[p:PARTICIPANT_IN]->(c:Conversation)
+      `MATCH (me:User {authId: $authId})-[p:PARTICIPANT_IN]->(c:Conversation)
        OPTIONAL MATCH (other:User)-[:PARTICIPANT_IN]->(c)
-       WHERE other.clerkId <> $clerkId
+       WHERE other.authId <> $authId
        WITH c, p, collect(other) AS others
        ORDER BY coalesce(c.lastMessageAt, c.createdAt) DESC
        LIMIT $limit
        RETURN c, p, others`,
-      { clerkId, limit }
+      { authId, limit }
     )
 
     return result.records.map((r) => {
@@ -121,15 +121,15 @@ export async function getConversations(
 
 export async function getConversationById(
   conversationId: string,
-  clerkId: string
+  authId: string
 ): Promise<DbConversation | null> {
   return runRead(async (session) => {
     const result = await session.run(
-      `MATCH (me:User {clerkId: $clerkId})-[p:PARTICIPANT_IN]->(c:Conversation {id: $conversationId})
+      `MATCH (me:User {authId: $authId})-[p:PARTICIPANT_IN]->(c:Conversation {id: $conversationId})
        OPTIONAL MATCH (other:User)-[:PARTICIPANT_IN]->(c)
-       WHERE other.clerkId <> $clerkId
+       WHERE other.authId <> $authId
        RETURN c, p, collect(other) AS others`,
-      { clerkId, conversationId }
+      { authId, conversationId }
     )
     if (!result.records.length) return null
     const conv = toPlain(result.records[0].get("c").properties)
@@ -144,7 +144,7 @@ export async function getConversationById(
 // ─── Messages ─────────────────────────────────────────────────────────────────
 
 export async function sendMessage(
-  clerkId: string,
+  authId: string,
   data: {
     conversationId: string
     content: string
@@ -159,7 +159,7 @@ export async function sendMessage(
     const now = Date.now()
 
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[:PARTICIPANT_IN]->(c:Conversation {id: $conversationId})
+      `MATCH (u:User {authId: $authId})-[:PARTICIPANT_IN]->(c:Conversation {id: $conversationId})
        CREATE (m:Message {
          id: $id,
          conversationId: $conversationId,
@@ -179,7 +179,7 @@ export async function sendMessage(
            c.lastMessageAt = $now
        RETURN m, u`,
       {
-        clerkId,
+        authId,
         conversationId: data.conversationId,
         id,
         content: data.content,
@@ -202,7 +202,7 @@ export async function sendMessage(
 }
 
 export async function getMessages(
-  clerkId: string,
+  authId: string,
   conversationId: string,
   limit = 50,
   cursor?: string
@@ -211,13 +211,13 @@ export async function getMessages(
     const cursorTs = cursor ? parseInt(cursor, 10) : Date.now() + 1
 
     const result = await session.run(
-      `MATCH (me:User {clerkId: $clerkId})-[:PARTICIPANT_IN]->(c:Conversation {id: $conversationId})
+      `MATCH (me:User {authId: $authId})-[:PARTICIPANT_IN]->(c:Conversation {id: $conversationId})
        MATCH (m:Message {conversationId: $conversationId})<-[:SENT]-(sender:User)
        WHERE m.createdAt < $cursorTs AND m.isDeleted = false
        RETURN m, sender
        ORDER BY m.createdAt DESC
        LIMIT $limit`,
-      { clerkId, conversationId, cursorTs, limit: limit + 1 }
+      { authId, conversationId, cursorTs, limit: limit + 1 }
     )
 
     const all = result.records.map((r) => ({
@@ -240,22 +240,22 @@ export async function getMessages(
   })
 }
 
-export async function deleteMessage(messageId: string, clerkId: string): Promise<void> {
+export async function deleteMessage(messageId: string, authId: string): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[:SENT]->(m:Message {id: $messageId})
+      `MATCH (u:User {authId: $authId})-[:SENT]->(m:Message {id: $messageId})
        SET m.isDeleted = true, m.content = '[Message deleted]'`,
-      { messageId, clerkId }
+      { messageId, authId }
     )
   })
 }
 
-export async function leaveConversation(conversationId: string, clerkId: string): Promise<void> {
+export async function leaveConversation(conversationId: string, authId: string): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[p:PARTICIPANT_IN]->(c:Conversation {id: $conversationId})
+      `MATCH (u:User {authId: $authId})-[p:PARTICIPANT_IN]->(c:Conversation {id: $conversationId})
        DELETE p`,
-      { conversationId, clerkId }
+      { conversationId, authId }
     )
   })
 }

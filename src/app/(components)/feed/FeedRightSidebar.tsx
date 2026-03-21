@@ -67,7 +67,7 @@ export function FeedRightSidebar() {
             {suggestions.map((s) => {
               if (!s.user) return null;
               const displayName = s.user.name ?? s.user.username ?? 'User';
-              const profileUserId = s.user.appUserId;
+              const profileUserId = s.user.id;
               const profileHref = profileUserId ? `/profile/${profileUserId}` : '/profile/me';
               return (
                 <div key={s._id} className="flex items-center gap-3">
@@ -97,7 +97,7 @@ export function FeedRightSidebar() {
                       <p className="text-xs text-muted-foreground truncate">{s.reasons[0]}</p>
                     )}
                   </div>
-                  <FollowButton profileUserId={profileUserId ?? undefined} targetClerkId={s.user.clerkId} />
+                  <FollowButton profileUserId={profileUserId ?? undefined} targetAuthId={s.user.authId} />
                 </div>
               );
             })}
@@ -111,7 +111,7 @@ export function FeedRightSidebar() {
   );
 }
 
-function FollowButton({ profileUserId, targetClerkId }: { profileUserId?: string; targetClerkId: string }) {
+function FollowButton({ profileUserId, targetAuthId }: { profileUserId?: string; targetAuthId: string }) {
   const { isSignedIn } = useUser();
   const isAuthenticated = isSignedIn ?? false;
   const hasProfileUserId = !!profileUserId;
@@ -136,7 +136,7 @@ function FollowButton({ profileUserId, targetClerkId }: { profileUserId?: string
           ? following
             ? unfollowUser({ userId: profileUserId as any })
             : followUser({ userId: profileUserId as any })
-          : graphFollowMutation.mutate({ targetClerkId, action: 'follow' })
+          : graphFollowMutation.mutate({ targetAuthId, action: 'follow' })
       }
       className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
         following

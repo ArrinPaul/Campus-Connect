@@ -5,8 +5,8 @@ import { getFollowers } from "@/server/db/follows"
 // GET /api/follows/followers?userId=...&limit=...&cursor=...
 export async function GET(req: Request) {
   try {
-    const { userId: clerkId } = await auth()
-    if (!clerkId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId: authId } = await auth()
+    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { searchParams } = new URL(req.url)
     const userId = searchParams.get("userId")
@@ -21,3 +21,4 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
+

@@ -11,27 +11,27 @@ export { runRead, runWrite, randomUUID }
 
 // ─── Auth helpers ─────────────────────────────────────────────────────────────
 
-export async function getClerkId(): Promise<string> {
+export async function getAuthId(): Promise<string> {
   const { userId } = await auth()
   if (!userId) throw new Error("Unauthorized")
   return userId
 }
 
 export async function getDbUser(
-  clerkId: string
-): Promise<{ id: string; clerkId: string; name: string; email: string; username?: string; profilePicture?: string; [key: string]: unknown } | null> {
+  authId: string
+): Promise<{ id: string; authId: string; name: string; email: string; username?: string; profilePicture?: string; [key: string]: unknown } | null> {
   return runRead(async (session) => {
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId}) RETURN u`,
-      { clerkId }
+      `MATCH (u:User {authId: $authId}) RETURN u`,
+      { authId }
     )
     if (result.records.length === 0) return null
     return result.records[0].get("u").properties
   })
 }
 
-export async function requireDbUser(clerkId: string) {
-  const user = await getDbUser(clerkId)
+export async function requireDbUser(authId: string) {
+  const user = await getDbUser(authId)
   if (!user) throw new Error("User not found")
   return user
 }

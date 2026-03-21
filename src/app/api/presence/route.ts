@@ -21,14 +21,15 @@ export async function GET(req: Request) {
 // POST /api/presence  body: { status, lastSeen? }
 export async function POST(req: Request) {
   try {
-    const { userId: clerkId } = await auth()
-    if (!clerkId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId: authId } = await auth()
+    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { status } = await req.json()
-    const me = await requireDbUser(clerkId)
+    const me = await requireDbUser(authId)
     await updatePresence(me.id as string, status ?? "online")
     return NextResponse.json({ success: true })
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
+

@@ -28,10 +28,10 @@ export async function GET(req: Request) {
 // POST /api/jobs  body: job data
 export async function POST(req: Request) {
   try {
-    const { userId: clerkId } = await auth()
-    if (!clerkId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId: authId } = await auth()
+    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const me = await requireDbUser(clerkId)
+    const me = await requireDbUser(authId)
     const body = await req.json()
     const job = await createJob(me.id as string, body)
     return NextResponse.json(job)

@@ -1,13 +1,13 @@
 import { auth } from "@/lib/auth/server"
 import { NextResponse } from "next/server"
-import { updatePrivacySettings, getUserByClerkId } from "@/server/db/users"
+import { updatePrivacySettings, getUserByAuthId } from "@/server/db/users"
 
 export async function GET() {
   try {
     const { userId } = await auth()
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const user = await getUserByClerkId(userId)
+    const user = await getUserByAuthId(userId)
     let settings = user?.privacySettings ?? {}
     if (typeof settings === "string") {
       try { settings = JSON.parse(settings as unknown as string) } catch { settings = {} }

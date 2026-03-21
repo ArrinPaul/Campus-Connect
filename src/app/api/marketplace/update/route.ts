@@ -6,13 +6,13 @@ import { requireDbUser } from "@/server/db/client"
 // PATCH /api/marketplace/update  body: { listingId, ...fields }
 export async function PATCH(req: Request) {
   try {
-    const { userId: clerkId } = await auth()
-    if (!clerkId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId: authId } = await auth()
+    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { listingId, ...updates } = await req.json()
     if (!listingId) return NextResponse.json({ error: "listingId required" }, { status: 400 })
 
-    const me = await requireDbUser(clerkId)
+    const me = await requireDbUser(authId)
     const listing = await updateListing(listingId, me.id as string, updates)
     return NextResponse.json(listing)
   } catch (err) {

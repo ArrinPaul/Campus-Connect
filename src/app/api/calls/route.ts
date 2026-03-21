@@ -6,10 +6,10 @@ import { requireDbUser } from "@/server/db/client"
 // GET /api/calls/incoming
 export async function GET() {
   try {
-    const { userId: clerkId } = await auth()
-    if (!clerkId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId: authId } = await auth()
+    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const me = await requireDbUser(clerkId)
+    const me = await requireDbUser(authId)
     const call = await getIncomingCall(me.id as string)
     return NextResponse.json(call)
   } catch (err) {
@@ -20,10 +20,10 @@ export async function GET() {
 // POST /api/calls  body: { recipientId, type }
 export async function POST(req: Request) {
   try {
-    const { userId: clerkId } = await auth()
-    if (!clerkId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId: authId } = await auth()
+    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const me = await requireDbUser(clerkId)
+    const me = await requireDbUser(authId)
     const { recipientId, type } = await req.json()
     if (!recipientId) return NextResponse.json({ error: "recipientId required" }, { status: 400 })
 
@@ -33,3 +33,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
+

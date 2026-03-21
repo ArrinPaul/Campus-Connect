@@ -6,10 +6,10 @@ import { requireDbUser } from "@/server/db/client"
 // GET /api/stories
 export async function GET() {
   try {
-    const { userId: clerkId } = await auth()
-    if (!clerkId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId: authId } = await auth()
+    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const me = await requireDbUser(clerkId)
+    const me = await requireDbUser(authId)
     const stories = await getActiveStories(me.id as string)
     return NextResponse.json(stories)
   } catch (err) {
@@ -20,10 +20,10 @@ export async function GET() {
 // POST /api/stories  body: { mediaUrl, mediaType, caption?, duration? }
 export async function POST(req: Request) {
   try {
-    const { userId: clerkId } = await auth()
-    if (!clerkId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId: authId } = await auth()
+    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const me = await requireDbUser(clerkId)
+    const me = await requireDbUser(authId)
     const body = await req.json()
     const story = await createStory(me.id as string, body)
     return NextResponse.json(story)
@@ -31,3 +31,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
+

@@ -1,13 +1,13 @@
 import { auth } from "@/lib/auth/server"
 import { NextResponse } from "next/server"
-import { updateNotificationPreferences, getUserByClerkId } from "@/server/db/users"
+import { updateNotificationPreferences, getUserByAuthId } from "@/server/db/users"
 
 export async function GET() {
   try {
     const { userId } = await auth()
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const user = await getUserByClerkId(userId)
+    const user = await getUserByAuthId(userId)
     let prefs = user?.notificationPreferences ?? {}
     if (typeof prefs === "string") {
       try { prefs = JSON.parse(prefs as unknown as string) } catch { prefs = {} }

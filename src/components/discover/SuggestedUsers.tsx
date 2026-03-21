@@ -10,10 +10,8 @@ import { X, RefreshCw, UserPlus, ChevronRight, Sparkles } from "lucide-react"
 import { Id } from "@/lib/api"
 import { createLogger } from "@/lib/logger"
 import {
-  useDismissGraphSuggestion,
   useGraphFollowMutation,
   useGraphSuggestions,
-  useRefreshGraphSuggestions,
 } from "@/hooks/useGraphSuggestions"
 
 const log = createLogger("SuggestedUsers")
@@ -33,9 +31,9 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
     data: suggestions,
     isLoading: suggestionsLoading,
   } = useGraphSuggestions(limit, isAuthenticated)
-  const dismissSuggestion = useDismissGraphSuggestion(limit)
+  
   const graphFollowUser = useGraphFollowMutation(limit)
-  const refreshSuggestions = useRefreshGraphSuggestions(limit)
+  const { dismissSuggestion } = useGraphSuggestions(limit, isAuthenticated)
 
   // Keep the primary follow relation in sync while graph suggestions are used.
   const followUser = useMutation(api.follows.followUser)
@@ -48,14 +46,14 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
     async (
       params: {
         suggestionId: string
-        targetClerkId: string
+        targetAuthId: string
         profileUserId?: string | null
       }
     ) => {
       setLoadingFollow((prev) => new Set(prev).add(params.suggestionId))
       try {
         await graphFollowUser.mutateAsync({
-          targetClerkId: params.targetClerkId,
+          targetAuthId: params.targetAuthId,
           action: "follow",
         })
 
@@ -64,7 +62,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
         }
 
         // Auto-dismiss after following
-        await dismissSuggestion.mutateAsync(params.targetClerkId)
+        await dismissSuggestion(params.targetAuthId)
       } catch (err) {
         log.error("Failed to follow user", err)
       } finally {
@@ -79,10 +77,10 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
   )
 
   const handleDismiss = useCallback(
-    async (params: { suggestionId: string; targetClerkId: string }) => {
+    async (params: { suggestionId: string; targetAuthId: string }) => {
       setDismissing((prev) => new Set(prev).add(params.suggestionId))
       try {
-        await dismissSuggestion.mutateAsync(params.targetClerkId)
+        await dismissSuggestion(params.targetAuthId)
       } catch (err) {
         log.error("Failed to dismiss suggestion", err)
       } finally {
@@ -96,34 +94,23 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
     [dismissSuggestion]
   )
 
-  const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true)
-    try {
-      await refreshSuggestions.mutateAsync()
-    } catch (err) {
-      log.error("Failed to refresh suggestions", err)
-    } finally {
-      setIsRefreshing(false)
-    }
-  }, [refreshSuggestions])
-
   // Loading skeleton
   if (suggestionsLoading || suggestions === undefined || suggestions === null) {
     return (
       <div className="rounded-lg border border-border bg-card p-4">
         <div className="flex items-center justify-between mb-3">
-          <div className="h-5 w-40 rounded bg-muted bg-muted animate-pulse" />
-          <div className="h-5 w-5 rounded bg-muted bg-muted animate-pulse" />
+          <div className="h-5 w-40 rounded bg-muted animate-pulse" />
+          <div className="h-5 w-5 rounded bg-muted animate-pulse" />
         </div>
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-muted bg-muted animate-pulse" />
+              <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
               <div className="flex-1 space-y-1">
-                <div className="h-4 w-24 rounded bg-muted bg-muted animate-pulse" />
-                <div className="h-3 w-32 rounded bg-muted bg-muted animate-pulse" />
+                <div className="h-4 w-24 rounded bg-muted animate-pulse" />
+                <div className="h-3 w-32 rounded bg-muted animate-pulse" />
               </div>
-              <div className="h-8 w-16 rounded bg-muted bg-muted animate-pulse" />
+              <div className="h-8 w-16 rounded bg-muted animate-pulse" />
             </div>
           ))}
         </div>
@@ -140,14 +127,6 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
             <Sparkles className="h-4 w-4 text-yellow-500" />
             Suggested for you
           </h3>
-          <button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className="rounded p-1 text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground transition-colors disabled:opacity-50"
-            title="Refresh suggestions"
-          >
-            <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-          </button>
         </div>
         <p className="text-sm text-muted-foreground text-center py-4">
           No suggestions yet. Follow some users and check back later!
@@ -164,29 +143,22 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
           <Sparkles className="h-4 w-4 text-yellow-500" />
           Suggested for you
         </h3>
-        <button
-          onClick={handleRefresh}
-          disabled={isRefreshing}
-          className="rounded p-1 text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground transition-colors disabled:opacity-50"
-          title="Refresh suggestions"
-        >
-          <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-        </button>
       </div>
 
       {/* Suggestion list */}
       <div className="space-y-3">
-        {suggestions.map((suggestion) => {
+        {suggestions.map((suggestion, index) => {
           const user = suggestion.user!
-          const isFollowing = loadingFollow.has(suggestion._id)
-          const isDismissingThis = dismissing.has(suggestion._id)
+          const suggestionKey = user.authId || `suggestion-${index}`
+          const isFollowing = loadingFollow.has(suggestionKey)
+          const isDismissingThis = dismissing.has(suggestionKey)
           const displayName = user.name ?? user.username ?? "User"
-          const profileUserId = user.appUserId
+          const profileUserId = user.id
           const profileHref = profileUserId ? `/profile/${profileUserId}` : "/profile/me"
 
           return (
             <div
-              key={suggestion._id}
+              key={suggestionKey}
               className={`group relative flex items-start gap-3 transition-opacity ${
                 isDismissingThis ? "opacity-50" : ""
               }`}
@@ -232,8 +204,8 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
                 <button
                   onClick={() =>
                     handleFollow({
-                      suggestionId: suggestion._id,
-                      targetClerkId: user.clerkId,
+                      suggestionId: suggestionKey,
+                      targetAuthId: user.authId,
                       profileUserId,
                     })
                   }
@@ -249,8 +221,8 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
               <button
                 onClick={() =>
                   handleDismiss({
-                    suggestionId: suggestion._id,
-                    targetClerkId: user.clerkId,
+                    suggestionId: suggestionKey,
+                    targetAuthId: user.authId,
                   })
                 }
                 disabled={isDismissingThis}
@@ -268,7 +240,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = true }: SuggestedUsersP
       {showSeeAll && (
         <Link
           href="/discover/suggested"
-          className="mt-3 flex items-center justify-center gap-1 rounded-lg py-2 text-xs font-medium text-primary hover:bg-primary/10 hover:bg-primary/10 transition-colors"
+          className="mt-3 flex items-center justify-center gap-1 rounded-lg py-2 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
         >
           See all suggestions
           <ChevronRight className="h-3 w-3" />
