@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "Campus-Connect Docs": {
+      "type": "sse",
+      "url": "https://gitmcp.io/ArrinPaul/Campus-Connect"
+    }
+  }
+}
