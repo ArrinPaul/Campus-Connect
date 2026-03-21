@@ -14,19 +14,19 @@ export interface DbNotification {
 }
 
 export async function createNotification(data: {
-  recipientClerkId: string
-  actorClerkId: string
+  recipientAuthId: string
+  actorAuthId: string
   type: string
   referenceId?: string
   message: string
 }): Promise<void> {
   return runWrite(async (session) => {
     // Don't notify self
-    if (data.recipientClerkId === data.actorClerkId) return
+    if (data.recipientAuthId === data.actorAuthId) return
 
     await session.run(
-      `MATCH (recipient:User {clerkId: $recipientClerkId})
-       MATCH (actor:User {clerkId: $actorClerkId})
+      `MATCH (recipient:User {authId: $recipientAuthId})
+       MATCH (actor:User {authId: $actorAuthId})
        CREATE (n:Notification {
          id: $id,
          recipientId: recipient.id,
@@ -40,8 +40,8 @@ export async function createNotification(data: {
        CREATE (recipient)-[:HAS_NOTIFICATION]->(n)
        CREATE (actor)-[:TRIGGERED]->(n)`,
       {
-        recipientClerkId: data.recipientClerkId,
-        actorClerkId: data.actorClerkId,
+        recipientAuthId: data.recipientAuthId,
+        actorAuthId: data.actorAuthId,
         id: randomUUID(),
         type: data.type,
         referenceId: data.referenceId ?? null,
@@ -53,7 +53,7 @@ export async function createNotification(data: {
 }
 
 export async function getNotifications(
-  clerkId: string,
+  authId: string,
   filter?: string,
   limit = 20,
   cursor?: string
@@ -63,13 +63,13 @@ export async function getNotifications(
     const typeFilter = filter && filter !== "all" ? `AND n.type = '${filter}'` : ""
 
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[:HAS_NOTIFICATION]->(n:Notification)
+      `MATCH (u:User {authId: $authId})-[:HAS_NOTIFICATION]->(n:Notification)
        OPTIONAL MATCH (actor:User)-[:TRIGGERED]->(n)
        WHERE n.createdAt < $cursorTs ${typeFilter}
        RETURN n, actor
        ORDER BY n.createdAt DESC
        LIMIT $limit`,
-      { clerkId, cursorTs, limit: limit + 1 }
+      { authId, cursorTs, limit: limit + 1 }
     )
 
     const all = result.records.map((r) => ({
@@ -88,33 +88,33 @@ export async function getNotifications(
   })
 }
 
-export async function markAsRead(notificationId: string, clerkId: string): Promise<void> {
+export async function markAsRead(notificationId: string, authId: string): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[:HAS_NOTIFICATION]->(n:Notification {id: $notificationId})
+      `MATCH (u:User {authId: $authId})-[:HAS_NOTIFICATION]->(n:Notification {id: $notificationId})
        SET n.isRead = true`,
-      { notificationId, clerkId }
+      { notificationId, authId }
     )
   })
 }
 
-export async function markAllAsRead(clerkId: string): Promise<void> {
+export async function markAllAsRead(authId: string): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[:HAS_NOTIFICATION]->(n:Notification)
+      `MATCH (u:User {authId: $authId})-[:HAS_NOTIFICATION]->(n:Notification)
        WHERE n.isRead = false
        SET n.isRead = true`,
-      { clerkId }
+      { authId }
     )
   })
 }
 
-export async function getUnreadCount(clerkId: string): Promise<number> {
+export async function getUnreadCount(authId: string): Promise<number> {
   return runRead(async (session) => {
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[:HAS_NOTIFICATION]->(n:Notification {isRead: false})
+      `MATCH (u:User {authId: $authId})-[:HAS_NOTIFICATION]->(n:Notification {isRead: false})
        RETURN count(n) AS cnt`,
-      { clerkId }
+      { authId }
     )
     return (result.records[0]?.get("cnt") as { low: number })?.low ?? 0
   })

@@ -18,7 +18,7 @@ export interface DbCommunity {
 }
 
 export async function createCommunity(
-  clerkId: string,
+  authId: string,
   data: {
     name: string
     slug: string
@@ -32,7 +32,7 @@ export async function createCommunity(
     const id = randomUUID()
     const now = Date.now()
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})
+      `MATCH (u:User {authId: $authId})
        CREATE (c:Community {
          id: $id, name: $name, slug: $slug,
          description: $description, type: $type,
@@ -41,19 +41,19 @@ export async function createCommunity(
        })
        CREATE (u)-[:MEMBER_OF {role: 'admin', joinedAt: $now, status: 'active'}]->(c)
        RETURN c`,
-      { clerkId, id, ...data, description: data.description ?? "", category: data.category ?? "", tags: data.tags ?? [], now }
+      { authId, id, ...data, description: data.description ?? "", category: data.category ?? "", tags: data.tags ?? [], now }
     )
     return toPlain(result.records[0].get("c").properties) as unknown as DbCommunity
   })
 }
 
-export async function getCommunityBySlug(slug: string, viewerClerkId?: string): Promise<DbCommunity | null> {
+export async function getCommunityBySlug(slug: string, viewerAuthId?: string): Promise<DbCommunity | null> {
   return runRead(async (session) => {
     const result = await session.run(
       `MATCH (c:Community {slug: $slug})
-       OPTIONAL MATCH (u:User {clerkId: $viewerClerkId})-[m:MEMBER_OF]->(c)
+       OPTIONAL MATCH (u:User {authId: $viewerAuthId})-[m:MEMBER_OF]->(c)
        RETURN c, m.role AS viewerRole`,
-      { slug, viewerClerkId: viewerClerkId ?? null }
+      { slug, viewerAuthId: viewerAuthId ?? null }
     )
     if (!result.records.length) return null
     return {
@@ -80,26 +80,26 @@ export async function getCommunities(
   })
 }
 
-export async function joinCommunity(clerkId: string, communityId: string): Promise<void> {
+export async function joinCommunity(authId: string, communityId: string): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (u:User {clerkId: $clerkId}), (c:Community {id: $communityId})
+      `MATCH (u:User {authId: $authId}), (c:Community {id: $communityId})
        MERGE (u)-[m:MEMBER_OF]->(c)
        ON CREATE SET m.role = CASE WHEN c.type = 'public' THEN 'member' ELSE 'pending' END,
          m.joinedAt = $now, m.status = CASE WHEN c.type = 'public' THEN 'active' ELSE 'pending' END,
          c.memberCount = CASE WHEN c.type = 'public' THEN c.memberCount + 1 ELSE c.memberCount END`,
-      { clerkId, communityId, now: Date.now() }
+      { authId, communityId, now: Date.now() }
     )
   })
 }
 
-export async function leaveCommunity(clerkId: string, communityId: string): Promise<void> {
+export async function leaveCommunity(authId: string, communityId: string): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[m:MEMBER_OF]->(c:Community {id: $communityId})
+      `MATCH (u:User {authId: $authId})-[m:MEMBER_OF]->(c:Community {id: $communityId})
        DELETE m
        SET c.memberCount = CASE WHEN c.memberCount > 0 THEN c.memberCount - 1 ELSE 0 END`,
-      { clerkId, communityId }
+      { authId, communityId }
     )
   })
 }
@@ -125,14 +125,14 @@ export async function getCommunityMembers(
 }
 
 export async function getMembership(
-  clerkId: string,
+  authId: string,
   communityId: string
 ): Promise<{ role: string; status: string } | null> {
   return runRead(async (session) => {
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[m:MEMBER_OF]->(c:Community {id: $communityId})
+      `MATCH (u:User {authId: $authId})-[m:MEMBER_OF]->(c:Community {id: $communityId})
        RETURN m.role AS role, m.status AS status`,
-      { clerkId, communityId }
+      { authId, communityId }
     )
     if (!result.records.length) return null
     return { role: result.records[0].get("role"), status: result.records[0].get("status") }

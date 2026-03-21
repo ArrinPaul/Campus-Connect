@@ -60,5 +60,3 @@ export function authMiddleware(
     return result
   }
 }
-
-export const clerkMiddleware = authMiddleware

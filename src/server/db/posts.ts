@@ -22,7 +22,7 @@ export interface DbPost {
 // ─── Create ───────────────────────────────────────────────────────────────────
 
 export async function createPost(
-  authorClerkId: string,
+  authorAuthId: string,
   data: {
     content: string
     mediaUrls?: string[]
@@ -38,11 +38,11 @@ export async function createPost(
     const id = randomUUID()
 
     const result = await session.run(
-      `MATCH (u:User {clerkId: $authorClerkId})
+      `MATCH (u:User {authId: $authorAuthId})
        CREATE (p:Post {
          id: $id,
          authorId: u.id,
-         authorClerkId: $authorClerkId,
+         authorAuthId: $authorAuthId,
          content: $content,
          mediaUrls: $mediaUrls,
          mediaType: $mediaType,
@@ -59,7 +59,7 @@ export async function createPost(
        CREATE (u)-[:AUTHORED]->(p)
        RETURN p, u`,
       {
-        authorClerkId,
+        authorAuthId,
         id,
         content: data.content,
         mediaUrls: data.mediaUrls ?? [],
@@ -98,14 +98,14 @@ export async function getPostById(postId: string): Promise<DbPost | null> {
 }
 
 export async function getFeedPosts(
-  clerkId: string,
+  authId: string,
   limit = 10,
   cursor?: string
 ): Promise<{ posts: DbPost[]; hasMore: boolean; nextCursor: string | null }> {
   return runRead(async (session) => {
     const cursorTs = cursor ? parseInt(cursor, 10) : Date.now() + 1
     const result = await session.run(
-      `MATCH (me:User {clerkId: $clerkId})
+      `MATCH (me:User {authId: $authId})
        OPTIONAL MATCH (me)-[:FOLLOWS]->(followed:User)-[:AUTHORED]->(p:Post)
        WITH me, p, followed
        WHERE p IS NOT NULL AND p.createdAt < $cursorTs
@@ -114,7 +114,7 @@ export async function getFeedPosts(
        ORDER BY p.createdAt DESC
        LIMIT $limit
        RETURN p, u`,
-      { clerkId, cursorTs, limit: limit + 1 }
+      { authId, cursorTs, limit: limit + 1 }
     )
 
     const all = result.records.map((r) => ({
@@ -173,7 +173,7 @@ export async function getUserPosts(
     const cursorTs = cursor ? parseInt(cursor, 10) : Date.now() + 1
     const result = await session.run(
       `MATCH (u:User)-[:AUTHORED]->(p:Post)
-       WHERE (u.id = $userId OR u.clerkId = $userId)
+       WHERE (u.id = $userId OR u.authId = $userId)
          AND p.createdAt < $cursorTs
        RETURN p, u
        ORDER BY p.createdAt DESC
@@ -235,15 +235,15 @@ export async function getPostsByHashtag(
 
 export async function updatePost(
   postId: string,
-  clerkId: string,
+  authId: string,
   content: string
 ): Promise<DbPost> {
   return runWrite(async (session) => {
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[:AUTHORED]->(p:Post {id: $postId})
+      `MATCH (u:User {authId: $authId})-[:AUTHORED]->(p:Post {id: $postId})
        SET p.content = $content, p.updatedAt = $now
        RETURN p, u`,
-      { postId, clerkId, content, now: Date.now() }
+      { postId, authId, content, now: Date.now() }
     )
     if (!result.records.length) throw new Error("Post not found or unauthorized")
     return {
@@ -253,13 +253,13 @@ export async function updatePost(
   })
 }
 
-export async function deletePost(postId: string, clerkId: string): Promise<void> {
+export async function deletePost(postId: string, authId: string): Promise<void> {
   return runWrite(async (session) => {
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[:AUTHORED]->(p:Post {id: $postId})
+      `MATCH (u:User {authId: $authId})-[:AUTHORED]->(p:Post {id: $postId})
        DETACH DELETE p
        RETURN count(p) AS deleted`,
-      { postId, clerkId }
+      { postId, authId }
     )
     const deleted = result.records[0]?.get("deleted")?.low ?? 0
     if (deleted === 0) throw new Error("Post not found or unauthorized")

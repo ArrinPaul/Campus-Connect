@@ -18,14 +18,14 @@ export interface DbListing {
 }
 
 export async function createListing(
-  clerkId: string,
+  authId: string,
   data: Omit<DbListing, "id" | "sellerId" | "isSold" | "createdAt" | "seller">
 ): Promise<DbListing> {
   return runWrite(async (session) => {
     const id = randomUUID()
     const now = Date.now()
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})
+      `MATCH (u:User {authId: $authId})
        CREATE (l:MarketplaceListing {
          id: $id, title: $title, description: $description,
          price: $price, condition: $condition, category: $category,
@@ -33,7 +33,7 @@ export async function createListing(
        })
        CREATE (u)-[:LISTED]->(l)
        RETURN l, u`,
-      { clerkId, id, ...data, description: data.description ?? "", condition: data.condition ?? "Good", category: data.category ?? "", images: data.images ?? [], now }
+      { authId, id, ...data, description: data.description ?? "", condition: data.condition ?? "Good", category: data.category ?? "", images: data.images ?? [], now }
     )
     return { ...toPlain(result.records[0].get("l").properties), seller: toPlain(result.records[0].get("u").properties) } as unknown as DbListing
   })
@@ -64,12 +64,12 @@ export async function getListingById(id: string): Promise<DbListing | null> {
   })
 }
 
-export async function updateListing(id: string, clerkId: string, data: Partial<Omit<DbListing, "id" | "sellerId" | "createdAt">>): Promise<DbListing> {
+export async function updateListing(id: string, authId: string, data: Partial<Omit<DbListing, "id" | "sellerId" | "createdAt">>): Promise<DbListing> {
   return runWrite(async (session) => {
     const sets = Object.entries(data).filter(([, v]) => v !== undefined).map(([k]) => `l.${k} = $${k}`).join(", ")
-    const params: Record<string, unknown> = { id, clerkId, now: Date.now(), ...data }
+    const params: Record<string, unknown> = { id, authId, now: Date.now(), ...data }
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[:LISTED]->(l:MarketplaceListing {id: $id})
+      `MATCH (u:User {authId: $authId})-[:LISTED]->(l:MarketplaceListing {id: $id})
        SET ${sets}, l.updatedAt = $now
        RETURN l, u`,
       params
@@ -79,21 +79,21 @@ export async function updateListing(id: string, clerkId: string, data: Partial<O
   })
 }
 
-export async function deleteListing(id: string, clerkId: string): Promise<void> {
+export async function deleteListing(id: string, authId: string): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[:LISTED]->(l:MarketplaceListing {id: $id}) DETACH DELETE l`,
-      { id, clerkId }
+      `MATCH (u:User {authId: $authId})-[:LISTED]->(l:MarketplaceListing {id: $id}) DETACH DELETE l`,
+      { id, authId }
     )
   })
 }
 
-export async function markAsSold(id: string, clerkId: string): Promise<void> {
+export async function markAsSold(id: string, authId: string): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[:LISTED]->(l:MarketplaceListing {id: $id})
+      `MATCH (u:User {authId: $authId})-[:LISTED]->(l:MarketplaceListing {id: $id})
        SET l.isSold = true`,
-      { id, clerkId }
+      { id, authId }
     )
   })
 }
@@ -110,7 +110,7 @@ export interface DbPoll {
 }
 
 export async function createPoll(
-  clerkId: string,
+  authId: string,
   data: { question: string; options: string[]; expiresAt?: number }
 ): Promise<DbPoll> {
   return runWrite(async (session) => {
@@ -125,16 +125,16 @@ export async function createPoll(
   })
 }
 
-export async function votePoll(clerkId: string, pollId: string, optionId: string): Promise<DbPoll> {
+export async function votePoll(authId: string, pollId: string, optionId: string): Promise<DbPoll> {
   return runWrite(async (session) => {
     const result = await session.run(
       `MATCH (p:Poll {id: $pollId})
-       MATCH (u:User {clerkId: $clerkId})
+       MATCH (u:User {authId: $authId})
        MERGE (u)-[v:VOTED_ON]->(p)
        ON CREATE SET v.optionId = $optionId, v.createdAt = $now,
          p.totalVotes = coalesce(p.totalVotes, 0) + 1
        RETURN p`,
-      { clerkId, pollId, optionId, now: Date.now() }
+      { authId, pollId, optionId, now: Date.now() }
     )
     return toPlain(result.records[0].get("p").properties) as unknown as DbPoll
   })
@@ -142,33 +142,33 @@ export async function votePoll(clerkId: string, pollId: string, optionId: string
 
 // ─── Reposts ──────────────────────────────────────────────────────────────────
 
-export async function repost(clerkId: string, postId: string): Promise<void> {
+export async function repost(authId: string, postId: string): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (u:User {clerkId: $clerkId}), (p:Post {id: $postId})
+      `MATCH (u:User {authId: $authId}), (p:Post {id: $postId})
        MERGE (u)-[r:REPOSTED]->(p)
        ON CREATE SET r.createdAt = $now, p.shareCount = coalesce(p.shareCount, 0) + 1`,
-      { clerkId, postId, now: Date.now() }
+      { authId, postId, now: Date.now() }
     )
   })
 }
 
-export async function undoRepost(clerkId: string, postId: string): Promise<void> {
+export async function undoRepost(authId: string, postId: string): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[r:REPOSTED]->(p:Post {id: $postId})
+      `MATCH (u:User {authId: $authId})-[r:REPOSTED]->(p:Post {id: $postId})
        DELETE r
        SET p.shareCount = CASE WHEN p.shareCount > 0 THEN p.shareCount - 1 ELSE 0 END`,
-      { clerkId, postId }
+      { authId, postId }
     )
   })
 }
 
-export async function isReposted(clerkId: string, postId: string): Promise<boolean> {
+export async function isReposted(authId: string, postId: string): Promise<boolean> {
   return runRead(async (session) => {
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[:REPOSTED]->(p:Post {id: $postId}) RETURN count(*) AS n`,
-      { clerkId, postId }
+      `MATCH (u:User {authId: $authId})-[:REPOSTED]->(p:Post {id: $postId}) RETURN count(*) AS n`,
+      { authId, postId }
     )
     return ((result.records[0]?.get("n") as { low: number })?.low ?? 0) > 0
   })
@@ -176,12 +176,12 @@ export async function isReposted(clerkId: string, postId: string): Promise<boole
 
 // ─── Presence ─────────────────────────────────────────────────────────────────
 
-export async function updatePresence(clerkId: string, status: string, statusText?: string): Promise<void> {
+export async function updatePresence(authId: string, status: string, statusText?: string): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (u:User {clerkId: $clerkId})
+      `MATCH (u:User {authId: $authId})
        SET u.onlineStatus = $status, u.statusText = $statusText, u.lastSeenAt = $now`,
-      { clerkId, status, statusText: statusText ?? null, now: Date.now() }
+      { authId, status, statusText: statusText ?? null, now: Date.now() }
     )
   })
 }
@@ -189,7 +189,7 @@ export async function updatePresence(clerkId: string, status: string, statusText
 export async function getUserStatuses(userIds: string[]): Promise<Record<string, string>> {
   return runRead(async (session) => {
     const result = await session.run(
-      `MATCH (u:User) WHERE u.id IN $userIds OR u.clerkId IN $userIds
+      `MATCH (u:User) WHERE u.id IN $userIds OR u.authId IN $userIds
        RETURN u.id AS id, coalesce(u.onlineStatus, 'offline') AS status`,
       { userIds }
     )
@@ -225,7 +225,7 @@ export interface DbPortfolio {
 export async function getPortfolio(userId: string): Promise<DbPortfolio | null> {
   return runRead(async (session) => {
     const result = await session.run(
-      `MATCH (u:User) WHERE u.id = $userId OR u.clerkId = $userId
+      `MATCH (u:User) WHERE u.id = $userId OR u.authId = $userId
        OPTIONAL MATCH (u)-[:HAS_PROJECT]->(proj:Project)
        OPTIONAL MATCH (u)-[:HAS_CERT]->(cert:Certification)
        RETURN u, collect(DISTINCT proj) AS projects, collect(DISTINCT cert) AS certs`,
@@ -244,18 +244,18 @@ export async function getPortfolio(userId: string): Promise<DbPortfolio | null> 
 }
 
 export async function addProject(
-  clerkId: string,
+  authId: string,
   data: Omit<DbProject, "id" | "createdAt">
 ): Promise<DbProject> {
   return runWrite(async (session) => {
     const id = randomUUID()
     const now = Date.now()
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})
+      `MATCH (u:User {authId: $authId})
        CREATE (p:Project { id: $id, title: $title, description: $description, url: $url, imageUrl: $imageUrl, tags: $tags, startDate: $startDate, endDate: $endDate, createdAt: $now })
        CREATE (u)-[:HAS_PROJECT]->(p)
        RETURN p`,
-      { clerkId, id, ...data, description: data.description ?? "", url: data.url ?? null, imageUrl: data.imageUrl ?? null, tags: data.tags ?? [], startDate: data.startDate ?? null, endDate: data.endDate ?? null, now }
+      { authId, id, ...data, description: data.description ?? "", url: data.url ?? null, imageUrl: data.imageUrl ?? null, tags: data.tags ?? [], startDate: data.startDate ?? null, endDate: data.endDate ?? null, now }
     )
     return toPlain(result.records[0].get("p").properties) as unknown as DbProject
   })
@@ -272,14 +272,14 @@ export interface DbEndorsement {
   endorser?: Record<string, unknown>
 }
 
-export async function endorseSkill(clerkId: string, targetUserId: string, skill: string): Promise<void> {
+export async function endorseSkill(authId: string, targetUserId: string, skill: string): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (endorser:User {clerkId: $clerkId})
-       MATCH (endorsee:User) WHERE endorsee.id = $targetUserId OR endorsee.clerkId = $targetUserId
+      `MATCH (endorser:User {authId: $authId})
+       MATCH (endorsee:User) WHERE endorsee.id = $targetUserId OR endorsee.authId = $targetUserId
        MERGE (endorser)-[e:ENDORSED_SKILL {skill: $skill}]->(endorsee)
        ON CREATE SET e.id = $id, e.createdAt = $now`,
-      { clerkId, targetUserId, skill, id: randomUUID(), now: Date.now() }
+      { authId, targetUserId, skill, id: randomUUID(), now: Date.now() }
     )
   })
 }
@@ -288,7 +288,7 @@ export async function getEndorsements(userId: string): Promise<DbEndorsement[]> 
   return runRead(async (session) => {
     const result = await session.run(
       `MATCH (endorser:User)-[e:ENDORSED_SKILL]->(endorsee:User)
-       WHERE endorsee.id = $userId OR endorsee.clerkId = $userId
+       WHERE endorsee.id = $userId OR endorsee.authId = $userId
        RETURN e, endorser ORDER BY e.createdAt DESC`,
       { userId }
     )
@@ -319,14 +319,14 @@ export interface DbAd {
 }
 
 export async function createAd(
-  clerkId: string,
+  authId: string,
   data: Omit<DbAd, "id" | "advertiserId" | "status" | "impressionCount" | "clickCount" | "spent" | "createdAt" | "advertiser">
 ): Promise<DbAd> {
   return runWrite(async (session) => {
     const id = randomUUID()
     const now = Date.now()
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})
+      `MATCH (u:User {authId: $authId})
        CREATE (a:Ad {
          id: $id, title: $title, body: $body, imageUrl: $imageUrl,
          ctaUrl: $ctaUrl, ctaText: $ctaText, advertiserId: u.id,
@@ -335,7 +335,7 @@ export async function createAd(
        })
        CREATE (u)-[:CREATED_AD]->(a)
        RETURN a, u`,
-      { clerkId, id, ...data, body: data.body ?? "", imageUrl: data.imageUrl ?? null, ctaUrl: data.ctaUrl ?? null, ctaText: data.ctaText ?? "Learn More", budget: data.budget ?? 0, now }
+      { authId, id, ...data, body: data.body ?? "", imageUrl: data.imageUrl ?? null, ctaUrl: data.ctaUrl ?? null, ctaText: data.ctaText ?? "Learn More", budget: data.budget ?? 0, now }
     )
     return { ...toPlain(result.records[0].get("a").properties), advertiser: toPlain(result.records[0].get("u").properties) } as unknown as DbAd
   })
@@ -370,11 +370,11 @@ export async function trackAdClick(adId: string): Promise<void> {
   })
 }
 
-export async function getAdDashboard(clerkId: string): Promise<DbAd[]> {
+export async function getAdDashboard(authId: string): Promise<DbAd[]> {
   return runRead(async (session) => {
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[:CREATED_AD]->(a:Ad) RETURN a, u ORDER BY a.createdAt DESC`,
-      { clerkId }
+      `MATCH (u:User {authId: $authId})-[:CREATED_AD]->(a:Ad) RETURN a, u ORDER BY a.createdAt DESC`,
+      { authId }
     )
     return result.records.map((r) => ({ ...toPlain(r.get("a").properties), advertiser: toPlain(r.get("u").properties) }) as unknown as DbAd)
   })
@@ -396,7 +396,7 @@ export interface DbUserStats {
 export async function getUserStats(userId: string): Promise<DbUserStats | null> {
   return runRead(async (session) => {
     const result = await session.run(
-      `MATCH (u:User) WHERE u.id = $userId OR u.clerkId = $userId
+      `MATCH (u:User) WHERE u.id = $userId OR u.authId = $userId
        RETURN u`,
       { userId }
     )
@@ -473,15 +473,15 @@ export async function universalSearch(query: string, limit = 10): Promise<{
 
 // ─── Calls ────────────────────────────────────────────────────────────────────
 
-export async function initiateCall(callerClerkId: string, calleeUserId: string, type: "video" | "audio"): Promise<{ id: string }> {
+export async function initiateCall(callerAuthId: string, calleeUserId: string, type: "video" | "audio"): Promise<{ id: string }> {
   return runWrite(async (session) => {
     const id = randomUUID()
     const now = Date.now()
     await session.run(
-      `MATCH (caller:User {clerkId: $callerClerkId})
-       MATCH (callee:User) WHERE callee.id = $calleeUserId OR callee.clerkId = $calleeUserId
+      `MATCH (caller:User {authId: $callerAuthId})
+       MATCH (callee:User) WHERE callee.id = $calleeUserId OR callee.authId = $calleeUserId
        CREATE (c:Call { id: $id, callerId: caller.id, calleeId: callee.id, type: $type, status: 'ringing', createdAt: $now })`,
-      { callerClerkId, calleeUserId, type, id, now }
+      { callerAuthId, calleeUserId, type, id, now }
     )
     return { id }
   })
@@ -496,15 +496,15 @@ export async function updateCallStatus(callId: string, status: string): Promise<
   })
 }
 
-export async function getIncomingCall(clerkId: string): Promise<Record<string, unknown> | null> {
+export async function getIncomingCall(authId: string): Promise<Record<string, unknown> | null> {
   return runRead(async (session) => {
     const fiveMinutesAgo = Date.now() - 5 * 60 * 1000
     const result = await session.run(
-      `MATCH (callee:User {clerkId: $clerkId})<-[:CALLED]-(caller:User)
+      `MATCH (callee:User {authId: $authId})<-[:CALLED]-(caller:User)
        MATCH (c:Call {calleeId: callee.id, status: 'ringing'})
        WHERE c.createdAt > $since
        RETURN c, caller LIMIT 1`,
-      { clerkId, since: fiveMinutesAgo }
+      { authId, since: fiveMinutesAgo }
     )
     if (!result.records.length) return null
     return { ...toPlain(result.records[0].get("c").properties), caller: toPlain(result.records[0].get("caller").properties) }

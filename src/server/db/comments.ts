@@ -47,7 +47,7 @@ export async function getPostComments(
 }
 
 export async function addComment(
-  clerkId: string,
+  authId: string,
   data: {
     postId: string
     content: string
@@ -60,7 +60,7 @@ export async function addComment(
     const depth = data.parentCommentId ? 1 : 0
 
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId}), (p:Post {id: $postId})
+      `MATCH (u:User {authId: $authId}), (p:Post {id: $postId})
        CREATE (c:Comment {
          id: $id,
          postId: $postId,
@@ -78,7 +78,7 @@ export async function addComment(
        SET p.commentCount = coalesce(p.commentCount, 0) + 1
        RETURN c, u`,
       {
-        clerkId,
+        authId,
         postId: data.postId,
         id,
         content: data.content,
@@ -103,15 +103,15 @@ export async function addComment(
   })
 }
 
-export async function deleteComment(commentId: string, clerkId: string): Promise<void> {
+export async function deleteComment(commentId: string, authId: string): Promise<void> {
   return runWrite(async (session) => {
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[:AUTHORED]->(c:Comment {id: $commentId})
+      `MATCH (u:User {authId: $authId})-[:AUTHORED]->(c:Comment {id: $commentId})
        OPTIONAL MATCH (c)-[:ON_POST]->(p:Post)
        SET p.commentCount = CASE WHEN p.commentCount > 0 THEN p.commentCount - 1 ELSE 0 END
        DETACH DELETE c
        RETURN count(c) AS deleted`,
-      { commentId, clerkId }
+      { commentId, authId }
     )
     const deleted = result.records[0]?.get("deleted")?.low ?? 0
     if (deleted === 0) throw new Error("Comment not found or unauthorized")

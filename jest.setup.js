@@ -34,8 +34,8 @@ jest.mock("next/dynamic", () => {
 jest.mock("@/lib/auth/client", () => ({
   useUser: jest.fn(() => ({ isLoaded: true, isSignedIn: true, user: { id: "test-user-id", fullName: "Test User", imageUrl: "/test.jpg" } })),
   useAuth: jest.fn(() => ({ isLoaded: true, isSignedIn: true, userId: "test-user-id" })),
-  useClerk: jest.fn(() => ({ signOut: jest.fn() })),
-  ClerkProvider: ({ children }) => children,
+  useAuthActions: jest.fn(() => ({ signOut: jest.fn() })),
+  AuthProvider: ({ children }) => children,
   SignIn: () => null,
   SignUp: () => null,
   SignedIn: ({ children }) => children,
@@ -50,6 +50,5 @@ jest.mock("@/lib/auth/server", () => ({
   auth: jest.fn(() => ({ userId: "test-user-id" })),
   currentUser: jest.fn(),
   authMiddleware: jest.fn(() => (req) => req),
-  clerkMiddleware: jest.fn(() => (req) => req),
   createRouteMatcher: jest.fn(() => () => false),
 }))

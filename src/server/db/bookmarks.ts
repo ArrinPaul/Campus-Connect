@@ -11,48 +11,48 @@ export interface DbBookmark {
 }
 
 export async function addBookmark(
-  clerkId: string,
+  authId: string,
   postId: string,
   collectionName = "Saved"
 ): Promise<{ action: string }> {
   return runWrite(async (session) => {
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})
+      `MATCH (u:User {authId: $authId})
        MATCH (p:Post {id: $postId})
        MERGE (u)-[b:BOOKMARKED]->(p)
        ON CREATE SET b.id = $id, b.collectionName = $collectionName, b.createdAt = $now
          RETURN 'created' AS action
        ON MATCH SET b.collectionName = CASE WHEN $collectionName <> b.collectionName THEN $collectionName ELSE b.collectionName END
        RETURN 'updated' AS action`,
-      { clerkId, postId, id: randomUUID(), collectionName, now: Date.now() }
+      { authId, postId, id: randomUUID(), collectionName, now: Date.now() }
     )
     return { action: result.records[0]?.get("action") ?? "created" }
   })
 }
 
-export async function removeBookmark(clerkId: string, postId: string): Promise<void> {
+export async function removeBookmark(authId: string, postId: string): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[b:BOOKMARKED]->(p:Post {id: $postId})
+      `MATCH (u:User {authId: $authId})-[b:BOOKMARKED]->(p:Post {id: $postId})
        DELETE b`,
-      { clerkId, postId }
+      { authId, postId }
     )
   })
 }
 
-export async function isBookmarked(clerkId: string, postId: string): Promise<boolean> {
+export async function isBookmarked(authId: string, postId: string): Promise<boolean> {
   return runRead(async (session) => {
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[b:BOOKMARKED]->(p:Post {id: $postId})
+      `MATCH (u:User {authId: $authId})-[b:BOOKMARKED]->(p:Post {id: $postId})
        RETURN count(b) AS n`,
-      { clerkId, postId }
+      { authId, postId }
     )
     return ((result.records[0]?.get("n") as { low: number })?.low ?? 0) > 0
   })
 }
 
 export async function getBookmarks(
-  clerkId: string,
+  authId: string,
   collectionName?: string,
   limit = 20,
   cursor?: string
@@ -62,12 +62,12 @@ export async function getBookmarks(
     const collectionFilter = collectionName ? `AND b.collectionName = '${collectionName}'` : ""
 
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[b:BOOKMARKED]->(p:Post)<-[:AUTHORED]-(author:User)
+      `MATCH (u:User {authId: $authId})-[b:BOOKMARKED]->(p:Post)<-[:AUTHORED]-(author:User)
        WHERE b.createdAt < $cursorTs ${collectionFilter}
        RETURN b, p, author
        ORDER BY b.createdAt DESC
        LIMIT $limit`,
-      { clerkId, cursorTs, limit: limit + 1 }
+      { authId, cursorTs, limit: limit + 1 }
     )
 
     const all = result.records.map((r) => ({
@@ -86,13 +86,13 @@ export async function getBookmarks(
   })
 }
 
-export async function getBookmarkCollections(clerkId: string): Promise<string[]> {
+export async function getBookmarkCollections(authId: string): Promise<string[]> {
   return runRead(async (session) => {
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[b:BOOKMARKED]->(:Post)
+      `MATCH (u:User {authId: $authId})-[b:BOOKMARKED]->(:Post)
        RETURN DISTINCT b.collectionName AS name
        ORDER BY name`,
-      { clerkId }
+      { authId }
     )
     return result.records.map((r) => r.get("name") as string)
   })

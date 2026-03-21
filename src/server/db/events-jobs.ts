@@ -24,14 +24,14 @@ export interface DbEvent {
 }
 
 export async function createEvent(
-  clerkId: string,
+  authId: string,
   data: Omit<DbEvent, "id" | "organizerId" | "attendeeCount" | "createdAt" | "organizer" | "isAttending">
 ): Promise<DbEvent> {
   return runWrite(async (session) => {
     const id = randomUUID()
     const now = Date.now()
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})
+      `MATCH (u:User {authId: $authId})
        CREATE (e:Event {
          id: $id, title: $title, description: $description,
          location: $location, isVirtual: $isVirtual, meetingUrl: $meetingUrl,
@@ -42,7 +42,7 @@ export async function createEvent(
        })
        CREATE (u)-[:ORGANIZED]->(e)
        RETURN e, u`,
-      { clerkId, id, ...data, description: data.description ?? "", location: data.location ?? null,
+      { authId, id, ...data, description: data.description ?? "", location: data.location ?? null,
         meetingUrl: data.meetingUrl ?? null, endDate: data.endDate ?? null,
         communityId: data.communityId ?? null, category: data.category ?? "",
         tags: data.tags ?? [], imageUrl: data.imageUrl ?? null, now }
@@ -77,13 +77,13 @@ export async function getEvents(
   })
 }
 
-export async function getEventById(id: string, clerkId?: string): Promise<DbEvent | null> {
+export async function getEventById(id: string, authId?: string): Promise<DbEvent | null> {
   return runRead(async (session) => {
     const result = await session.run(
       `MATCH (e:Event {id: $id})<-[:ORGANIZED]-(u:User)
-       OPTIONAL MATCH (me:User {clerkId: $clerkId})-[:ATTENDING]->(e)
+       OPTIONAL MATCH (me:User {authId: $authId})-[:ATTENDING]->(e)
        RETURN e, u, me IS NOT NULL AS isAttending`,
-      { id, clerkId: clerkId ?? null }
+      { id, authId: authId ?? null }
     )
     if (!result.records.length) return null
     return {
@@ -94,24 +94,24 @@ export async function getEventById(id: string, clerkId?: string): Promise<DbEven
   })
 }
 
-export async function attendEvent(clerkId: string, eventId: string): Promise<void> {
+export async function attendEvent(authId: string, eventId: string): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (u:User {clerkId: $clerkId}), (e:Event {id: $eventId})
+      `MATCH (u:User {authId: $authId}), (e:Event {id: $eventId})
        MERGE (u)-[:ATTENDING]->(e)
        ON CREATE SET e.attendeeCount = coalesce(e.attendeeCount, 0) + 1`,
-      { clerkId, eventId }
+      { authId, eventId }
     )
   })
 }
 
-export async function unattendEvent(clerkId: string, eventId: string): Promise<void> {
+export async function unattendEvent(authId: string, eventId: string): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[a:ATTENDING]->(e:Event {id: $eventId})
+      `MATCH (u:User {authId: $authId})-[a:ATTENDING]->(e:Event {id: $eventId})
        DELETE a
        SET e.attendeeCount = CASE WHEN e.attendeeCount > 0 THEN e.attendeeCount - 1 ELSE 0 END`,
-      { clerkId, eventId }
+      { authId, eventId }
     )
   })
 }
@@ -137,14 +137,14 @@ export interface DbJob {
 }
 
 export async function createJob(
-  clerkId: string,
+  authId: string,
   data: Omit<DbJob, "id" | "postedById" | "createdAt" | "poster" | "isApplied">
 ): Promise<DbJob> {
   return runWrite(async (session) => {
     const id = randomUUID()
     const now = Date.now()
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})
+      `MATCH (u:User {authId: $authId})
        CREATE (j:Job {
          id: $id, title: $title, company: $company,
          description: $description, location: $location,
@@ -154,7 +154,7 @@ export async function createJob(
        })
        CREATE (u)-[:POSTED_JOB]->(j)
        RETURN j, u`,
-      { clerkId, id, ...data,
+      { authId, id, ...data,
         location: data.location ?? null, salary: data.salary ?? null,
         requirements: data.requirements ?? [], tags: data.tags ?? [],
         deadline: data.deadline ?? null, now }
@@ -203,27 +203,27 @@ export async function getJobById(id: string): Promise<DbJob | null> {
 }
 
 export async function applyToJob(
-  clerkId: string,
+  authId: string,
   jobId: string,
   coverLetter?: string
 ): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (u:User {clerkId: $clerkId}), (j:Job {id: $jobId})
+      `MATCH (u:User {authId: $authId}), (j:Job {id: $jobId})
        MERGE (u)-[a:APPLIED_TO]->(j)
        ON CREATE SET a.coverLetter = $coverLetter, a.appliedAt = $now, a.status = 'pending'`,
-      { clerkId, jobId, coverLetter: coverLetter ?? "", now: Date.now() }
+      { authId, jobId, coverLetter: coverLetter ?? "", now: Date.now() }
     )
   })
 }
 
-export async function getMyApplications(clerkId: string): Promise<{ job: DbJob; status: string; appliedAt: number }[]> {
+export async function getMyApplications(authId: string): Promise<{ job: DbJob; status: string; appliedAt: number }[]> {
   return runRead(async (session) => {
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[a:APPLIED_TO]->(j:Job)<-[:POSTED_JOB]-(poster:User)
+      `MATCH (u:User {authId: $authId})-[a:APPLIED_TO]->(j:Job)<-[:POSTED_JOB]-(poster:User)
        RETURN j, poster, a.status AS status, a.appliedAt AS appliedAt
        ORDER BY a.appliedAt DESC`,
-      { clerkId }
+      { authId }
     )
     return result.records.map((r) => ({
       job: { ...toPlain(r.get("j").properties), poster: toPlain(r.get("poster").properties) } as unknown as DbJob,

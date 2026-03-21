@@ -5,7 +5,7 @@ export const REACTION_TYPES = ["like", "love", "laugh", "wow", "sad", "scholarly
 export type ReactionType = (typeof REACTION_TYPES)[number]
 
 export async function addReaction(
-  clerkId: string,
+  authId: string,
   targetId: string,
   targetType: "post" | "comment",
   type: ReactionType
@@ -13,7 +13,7 @@ export async function addReaction(
   return runWrite(async (session) => {
     const now = Date.now()
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})
+      `MATCH (u:User {authId: $authId})
        MATCH (target) WHERE (target:Post OR target:Comment) AND target.id = $targetId
        MERGE (u)-[r:REACTED_TO {targetType: $targetType}]->(target)
        ON CREATE SET r.id = $id, r.type = $type, r.createdAt = $now
@@ -21,7 +21,7 @@ export async function addReaction(
        ON MATCH SET r.type = CASE WHEN r.type = $type THEN r.type ELSE $type END,
                     r.createdAt = $now
        RETURN CASE WHEN r.type = $prevType THEN 'no-change' ELSE 'updated' END AS action, r, u, target`,
-      { clerkId, targetId, targetType, type, id: randomUUID(), now, prevType: type }
+      { authId, targetId, targetType, type, id: randomUUID(), now, prevType: type }
     )
 
     if (!result.records.length) throw new Error("Target not found")
@@ -30,31 +30,31 @@ export async function addReaction(
 }
 
 export async function removeReaction(
-  clerkId: string,
+  authId: string,
   targetId: string,
   targetType: "post" | "comment"
 ): Promise<void> {
   return runWrite(async (session) => {
     await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[r:REACTED_TO {targetType: $targetType}]->(target)
+      `MATCH (u:User {authId: $authId})-[r:REACTED_TO {targetType: $targetType}]->(target)
        WHERE target.id = $targetId
        DELETE r`,
-      { clerkId, targetId, targetType }
+      { authId, targetId, targetType }
     )
   })
 }
 
 export async function getUserReaction(
-  clerkId: string,
+  authId: string,
   targetId: string,
   targetType: "post" | "comment"
 ): Promise<{ type: ReactionType } | null> {
   return runRead(async (session) => {
     const result = await session.run(
-      `MATCH (u:User {clerkId: $clerkId})-[r:REACTED_TO {targetType: $targetType}]->(target)
+      `MATCH (u:User {authId: $authId})-[r:REACTED_TO {targetType: $targetType}]->(target)
        WHERE target.id = $targetId
        RETURN r.type AS type`,
-      { clerkId, targetId, targetType }
+      { authId, targetId, targetType }
     )
     if (!result.records.length) return null
     return { type: result.records[0].get("type") as ReactionType }
