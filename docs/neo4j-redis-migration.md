@@ -41,7 +41,7 @@ Use `POST /api/graph/sync` with `Authorization: Bearer <GRAPH_SYNC_TOKEN>`.
 {
   "type": "user",
   "user": {
-    "clerkId": "user_123",
+    "authId": "user_123",
     "convexUserId": "jh7z3...",
     "name": "Alice",
     "skills": ["react", "ml"]
@@ -54,8 +54,8 @@ Use `POST /api/graph/sync` with `Authorization: Bearer <GRAPH_SYNC_TOKEN>`.
 ```json
 {
   "type": "follow",
-  "followerClerkId": "user_123",
-  "followingClerkId": "user_456",
+  "followerauthId": "user_123",
+  "followingauthId": "user_456",
   "action": "follow"
 }
 ```
@@ -67,7 +67,7 @@ Use `POST /api/graph/sync` with `Authorization: Bearer <GRAPH_SYNC_TOKEN>`.
   "type": "post",
   "post": {
     "postId": "post_abc",
-    "authorClerkId": "user_456",
+    "authorauthId": "user_456",
     "content": "Graph databases are great for recommendations",
     "hashtags": ["graph", "neo4j"],
     "engagementScore": 2.3
@@ -81,7 +81,7 @@ Use `POST /api/graph/sync` with `Authorization: Bearer <GRAPH_SYNC_TOKEN>`.
 {
   "type": "interaction",
   "interaction": {
-    "viewerClerkId": "user_123",
+    "viewerauthId": "user_123",
     "postId": "post_abc",
     "interactionType": "like",
     "weight": 1

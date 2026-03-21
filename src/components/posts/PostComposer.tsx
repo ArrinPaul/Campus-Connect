@@ -331,7 +331,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
     e.preventDefault()
     setError("")
 
-    // Auth check - use app auth status which syncs with Clerk
+    // Auth check - use app auth status
     if (!isAuthenticated) {
       setError("You must be signed in to create a post")
       toast.error("Sign in required", { description: "Please sign in to create a post" })

@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useClerk } from '@/lib/auth/client';
+import { useAuthActions } from '@/lib/auth/client';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 type NavItem = { href: string; icon: React.ElementType; label: string };
@@ -56,7 +56,7 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
 
 export function PrimarySidebar() {
   const pathname = usePathname();
-  const { signOut } = useClerk();
+  const { signOut } = useAuthActions();
 
   return (
     <div className="flex h-full w-60 flex-col border-r bg-card">
@@ -121,3 +121,4 @@ export function PrimarySidebar() {
     </div>
   );
 }
+

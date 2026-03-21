@@ -32,7 +32,7 @@ const mockPost = {
     _id: "author123" as any,
     name: "Test Author",
     username: "testauthor",
-    clerkId: "clerk123",
+    authId: "auth123",
     imageUrl: "https://example.com/image.jpg",
     bio: "Test bio",
     createdAt: Date.now(),

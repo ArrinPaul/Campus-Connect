@@ -55,12 +55,12 @@ export function useAuth(): {
   }
 }
 
-export function useAuthActions(): { signOut: () => Promise<void> } {
+export function useAuthActions(): { signOut: (options?: { redirectUrl?: string }) => Promise<void> } {
   const router = useRouter()
   return {
-    signOut: async () => {
+    signOut: async (options) => {
       document.cookie = "cc_user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
-      router.push("/sign-in")
+      router.push(options?.redirectUrl || "/sign-in")
       router.refresh()
     },
   }
