@@ -1,23 +1,21 @@
-import "server-only"
-
 import neo4j, { Driver, Session } from "neo4j-driver"
 
 type Neo4jGlobal = typeof globalThis & {
-  __campusConnectNeo4jDriver?: Driver
-  __campusConnectNeo4jInitPromise?: Promise<void>
+  __neo4jDriver?: Driver
+  __neo4jInitPromise?: Promise<void>
 }
 
 const neo4jGlobal = globalThis as Neo4jGlobal
 
 function getNeo4jEnv() {
   const uri = (process.env.NEO4J_URI || "").trim()
-  const username = (process.env.NEO4J_USERNAME || process.env.NEO4J_USER || "").trim()
-  const password = (process.env.NEO4J_PASSWORD || process.env.NEO4J_PASS || "").trim()
-  const database = process.env.NEO4J_DATABASE?.trim() || undefined
+  const username = (process.env.NEO4J_USERNAME || "").trim()
+  const password = (process.env.NEO4J_PASSWORD || "").trim()
+  const database = (process.env.NEO4J_DATABASE || "neo4j").trim()
 
   if (!uri || !username || !password) {
     throw new Error(
-      "Neo4j environment variables are not configured. Set NEO4J_URI, NEO4J_USERNAME, and NEO4J_PASSWORD."
+      "Neo4j environment variables not configured. Set NEO4J_URI, NEO4J_USERNAME, and NEO4J_PASSWORD."
     )
   }
 
@@ -34,27 +32,30 @@ function isNeo4jAuthError(error: unknown): boolean {
 }
 
 export function getNeo4jDriver(): Driver {
-  if (neo4jGlobal.__campusConnectNeo4jDriver) return neo4jGlobal.__campusConnectNeo4jDriver
+  if (neo4jGlobal.__neo4jDriver) return neo4jGlobal.__neo4jDriver
 
   const { uri, username, password } = getNeo4jEnv()
-  neo4jGlobal.__campusConnectNeo4jDriver = neo4j.driver(uri, neo4j.auth.basic(username, password), {
+  neo4jGlobal.__neo4jDriver = neo4j.driver(uri, neo4j.auth.basic(username, password), {
     maxConnectionLifetime: 60 * 60 * 1000,
     maxConnectionPoolSize: 50,
   })
-  return neo4jGlobal.__campusConnectNeo4jDriver
+  return neo4jGlobal.__neo4jDriver
 }
 
 export function initializeNeo4j(): Promise<void> {
-  if (neo4jGlobal.__campusConnectNeo4jInitPromise) {
-    return neo4jGlobal.__campusConnectNeo4jInitPromise
+  if (neo4jGlobal.__neo4jInitPromise) {
+    return neo4jGlobal.__neo4jInitPromise
   }
 
   const driver = getNeo4jDriver()
-  neo4jGlobal.__campusConnectNeo4jInitPromise = driver.verifyConnectivity().then(() => undefined)
-  return neo4jGlobal.__campusConnectNeo4jInitPromise
+  neo4jGlobal.__neo4jInitPromise = driver.verifyConnectivity().then(() => undefined)
+  return neo4jGlobal.__neo4jInitPromise
 }
 
-async function withSession<T>(mode: "READ" | "WRITE", fn: (session: Session) => Promise<T>): Promise<T> {
+async function withSession<T>(
+  mode: "READ" | "WRITE",
+  fn: (session: Session) => Promise<T>
+): Promise<T> {
   await initializeNeo4j()
 
   const { database } = getNeo4jEnv()
@@ -62,7 +63,7 @@ async function withSession<T>(mode: "READ" | "WRITE", fn: (session: Session) => 
   const sessionOptions: Parameters<Driver["session"]>[0] = {
     defaultAccessMode: mode === "READ" ? neo4j.session.READ : neo4j.session.WRITE,
   }
-  
+
   if (database) {
     sessionOptions.database = database
   }
@@ -74,7 +75,7 @@ async function withSession<T>(mode: "READ" | "WRITE", fn: (session: Session) => 
   } catch (error) {
     if (isNeo4jAuthError(error)) {
       throw new Error(
-        "Database authentication failed. Verify NEO4J_URI, NEO4J_USERNAME, and NEO4J_PASSWORD in .env.local."
+        "Database authentication failed. Verify NEO4J_URI, NEO4J_USERNAME, and NEO4J_PASSWORD."
       )
     }
     throw error
@@ -92,8 +93,22 @@ export function runWrite<T>(fn: (session: Session) => Promise<T>): Promise<T> {
 }
 
 export async function closeNeo4jDriver(): Promise<void> {
-  const activeDriver = neo4jGlobal.__campusConnectNeo4jDriver
-  neo4jGlobal.__campusConnectNeo4jDriver = undefined
-  neo4jGlobal.__campusConnectNeo4jInitPromise = undefined
+  const activeDriver = neo4jGlobal.__neo4jDriver
+  neo4jGlobal.__neo4jDriver = undefined
+  neo4jGlobal.__neo4jInitPromise = undefined
   await activeDriver?.close()
+}
+
+export function toPlain(record: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = {}
+  for (const [k, v] of Object.entries(record)) {
+    if (v !== null && typeof v === "object" && "low" in (v as object)) {
+      out[k] = (v as { low: number; high: number }).low
+    } else if (v !== null && typeof v === "object" && "toNumber" in (v as object)) {
+      out[k] = (v as { toNumber: () => number }).toNumber()
+    } else {
+      out[k] = v
+    }
+  }
+  return out
 }

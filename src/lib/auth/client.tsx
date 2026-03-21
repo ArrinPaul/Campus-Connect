@@ -23,8 +23,9 @@ function useSessionUserId() {
 
   useEffect(() => {
     let mounted = true
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
 
-    void fetch("/api/auth/session", { credentials: "include", cache: "no-store" })
+    void fetch(`${apiUrl}/api/auth/session`, { credentials: "include", cache: "no-store" })
       .then((res) => (res.ok ? res.json() : { userId: null }))
       .then((payload) => {
         if (!mounted) return
@@ -84,13 +85,13 @@ export function useAuth(): {
 
 export function useAuthActions(): { signOut: (options?: { redirectUrl?: string }) => Promise<void> } {
   const router = useRouter()
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
   return {
     signOut: async (options) => {
-      await fetch("/api/auth/sign-out", {
+      await fetch(`${apiUrl}/api/auth/sign-out`, {
         method: "POST",
         credentials: "include",
       }).catch(() => null)
-      document.cookie = "cc_user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
       router.push(options?.redirectUrl || "/sign-in")
       router.refresh()
     },
@@ -144,8 +145,9 @@ export function SignIn(_props: Record<string, unknown>) {
     }
 
     setIsSubmitting(true)
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
     try {
-      const response = await fetch("/api/auth/sign-in", {
+      const response = await fetch(`${apiUrl}/api/auth/sign-in`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -158,7 +160,6 @@ export function SignIn(_props: Record<string, unknown>) {
         return
       }
 
-      await fetch("/api/users/me", { credentials: "include" }).catch(() => null)
       router.push("/feed")
       router.refresh()
     } finally {
@@ -225,8 +226,9 @@ export function SignUp(_props: Record<string, unknown>) {
     }
 
     setIsSubmitting(true)
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
     try {
-      const response = await fetch("/api/auth/sign-up", {
+      const response = await fetch(`${apiUrl}/api/auth/sign-up`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -239,7 +241,6 @@ export function SignUp(_props: Record<string, unknown>) {
         return
       }
 
-      await fetch("/api/users/me", { credentials: "include" }).catch(() => null)
       router.push("/onboarding")
       router.refresh()
     } finally {
@@ -294,7 +295,8 @@ export function SignUp(_props: Record<string, unknown>) {
 }
 
 export async function currentUser() {
-  const payload = await fetch("/api/auth/session", { credentials: "include", cache: "no-store" })
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+  const payload = await fetch(`${apiUrl}/api/auth/session`, { credentials: "include", cache: "no-store" })
     .then((res) => (res.ok ? res.json() : { userId: null }))
     .catch(() => ({ userId: null }))
   const userId = typeof payload?.userId === "string" ? payload.userId : getDevUserId()

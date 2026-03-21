@@ -1,16 +1,7 @@
 "use client"
 
 /**
- * Legacy data-client compatibility layer for Neo4j migration.
- *
- * Drop-in replacement for:
- *   import { useQuery, useMutation } from '@/lib/api'
- *   import { api } from '@/lib/api'
- *   import type { Id, Doc } from '@/lib/api'
- *
- * Usage:
- *   import { useQuery, useMutation, api } from '@/lib/api'
- *   import type { Id, Doc } from '@/lib/api'
+ * Backend API client - calls apps/api instead of internal routes.
  */
 
 import {
@@ -21,15 +12,10 @@ import {
 import { useAuth } from "@/lib/auth/client"
 import type { ReactNode } from "react"
 
-// ─── Type compatibility shims ────────────────────────────────────────────────
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
 
-/** Neo4j IDs are plain strings (UUIDs). */
 export type Id<_T extends string = string> = string
-
-/** Generic document type – replace with domain-specific types where needed. */
 export type Doc<_T extends string = string> = Record<string, unknown>
-
-// ─── Endpoint descriptor ─────────────────────────────────────────────────────
 
 export interface Endpoint {
   readonly _path: string
@@ -45,10 +31,10 @@ function ep(
 
 // ─── useQuery ────────────────────────────────────────────────────────────────
 /**
- * Legacy-compatible useQuery: returns `undefined` while loading, data when done.
- * Pass `null` as the endpoint to disable (mirrors the old skip pattern).
+ * Legacy-compatible useQuery: returns undefined while loading, data when done.
+ * Pass null endpoint or "skip" args to disable fetching.
  */
-export function useQuery<T = unknown>(
+export function useQuery<T = any>(
   endpoint: Endpoint | null | undefined,
   args?: Record<string, unknown> | "skip"
 ): T | undefined {
@@ -63,8 +49,8 @@ export function useQuery<T = unknown>(
 
   const url = enabled
     ? params.toString()
-      ? `${endpoint!._path}?${params}`
-      : endpoint!._path
+      ? `${API_BASE_URL}${endpoint!._path}?${params.toString()}`
+      : `${API_BASE_URL}${endpoint!._path}`
     : ""
 
   const { data } = useTanstackQuery<T>({
@@ -89,14 +75,14 @@ export function useQuery<T = unknown>(
 /**
  * Legacy-compatible useMutation: returns an async function that sends the request.
  */
-export function useMutation<A = Record<string, unknown>, T = unknown>(
+export function useMutation<A = any, T = any>(
   endpoint: Endpoint
 ): (args?: A) => Promise<T> {
   const queryClient = useQueryClient()
 
   const mutation = useTanstackMutation<T, Error, A | undefined>({
     mutationFn: async (args) => {
-      const res = await fetch(endpoint._path, {
+      const res = await fetch(`${API_BASE_URL}${endpoint._path}`, {
         method: endpoint._method === "GET" ? "POST" : endpoint._method,
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -109,12 +95,27 @@ export function useMutation<A = Record<string, unknown>, T = unknown>(
       return res.json() as T
     },
     onSuccess: () => {
-      // Invalidate all cached queries to keep UI in sync
       queryClient.invalidateQueries()
     },
   })
 
   return (args?: A) => mutation.mutateAsync(args)
+}
+
+export function useAction<A = any, T = any>(endpoint: Endpoint): (args?: A) => Promise<T> {
+  return async (args?: A) => {
+    const res = await fetch(`${API_BASE_URL}${endpoint._path}`, {
+      method: endpoint._method === "GET" ? "POST" : endpoint._method,
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(args ?? {}),
+    })
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }))
+      throw new Error(err.error || "Action failed")
+    }
+    return res.json() as T
+  }
 }
 
 // Legacy auth compatibility used by existing UI/tests.
@@ -134,12 +135,13 @@ export function ConvexProvider({ children }: { children: ReactNode; client?: unk
 
 // ─── api object (mirrors legacy generated api shape) ─────────────────────────
 
-export const api = {
+export const api: any = {
   // ── users ──────────────────────────────────────────────────────────────────
   users: {
     getCurrentUser: ep("/api/users/me"),
     getUserById: ep("/api/users/profile"),
     searchUsers: ep("/api/users/search"),
+    searchUsersByUsername: ep("/api/users/search"),
     updateProfile: ep("/api/users/me", "PATCH"),
     addSkill: ep("/api/users/skills", "POST"),
     removeSkill: ep("/api/users/skills", "DELETE"),
@@ -178,6 +180,7 @@ export const api = {
   comments: {
     getPostComments: ep("/api/comments"),
     addComment: ep("/api/comments", "POST"),
+    createComment: ep("/api/comments", "POST"),
     deleteComment: ep("/api/comments/delete", "DELETE"),
     getReplies: ep("/api/comments/replies"),
   },
@@ -349,13 +352,18 @@ export const api = {
   // ── polls ──────────────────────────────────────────────────────────────────
   polls: {
     getPoll: ep("/api/polls/single"),
+    getPollResults: ep("/api/polls/single"),
+    getUserVote: ep("/api/polls/user-vote"),
     createPoll: ep("/api/polls", "POST"),
     votePoll: ep("/api/polls/vote", "POST"),
+    vote: ep("/api/polls/vote", "POST"),
+    linkPollToPost: ep("/api/polls/link", "POST"),
   },
 
   // ── reposts ────────────────────────────────────────────────────────────────
   reposts: {
     repost: ep("/api/reposts", "POST"),
+    createRepost: ep("/api/reposts", "POST"),
     undoRepost: ep("/api/reposts/undo", "DELETE"),
     isReposted: ep("/api/reposts/check"),
   },
@@ -447,6 +455,8 @@ export const api = {
   media: {
     generateUploadUrl: ep("/api/media/upload-url", "POST"),
     confirmUpload: ep("/api/media/confirm", "POST"),
+    resolveStorageUrls: ep("/api/media/resolve-urls", "POST"),
+    fetchLinkPreview: ep("/api/media/link-preview", "POST"),
   },
 
   // ── subscriptions ──────────────────────────────────────────────────────────
