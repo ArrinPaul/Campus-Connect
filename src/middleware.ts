@@ -24,6 +24,10 @@ function isApiRoute(request: NextRequest): boolean {
   return request.nextUrl.pathname.startsWith("/api/")
 }
 
+function isDevAuthShimEnabled(): boolean {
+  return process.env.ENABLE_DEV_AUTH_SHIM === "true"
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getClientIp(request: NextRequest): string {
@@ -63,11 +67,13 @@ export default async function middleware(request: NextRequest) {
   // Protect all non-public routes using local auth markers.
   if (!isPublicRoute(request)) {
     const userId =
-      request.headers.get("x-user-id") ||
       request.cookies.get("cc_session")?.value ||
-      request.cookies.get("cc_user_id")?.value ||
-      process.env.DEV_USER_ID ||
-      null
+      (isDevAuthShimEnabled()
+        ? request.headers.get("x-user-id") ||
+          request.cookies.get("cc_user_id")?.value ||
+          process.env.DEV_USER_ID ||
+          null
+        : null)
 
     if (!userId) {
       if (isApiRoute(request)) {

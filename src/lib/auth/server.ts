@@ -2,7 +2,12 @@ import type { NextRequest } from "next/server"
 import { cookies, headers } from "next/headers"
 import { getSessionCookieName, verifySessionToken } from "@/lib/auth/session"
 
+function isDevAuthShimEnabled(): boolean {
+  return process.env.ENABLE_DEV_AUTH_SHIM === "true"
+}
+
 function getFallbackUserId(): string | null {
+  if (!isDevAuthShimEnabled()) return null
   const value = process.env.DEV_USER_ID
   return value && value.trim().length > 0 ? value.trim() : null
 }
@@ -17,18 +22,29 @@ function fromRequest(request: NextRequest): string | null {
   const tokenUserId = readUserIdFromToken(sessionToken)
   if (tokenUserId) return tokenUserId
 
-  const headerUserId = request.headers.get("x-user-id")
-  const cookieUserId = request.cookies.get("cc_user_id")?.value
-  return headerUserId || cookieUserId || getFallbackUserId()
+  if (isDevAuthShimEnabled()) {
+    const headerUserId = request.headers.get("x-user-id")
+    const cookieUserId = request.cookies.get("cc_user_id")?.value
+    return headerUserId || cookieUserId || getFallbackUserId()
+  }
+
+  return null
 }
 
 export async function auth(): Promise<{ userId: string | null }> {
   try {
-    const h = await headers()
     const c = await cookies()
     const sessionToken = c.get(getSessionCookieName())?.value
     const tokenUserId = readUserIdFromToken(sessionToken)
-    const userId = tokenUserId || h.get("x-user-id") || c.get("cc_user_id")?.value || getFallbackUserId()
+    if (tokenUserId) return { userId: tokenUserId }
+
+    if (isDevAuthShimEnabled()) {
+      const h = await headers()
+      const userId = h.get("x-user-id") || c.get("cc_user_id")?.value || getFallbackUserId()
+      return { userId }
+    }
+
+    const userId = getFallbackUserId()
     return { userId }
   } catch {
     return { userId: getFallbackUserId() }

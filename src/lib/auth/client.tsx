@@ -1,7 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 
 type NullableUser = {
@@ -12,12 +12,39 @@ type NullableUser = {
 } | null
 
 function getDevUserId(): string | null {
-  if (typeof window !== "undefined") {
-    const match = document.cookie.match(/(?:^|; )cc_user_id=([^;]*)/)
-    if (match) return decodeURIComponent(match[1])
-  }
+  if (process.env.NEXT_PUBLIC_ENABLE_DEV_AUTH_SHIM !== "true") return null
   const value = process.env.NEXT_PUBLIC_DEV_USER_ID
   return value && value.trim().length > 0 ? value.trim() : null
+}
+
+function useSessionUserId() {
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
+
+  useEffect(() => {
+    let mounted = true
+
+    void fetch("/api/auth/session", { credentials: "include", cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : { userId: null }))
+      .then((payload) => {
+        if (!mounted) return
+        const id = typeof payload?.userId === "string" ? payload.userId : null
+        setUserId(id || getDevUserId())
+      })
+      .catch(() => {
+        if (!mounted) return
+        setUserId(getDevUserId())
+      })
+      .finally(() => {
+        if (mounted) setIsLoaded(true)
+      })
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  return { isLoaded, userId }
 }
 
 export function useUser(): {
@@ -25,9 +52,9 @@ export function useUser(): {
   isSignedIn: boolean
   user: NullableUser
 } {
-  const userId = getDevUserId()
+  const { isLoaded, userId } = useSessionUserId()
   return {
-    isLoaded: true,
+    isLoaded,
     isSignedIn: Boolean(userId),
     user: userId
       ? {
@@ -46,9 +73,9 @@ export function useAuth(): {
   userId: string | null
   getToken: () => Promise<string | null>
 } {
-  const userId = getDevUserId()
+  const { isLoaded, userId } = useSessionUserId()
   return {
-    isLoaded: true,
+    isLoaded,
     isSignedIn: Boolean(userId),
     userId,
     getToken: async () => null,
@@ -267,7 +294,10 @@ export function SignUp(_props: Record<string, unknown>) {
 }
 
 export async function currentUser() {
-  const userId = getDevUserId()
+  const payload = await fetch("/api/auth/session", { credentials: "include", cache: "no-store" })
+    .then((res) => (res.ok ? res.json() : { userId: null }))
+    .catch(() => ({ userId: null }))
+  const userId = typeof payload?.userId === "string" ? payload.userId : getDevUserId()
   if (!userId) return null
   return {
     id: userId,
@@ -277,6 +307,9 @@ export async function currentUser() {
 }
 
 export async function auth() {
-  const userId = getDevUserId()
+  const payload = await fetch("/api/auth/session", { credentials: "include", cache: "no-store" })
+    .then((res) => (res.ok ? res.json() : { userId: null }))
+    .catch(() => ({ userId: null }))
+  const userId = typeof payload?.userId === "string" ? payload.userId : getDevUserId()
   return { userId }
 }
