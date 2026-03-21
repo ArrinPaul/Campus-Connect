@@ -143,9 +143,12 @@ self.addEventListener("fetch", (event) => {
 
 /** Network-first for navigations, falls back to cache or offline page */
 async function networkFirstNavigation(request) {
+  const url = new URL(request.url)
+  const isAuthPage = url.pathname.startsWith("/sign-in") || url.pathname.startsWith("/sign-up")
+
   try {
     const response = await fetch(request)
-    if (response.ok) {
+    if (response.ok && !isAuthPage) {
       const cache = await caches.open(DYNAMIC_CACHE)
       cache.put(request, response.clone())
       trimCache(DYNAMIC_CACHE, DYNAMIC_CACHE_LIMIT)

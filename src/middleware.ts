@@ -11,6 +11,7 @@ function isPublicRoute(request: NextRequest): boolean {
     pathname === "/" ||
     pathname.startsWith("/sign-in") ||
     pathname.startsWith("/sign-up") ||
+    pathname.startsWith("/api/auth") ||
     pathname.startsWith("/api/webhooks")
   )
 }

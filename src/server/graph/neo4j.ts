@@ -3,55 +3,29 @@ import "server-only"
 import neo4j, { Driver, Session } from "neo4j-driver"
 
 let driver: Driver | null = null
-let activeUri: string | null = null
 
 function getNeo4jEnv() {
-  const uri = process.env.NEO4J_URI
-  const username = process.env.NEO4J_USERNAME
-  const password = process.env.NEO4J_PASSWORD
+  const uri = (process.env.NEO4J_URI || "").trim()
+  const username = (process.env.NEO4J_USERNAME || process.env.NEO4J_USER || "").trim()
+  const password = (process.env.NEO4J_PASSWORD || process.env.NEO4J_PASS || "").trim()
+  const database = process.env.NEO4J_DATABASE?.trim() || undefined
 
   if (!uri || !username || !password) {
-    throw new Error("Neo4j environment variables are not configured. Set NEO4J_URI, NEO4J_USERNAME, and NEO4J_PASSWORD.")
+    throw new Error(
+      "Neo4j environment variables are not configured. Set NEO4J_URI, NEO4J_USERNAME, and NEO4J_PASSWORD."
+    )
   }
 
-  return { uri, username, password }
+  return { uri, username, password, database }
 }
 
-function toDirectBoltUri(uri: string): string {
-  if (uri.startsWith("neo4j+s://")) return `bolt+s://${uri.slice("neo4j+s://".length)}`
-  if (uri.startsWith("neo4j+ssc://")) return `bolt+ssc://${uri.slice("neo4j+ssc://".length)}`
-  if (uri.startsWith("neo4j://")) return `bolt://${uri.slice("neo4j://".length)}`
-  return uri
-}
-
-function isRoutingDiscoveryError(error: unknown): boolean {
-  if (!(error instanceof Error)) return false
-  return /could not perform discovery|no routing servers available/i.test(error.message)
-}
-
-function isDatabaseNotFoundError(error: unknown): boolean {
-  if (!(error instanceof Error)) return false
-  return /database .* not found|database does not exist/i.test(error.message)
-}
-
-function switchToDirectDriver(): boolean {
-  const { uri, username, password } = getNeo4jEnv()
-  const directUri = toDirectBoltUri(uri)
-
-  if (directUri === uri || activeUri === directUri) {
-    return false
-  }
-
-  void driver?.close().catch(() => {
-    // Ignore close errors during fallback; we'll try opening a fresh driver.
-  })
-
-  driver = neo4j.driver(directUri, neo4j.auth.basic(username, password), {
-    maxConnectionLifetime: 60 * 60 * 1000,
-    maxConnectionPoolSize: 50,
-  })
-  activeUri = directUri
-  return true
+function isNeo4jAuthError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message.toLowerCase() : ""
+  return (
+    message.includes("unauthorized") ||
+    message.includes("authentication failure") ||
+    message.includes("invalid credentials")
+  )
 }
 
 export function getNeo4jDriver(): Driver {
@@ -62,30 +36,33 @@ export function getNeo4jDriver(): Driver {
     maxConnectionLifetime: 60 * 60 * 1000,
     maxConnectionPoolSize: 50,
   })
-  activeUri = uri
   return driver
 }
 
 async function withSession<T>(mode: "READ" | "WRITE", fn: (session: Session) => Promise<T>): Promise<T> {
-  const execute = async (): Promise<T> => {
-    const session = getNeo4jDriver().session({
-      defaultAccessMode: mode === "READ" ? neo4j.session.READ : neo4j.session.WRITE,
-    })
+  const { database } = getNeo4jEnv()
 
-    try {
-      return await fn(session)
-    } finally {
-      await session.close()
-    }
+  const sessionOptions: any = {
+    defaultAccessMode: mode === "READ" ? neo4j.session.READ : neo4j.session.WRITE,
+  }
+  
+  if (database) {
+    sessionOptions.database = database
   }
 
+  const session = getNeo4jDriver().session(sessionOptions)
+
   try {
-    return await execute()
+    return await fn(session)
   } catch (error) {
-    if ((isRoutingDiscoveryError(error) || isDatabaseNotFoundError(error)) && switchToDirectDriver()) {
-      return execute()
+    if (isNeo4jAuthError(error)) {
+      throw new Error(
+        "Database authentication failed. Verify NEO4J_URI, NEO4J_USERNAME, and NEO4J_PASSWORD in .env.local."
+      )
     }
     throw error
+  } finally {
+    await session.close()
   }
 }
 

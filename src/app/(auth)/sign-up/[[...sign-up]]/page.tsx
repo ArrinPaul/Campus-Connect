@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   description: "Create your Campus Connect account to start connecting with academic peers.",
 }
 
-// Revalidate the server-rendered shell every hour
-export const revalidate = 3600
+// Auth pages should not serve stale HTML shells because they hydrate interactive forms.
+export const dynamic = "force-dynamic"
 
 export default function SignUpPage() {
   return (
