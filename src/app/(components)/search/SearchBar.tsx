@@ -1,14 +1,16 @@
 'use client';
 
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { cn } from '@/lib/utils';
 
 type Props = {
     initialQuery?: string;
+    className?: string;
 };
 
-export function SearchBar({ initialQuery = '' }: Props) {
+export function SearchBar({ initialQuery = '', className }: Props) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [query, setQuery] = useState(initialQuery);
@@ -27,15 +29,27 @@ export function SearchBar({ initialQuery = '' }: Props) {
     };
 
     return (
-        <form onSubmit={handleSearch} className="relative w-full max-w-lg mx-auto">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        <form 
+            onSubmit={handleSearch} 
+            className={cn("relative w-full max-w-2xl mx-auto group", className)}
+        >
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-ink-muted-48 group-focus-within:text-primary transition-colors" />
             <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search for posts, people, communities..."
-                className="w-full pl-10 pr-4 py-2.5 text-base bg-muted/50 rounded-full focus:outline-none focus:ring-1 focus:ring-primary"
+                placeholder="Search Campus Connect..."
+                className="w-full pl-11 pr-10 h-12 rounded-pill border border-hairline bg-canvas text-body focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
             />
+            {query && (
+                <button
+                    type="button"
+                    onClick={() => { setQuery(''); router.push('/search'); }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-canvas-parchment text-ink-muted-48"
+                >
+                    <X className="h-4 w-4" />
+                </button>
+            )}
         </form>
     );
 }

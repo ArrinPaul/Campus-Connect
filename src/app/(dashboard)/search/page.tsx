@@ -9,19 +9,19 @@ import { SearchBar } from '../../(components)/search/SearchBar';
 import { PostCard } from '../../(components)/feed/PostCard';
 import { UserCard } from '../../(components)/search/UserCard';
 import { HashtagCard } from '../../(components)/search/HashtagCard';
-import { FeedItem } from '../../(components)/feed/types'; // Import FeedItem type
-import { Loader2 } from 'lucide-react';
+import { Section, SectionHeader } from '@/components/ui/Section';
+import { cn } from '@/lib/utils';
+import { Search, Inbox } from 'lucide-react';
 
 type Tab = 'all' | 'posts' | 'people' | 'hashtags';
 
 const SearchResultsSkeleton = () => (
-    <div className="space-y-4">
-        <div className="h-10 w-full bg-muted/50 rounded-md animate-pulse" />
-        <div className="grid grid-cols-3 gap-2">
-            {[...Array(3)].map((_, i) => <div key={i} className="h-10 bg-muted/50 rounded-md animate-pulse" />)}
+    <div className="w-full space-y-4">
+        <div className="h-12 w-full bg-canvas-parchment animate-pulse rounded-pill" />
+        <div className="flex gap-4 border-b border-hairline py-4">
+           {[...Array(4)].map((_, i) => <div key={i} className="h-6 w-16 bg-canvas-parchment animate-pulse rounded" />)}
         </div>
-        <div className="h-32 w-full bg-muted/50 rounded-md animate-pulse" />
-        <div className="h-32 w-full bg-muted/50 rounded-md animate-pulse" />
+        {[...Array(3)].map((_, i) => <div key={i} className="h-32 w-full bg-canvas-parchment animate-pulse rounded-lg" />)}
     </div>
 );
 
@@ -41,20 +41,23 @@ function SearchResultsContent() {
     const hashtags = searchResult?.hashtags ?? [];
 
     useEffect(() => {
-        // Reset to 'all' tab if query changes
         setActiveTab('all');
     }, [currentQuery]);
 
     const renderResults = () => {
         if (!currentQuery) {
             return (
-                <div className="text-center py-16 text-muted-foreground">
-                    <p className="text-lg">Start typing to search for posts, people, or hashtags.</p>
+                <div className="flex flex-col items-center justify-center py-32 text-center opacity-50">
+                    <Search size={64} className="mb-4 text-ink-muted-48" />
+                    <h3 className="text-display-md text-ink">Discover Campus Connect.</h3>
+                    <p className="text-body text-ink-muted-48 mt-2 max-w-sm">
+                        Search for people, posts, or academic hashtags to expand your community.
+                    </p>
                 </div>
             );
         }
 
-        if (users === undefined || posts === undefined || hashtags === undefined) {
+        if (searchResult === undefined) {
             return <SearchResultsSkeleton />;
         }
         
@@ -62,69 +65,64 @@ function SearchResultsContent() {
 
         if (!hasResults) {
             return (
-                <div className="text-center py-16 text-muted-foreground">
-                    <p className="text-lg">No results found for &ldquo;{currentQuery}&rdquo;.</p>
-                    <p className="text-sm">Try a different search term.</p>
+                <div className="flex flex-col items-center justify-center py-32 text-center">
+                    <Inbox size={64} className="mb-4 text-ink/10" />
+                    <h3 className="text-display-md text-ink">No matches found.</h3>
+                    <p className="text-body text-ink-muted-48 mt-2 max-w-sm">
+                        We couldn&apos;t find anything for &ldquo;{currentQuery}&rdquo;. Try checking the spelling or using broader keywords.
+                    </p>
                 </div>
             );
         }
 
+        const PostGrid = ({ items }: { items: any[] }) => (
+            <div className="space-y-4">
+                {items.map(post => (
+                    <PostCard key={post._id} post={post} author={post.author} />
+                ))}
+            </div>
+        );
+
+        const UserGrid = ({ items }: { items: any[] }) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {items.map(user => (
+                    <UserCard key={user._id} user={user as any} />
+                ))}
+            </div>
+        );
+
         switch (activeTab) {
             case 'posts':
-                return posts.length > 0 ? (
-                    <div className="space-y-4">
-                        {posts.map(post => (
-                            <PostCard key={post._id} item={{ type: 'post', post: post as any, _id: post._id, createdAt: post.createdAt }} />
-                        ))}
-                    </div>
-                ) : <div className="text-center py-8 text-muted-foreground">No posts found.</div>;
+                return posts.length > 0 ? <PostGrid items={posts} /> : <p className="text-center py-8">No posts found.</p>;
             case 'people':
-                return users.length > 0 ? (
-                    <div className="space-y-4">
-                        {users.map(user => (
-                            <UserCard key={user._id} user={user as any} />
-                        ))}
-                    </div>
-                ) : <div className="text-center py-8 text-muted-foreground">No people found.</div>;
+                return users.length > 0 ? <UserGrid items={users} /> : <p className="text-center py-8">No people found.</p>;
             case 'hashtags':
                 return hashtags.length > 0 ? (
-                    <div className="space-y-4">
-                        {hashtags.map(hashtag => (
-                            <HashtagCard key={hashtag._id} hashtag={hashtag as any} />
-                        ))}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {hashtags.map(hashtag => <HashtagCard key={hashtag._id} hashtag={hashtag as any} />)}
                     </div>
-                ) : <div className="text-center py-8 text-muted-foreground">No hashtags found.</div>;
+                ) : <p className="text-center py-8">No hashtags found.</p>;
             case 'all':
             default:
                 return (
-                    <div className="space-y-8">
+                    <div className="space-y-12">
                         {posts.length > 0 && (
-                            <div>
-                                <h3 className="text-xl font-bold mb-4">Posts ({posts.length})</h3>
-                                <div className="space-y-4">
-                                    {posts.map(post => (
-                                        <PostCard key={post._id} item={{ type: 'post', post: post as any, _id: post._id, createdAt: post.createdAt }} />
-                                    ))}
-                                </div>
+                            <div className="space-y-4">
+                                <div className="text-fine-print text-ink-muted-48 font-bold uppercase tracking-widest border-b border-hairline pb-2">Top Posts</div>
+                                <PostGrid items={posts} />
                             </div>
                         )}
                         {users.length > 0 && (
-                            <div className="mt-8">
-                                <h3 className="text-xl font-bold mb-4">People ({users.length})</h3>
-                                <div className="space-y-4">
-                                    {users.map(user => (
-                                        <UserCard key={user._id} user={user as any} />
-                                    ))}
-                                </div>
+                            <div className="space-y-4">
+                                <div className="text-fine-print text-ink-muted-48 font-bold uppercase tracking-widest border-b border-hairline pb-2">Relevant People</div>
+                                <UserGrid items={users} />
                             </div>
                         )}
                         {hashtags.length > 0 && (
-                            <div className="mt-8">
-                                <h3 className="text-xl font-bold mb-4">Hashtags ({hashtags.length})</h3>
-                                <div className="space-y-4">
-                                    {hashtags.map(hashtag => (
-                                        <HashtagCard key={hashtag._id} hashtag={hashtag as any} />
-                                    ))}
+                            <div className="space-y-4">
+                                <div className="text-fine-print text-ink-muted-48 font-bold uppercase tracking-widest border-b border-hairline pb-2">Academic Hashtags</div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {hashtags.map(hashtag => <HashtagCard key={hashtag._id} hashtag={hashtag as any} />)}
                                 </div>
                             </div>
                         )}
@@ -134,49 +132,57 @@ function SearchResultsContent() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto py-8 px-4">
-            <h1 className="text-3xl font-bold mb-6">Search</h1>
-            <SearchBar initialQuery={currentQuery} />
+        <div className="w-full bg-canvas min-h-screen">
+            {/* Header Section */}
+            <Section variant="parchment" className="py-xl">
+                <SectionHeader title="Search." tagline={currentQuery ? `Results for "${currentQuery}"` : "Find what you're looking for across the campus."}>
+                    <SearchBar className="max-w-2xl" />
+                </SectionHeader>
+            </Section>
 
-            <div className="mt-8 border-b">
-                <nav className="flex gap-4" aria-label="Search result types">
-                    <button 
-                        onClick={() => setActiveTab('all')}
-                        className={`py-3 px-1 border-b-2 ${activeTab === 'all' ? 'border-primary text-primary font-semibold' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-                    >
-                        All ({ (users?.length || 0) + (posts?.length || 0) + (hashtags?.length || 0) })
-                    </button>
-                    <button 
-                        onClick={() => setActiveTab('posts')}
-                        className={`py-3 px-1 border-b-2 ${activeTab === 'posts' ? 'border-primary text-primary font-semibold' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-                    >
-                        Posts ({posts?.length || 0})
-                    </button>
-                    <button 
-                        onClick={() => setActiveTab('people')}
-                        className={`py-3 px-1 border-b-2 ${activeTab === 'people' ? 'border-primary text-primary font-semibold' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-                    >
-                        People ({users?.length || 0})
-                    </button>
-                    <button 
-                        onClick={() => setActiveTab('hashtags')}
-                        className={`py-3 px-1 border-b-2 ${activeTab === 'hashtags' ? 'border-primary text-primary font-semibold' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-                    >
-                        Hashtags ({hashtags?.length || 0})
-                    </button>
-                </nav>
-            </div>
+            <main className="w-full flex flex-col items-center">
+                <div className="w-full max-w-4xl px-4 md:px-0">
+                    
+                    {/* Tabs - Apple Style */}
+                    <div className="w-full flex items-center justify-center md:justify-start gap-8 h-12 border-b border-hairline mt-4 sticky top-[96px] z-30 glass bg-canvas/80">
+                        {[
+                           { id: 'all', label: 'All', count: (users?.length || 0) + (posts?.length || 0) + (hashtags?.length || 0) },
+                           { id: 'posts', label: 'Posts', count: posts?.length || 0 },
+                           { id: 'people', label: 'People', count: users?.length || 0 },
+                           { id: 'hashtags', label: 'Hashtags', count: hashtags?.length || 0 },
+                        ].map(tab => (
+                            <button 
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id as Tab)}
+                                className={cn(
+                                    "relative h-full flex items-center text-caption font-semibold transition-colors btn-press whitespace-nowrap",
+                                    activeTab === tab.id ? "text-primary" : "text-ink-muted-48 hover:text-ink"
+                                )}
+                            >
+                                {tab.label} ({tab.count})
+                                {activeTab === tab.id && (
+                                    <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full" />
+                                )}
+                            </button>
+                        ))}
+                    </div>
 
-            <div className="mt-8">
-                {renderResults()}
-            </div>
+                    <div className="py-8">
+                        {renderResults()}
+                    </div>
+                </div>
+            </main>
         </div>
     );
 }
 
 export default function SearchPage() {
     return (
-        <Suspense fallback={<SearchResultsSkeleton />}>
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-screen bg-canvas">
+                <div className="animate-pulse text-ink/30 font-display text-2xl">Searching...</div>
+            </div>
+        }>
             <SearchResultsContent />
         </Suspense>
     );
