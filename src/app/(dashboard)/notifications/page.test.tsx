@@ -1,19 +1,12 @@
 import { render, screen, fireEvent } from "@testing-library/react"
 import NotificationsPage from "./page"
 import { useQuery, useMutation, useConvexAuth } from "@/lib/api"
+import { useUser } from "@/lib/auth/client"
 
-// Mock dependencies
 jest.mock("@/lib/api", () => ({
   useQuery: jest.fn(),
   useMutation: jest.fn(() => jest.fn()),
   useConvexAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false })),
-}))
-jest.mock("@/components/notifications/NotificationItem", () => ({
-  NotificationItem: ({ notification }: any) => (
-    <div data-testid="notification-item">{notification.message}</div>
-  ),
-}))
-jest.mock("@/lib/api", () => ({
   api: {
     notifications: {
       getNotifications: {},
@@ -22,10 +15,16 @@ jest.mock("@/lib/api", () => ({
     },
   },
 }))
+jest.mock("@/components/notifications/NotificationItem", () => ({
+  NotificationItem: ({ notification }: any) => (
+    <div data-testid="notification-item">{notification.message}</div>
+  ),
+}))
 
 const mockUseQuery = useQuery as jest.MockedFunction<typeof useQuery>
 const mockUseMutation = useMutation as jest.MockedFunction<typeof useMutation>
 const mockUseConvexAuth = useConvexAuth as jest.MockedFunction<typeof useConvexAuth>
+const mockUseUser = useUser as jest.MockedFunction<typeof useUser>
 const mockMarkAllAsRead = jest.fn()
 
 describe("NotificationsPage", () => {
@@ -33,6 +32,7 @@ describe("NotificationsPage", () => {
     jest.clearAllMocks()
     mockUseMutation.mockReturnValue(mockMarkAllAsRead as any)
     mockUseConvexAuth.mockReturnValue({ isAuthenticated: true, isLoading: false })
+    mockUseUser.mockReturnValue({ isLoaded: true, isSignedIn: true, user: { id: "test-user-id", fullName: "Test User", imageUrl: "/test.jpg" } } as any)
   })
 
   it("should render page title", () => {
@@ -113,6 +113,7 @@ describe("NotificationsPage", () => {
   })
 
   it("should show sign-in prompt when not authenticated", () => {
+    mockUseUser.mockReturnValue({ isLoaded: true, isSignedIn: false, user: null } as any)
     mockUseConvexAuth.mockReturnValue({ isAuthenticated: false, isLoading: false })
     // skip means useQuery returns undefined
     mockUseQuery.mockReturnValue(undefined)

@@ -6,15 +6,21 @@ const mockAddSkill = jest.fn()
 const mockRemoveSkill = jest.fn()
 
 jest.mock("@/lib/api", () => ({
-  useMutation: jest.fn((api) => {
-    if (api.toString().includes("addSkill")) {
+  useMutation: jest.fn((apiFunction) => {
+    if (apiFunction === "users:addSkill") {
       return mockAddSkill
     }
-    if (api.toString().includes("removeSkill")) {
+    if (apiFunction === "users:removeSkill") {
       return mockRemoveSkill
     }
     return jest.fn()
   }),
+  api: {
+    users: {
+      addSkill: "users:addSkill",
+      removeSkill: "users:removeSkill",
+    },
+  },
 }))
 
 // Mock validations

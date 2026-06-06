@@ -44,10 +44,6 @@ jest.mock("@/components/editor/RichTextEditor", () => ({
 const mockCreateComment = jest.fn()
 jest.mock("@/lib/api", () => ({
   useMutation: jest.fn(() => mockCreateComment),
-}))
-
-// Mock the app API descriptors
-jest.mock("@/lib/api", () => ({
   api: {
     comments: {
       createComment: "comments:createComment",

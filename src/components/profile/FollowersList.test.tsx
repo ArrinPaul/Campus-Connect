@@ -12,6 +12,11 @@ jest.mock("@/lib/api", () => ({
     }
     return null
   }),
+  api: {
+    follows: {
+      getFollowers: "follows:getFollowers",
+    },
+  },
 }))
 
 // Mock UserCard component

@@ -295,6 +295,7 @@ export const api: any = {
   // ── stories ────────────────────────────────────────────────────────────────
   stories: {
     getActiveStories: ep("/api/stories"),
+    getStories: ep("/api/stories"),
     getUserStories: ep("/api/stories/user"),
     createStory: ep("/api/stories", "POST"),
     viewStory: ep("/api/stories/view", "POST"),

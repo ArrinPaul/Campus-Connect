@@ -7,6 +7,12 @@ import { render, screen } from "@testing-library/react"
 jest.mock("@/lib/api", () => ({
   useQuery: jest.fn(),
   useMutation: jest.fn(() => jest.fn()),
+  api: {
+    stories: {
+      getStories: "stories:getStories",
+      createStory: "stories:createStory",
+    },
+  },
 }))
 
 jest.mock("next/navigation", () => ({

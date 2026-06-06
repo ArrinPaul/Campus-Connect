@@ -25,8 +25,30 @@ jest.mock("@/lib/api", () => ({
     if (apiFunction === "follows:isFollowing") {
       return mockIsFollowing()
     }
+    if (apiFunction === "users:getCurrentUser") {
+      return { _id: "current-user-id" }
+    }
+    if (apiFunction === "presence:getUserPresence") {
+      return { status: "online", lastSeen: Date.now() }
+    }
     return null
   }),
+  api: {
+    users: {
+      getCurrentUser: "users:getCurrentUser",
+    },
+    follows: {
+      followUser: "follows:followUser",
+      unfollowUser: "follows:unfollowUser",
+      isFollowing: "follows:isFollowing",
+    },
+    conversations: {
+      getOrCreateConversation: "conversations:getOrCreateConversation",
+    },
+    presence: {
+      getUserPresence: "presence:getUserPresence",
+    },
+  },
 }))
 
 // Mock Next.js Image component

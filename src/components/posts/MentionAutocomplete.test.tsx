@@ -7,6 +7,11 @@ jest.mock('@/lib/api', () => ({
   useMutation: jest.fn(() => jest.fn()),
   ConvexProvider: ({ children }: any) => children,
   ConvexReactClient: jest.fn(),
+  api: {
+    users: {
+      searchUsersByUsername: "users:searchUsersByUsername",
+    },
+  },
 }))
 
 // Mock next/image to render a plain <img> so src attributes are testable

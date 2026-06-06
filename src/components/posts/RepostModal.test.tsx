@@ -2,17 +2,16 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { RepostModal } from "./RepostModal"
 import { useMutation } from "@/lib/api"
 
-// Mock dependencies
-jest.mock("@/lib/api")
-jest.mock("lucide-react", () => ({
-  X: () => <div data-testid="x-icon">X</div>,
-}))
 jest.mock("@/lib/api", () => ({
+  useMutation: jest.fn(),
   api: {
     reposts: {
       createRepost: {},
     },
   },
+}))
+jest.mock("lucide-react", () => ({
+  X: () => <div data-testid="x-icon">X</div>,
 }))
 
 const mockUseMutation = useMutation as jest.MockedFunction<typeof useMutation>

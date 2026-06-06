@@ -32,6 +32,33 @@ jest.mock("@/lib/api", () => ({
   useAction: jest.fn(() => jest.fn()),
   useQuery: jest.fn(() => null),
   useConvexAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false })),
+  api: {
+    posts: {
+      createPost: "posts:createPost",
+      deletePost: "posts:deletePost",
+    },
+    media: {
+      generateUploadUrl: "media:generateUploadUrl",
+      resolveStorageUrls: "media:resolveStorageUrls",
+      fetchLinkPreview: "media:fetchLinkPreview",
+    },
+    polls: {
+      createPoll: "polls:createPoll",
+      linkPollToPost: "polls:linkPollToPost",
+    },
+    users: {
+      getCurrentUser: "users:getCurrentUser",
+    },
+    reposts: {
+      createRepost: "reposts:createRepost",
+    },
+    comments: {
+      getPostComments: "comments:getPostComments",
+    },
+    presence: {
+      getUserPresence: "presence:getUserPresence",
+    },
+  },
 }))
 
 // Mock Next.js Image

@@ -45,6 +45,13 @@ const LEVEL_PREFIXES: Record<LogLevel, string> = {
 const isDev = process.env.NODE_ENV === "development"
 const isServer = typeof window === "undefined"
 
+let Sentry: any = null
+try {
+  Sentry = require("@sentry/nextjs")
+} catch (e) {
+  // Sentry is optional
+}
+
 // ─── Core emit ───────────────────────────────────────────────────────────────
 
 function emit(
@@ -54,6 +61,25 @@ function emit(
   error?: unknown,
   context?: LogContext
 ): void {
+  if (Sentry && (level === "error" || level === "warn")) {
+    try {
+      Sentry.withScope((sentryScope: any) => {
+        sentryScope.setTag("logger.scope", scope)
+        if (context) {
+          sentryScope.setExtras(context)
+        }
+        if (level === "error") {
+          Sentry.captureException(error || new Error(message))
+        } else if (level === "warn") {
+          sentryScope.setExtras({ level: "warning" }) // Set warning level extra if needed, or captured in message
+          Sentry.captureMessage(message, "warning")
+        }
+      })
+    } catch (err) {
+      // Ignore
+    }
+  }
+
   const ts = new Date().toISOString()
   const payload: Record<string, unknown> = {
     level,

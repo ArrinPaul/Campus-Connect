@@ -58,10 +58,6 @@ jest.mock("@/lib/api", () => ({
   }),
   useQuery: jest.fn(() => mockUseQuery()),
   useConvexAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false })),
-}))
-
-// Mock the app API descriptors
-jest.mock("@/lib/api", () => ({
   api: {
     posts: {
       createPost: "posts:createPost",

@@ -21,6 +21,23 @@ jest.mock("@/lib/api", () => ({
     if (fn === "posts:hasUserLikedPost") return mockHasUserLikedPost()
     return null
   }),
+  api: {
+    posts: {
+      deletePost: "posts:deletePost",
+      likePost: "posts:likePost",
+      unlikePost: "posts:unlikePost",
+      hasUserLikedPost: "posts:hasUserLikedPost",
+    },
+    users: {
+      getCurrentUser: "users:getCurrentUser",
+    },
+    reposts: {
+      createRepost: "reposts:createRepost",
+    },
+    comments: {
+      getPostComments: "comments:getPostComments",
+    },
+  },
 }))
 
 // Mock Next.js Image component

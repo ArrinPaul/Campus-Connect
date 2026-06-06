@@ -3,23 +3,20 @@ import { NotificationBell } from "./NotificationBell"
 import { useQuery } from "@/lib/api"
 import { useRouter } from "next/navigation"
 
-// Mock dependencies
 jest.mock("@/lib/api", () => ({
   useQuery: jest.fn(),
   useMutation: jest.fn(() => jest.fn()),
   useConvexAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false })),
-}))
-jest.mock("next/navigation")
-jest.mock("date-fns", () => ({
-  formatDistanceToNow: jest.fn(() => "2 minutes ago"),
-}))
-jest.mock("@/lib/api", () => ({
   api: {
     notifications: {
       getUnreadCount: {},
       getRecentNotifications: {},
     },
   },
+}))
+jest.mock("next/navigation")
+jest.mock("date-fns", () => ({
+  formatDistanceToNow: jest.fn(() => "2 minutes ago"),
 }))
 jest.mock("@/components/accessibility/LiveRegion", () => ({
   useLiveRegion: jest.fn(() => ({ announce: jest.fn() })),

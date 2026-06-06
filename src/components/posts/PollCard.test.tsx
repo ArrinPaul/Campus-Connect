@@ -2,18 +2,9 @@ import React from "react"
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { PollCard } from "./PollCard"
 
-// Mock @/lib/api
 jest.mock("@/lib/api", () => ({
   useQuery: jest.fn(),
   useMutation: jest.fn(() => jest.fn()),
-}))
-
-// Mock next navigation
-jest.mock("next/navigation", () => ({
-  useRouter: () => ({ push: jest.fn() }),
-}))
-
-jest.mock("@/lib/api", () => ({
   api: {
     polls: {
       getPollResults: "polls:getPollResults",
@@ -21,6 +12,10 @@ jest.mock("@/lib/api", () => ({
       vote: "polls:vote",
     },
   },
+}))
+// Mock next navigation
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ push: jest.fn() }),
 }))
 
 import { useQuery, useMutation } from "@/lib/api"
