@@ -7,6 +7,7 @@ import { api } from "@/lib/api"
 import { Id } from "@/lib/api"
 import { formatDistanceToNow } from "date-fns"
 import { Heart, MessageCircle, AtSign, UserPlus, MessageSquare, Calendar, Award } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface NotificationItemProps {
   notification: {
@@ -27,16 +28,11 @@ interface NotificationItemProps {
   onRead?: () => void
 }
 
-/**
- * NotificationItem component
- * Displays a single notification with appropriate icon and styling
- */
 export function NotificationItem({ notification, onRead }: NotificationItemProps) {
   const router = useRouter()
   const markAsRead = useMutation(api.notifications.markAsRead)
 
   const handleClick = async () => {
-    // Mark as read if unread
     if (!notification.isRead) {
       try {
         await markAsRead({ notificationId: notification._id })
@@ -46,7 +42,6 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
       }
     }
 
-    // Navigate to the referenced content
     if (notification.type === "follow") {
       router.push(`/profile/${notification.actorId}`)
     } else if (notification.type === "message") {
@@ -60,77 +55,81 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
     }
   }
 
-  // Get icon based on notification type
   const getIcon = () => {
+    const iconClass = "w-4 h-4";
     switch (notification.type) {
-      case "reaction":
-        return <Heart className="w-5 h-5 text-destructive" />
-      case "comment":
-        return <MessageCircle className="w-5 h-5 text-primary" />
-      case "mention":
-        return <AtSign className="w-5 h-5 text-purple-500" />
-      case "follow":
-        return <UserPlus className="w-5 h-5 text-success" />
-      case "reply":
-        return <MessageSquare className="w-5 h-5 text-indigo-500" />
-      case "message":
-        return <MessageSquare className="w-5 h-5 text-blue-500" />
-      case "event":
-        return <Calendar className="w-5 h-5 text-orange-500" />
-      case "achievement":
-        return <Award className="w-5 h-5 text-yellow-500" />
-      default:
-        return null
+      case "reaction": return <Heart className={cn(iconClass, "text-primary")} />
+      case "comment": return <MessageCircle className={cn(iconClass, "text-primary")} />
+      case "mention": return <AtSign className={cn(iconClass, "text-primary")} />
+      case "follow": return <UserPlus className={cn(iconClass, "text-primary")} />
+      case "reply": return <MessageSquare className={cn(iconClass, "text-primary")} />
+      case "message": return <MessageSquare className={cn(iconClass, "text-primary")} />
+      case "event": return <Calendar className={cn(iconClass, "text-primary")} />
+      case "achievement": return <Award className={cn(iconClass, "text-primary")} />
+      default: return null
     }
   }
 
   return (
     <button
       onClick={handleClick}
-      className={`w-full px-4 py-4 text-left hover:bg-accent transition-colors ${
-        !notification.isRead ? "bg-primary/10" : ""
-      }`}
+      className={cn(
+        "w-full px-4 py-6 text-left transition-all btn-press border-b border-hairline relative group",
+        !notification.isRead ? "bg-canvas-parchment/30" : "bg-canvas hover:bg-canvas-parchment/20"
+      )}
     >
-      <div className="flex items-start space-x-3">
+      <div className="max-w-2xl mx-auto flex items-start gap-4">
+        {/* Unread Dot */}
+        {!notification.isRead && (
+          <div className="absolute left-1 top-1/2 -translate-y-1/2">
+            <div className="w-2 h-2 bg-primary rounded-full shadow-sm" />
+          </div>
+        )}
+
         {/* Actor Avatar */}
-        <div className="flex-shrink-0">
-          {notification.actor?.profilePicture ? (
-            <OptimizedImage
-              src={notification.actor.profilePicture}
-              alt={notification.actor.name}
-              width={48}
-              height={48}
-              isAvatar
-              className="w-12 h-12 rounded-full"
-            />
-          ) : (
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-lg">
-              {notification.actor?.name.charAt(0) || "?"}
-            </div>
-          )}
+        <div className="relative flex-shrink-0">
+          <div className="h-12 w-12 rounded-full overflow-hidden border border-hairline bg-canvas-parchment shadow-sm">
+            {notification.actor?.profilePicture ? (
+              <OptimizedImage
+                src={notification.actor.profilePicture}
+                alt={notification.actor.name}
+                width={48}
+                height={48}
+                isAvatar
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="h-full w-full flex items-center justify-center text-ink/20 font-bold text-lg">
+                {notification.actor?.name.charAt(0) || "?"}
+              </div>
+            )}
+          </div>
           
           {/* Notification Icon Badge */}
-          <div className="absolute ml-8 -mt-2 w-6 h-6 rounded-full bg-card flex items-center justify-center border-2 border-white border-background">
+          <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-canvas border border-hairline flex items-center justify-center shadow-sm">
             {getIcon()}
           </div>
         </div>
 
         {/* Notification Content */}
-        <div className="flex-1 min-w-0">
-          <p className={`text-sm ${!notification.isRead ? "font-semibold" : ""} text-foreground`}>
+        <div className="flex-1 min-w-0 py-0.5">
+          <p className={cn(
+            "text-body text-ink leading-snug",
+            !notification.isRead ? "font-semibold" : "font-normal"
+          )}>
             {notification.message}
           </p>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-caption text-ink-muted-48 mt-1 font-medium">
             {formatDistanceToNow(notification.createdAt, { addSuffix: true })}
           </p>
         </div>
-
-        {/* Unread Indicator */}
-        {!notification.isRead && (
-          <div className="flex-shrink-0 pt-1">
-            <div className="w-2.5 h-2.5 bg-primary rounded-full" />
-          </div>
-        )}
+        
+        {/* Right Arrow (Apple Style) */}
+        <div className="flex-shrink-0 self-center opacity-0 group-hover:opacity-100 transition-opacity">
+           <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="3" fill="none" className="text-ink-muted-48">
+              <path d="M9 18l6-6-6-6" />
+           </svg>
+        </div>
       </div>
     </button>
   )

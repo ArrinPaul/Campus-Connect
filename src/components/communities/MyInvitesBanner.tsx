@@ -8,6 +8,8 @@ import { Mail, Check, X, Loader2, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export function MyInvitesBanner() {
     const invites = useQuery(api.communities.getMyInvites);
@@ -42,61 +44,66 @@ export function MyInvitesBanner() {
     };
 
     return (
-        <div className="rounded-lg border border-blue-200 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-900/10 p-4">
-            <div className="flex items-center gap-2 mb-3">
-                <Mail className="h-4 w-4 text-blue-600" />
-                <h3 className="text-sm font-semibold text-blue-700 dark:text-blue-400">
+        <div className="rounded-lg border border-hairline bg-canvas-parchment/50 p-lg shadow-sm">
+            <div className="flex items-center gap-2 mb-lg">
+                <div className="p-2 rounded-full bg-primary/10 text-primary">
+                    <Mail className="h-4 w-4" />
+                </div>
+                <h3 className="text-body-strong text-ink">
                     Community Invites ({invites.length})
                 </h3>
             </div>
             <div className="space-y-3">
                 {invites.map((invite: any) => (
-                    <div key={invite._id} className="flex items-center gap-3 rounded-lg bg-background/70 p-3 border">
+                    <div key={invite._id} className="flex items-center gap-md rounded-md bg-canvas p-md border border-hairline transition-all hover:shadow-product">
                         {invite.community?.avatarUrl ? (
                             <Image
                                 src={invite.community.avatarUrl}
                                 alt={invite.community?.name || 'Community'}
-                                width={40}
-                                height={40}
-                                className="h-10 w-10 rounded-full object-cover flex-shrink-0"
+                                width={48}
+                                height={48}
+                                className="h-12 w-12 rounded-sm object-cover flex-shrink-0"
                             />
                         ) : (
-                            <div className="h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold flex-shrink-0">
-                                <Users className="h-5 w-5" />
+                            <div className="h-12 w-12 rounded-sm bg-canvas-parchment text-ink/20 flex items-center justify-center font-bold flex-shrink-0">
+                                <Users size={20} />
                             </div>
                         )}
                         <div className="flex-1 min-w-0">
                             <Link
                                 href={`/c/${invite.community?.slug || ''}`}
-                                className="text-sm font-medium hover:underline"
+                                className="text-body-strong hover:text-primary transition-colors"
                             >
                                 {invite.community?.name || 'Unknown Community'}
                             </Link>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-caption text-ink-muted-48">
                                 Invited by {invite.inviter?.name || 'someone'}
                             </p>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                            <button
+                        <div className="flex items-center gap-2">
+                            <Button 
+                                variant="primary" 
+                                size="sm" 
+                                className="h-9 px-4"
                                 onClick={() => handleAccept(invite._id)}
                                 disabled={processing === invite._id}
-                                className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 transition-colors"
                             >
                                 {processing === invite._id ? (
                                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
                                 ) : (
                                     <Check className="h-3.5 w-3.5" />
                                 )}
-                                Accept
-                            </button>
-                            <button
+                                <span className="ml-1.5">Accept</span>
+                            </Button>
+                            <Button 
+                                variant="pearl" 
+                                size="sm" 
+                                className="h-9 w-9 p-0"
                                 onClick={() => handleDecline(invite._id)}
                                 disabled={processing === invite._id}
-                                className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-md border hover:bg-muted disabled:opacity-50 transition-colors"
                             >
-                                <X className="h-3.5 w-3.5" />
-                                Decline
-                            </button>
+                                <X className="h-4 w-4" />
+                            </Button>
                         </div>
                     </div>
                 ))}

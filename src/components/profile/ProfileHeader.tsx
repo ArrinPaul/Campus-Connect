@@ -8,11 +8,13 @@ import { useMutation, useQuery } from "@/lib/api"
 import { api } from "@/lib/api"
 import { Id } from "@/lib/api"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
-import { OnlineStatusDot, formatLastSeen } from "@/components/ui/OnlineStatusDot"
-import { MessageSquare, Pencil, X } from "lucide-react"
+import { OnlineStatusDot } from "@/components/ui/OnlineStatusDot"
+import { MessageSquare, Pencil, X, Share2, Globe, Github, Linkedin, Twitter } from "lucide-react"
 import { createLogger } from "@/lib/logger"
 import { toast } from "sonner"
 import { ProfileForm } from "@/components/profile/ProfileForm"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 const log = createLogger("ProfileHeader")
 
@@ -46,7 +48,6 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
   const unfollowUser = useMutation(api.follows.unfollowUser)
   const getOrCreateConversation = useMutation(api.conversations.getOrCreateConversation)
 
-  // Auto-detect isOwnProfile if not explicitly provided
   const currentUser = useQuery(
     api.users.getCurrentUser,
     isLoaded && isSignedIn ? {} : "skip"
@@ -63,25 +64,19 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
   const [isMessageLoading, setIsMessageLoading] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   
-  // Use optimistic state if available, otherwise use query result
   const isFollowing = optimisticFollowing !== null ? optimisticFollowing : (isFollowingQuery ?? false)
   
   const handleFollowToggle = async () => {
     try {
       setIsLoading(true)
-      // Optimistically update the UI
       setOptimisticFollowing(!isFollowing)
-      
       if (isFollowing) {
         await unfollowUser({ userId: user._id })
       } else {
         await followUser({ userId: user._id })
       }
-      
-      // Reset optimistic state after successful mutation
       setOptimisticFollowing(null)
     } catch (error) {
-      // Revert optimistic update on error
       setOptimisticFollowing(null)
       log.error("Failed to toggle follow", error)
       toast.error("Failed to update follow status")
@@ -89,205 +84,173 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
       setIsLoading(false)
     }
   }
+
   return (
-    <div className="rounded-lg bg-card p-4 shadow-elevation-1 sm:p-6">
-      <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">
-        {/* Avatar with online status */}
-        <div className="relative h-20 w-20 flex-shrink-0 sm:h-24 sm:w-24">
-          {user.profilePicture ? (
-            <Image
-              src={user.profilePicture}
-              alt={user.name}
-              fill
-              sizes="(max-width: 640px) 80px, 96px"
-              className="rounded-full object-cover"
-              priority
-            />
-          ) : (
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary text-2xl font-bold text-primary-foreground sm:h-24 sm:w-24 sm:text-3xl">
-              {user.name.charAt(0).toUpperCase()}
+    <div className="w-full bg-canvas border-b border-hairline">
+      {/* Cover Image / Gradient Area */}
+      <div className="relative h-48 md:h-64 w-full bg-canvas-parchment overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-canvas/20" />
+        <div className="absolute inset-0 bg-tile-black opacity-5" />
+      </div>
+
+      {/* Header Content */}
+      <div className="max-w-4xl mx-auto px-4 md:px-0">
+        <div className="relative flex flex-col items-center md:items-start -mt-20 md:-mt-24 pb-8">
+          {/* Avatar */}
+          <div className="relative h-40 w-40 rounded-lg border-4 border-canvas bg-canvas-parchment shadow-product overflow-hidden flex-shrink-0 z-10">
+            {user.profilePicture ? (
+              <Image
+                src={user.profilePicture}
+                alt={user.name}
+                fill
+                sizes="160px"
+                className="object-cover"
+                priority
+              />
+            ) : (
+              <div className="h-full w-full flex items-center justify-center text-ink/20 font-display text-6xl">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+            )}
+            {!isOwnProfile && (
+              <OnlineStatusDot
+                userId={user._id}
+                size="lg"
+                overlay
+              />
+            )}
+          </div>
+
+          {/* User Info Section */}
+          <div className="mt-6 w-full flex flex-col md:flex-row justify-between items-center md:items-end gap-6">
+            <div className="flex-1 text-center md:text-left space-y-2">
+              <h1 className="text-display-lg md:text-hero-display text-ink leading-tight">
+                {user.name}
+              </h1>
+              
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-caption-strong text-ink-muted-48 uppercase tracking-wider">
+                <span className="text-primary">{user.role}</span>
+                <span className="border-l border-hairline pl-4">{user.university || "Global Academic"}</span>
+                <span className="border-l border-hairline pl-4">{user.experienceLevel}</span>
+              </div>
+
+              {user.bio && (
+                <p className="text-body text-ink-muted-48 max-w-2xl mt-4 leading-relaxed italic">
+                  &ldquo;{user.bio}&rdquo;
+                </p>
+              )}
+
+              {/* Stats & Socials Row */}
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 mt-6 pt-6 border-t border-hairline w-full">
+                <div className="flex gap-4">
+                  <div className="text-center md:text-left">
+                    <p className="text-tagline font-bold text-ink">{user.followerCount}</p>
+                    <p className="text-[10px] text-ink-muted-48 uppercase font-semibold">Followers</p>
+                  </div>
+                  <div className="text-center md:text-left border-l border-hairline pl-4">
+                    <p className="text-tagline font-bold text-ink">{user.followingCount}</p>
+                    <p className="text-[10px] text-ink-muted-48 uppercase font-semibold">Following</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 ml-auto">
+                  {user.socialLinks?.website && (
+                    <a href={user.socialLinks.website} target="_blank" className="p-2 rounded-full hover:bg-canvas-parchment text-ink-muted-48 transition-colors"><Globe size={18} /></a>
+                  )}
+                  {user.socialLinks?.github && (
+                    <a href={user.socialLinks.github} target="_blank" className="p-2 rounded-full hover:bg-canvas-parchment text-ink-muted-48 transition-colors"><Github size={18} /></a>
+                  )}
+                  {user.socialLinks?.linkedin && (
+                    <a href={user.socialLinks.linkedin} target="_blank" className="p-2 rounded-full hover:bg-canvas-parchment text-ink-muted-48 transition-colors"><Linkedin size={18} /></a>
+                  )}
+                  {user.socialLinks?.twitter && (
+                    <a href={user.socialLinks.twitter} target="_blank" className="p-2 rounded-full hover:bg-canvas-parchment text-ink-muted-48 transition-colors"><Twitter size={18} /></a>
+                  )}
+                </div>
+              </div>
             </div>
-          )}
-          {!isOwnProfile && (
-            <OnlineStatusDot
-              userId={user._id}
-              size="lg"
-              overlay
-            />
-          )}
+
+            {/* Actions */}
+            <div className="flex items-center gap-3">
+              <Button variant="pearl" size="icon" className="shadow-sm">
+                <Share2 size={20} />
+              </Button>
+              
+              {!isOwnProfile && (
+                <>
+                  <Button
+                    onClick={async () => {
+                      try {
+                        setIsMessageLoading(true)
+                        const conversationId = await getOrCreateConversation({ otherUserId: user._id })
+                        router.push(`/messages?conversation=${conversationId}`)
+                      } catch (error) { log.error("Failed to open conversation", error) }
+                      finally { setIsMessageLoading(false) }
+                    }}
+                    disabled={isMessageLoading}
+                    variant="secondary"
+                    size="lg"
+                  >
+                    {isMessageLoading ? "..." : "Message"}
+                  </Button>
+                  <Button
+                    onClick={handleFollowToggle}
+                    disabled={isLoading}
+                    variant={isFollowing ? "secondary" : "primary"}
+                    size="lg"
+                    className="min-w-[120px]"
+                  >
+                    {isLoading ? '...' : isFollowing ? 'Unfollow' : 'Follow'}
+                  </Button>
+                </>
+              )}
+
+              {isOwnProfile && (
+                <Button
+                  onClick={() => setShowEditModal(true)}
+                  variant="primary"
+                  size="lg"
+                  className="flex items-center gap-2"
+                >
+                  <Pencil size={18} /> Edit Profile
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* User Info */}
-        <div className="flex-1 text-center sm:text-left">
-          <h1 className="text-xl font-bold text-foreground sm:text-2xl">{user.name}</h1>
-
-          {/* Last seen for other profiles */}
-          {!isOwnProfile && (
-            <OnlineStatusDot
-              userId={user._id}
-              showLastSeen
-              className="mt-0.5"
-            />
-          )}
-
-          <div className="mt-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary sm:text-sm">
-              {user.role}
-            </span>
-            <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground sm:text-sm">
-              {user.experienceLevel}
-            </span>
-          </div>
-
-          {user.university && (
-            <p className="mt-2 text-xs text-muted-foreground sm:text-sm">{user.university}</p>
-          )}
-
-          {user.bio && (
-            <p className="mt-2 text-sm text-foreground sm:mt-3">{user.bio}</p>
-          )}
-
-          {/* Stats */}
-          <div className="mt-3 flex justify-center gap-4 sm:mt-4 sm:justify-start sm:gap-6">
-            <div className="text-center">
-              <p className="text-xl font-bold text-foreground sm:text-2xl">
-                {user.followerCount}
-              </p>
-              <p className="text-xs text-muted-foreground sm:text-sm">Followers</p>
-            </div>
-            <div className="text-center">
-              <p className="text-xl font-bold text-foreground sm:text-2xl">
-                {user.followingCount}
-              </p>
-              <p className="text-xs text-muted-foreground sm:text-sm">Following</p>
-            </div>
-          </div>
-
-          {/* Social Links */}
-          {user.socialLinks && (user.socialLinks.github || user.socialLinks.linkedin || user.socialLinks.twitter || user.socialLinks.website) && (
-            <div className="mt-3 flex flex-wrap justify-center gap-3 sm:mt-4 sm:justify-start">
-              {user.socialLinks.github && (
-                <a
-                  href={user.socialLinks.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted dark:hover:bg-muted transition-colors"
-                  aria-label="GitHub profile"
-                >
-                  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                  GitHub
-                </a>
-              )}
-              {user.socialLinks.linkedin && (
-                <a
-                  href={user.socialLinks.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/15 transition-colors"
-                  aria-label="LinkedIn profile"
-                >
-                  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                  LinkedIn
-                </a>
-              )}
-              {user.socialLinks.twitter && (
-                <a
-                  href={user.socialLinks.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-md bg-sky-50 dark:bg-sky-900/30 px-3 py-1.5 text-xs font-medium text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900/50 transition-colors"
-                  aria-label="Twitter profile"
-                >
-                  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
-                  Twitter
-                </a>
-              )}
-              {user.socialLinks.website && (
-                <a
-                  href={user.socialLinks.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-md bg-accent-emerald/10 px-3 py-1.5 text-xs font-medium text-accent-emerald hover:bg-accent-emerald/15 transition-colors"
-                  aria-label="Personal website"
-                >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/></svg>
-                  Website
-                </a>
-              )}
-            </div>
-          )}
+        {/* Tabs - Apple Style */}
+        <div className="w-full flex items-center justify-center md:justify-start gap-8 h-12 border-t border-hairline overflow-x-auto scrollbar-none">
+          <button className="relative h-full flex items-center text-caption font-semibold text-primary whitespace-nowrap">
+            Posts
+            <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full" />
+          </button>
+          <button className="h-full flex items-center text-caption font-semibold text-ink-muted-48 hover:text-ink transition-colors whitespace-nowrap">
+            Activity
+          </button>
+          <button className="h-full flex items-center text-caption font-semibold text-ink-muted-48 hover:text-ink transition-colors whitespace-nowrap">
+            Portfolio
+          </button>
+          <button className="h-full flex items-center text-caption font-semibold text-ink-muted-48 hover:text-ink transition-colors whitespace-nowrap">
+            Skills
+          </button>
         </div>
-
-        {/* Action Buttons (only for other users) */}
-        {!isOwnProfile && (
-          <div className="flex-shrink-0 w-full sm:w-auto flex flex-col gap-2 sm:flex-row">
-            {/* Message Button */}
-            <button
-              onClick={async () => {
-                try {
-                  setIsMessageLoading(true)
-                  const conversationId = await getOrCreateConversation({ otherUserId: user._id })
-                  router.push(`/messages?conversation=${conversationId}`)
-                } catch (error) {
-                  log.error("Failed to open conversation", error)
-                } finally {
-                  setIsMessageLoading(false)
-                }
-              }}
-              disabled={isMessageLoading}
-              className="w-full rounded-xl px-6 py-2 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/15 focus:outline-none focus:ring-2 focus:ring-primary/30 sm:w-auto flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              style={{ minHeight: "44px" }}
-            >
-              {isMessageLoading ? <ButtonLoadingSpinner /> : <MessageSquare className="h-4 w-4" />}
-              {isMessageLoading ? "..." : "Message"}
-            </button>
-
-            {/* Follow Button */}
-            <button 
-              onClick={handleFollowToggle}
-              disabled={isLoading}
-              className={`w-full rounded-md px-6 py-2 text-sm font-medium text-primary-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 sm:w-auto flex items-center justify-center gap-2 ${
-                isFollowing 
-                  ? "bg-muted hover:bg-muted dark:hover:bg-muted" 
-                  : "bg-primary hover:bg-primary/90"
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
-              style={{ minHeight: "44px" }}
-            >
-              {isLoading && <ButtonLoadingSpinner />}
-              {isLoading ? "..." : isFollowing ? "Unfollow" : "Follow"}
-            </button>
-          </div>
-        )}
-
-        {/* Edit Profile Button (own profile only) */}
-        {isOwnProfile && (
-          <div className="flex-shrink-0 w-full sm:w-auto">
-            <button
-              onClick={() => setShowEditModal(true)}
-              className="w-full rounded-md px-6 py-2 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 sm:w-auto flex items-center justify-center gap-2"
-              style={{ minHeight: "44px" }}
-            >
-              <Pencil className="h-4 w-4" />
-              Edit Profile
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Edit Profile Modal */}
       {showEditModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowEditModal(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 glass" onClick={() => setShowEditModal(false)}>
           <div
-            className="bg-card border rounded-xl shadow-lg w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto"
+            className="bg-canvas border border-hairline rounded-lg shadow-product w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-4 border-b">
-              <h2 className="text-lg font-semibold">Edit Profile</h2>
-              <button onClick={() => setShowEditModal(false)} className="p-1 rounded-lg hover:bg-muted">
+            <div className="flex items-center justify-between p-lg border-b border-hairline">
+              <h2 className="text-display-md text-ink">Edit Profile</h2>
+              <button onClick={() => setShowEditModal(false)} className="p-2 rounded-full hover:bg-canvas-parchment text-ink-muted-48 transition-colors">
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <div className="p-4">
+            <div className="p-lg">
               <ProfileForm
                 initialData={{
                   bio: user.bio,

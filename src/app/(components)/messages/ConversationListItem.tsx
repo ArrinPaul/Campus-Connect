@@ -1,59 +1,101 @@
-'use client';
+"use client"
 
-import type { Doc } from '@/lib/api';
-import Image from 'next/image';
-import { formatDistanceToNow } from 'date-fns';
-import Link from 'next/link';
-import { useMediaQuery } from '@/hooks/useMediaQuery'; // Assuming a useMediaQuery hook exists
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
+import { OnlineStatusDot } from "@/components/ui/OnlineStatusDot"
+import { useUser } from "@/lib/auth/client"
+import { Id } from "@/lib/api"
+import { formatDistanceToNow } from "date-fns"
+import { cn } from "@/lib/utils"
 
-// Manually define the type based on the getConversations query
-export type Conversation = Doc<'conversations'> & {
-    otherUsers: {
-        _id: Doc<'users'>['_id'];
-        name: Doc<'users'>['name'];
-        profilePicture: Doc<'users'>['profilePicture'];
-    }[];
-    unreadCount: number;
-};
+interface ConversationListItemProps {
+  conversation: {
+    _id: Id<"conversations">
+    lastMessage?: string
+    updatedAt: number
+    otherUser: {
+      _id: Id<"users">
+      name: string
+      profilePicture?: string
+    }
+    unreadCount?: number
+  }
+  isSelected: boolean
+  onClick: () => void
+}
 
-type Props = {
-    conversation: Conversation;
-    isSelected: boolean;
-};
+export function ConversationListItem({
+  conversation,
+  isSelected,
+  onClick,
+}: ConversationListItemProps) {
+  const { user: currentUser } = useUser()
+  const otherUser = conversation.otherUser
 
-export function ConversationListItem({ conversation, isSelected }: Props) {
-    const isMobile = useMediaQuery("(max-width: 768px)");
-    const otherUser = conversation.otherUsers[0];
-    const lastMessageTime = conversation.lastMessageAt ? formatDistanceToNow(new Date(conversation.lastMessageAt), { addSuffix: true }) : null;
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "w-full px-4 py-4 text-left transition-all btn-press border-b border-hairline relative flex items-center gap-4 group",
+        isSelected ? "bg-canvas-parchment" : "bg-canvas hover:bg-canvas-parchment/30"
+      )}
+    >
+      {/* Selected Indicator Bar */}
+      {isSelected && (
+        <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-primary rounded-r-full" />
+      )}
 
-    const href = isMobile ? `/messages/${conversation._id}` : `/messages?c=${conversation._id}`;
-
-    return (
-        <Link href={href} scroll={false} className={`block w-full ${isSelected ? 'bg-primary/10' : ''}`}>
-            <div className="flex items-center gap-3 p-3 transition-colors hover:bg-muted/50">
-                <div className="relative h-12 w-12 rounded-full bg-muted flex-shrink-0">
-                    {otherUser?.profilePicture && (
-                        <Image src={otherUser.profilePicture} alt={otherUser.name ?? ''} width={48} height={48} className="h-full w-full rounded-full object-cover" />
-                    )}
-                     {conversation.otherUsers.length > 1 && (
-                        <div className="absolute bottom-0 right-0 h-5 w-5 rounded-full bg-muted border-2 border-card flex items-center justify-center text-2xs font-bold">{conversation.otherUsers.length}</div>
-                    )}
-                </div>
-                <div className="flex-1 overflow-hidden">
-                    <div className="flex justify-between items-center">
-                        <p className="font-bold truncate">{conversation.name ?? otherUser?.name ?? 'Unknown User'}</p>
-                        {lastMessageTime && <p className="text-xs text-muted-foreground flex-shrink-0 ml-2">{lastMessageTime}</p>}
-                    </div>
-                    <div className="flex justify-between items-start">
-                        <p className="text-sm text-muted-foreground truncate">{conversation.lastMessagePreview ?? 'No messages yet'}</p>
-                        {conversation.unreadCount > 0 && (
-                            <span className="ml-2 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 min-w-[20px] px-1 flex items-center justify-center flex-shrink-0">
-                                {conversation.unreadCount > 9 ? '9+' : conversation.unreadCount}
-                            </span>
-                        )}
-                    </div>
-                </div>
+      {/* Avatar */}
+      <div className="relative flex-shrink-0">
+        <div className="h-12 w-12 rounded-full overflow-hidden border border-hairline bg-canvas-parchment shadow-sm">
+          {otherUser.profilePicture ? (
+            <OptimizedImage
+              src={otherUser.profilePicture}
+              alt={otherUser.name}
+              width={48}
+              height={48}
+              isAvatar
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="h-full w-full flex items-center justify-center text-ink/20 font-bold text-lg">
+              {otherUser.name.charAt(0).toUpperCase()}
             </div>
-        </Link>
-    );
+          )}
+        </div>
+        <OnlineStatusDot
+          userId={otherUser._id}
+          size="sm"
+          overlay
+        />
+      </div>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <div className="flex justify-between items-baseline mb-0.5">
+          <h3 className={cn(
+            "text-body-strong truncate",
+            isSelected ? "text-ink" : "text-ink-muted-80"
+          )}>
+            {otherUser.name}
+          </h3>
+          <span className="text-[10px] text-ink-muted-48 font-semibold uppercase tracking-wider">
+            {formatDistanceToNow(conversation.updatedAt, { addSuffix: false })}
+          </span>
+        </div>
+        <div className="flex justify-between items-center gap-2">
+          <p className={cn(
+            "text-caption truncate",
+            (conversation.unreadCount ?? 0) > 0 ? "text-ink font-semibold" : "text-ink-muted-48"
+          )}>
+            {conversation.lastMessage || "No messages yet"}
+          </p>
+          {(conversation.unreadCount ?? 0) > 0 && (
+            <div className="h-4 min-w-[16px] px-1 rounded-full bg-primary text-[10px] font-bold text-white flex items-center justify-center shadow-sm">
+              {conversation.unreadCount}
+            </div>
+          )}
+        </div>
+      </div>
+    </button>
+  )
 }

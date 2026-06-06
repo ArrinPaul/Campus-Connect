@@ -3,6 +3,10 @@
 import type { ReactNode } from "react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { Mail, Lock, User, Loader2, ArrowRight } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 type NullableUser = {
   id: string
@@ -120,7 +124,7 @@ export function UserButton(_props: Record<string, unknown>) {
   return (
     <button 
       onClick={() => signOut()}
-      className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-medium"
+      className="btn-press flex h-10 w-10 items-center justify-center rounded-full bg-canvas-parchment text-ink text-sm font-semibold border border-hairline shadow-sm"
       title="Sign Out"
     >
       {user.id.substring(0, 2).toUpperCase()}
@@ -138,12 +142,10 @@ export function SignIn(_props: Record<string, unknown>) {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
-
     if (!email.trim() || !password) {
       setError("Email and password are required")
       return
     }
-
     setIsSubmitting(true)
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
     try {
@@ -153,13 +155,11 @@ export function SignIn(_props: Record<string, unknown>) {
         credentials: "include",
         body: JSON.stringify({ email: email.trim(), password }),
       })
-
       const payload = await response.json().catch(() => ({}))
       if (!response.ok) {
         setError(typeof payload?.error === "string" ? payload.error : "Unable to sign in")
         return
       }
-
       router.push("/feed")
       router.refresh()
     } finally {
@@ -168,38 +168,60 @@ export function SignIn(_props: Record<string, unknown>) {
   }
 
   return (
-    <form onSubmit={handleSignIn} className="space-y-4 w-full">
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Email</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-          className="w-full px-3 py-2 border rounded-md bg-background"
-          required
-        />
+    <div className="w-full max-w-md mx-auto space-y-xl animate-in">
+      <div className="text-center space-y-2">
+        <h1 className="text-display-md font-bold text-ink">Sign in to Campus Connect.</h1>
+        <p className="text-body text-ink-muted-48">Enter your details to continue.</p>
       </div>
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter your password"
-          className="w-full px-3 py-2 border rounded-md bg-background"
-          required
-        />
+
+      <form onSubmit={handleSignIn} className="space-y-md">
+        <div className="space-y-4">
+          <div className="relative group">
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted-48 group-focus-within:text-primary transition-colors" />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email address"
+              className="w-full pl-11 pr-4 h-12 rounded-sm border border-hairline bg-canvas text-body focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm"
+              required
+            />
+          </div>
+          <div className="relative group">
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted-48 group-focus-within:text-primary transition-colors" />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              className="w-full pl-11 pr-4 h-12 rounded-sm border border-hairline bg-canvas text-body focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm"
+              required
+            />
+          </div>
+        </div>
+
+        {error && <p className="text-caption font-semibold text-destructive text-center bg-destructive/5 py-2 rounded-sm border border-destructive/10">{error}</p>}
+
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          variant="primary"
+          size="lg"
+          className="w-full h-12"
+        >
+          {isSubmitting ? <Loader2 className="animate-spin" /> : "Sign In"}
+        </Button>
+      </form>
+
+      <div className="text-center pt-md border-t border-hairline">
+        <p className="text-caption text-ink-muted-48">
+          Don&apos;t have an account?{" "}
+          <Link href="/sign-up" className="text-primary font-semibold hover:underline">
+            Create one for free
+          </Link>
+        </p>
       </div>
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full py-2 bg-primary text-primary-foreground rounded-md font-medium hover:bg-primary/90 transition-colors"
-      >
-        {isSubmitting ? "Signing In..." : "Sign In"}
-      </button>
-    </form>
+    </div>
   )
 }
 
@@ -214,17 +236,14 @@ export function SignUp(_props: Record<string, unknown>) {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
-
     if (!email.trim() || !password) {
       setError("Email and password are required")
       return
     }
-
     if (password.length < 8) {
       setError("Password must be at least 8 characters")
       return
     }
-
     setIsSubmitting(true)
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
     try {
@@ -234,13 +253,11 @@ export function SignUp(_props: Record<string, unknown>) {
         credentials: "include",
         body: JSON.stringify({ name: name.trim(), email: email.trim(), password }),
       })
-
       const payload = await response.json().catch(() => ({}))
       if (!response.ok) {
         setError(typeof payload?.error === "string" ? payload.error : "Unable to sign up")
         return
       }
-
       router.push("/onboarding")
       router.refresh()
     } finally {
@@ -249,48 +266,71 @@ export function SignUp(_props: Record<string, unknown>) {
   }
 
   return (
-    <form onSubmit={handleSignUp} className="space-y-4 w-full">
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Name</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Your name"
-          className="w-full px-3 py-2 border rounded-md bg-background"
-        />
+    <div className="w-full max-w-md mx-auto space-y-xl animate-in">
+      <div className="text-center space-y-2">
+        <h1 className="text-display-md font-bold text-ink">Create your account.</h1>
+        <p className="text-body text-ink-muted-48">Join the academic revolution today.</p>
       </div>
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Email</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-          className="w-full px-3 py-2 border rounded-md bg-background"
-          required
-        />
+
+      <form onSubmit={handleSignUp} className="space-y-md">
+        <div className="space-y-4">
+          <div className="relative group">
+            <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted-48 group-focus-within:text-primary transition-colors" />
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Full name"
+              className="w-full pl-11 pr-4 h-12 rounded-sm border border-hairline bg-canvas text-body focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm"
+              required
+            />
+          </div>
+          <div className="relative group">
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted-48 group-focus-within:text-primary transition-colors" />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email address"
+              className="w-full pl-11 pr-4 h-12 rounded-sm border border-hairline bg-canvas text-body focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm"
+              required
+            />
+          </div>
+          <div className="relative group">
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted-48 group-focus-within:text-primary transition-colors" />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password (min 8 chars)"
+              className="w-full pl-11 pr-4 h-12 rounded-sm border border-hairline bg-canvas text-body focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm"
+              required
+            />
+          </div>
+        </div>
+
+        {error && <p className="text-caption font-semibold text-destructive text-center bg-destructive/5 py-2 rounded-sm border border-destructive/10">{error}</p>}
+
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          variant="primary"
+          size="lg"
+          className="w-full h-12"
+        >
+          {isSubmitting ? <Loader2 className="animate-spin" /> : "Create Account"}
+        </Button>
+      </form>
+
+      <div className="text-center pt-md border-t border-hairline">
+        <p className="text-caption text-ink-muted-48">
+          Already have an account?{" "}
+          <Link href="/sign-in" className="text-primary font-semibold hover:underline">
+            Sign in here
+          </Link>
+        </p>
       </div>
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Minimum 8 characters"
-          className="w-full px-3 py-2 border rounded-md bg-background"
-          required
-        />
-      </div>
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full py-2 bg-primary text-primary-foreground rounded-md font-medium hover:bg-primary/90 transition-colors"
-      >
-        {isSubmitting ? "Creating Account..." : "Create Account"}
-      </button>
-    </form>
+    </div>
   )
 }
 

@@ -1,73 +1,95 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { useMutation } from '@/lib/api';
-import { api } from '@/lib/api';
-import type { Id } from '@/lib/api';
-import { SendHorizontal, Plus, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState, useRef, useEffect } from "react"
+import { Send, Image as ImageIcon, Smile, Paperclip } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
-type Props = {
-    conversationId: Id<'conversations'>;
-};
+interface ChatInputProps {
+  onSendMessage: (content: string) => void
+  disabled?: boolean
+  placeholder?: string
+}
 
-export function ChatInput({ conversationId }: Props) {
-    const [content, setContent] = useState('');
-    const sendMessage = useMutation(api.messages.sendMessage);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+export function ChatInput({ onSendMessage, disabled, placeholder = "Type a message..." }: ChatInputProps) {
+  const [content, setContent] = useState("")
+  const inputRef = useRef<HTMLTextAreaElement>(null)
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const trimmedContent = content.trim();
-        if (trimmedContent === '') return;
-
-        setIsSubmitting(true);
-        try {
-            setContent('');
-            await sendMessage({
-                conversationId,
-                content: trimmedContent,
-            });
-        } catch (error) {
-             toast.error("Failed to send message.");
-             setContent(trimmedContent); // Restore content on error
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSubmit(e as any);
-        }
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault()
+    if (!content.trim() || disabled) return
+    onSendMessage(content.trim())
+    setContent("")
+    
+    // Reset height
+    if (inputRef.current) {
+      inputRef.current.style.height = "auto"
     }
+  }
 
-    return (
-        <form onSubmit={handleSubmit} className="flex items-center gap-2">
-            <button type="button" className="p-2 rounded-full hover:bg-muted" title="Attach file">
-                <Plus className="h-5 w-5 text-muted-foreground" />
-            </button>
-            <input
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Type a message..."
-                className="flex-1 px-4 py-2 text-sm bg-muted/50 rounded-full focus:outline-none focus:ring-1 focus:ring-primary"
-                disabled={isSubmitting}
-            />
-            <button
-                type="submit"
-                disabled={isSubmitting || content.trim() === ''}
-                className="p-2 h-9 w-9 flex items-center justify-center rounded-full bg-primary text-primary-foreground disabled:bg-muted disabled:text-muted-foreground btn-press"
-                title="Send message"
-            >
-                {isSubmitting ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                    <SendHorizontal className="h-5 w-5" />
-                )}
-            </button>
-        </form>
-    );
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault()
+      handleSubmit()
+    }
+  }
+
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setContent(e.target.value)
+    
+    // Auto-resize
+    e.target.style.height = "auto"
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`
+  }
+
+  return (
+    <form 
+      onSubmit={handleSubmit}
+      className="p-4 bg-canvas border-t border-hairline flex items-end gap-3 animate-in"
+    >
+      <div className="flex items-center gap-1 pb-1">
+        <button type="button" className="p-2 rounded-full text-ink-muted-48 hover:bg-canvas-parchment hover:text-primary transition-colors btn-press">
+          <Paperclip size={20} />
+        </button>
+        <button type="button" className="p-2 rounded-full text-ink-muted-48 hover:bg-canvas-parchment hover:text-primary transition-colors btn-press">
+          <ImageIcon size={20} />
+        </button>
+      </div>
+
+      <div className="flex-1 relative">
+        <textarea
+          ref={inputRef}
+          rows={1}
+          value={content}
+          onChange={handleInput}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          disabled={disabled}
+          className={cn(
+            "w-full resize-none bg-canvas-parchment/50 border border-hairline rounded-lg px-4 py-2.5 text-body focus:outline-none focus:ring-1 focus:ring-primary transition-all max-h-32 scrollbar-none",
+            disabled && "opacity-50 cursor-not-allowed"
+          )}
+          style={{ height: "44px" }}
+        />
+        <button 
+          type="button" 
+          className="absolute right-3 bottom-2.5 p-1 rounded-full text-ink-muted-48 hover:text-primary transition-colors"
+        >
+          <Smile size={20} />
+        </button>
+      </div>
+
+      <div className="pb-0.5">
+        <Button
+          type="submit"
+          disabled={!content.trim() || disabled}
+          variant="primary"
+          size="icon"
+          className="h-10 w-10 rounded-full shadow-sm"
+        >
+          <Send size={18} />
+        </Button>
+      </div>
+    </form>
+  )
 }

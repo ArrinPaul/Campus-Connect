@@ -1,55 +1,90 @@
-'use client';
+"use client"
 
-import { format } from 'date-fns';
-import Image from 'next/image';
-import { cn } from '@/lib/utils';
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
+import { Id } from "@/lib/api"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
 
-// Based on the return value of the `getMessages` query
-type Message = {
-    _id: string;
-    content: string;
-    createdAt: number;
-    isOwn: boolean;
-    senderAvatar?: string | null;
-    senderName: string;
-    messageType: 'text' | 'image' | 'file' | 'system';
-};
+interface ChatMessageProps {
+  message: {
+    _id: Id<"messages">
+    senderId: Id<"users">
+    content: string
+    createdAt: number
+    sender: {
+      _id: Id<"users">
+      name: string
+      profilePicture?: string
+    } | null
+  }
+  isOwn: boolean
+  showSenderInfo?: boolean
+}
 
-type Props = {
-    message: Message;
-};
+export function ChatMessage({ message, isOwn, showSenderInfo }: ChatMessageProps) {
+  return (
+    <div className={cn(
+      "w-full flex flex-col mb-4 px-4 animate-in",
+      isOwn ? "items-end" : "items-start"
+    )}>
+      {/* Sender Name (only for group chats or if requested) */}
+      {!isOwn && showSenderInfo && message.sender && (
+        <span className="text-[10px] text-ink-muted-48 font-bold uppercase tracking-widest ml-1 mb-1">
+          {message.sender.name}
+        </span>
+      )}
 
-export function ChatMessage({ message }: Props) {
-    const time = format(new Date(message.createdAt), 'p');
-
-    if (message.messageType === 'system') {
-        return (
-            <div className="text-center text-xs text-muted-foreground py-2">
-                {message.content}
-            </div>
-        );
-    }
-
-    return (
-        <div className={cn("flex items-end gap-2", { "justify-end": message.isOwn })}>
-            {!message.isOwn && (
-                 <div className="h-8 w-8 rounded-full bg-muted flex-shrink-0">
-                    {message.senderAvatar && <Image src={message.senderAvatar} alt={message.senderName} width={32} height={32} className="h-full w-full rounded-full object-cover" />}
+      <div className={cn(
+        "flex max-w-[80%] md:max-w-[70%] group relative",
+        isOwn ? "flex-row-reverse" : "flex-row"
+      )}>
+        {/* Avatar (only for incoming) */}
+        {!isOwn && (
+          <div className="flex-shrink-0 mr-2 mt-auto">
+            <div className="h-8 w-8 rounded-full overflow-hidden border border-hairline bg-canvas-parchment shadow-sm">
+              {message.sender?.profilePicture ? (
+                <OptimizedImage
+                  src={message.sender.profilePicture}
+                  alt={message.sender.name}
+                  width={32}
+                  height={32}
+                  isAvatar
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="h-full w-full flex items-center justify-center text-ink/20 font-bold text-xs">
+                  {message.sender?.name.charAt(0).toUpperCase() || "?"}
                 </div>
-            )}
-            <div className={cn(
-                "group relative max-w-xs md:max-w-md lg:max-w-lg px-3 py-2 rounded-2xl", 
-                { "bg-primary text-primary-foreground": message.isOwn },
-                { "bg-muted": !message.isOwn }
-            )}>
-                <p className="whitespace-pre-wrap">{message.content}</p>
-                 <div 
-                    className="text-2xs text-muted-foreground/70 absolute -bottom-5 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                    title={new Date(message.createdAt).toLocaleString()}
-                >
-                    {time}
-                </div>
+              )}
             </div>
+          </div>
+        )}
+
+        {/* Message Bubble */}
+        <div className={cn(
+          "px-4 py-2.5 rounded-lg text-body shadow-sm transition-all",
+          isOwn 
+            ? "bg-primary text-white rounded-br-none" 
+            : "bg-canvas-parchment text-ink rounded-bl-none border border-hairline"
+        )}>
+          <p className="whitespace-pre-wrap break-words">
+            {message.content}
+          </p>
         </div>
-    );
+
+        {/* Timestamp - visible on hover */}
+        <div className={cn(
+          "absolute top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap text-[10px] text-ink-muted-48 font-semibold",
+          isOwn ? "-left-12" : "-right-12"
+        )}>
+          {format(message.createdAt, "h:mm a")}
+        </div>
+      </div>
+      
+      {/* Tiny timestamp always visible below (optional) */}
+      {/* <span className="text-[9px] text-ink-muted-48 mt-1 px-1">
+        {format(message.createdAt, "h:mm a")}
+      </span> */}
+    </div>
+  )
 }

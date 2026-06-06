@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation';
 import { CommunityHeader } from '../../../(components)/communities/CommunityHeader';
 import { CommunityPostFeed } from '../../../(components)/communities/CommunityPostFeed';
 import { CreatePost } from '../../../(components)/feed/CreatePost';
+import { Section } from '@/components/ui/Section';
 
 type PageProps = {
     params: {
@@ -19,11 +20,12 @@ function CommunityPageContent({ slug }: { slug: string }) {
 
     if (community === undefined) {
         return (
-            <div className="max-w-4xl mx-auto py-12 px-4">
-                <div className="h-48 w-full bg-muted animate-pulse rounded-lg" />
-                <div className="mt-6 space-y-4">
-                    <div className="h-8 w-1/3 bg-muted animate-pulse rounded" />
-                    <div className="h-4 w-1/2 bg-muted animate-pulse rounded" />
+            <div className="w-full bg-canvas min-h-screen">
+                <div className="h-80 w-full bg-canvas-parchment animate-pulse" />
+                <div className="max-w-4xl mx-auto px-4 md:px-0 py-12 space-y-8">
+                    <div className="h-40 w-40 rounded-lg bg-canvas-parchment animate-pulse shadow-sm" />
+                    <div className="h-12 w-1/3 bg-canvas-parchment animate-pulse rounded" />
+                    <div className="h-4 w-1/2 bg-canvas-parchment animate-pulse rounded" />
                 </div>
             </div>
         );
@@ -33,51 +35,53 @@ function CommunityPageContent({ slug }: { slug: string }) {
         notFound();
     }
 
+    const viewerRole = (community as any).viewerRole;
+    const canPost = viewerRole && viewerRole !== 'pending';
+
     return (
-        <div>
+        <div className="w-full min-h-screen bg-canvas">
             <CommunityHeader community={community as any} />
-            <div className="max-w-4xl mx-auto px-4 py-8">
-                <div className="grid grid-cols-12 gap-8">
-                    <main className="col-span-12 md:col-span-8">
-                        {/* Only show post creation for active community members */}
-                        {(community as any).viewerRole && (community as any).viewerRole !== 'pending' ? (
-                            <CreatePost communityId={community._id} />
-                        ) : (
-                            <div className="rounded-lg border bg-card p-4 mb-4 text-center">
-                                <p className="text-sm text-muted-foreground">
-                                    {(community as any).viewerRole === 'pending'
-                                        ? 'Your membership is pending approval. You can post once approved.'
-                                        : 'Join this community to create posts.'}
-                                </p>
-                            </div>
-                        )}
-                        <CommunityPostFeed communityId={community._id} />
-                    </main>
-                    <aside className="hidden md:block md:col-span-4">
-                        <div className="sticky top-24 space-y-4">
-                            <div className="rounded-lg border bg-card p-4">
-                                <h3 className="font-bold text-lg">About Community</h3>
-                                <p className="text-sm text-muted-foreground mt-2">{community.description}</p>
-                            </div>
-                             {community.rules && community.rules.length > 0 && (
-                                <div className="rounded-lg border bg-card p-4">
-                                    <h3 className="font-bold text-lg">Rules</h3>
-                                    <ul className="list-decimal list-inside text-sm text-muted-foreground mt-2 space-y-1">
-                                        {community.rules.map((rule, i) => <li key={i}>{rule}</li>)}
-                                    </ul>
-                                </div>
-                            )}
+            
+            <main className="w-full flex flex-col items-center py-lg md:py-xl">
+                <div className="w-full max-w-2xl px-4 md:px-0 space-y-lg">
+                    {/* Post Creation Area */}
+                    {canPost ? (
+                        <CreatePost communityId={community._id} />
+                    ) : (
+                        <div className="rounded-lg border border-hairline bg-canvas-parchment/30 p-xl text-center">
+                            <h3 className="text-body-strong text-ink">
+                                {viewerRole === 'pending'
+                                    ? 'Membership Pending'
+                                    : 'Connect with this Community'}
+                            </h3>
+                            <p className="text-caption text-ink-muted-48 mt-2 max-w-xs mx-auto">
+                                {viewerRole === 'pending'
+                                    ? 'Your request is being reviewed by the moderators.'
+                                    : 'Join this community to share your thoughts and participate in discussions.'}
+                            </p>
                         </div>
-                    </aside>
+                    )}
+
+                    {/* Community Feed */}
+                    <div className="w-full">
+                        <div className="text-fine-print text-ink-muted-48 font-bold uppercase tracking-widest mb-md border-b border-hairline pb-2">
+                            Recent Activity
+                        </div>
+                        <CommunityPostFeed communityId={community._id} />
+                    </div>
                 </div>
-            </div>
+            </main>
         </div>
     );
 }
 
 export default function CommunityPage({ params }: PageProps) {
     return (
-        <Suspense fallback={<div>Loading community...</div>}>
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-screen bg-canvas">
+                <div className="animate-pulse text-ink/30 font-display text-2xl">Loading community...</div>
+            </div>
+        }>
             <CommunityPageContent slug={params.slug} />
         </Suspense>
     );

@@ -7,7 +7,6 @@ import { UserPostList } from '../../../(components)/profile/UserPostList';
 import { ProfileSkillsSection } from '../../../(components)/profile/ProfileSkillsSection';
 import { ProfileBadges } from '../../../(components)/profile/ProfileBadges';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
 
 type ProfilePageProps = {
     params: {
@@ -28,25 +27,37 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
     }
 
     return (
-        <div>
+        <div className="w-full min-h-screen bg-canvas">
             <ProfileHeader user={userProfile as any} />
-            <div className="px-4 sm:px-6 lg:px-8">
-                <ProfileSkillsSection userId={userId} skills={(userProfile as any).skills || []} />
-            </div>
-            <div className="px-4 sm:px-6 lg:px-8 mt-4">
-                <ProfileBadges userId={userId} />
-            </div>
-            <div className="px-4 sm:px-6 lg:px-8 mt-6">
-                <div className="border-b">
-                    <nav className="flex gap-4" aria-label="Profile tabs">
-                        <span className="py-3 px-1 border-b-2 border-primary text-primary font-semibold cursor-default">Posts</span>
-                        <Link href={`/profile/${userId}/activity`} className="py-3 px-1 border-b-2 border-transparent text-muted-foreground hover:text-foreground">Activity</Link>
-                        <Link href={`/profile/${userId}/portfolio`} className="py-3 px-1 border-b-2 border-transparent text-muted-foreground hover:text-foreground">Portfolio</Link>
-                    </nav>
-                </div>
+            
+            <main className="w-full flex flex-col items-center py-lg md:py-xl">
+                <div className="w-full max-w-2xl px-4 md:px-0 space-y-xl">
+                    
+                    {/* Skills Section */}
+                    <div className="w-full">
+                        <div className="text-fine-print text-ink-muted-48 font-bold uppercase tracking-widest mb-md border-b border-hairline pb-2">
+                            Academic Expertise
+                        </div>
+                        <ProfileSkillsSection userId={userId} skills={(userProfile as any).skills || []} />
+                    </div>
 
-                <UserPostList userId={userId} />
-            </div>
+                    {/* Badges Section */}
+                    <div className="w-full">
+                        <div className="text-fine-print text-ink-muted-48 font-bold uppercase tracking-widest mb-md border-b border-hairline pb-2">
+                            Achievements & Recognition
+                        </div>
+                        <ProfileBadges userId={userId} />
+                    </div>
+
+                    {/* Posts Section */}
+                    <div className="w-full">
+                        <div className="text-fine-print text-ink-muted-48 font-bold uppercase tracking-widest mb-md border-b border-hairline pb-2">
+                            Recent Contributions
+                        </div>
+                        <UserPostList userId={userId} />
+                    </div>
+                </div>
+            </main>
         </div>
     );
 }

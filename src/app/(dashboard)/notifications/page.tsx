@@ -4,7 +4,10 @@ import { useQuery, useMutation } from '@/lib/api';
 import { useUser } from '@/lib/auth/client';
 import { api } from '@/lib/api';
 import { NotificationItem } from '@/components/notifications/NotificationItem';
-import { Bell, CheckCheck } from 'lucide-react';
+import { Bell, CheckCheck, Inbox } from 'lucide-react';
+import { Section, SectionHeader } from '@/components/ui/Section';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export default function NotificationsPage() {
   const { isSignedIn, isLoaded } = useUser();
@@ -13,16 +16,18 @@ export default function NotificationsPage() {
   const data = useQuery(api.notifications.getNotifications, isAuthenticated ? {} : 'skip');
   const markAllAsRead = useMutation(api.notifications.markAllAsRead);
 
-  // Backend returns { notifications: [...], cursor: null }, not a plain array
   const notifications = data?.notifications;
   const unreadCount = notifications?.filter((n) => !n.isRead).length ?? 0;
 
   if (isLoading) {
     return (
-      <div className="max-w-2xl mx-auto py-8 px-4">
-        <div className="space-y-3">
+      <div className="w-full bg-canvas min-h-screen">
+        <Section variant="parchment" className="py-xl">
+           <div className="h-12 w-48 bg-canvas animate-pulse rounded mx-auto" />
+        </Section>
+        <div className="max-w-2xl mx-auto py-8 px-4 space-y-4">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="border rounded-lg bg-card p-4 h-20 animate-pulse" />
+            <div key={i} className="h-24 w-full bg-canvas-parchment animate-pulse rounded-lg" />
           ))}
         </div>
       </div>
@@ -31,58 +36,79 @@ export default function NotificationsPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="max-w-2xl mx-auto py-8 px-4 text-center">
-        <Bell className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-30" />
-        <h2 className="text-xl font-semibold">Sign in to view notifications</h2>
-        <p className="text-sm text-muted-foreground mt-1">You need to be signed in to see your notifications.</p>
+      <div className="w-full bg-canvas min-h-screen flex flex-col items-center justify-center p-8 text-center">
+        <div className="p-6 rounded-full bg-canvas-parchment text-ink/10 mb-6">
+           <Bell size={64} />
+        </div>
+        <h2 className="text-display-md text-ink">Stay in the loop.</h2>
+        <p className="text-body text-ink-muted-48 mt-2 max-w-xs">
+          Sign in to view your notifications and stay connected with your community.
+        </p>
+        <Button variant="primary" size="lg" className="mt-8" onClick={() => window.location.href = '/sign-in'}>
+          Sign In to Continue
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <Bell className="h-7 w-7 text-primary" />
-          <h1 className="text-3xl font-bold">Notifications</h1>
+    <div className="w-full bg-canvas min-h-screen">
+      {/* Header Section */}
+      <Section variant="parchment" className="py-xl border-b border-hairline">
+        <SectionHeader 
+          title="Notifications." 
+          tagline="Keep track of likes, comments, and community updates in one place."
+        >
           {unreadCount > 0 && (
-            <span className="bg-primary text-primary-foreground text-xs font-semibold px-2 py-0.5 rounded-full">
-              {unreadCount}
-            </span>
+            <Button
+              variant="pearl"
+              size="sm"
+              className="flex items-center gap-2"
+              onClick={() => markAllAsRead()}
+            >
+              <CheckCheck size={16} /> Mark all as read
+            </Button>
           )}
-        </div>
-        {unreadCount > 0 && (
-          <button
-            onClick={() => markAllAsRead()}
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <CheckCheck className="h-4 w-4" />
-            Mark all as read
-          </button>
-        )}
-      </div>
+        </SectionHeader>
+      </Section>
 
-      {notifications === undefined ? (
-        <div className="space-y-3">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="border rounded-lg bg-card p-4 h-20 animate-pulse" />
-          ))}
+      <main className="w-full flex flex-col items-center">
+        <div className="w-full">
+           {notifications === undefined ? (
+              <div className="max-w-2xl mx-auto py-8 px-4 space-y-4">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="h-24 w-full bg-canvas-parchment animate-pulse rounded-lg" />
+                ))}
+              </div>
+           ) : notifications.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-32 text-center">
+                <div className="p-6 rounded-full bg-canvas-parchment text-ink/10 mb-6">
+                  <Inbox size={64} />
+                </div>
+                <h3 className="text-display-md text-ink">All caught up.</h3>
+                <p className="text-body text-ink-muted-48 mt-2">
+                  When new activity happens, you&apos;ll see it here.
+                </p>
+              </div>
+           ) : (
+              <div className="w-full">
+                <div className="max-w-2xl mx-auto px-4 py-6">
+                   <div className="text-fine-print text-ink-muted-48 font-bold uppercase tracking-widest mb-2">
+                      Recent Activity {unreadCount > 0 && `(${unreadCount} unread)`}
+                   </div>
+                </div>
+                <div className="border-t border-hairline">
+                  {notifications.map((notification) => (
+                    <NotificationItem key={notification._id} notification={notification} />
+                  ))}
+                </div>
+                <div className="py-12 flex justify-center">
+                   <p className="text-fine-print text-ink-muted-48 font-semibold uppercase tracking-widest">End of Notifications</p>
+                </div>
+              </div>
+           )}
         </div>
-      ) : notifications.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <Bell className="h-16 w-16 text-muted-foreground mb-4 opacity-30" />
-          <h2 className="text-xl font-semibold text-muted-foreground">No notifications yet</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            When someone interacts with you, you&apos;ll see it here.
-          </p>
-        </div>
-      ) : (
-        <div className="divide-y divide-border border rounded-lg bg-card overflow-hidden">
-          {notifications.map((notification) => (
-            <NotificationItem key={notification._id} notification={notification} />
-          ))}
-        </div>
-      )}
+      </main>
     </div>
   );
 }

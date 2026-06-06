@@ -3,11 +3,13 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import type { Doc } from '@/lib/api';
-import { Users, Rss, Settings, Lock } from 'lucide-react';
+import { Users, Rss, Settings, Lock, Share2 } from 'lucide-react';
 import Link from 'next/link';
 import { useMutation } from '@/lib/api';
 import { api } from '@/lib/api';
 import { useUser } from '@/lib/auth/client';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 // Manually defining type based on getCommunity query
 type Community = Doc<'communities'> & {
@@ -51,52 +53,99 @@ export function CommunityHeader({ community }: Props) {
     }
 
     return (
-        <div>
-            <div className="h-48 w-full bg-muted" style={community.banner ? { backgroundImage: `url(${community.banner})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined} />
-            <div className="bg-card">
-                <div className="max-w-4xl mx-auto px-4">
-                     <div className="flex items-end gap-4 -mt-16">
-                        <div className="h-32 w-32 rounded-md border-4 border-card bg-muted flex-shrink-0">
-                            {community.avatar && <Image src={community.avatar} alt={community.name} width={128} height={128} className="h-full w-full rounded-sm object-cover" />}
-                        </div>
+        <div className="w-full bg-canvas border-b border-hairline">
+            {/* Banner Section */}
+            <div className="relative h-64 md:h-80 w-full bg-canvas-parchment overflow-hidden">
+                {community.banner ? (
+                    <Image 
+                        src={community.banner} 
+                        alt="" 
+                        fill 
+                        priority
+                        className="object-cover opacity-90" 
+                    />
+                ) : (
+                    <div className="absolute inset-0 bg-tile-1 opacity-5" />
+                )}
+            </div>
+
+            {/* Header Content */}
+            <div className="max-w-4xl mx-auto px-4 md:px-0">
+                <div className="relative flex flex-col items-center md:items-start -mt-20 md:-mt-24 pb-8">
+                    {/* Avatar */}
+                    <div className="relative h-40 w-40 rounded-lg border-4 border-canvas bg-canvas-parchment shadow-product overflow-hidden flex-shrink-0 z-10">
+                        {community.avatar ? (
+                            <Image src={community.avatar} alt={community.name} width={160} height={160} className="h-full w-full object-cover" />
+                        ) : (
+                            <div className="h-full w-full flex items-center justify-center text-ink/20 font-display text-6xl">
+                                {community.name.charAt(0)}
+                            </div>
+                        )}
                     </div>
-                    <div className="mt-4 flex flex-col md:flex-row justify-between md:items-start">
-                        <div className="flex-1">
-                            <h1 className="text-3xl font-bold">{community.name}</h1>
-                             <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
-                                <div className="flex items-center gap-1.5"><Users className="h-4 w-4"/> {community.memberCount} members</div>
+
+                    {/* Text & Actions */}
+                    <div className="mt-6 w-full flex flex-col md:flex-row justify-between items-center md:items-end gap-6">
+                        <div className="flex-1 text-center md:text-left space-y-2">
+                            <h1 className="text-display-lg md:text-hero-display text-ink leading-tight">
+                                {community.name}
+                            </h1>
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-caption-strong text-ink-muted-48 uppercase tracking-wider">
                                 <div className="flex items-center gap-1.5">
-                                    {React.createElement(typeInfo[community.type].icon, { className: 'h-4 w-4' })}
-                                    {typeInfo[community.type].text}
+                                    <Users size={16} className="text-primary" />
+                                    <span>{community.memberCount} members</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 border-l border-hairline pl-4">
+                                    {React.createElement(typeInfo[community.type].icon, { size: 16, className: 'text-primary' })}
+                                    <span>{typeInfo[community.type].text}</span>
                                 </div>
                             </div>
-                            <p className="text-sm mt-2">{community.description}</p>
+                            <p className="text-body text-ink-muted-48 max-w-2xl mt-4 leading-relaxed">
+                                {community.description}
+                            </p>
                         </div>
-                        <div className="mt-4 md:mt-0">
-                             {!isOwner && (
-                                <button
+
+                        {/* CTAs */}
+                        <div className="flex items-center gap-3">
+                            <Button variant="pearl" size="icon" className="shadow-sm">
+                                <Share2 size={20} />
+                            </Button>
+                            {!isOwner && (
+                                <Button
                                     onClick={handleJoinLeave}
                                     disabled={isLoading || !isAuthenticated}
-                                    className={`h-10 w-full md:w-auto py-2 px-4 btn-press rounded-md text-sm font-semibold transition-colors ${
-                                        isMember
-                                            ? 'bg-muted text-muted-foreground hover:bg-destructive hover:text-destructive-foreground'
-                                            : 'bg-primary text-primary-foreground hover:bg-primary/90'
-                                    } disabled:opacity-50`}
+                                    variant={isMember ? "secondary" : "primary"}
+                                    size="lg"
+                                    className="min-w-[120px]"
                                 >
-                                    {isLoading ? 'Loading...' : isMember ? 'Leave' : 'Join'}
-                                </button>
-                             )}
+                                    {isLoading ? '...' : isMember ? 'Leave' : 'Join Community'}
+                                </Button>
+                            )}
+                            {(community.viewerRole === 'admin' || isOwner) && (
+                                <Link href={`/c/${community.slug}/settings`}>
+                                    <Button variant="pearl" size="icon" className="shadow-sm">
+                                        <Settings size={20} />
+                                    </Button>
+                                </Link>
+                            )}
                         </div>
                     </div>
-                     <div className="mt-4 border-b">
-                        <nav className="flex gap-4" aria-label="Community tabs">
-                            <Link href={`/c/${community.slug}`} className="py-3 px-1 border-b-2 border-primary text-primary font-semibold">Posts</Link>
-                            <Link href={`/c/${community.slug}/members`} className="py-3 px-1 border-b-2 border-transparent text-muted-foreground hover:text-foreground">Members</Link>
-                            {community.viewerRole === 'admin' || community.viewerRole === 'owner' ? (
-                                <Link href={`/c/${community.slug}/settings`} className="py-3 px-1 border-b-2 border-transparent text-muted-foreground hover:text-foreground">Settings</Link>
-                            ) : null}
-                        </nav>
-                    </div>
+                </div>
+
+                {/* Tabs - Apple Style */}
+                <div className="w-full flex items-center justify-center md:justify-start gap-8 h-12 border-t border-hairline">
+                    <Link 
+                        href={`/c/${community.slug}`} 
+                        className="relative h-full flex items-center text-caption font-semibold text-primary"
+                    >
+                        Posts
+                        <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full" />
+                    </Link>
+                    <Link 
+                        href={`/c/${community.slug}/members`} 
+                        className="h-full flex items-center text-caption font-semibold text-ink-muted-48 hover:text-ink transition-colors"
+                    >
+                        Members
+                    </Link>
                 </div>
             </div>
         </div>
