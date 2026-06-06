@@ -5,6 +5,14 @@ import { ReactionPicker, reactionEmojis } from "./ReactionPicker"
 jest.mock("@/lib/api", () => ({
   useMutation: jest.fn(() => jest.fn()),
   useQuery: jest.fn(() => null),
+  api: {
+    reactions: {
+      addReaction: "reactions:addReaction",
+      removeReaction: "reactions:removeReaction",
+      getUserReaction: "reactions:getUserReaction",
+      getReactions: "reactions:getReactions",
+    },
+  },
 }))
 
 // Mock tooltip components

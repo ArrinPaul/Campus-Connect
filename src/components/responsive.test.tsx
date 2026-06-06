@@ -58,6 +58,9 @@ jest.mock("@/lib/api", () => ({
     presence: {
       getUserPresence: "presence:getUserPresence",
     },
+    hashtags: {
+      searchHashtags: "hashtags:searchHashtags",
+    },
   },
 }))
 

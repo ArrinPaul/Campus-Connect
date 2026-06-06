@@ -51,7 +51,7 @@ const nextConfig = {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: blob: https://images.unsplash.com",
       "font-src 'self' https://fonts.gstatic.com",
-      `connect-src 'self' ${isDev ? "ws://localhost:*" : ""} https://*.posthog.com https://*.sentry.io`,
+      `connect-src 'self' ${isDev ? "ws://localhost:* http://localhost:*" : ""} https://*.posthog.com https://*.sentry.io`,
       "frame-src 'self' https://challenges.cloudflare.com",
       "object-src 'none'",
       "base-uri 'self'",

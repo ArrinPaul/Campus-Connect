@@ -14,6 +14,17 @@ import type { ReactNode } from "react"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
 
+function getBaseUrl(path: string): string {
+  if (
+    path.startsWith("/api/auth") ||
+    path === "/api/users/me" ||
+    path === "/api/users/onboarding"
+  ) {
+    return API_BASE_URL
+  }
+  return ""
+}
+
 export type Id<_T extends string = string> = string
 export type Doc<_T extends string = string> = any
 
@@ -47,10 +58,11 @@ export function useQuery<T = any>(
     })
   }
 
+  const baseUrl = getBaseUrl(endpoint?._path || "")
   const url = enabled
     ? params.toString()
-      ? `${API_BASE_URL}${endpoint!._path}?${params.toString()}`
-      : `${API_BASE_URL}${endpoint!._path}`
+      ? `${baseUrl}${endpoint!._path}?${params.toString()}`
+      : `${baseUrl}${endpoint!._path}`
     : ""
 
   const { data } = useTanstackQuery<T>({
@@ -82,7 +94,8 @@ export function useMutation<A = any, T = any>(
 
   const mutation = useTanstackMutation<T, Error, A | undefined>({
     mutationFn: async (args) => {
-      const res = await fetch(`${API_BASE_URL}${endpoint._path}`, {
+      const baseUrl = getBaseUrl(endpoint._path)
+      const res = await fetch(`${baseUrl}${endpoint._path}`, {
         method: endpoint._method === "GET" ? "POST" : endpoint._method,
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -104,7 +117,8 @@ export function useMutation<A = any, T = any>(
 
 export function useAction<A = any, T = any>(endpoint: Endpoint): (args?: A) => Promise<T> {
   return async (args?: A) => {
-    const res = await fetch(`${API_BASE_URL}${endpoint._path}`, {
+    const baseUrl = getBaseUrl(endpoint._path)
+    const res = await fetch(`${baseUrl}${endpoint._path}`, {
       method: endpoint._method === "GET" ? "POST" : endpoint._method,
       headers: { "Content-Type": "application/json" },
       credentials: "include",

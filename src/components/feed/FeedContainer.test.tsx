@@ -13,7 +13,7 @@ jest.mock("@/lib/api", () => ({
   useQuery: jest.fn((fn: any, args?: any) => {
     if (fn === "users:getCurrentUser") return mockGetCurrentUser()
     if (fn === "posts:hasUserLikedPost") return mockHasUserLikedPost()
-    if (fn.toString().includes("getFeedPosts") || fn.toString().includes("getUnifiedFeed") || fn.toString().includes("getRankedFeed") || fn.toString().includes("getTrendingFeed")) {
+    if (fn && (fn.toString().includes("getFeedPosts") || fn.toString().includes("getUnifiedFeed") || fn.toString().includes("getRankedFeed") || fn.toString().includes("getTrendingFeed"))) {
       // Handle multiple queries for pagination
       const result = mockQueryResults[queryCallCount] || mockQueryResults[0]
       if (args !== "skip") {
@@ -34,6 +34,19 @@ jest.mock("@/lib/api", () => ({
   }),
   useMutation: jest.fn(() => jest.fn()),
   useConvexAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false })),
+  api: {
+    users: {
+      getCurrentUser: "users:getCurrentUser",
+    },
+    posts: {
+      getFeedPosts: "posts:getFeedPosts",
+      hasUserLikedPost: "posts:hasUserLikedPost",
+    },
+    feed_ranking: {
+      getRankedFeed: "feed_ranking:getRankedFeed",
+      getTrendingFeed: "feed_ranking:getTrendingFeed",
+    },
+  },
 }))
 
 // Mock Next.js Image component

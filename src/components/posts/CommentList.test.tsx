@@ -2,10 +2,18 @@ import { render, screen } from "@testing-library/react"
 import { CommentList } from "./CommentList"
 import { Id } from "@/lib/api"
 
-// Mock @/lib/api
 jest.mock("@/lib/api", () => ({
   useMutation: jest.fn(() => jest.fn()),
   useQuery: jest.fn(() => null),
+  api: {
+    comments: {
+      deleteComment: "comments:deleteComment",
+      createComment: "comments:createComment",
+    },
+    users: {
+      getCurrentUser: "users:getCurrentUser",
+    },
+  },
 }))
 
 // Mock Auth

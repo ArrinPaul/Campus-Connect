@@ -14,6 +14,11 @@ jest.mock("@/components/theme/theme-toggle", () => ({
 // Mock app data client
 jest.mock("@/lib/api", () => ({
   useQuery: jest.fn(() => 0),
+  api: {
+    conversations: {
+      getTotalUnreadCount: "conversations:getTotalUnreadCount",
+    },
+  },
 }))
 
 // Mock next/navigation

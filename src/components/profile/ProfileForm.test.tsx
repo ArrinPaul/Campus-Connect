@@ -1,5 +1,8 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { ProfileForm } from "./ProfileForm"
+import { useMutation } from "@/lib/api"
+
+const mockUseMutation = useMutation as jest.MockedFunction<typeof useMutation>
 
 // Mock FileReader so image preview works in jsdom
 const mockFileReaderResult = "data:image/png;base64,fakepreview"
@@ -7,8 +10,10 @@ const mockFileReader = {
   readAsDataURL: jest.fn(function (this: any) {
     this.result = mockFileReaderResult
     this.onload?.({ target: this } as any)
+    this.onloadend?.({ target: this } as any)
   }),
   onload: null as any,
+  onloadend: null as any,
   result: null as any,
 }
 global.FileReader = jest.fn(() => mockFileReader) as any
@@ -16,9 +21,16 @@ global.FileReader = jest.fn(() => mockFileReader) as any
 // Mock app data client
 jest.mock("@/lib/api", () => ({
   useMutation: jest.fn(() => jest.fn()),
+  api: {
+    users: {
+      updateProfile: "users:updateProfile",
+      generateUploadUrl: "users:generateUploadUrl",
+      updateProfilePicture: "users:updateProfilePicture",
+    },
+  },
 }))
 
-// Mock validations
+jest.mock("browser-image-compression", () => jest.fn((file) => Promise.resolve(file)))
 jest.mock("../../../lib/validations", () => ({
   validateBio: jest.fn((bio: string) => {
     if (bio.length > 500) {
@@ -42,6 +54,8 @@ jest.mock("../../../lib/validations", () => ({
 describe("ProfileForm", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockUseMutation.mockReset()
+    mockUseMutation.mockReturnValue(jest.fn())
   })
 
   it("should render all form fields", () => {
@@ -140,9 +154,8 @@ describe("ProfileForm", () => {
   })
 
   it("should call onSave callback after successful submission", async () => {
-    const { useMutation } = require("@/lib/api")
     const mockUpdateProfile = jest.fn().mockResolvedValue(undefined)
-    useMutation.mockReturnValue(mockUpdateProfile)
+    mockUseMutation.mockReturnValue(mockUpdateProfile)
 
     const onSave = jest.fn()
     render(<ProfileForm onSave={onSave} />)
@@ -156,9 +169,8 @@ describe("ProfileForm", () => {
   })
 
   it("should display success message after successful submission", async () => {
-    const { useMutation } = require("@/lib/api")
     const mockUpdateProfile = jest.fn().mockResolvedValue(undefined)
-    useMutation.mockReturnValue(mockUpdateProfile)
+    mockUseMutation.mockReturnValue(mockUpdateProfile)
 
     render(<ProfileForm />)
 
@@ -171,11 +183,10 @@ describe("ProfileForm", () => {
   })
 
   it("should disable submit button while submitting", async () => {
-    const { useMutation } = require("@/lib/api")
     const mockUpdateProfile = jest
       .fn()
       .mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 100)))
-    useMutation.mockReturnValue(mockUpdateProfile)
+    mockUseMutation.mockReturnValue(mockUpdateProfile)
 
     render(<ProfileForm />)
 

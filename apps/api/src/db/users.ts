@@ -7,6 +7,7 @@ export interface User {
   email: string
   name: string
   password?: string
+  passwordHash?: string
   username?: string
   bio?: string
   university?: string
@@ -34,6 +35,7 @@ export async function createUser(data: {
         email: $email,
         name: $name,
         password: $password,
+        passwordHash: $password,
         createdAt: $now,
         updatedAt: $now,
         onboardingCompleted: false
@@ -59,7 +61,11 @@ export async function findUserByEmail(email: string): Promise<User | null> {
     )
     
     if (result.records.length === 0) return null
-    return toPlain(result.records[0].get("u").properties) as unknown as User
+    const user = toPlain(result.records[0].get("u").properties) as unknown as User
+    if (user && !user.password && user.passwordHash) {
+      user.password = user.passwordHash
+    }
+    return user
   })
 }
 
@@ -70,7 +76,11 @@ export async function getUserByAuthId(authId: string): Promise<User | null> {
       { authId }
     )
     if (result.records.length === 0) return null
-    return toPlain(result.records[0].get("u").properties) as unknown as User
+    const user = toPlain(result.records[0].get("u").properties) as unknown as User
+    if (user && !user.password && user.passwordHash) {
+      user.password = user.passwordHash
+    }
+    return user
   })
 }
 
@@ -117,6 +127,7 @@ export async function getDbUser(authId: string): Promise<User | null> {
     if (result.records.length === 0) return null
     const user = toPlain(result.records[0].get("u").properties) as unknown as User
     delete user.password
+    delete user.passwordHash
     return user
   })
 }
