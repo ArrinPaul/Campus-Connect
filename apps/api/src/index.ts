@@ -38,14 +38,13 @@ async function start() {
     console.log("[API] Initializing Neo4j connection...")
     await initializeNeo4j()
     console.log("[API] Neo4j connected successfully")
-
-    app.listen(PORT, () => {
-      console.log(`[API] Server running on http://localhost:${PORT}`)
-    })
   } catch (error) {
-    console.error("[API] Failed to start:", error instanceof Error ? error.message : error)
-    process.exit(1)
+    console.warn("[API] Warning: Failed to connect to Neo4j. Database features will be unavailable.", error instanceof Error ? error.message : error)
   }
+
+  app.listen(PORT, () => {
+    console.log(`[API] Server running on http://localhost:${PORT}`)
+  })
 }
 
 // Graceful shutdown

@@ -2,121 +2,75 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── DESIGN SYSTEM ──────────────────────────────────────────────
-   Gemini CLI Redesign — "Social Productivity"
-   Philosophy: Premium, Human-Crafted, Alive
-   Inspiration: Linear, Instagram, Discord
-   ─────────────────────────────────────────────────────────────── */
-
 @layer base {
   :root {
-    /* ── Light Theme (Default) ────────────────────────────────── */
-    --background: 240 5% 96%; /* Neutral, cool off-white */
-    --foreground: 240 10% 3.9%; /* Almost black */
-
-    --card: 240 5% 96%;
-    --card-foreground: 240 10% 3.9%;
-
-    --popover: 240 5% 96%;
-    --popover-foreground: 240 10% 3.9%;
-
-    /* -- Primary (Brand Blue) -- */
-    --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* ── Apple Design Language Tokens ──────────────────────────── */
+    --primary: #0066cc; /* Action Blue */
+    --primary-focus: #0071e3;
+    --primary-on-dark: #2997ff;
     
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 221 83% 53%;
+    --ink: #1d1d1f;
+    --ink-muted-80: #333333;
+    --ink-muted-48: #7a7a7a;
+    
+    --canvas: #ffffff;
+    --canvas-parchment: #f5f5f7;
+    --surface-pearl: #fafafc;
+    
+    --hairline: #e0e0e0;
+    --divider-soft: #f0f0f0;
 
-    --radius: 0.5rem;
+    --radius: 11px; /* Default md radius */
   }
 
   .dark {
-    /* ── Dark Theme ───────────────────────────────────────────── */
-    --background: 240 10% 3.9%; /* Deep, dark blue-ish grey */
-    --foreground: 210 40% 98%; /* Light grey */
-    
-    --card: 240 10% 3.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 210 40% 98%;
-
-    /* -- Primary (Brighter Brand Blue) -- */
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 47% 11%;
-    
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 210 40% 98%;
-    
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 217 91% 60%;
+    --canvas: #1d1d1f;
+    --ink: #ffffff;
+    --canvas-parchment: #272729;
+    --hairline: #333333;
   }
 }
 
-/* ─── BASE RESETS & TYPOGRAPHY ───────────────────────────────── */
 @layer base {
   * {
     @apply border-border;
   }
+  
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
+    background-color: var(--canvas);
   }
+
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: var(--font-sans);
   }
+
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-semibold text-foreground;
+    @apply font-display text-foreground;
+    letter-spacing: -0.015em;
   }
+
   :focus-visible {
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 }
 
-/* ─── NEW COMPONENT UTILITIES ────────────────────────────────── */
 @layer components {
-  /* A subtle, breathing background effect for the main layout to feel alive */
-  .bg-grid-glow {
-    background-image:
-      radial-gradient(circle at 1px 1px, hsl(var(--border) / 0.5) 1px, transparent 0);
-    background-size: 40px 40px;
-  }
-  
-  /* Primary button with a satisfying press-down effect */
+  /* Signature Apple Micro-interaction */
   .btn-press {
-    @apply transition-transform duration-150 active:scale-[0.97];
+    @apply transition-all duration-200 active:scale-[0.95];
   }
 
-  /* Custom scrollbar for a more branded feel */
-  .scrollbar-custom {
-    scrollbar-width: thin;
-    scrollbar-color: hsl(var(--border)) transparent;
+  /* Frosted Glass Effect */
+  .glass {
+    @apply bg-opacity-80 backdrop-blur-xl saturate-[180%];
   }
+
+  /* Custom scrollbar - Minimal */
   .scrollbar-custom::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -125,75 +79,18 @@
     background: transparent;
   }
   .scrollbar-custom::-webkit-scrollbar-thumb {
-    background: hsl(var(--border));
+    background: var(--hairline);
     border-radius: 3px;
-    transition: background 0.2s;
   }
-  .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--muted-foreground));
-  }
-}
-
-/* ─── ANIMATION UTILITIES ─────────────────────────────────────── */
-@layer utilities {
-  @keyframes slide-down-and-fade {
-    from {
-      opacity: 0;
-      transform: translateY(-4px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes slide-up-and-fade {
-    from {
-      opacity: 0;
-      transform: translateY(4px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .animate-in {
-    animation: slide-down-and-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-  
-  .animate-out {
-    animation: slide-up-and-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    animation-direction: reverse;
-  }
-
-  /* Staggered animation delays */
-  .delay-1 { animation-delay: 0.05s; }
-  .delay-2 { animation-delay: 0.1s; }
-  .delay-3 { animation-delay: 0.15s; }
-  .delay-4 { animation-delay: 0.2s; }
-  .delay-5 { animation-delay: 0.25s; }
-
-  /* Blob animation for landing page */
-  @keyframes blob {
-    0% { transform: translate(0px, 0px) scale(1); }
-    33% { transform: translate(30px, -50px) scale(1.1); }
-    66% { transform: translate(-20px, 20px) scale(0.9); }
-    100% { transform: translate(0px, 0px) scale(1); }
-  }
-
-  .animate-blob {
-    animation: blob 7s infinite cubic-bezier(0.62, 0.28, 0.23, 0.99);
-  }
-  .animation-delay-2000 { animation-delay: 2s; }
 }
 
 /* ─── SELECTION HIGHLIGHT ────────────────────────────────────── */
 ::selection {
-  background: hsl(var(--primary) / 0.2);
+  background: rgba(0, 102, 204, 0.1);
+  color: inherit;
 }
 
-/* ─── REDUCED MOTION PREFERENCE ──────────────────────────────── */
+/* ─── REDUCED MOTION ─────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -201,78 +98,4 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
-/* ─── AUTH COMPONENT STYLING ───────────────────────────────── */
-.cl-root {
-  --color-focus-ring: hsl(var(--ring));
-}
-
-.cl-card {
-  @apply shadow-xl rounded-xl overflow-hidden;
-}
-
-.cl-socialButtonsBlockButton__google,
-.cl-socialButtonsBlockButton__github,
-.cl-socialButtonsBlockButton__microsoft {
-  @apply border border-border/50 bg-background text-foreground hover:bg-accent/50 transition-all duration-200 font-medium shadow-sm;
-}
-
-.cl-formButtonPrimary {
-  @apply bg-primary text-primary-foreground font-semibold shadow-md hover:bg-primary/90 transition-all duration-200 active:scale-[0.98];
-}
-
-.cl-formFieldInput {
-  @apply bg-background border border-border/50 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary;
-}
-
-.cl-formFieldLabel {
-  @apply text-foreground font-medium text-sm;
-}
-
-.cl-dividerLine {
-  @apply bg-border/30;
-}
-
-.cl-dividerText {
-  @apply text-muted-foreground text-sm;
-}
-
-.cl-headerTitle {
-  @apply font-display text-3xl font-bold text-foreground;
-}
-
-.cl-headerSubtitle {
-  @apply text-muted-foreground text-base;
-}
-
-.cl-formLink {
-  @apply text-primary hover:text-primary/80 underline transition-colors;
-}
-
-/* Footer/alternative methods */
-.cl-footer {
-  @apply border-t border-border/30 pt-4;
-}
-
-.cl-alternativeMethodsBlockButton {
-  @apply border border-border/50 text-foreground hover:bg-accent/50 transition-colors;
-}
-
-/* Error and success messages */
-.cl-formFieldErrorText {
-  @apply text-destructive text-sm font-medium;
-}
-
-.cl-formFieldSuccessText {
-  @apply text-green-600 text-sm font-medium;
-}
-
-/* Identifiers page */
-.cl-identifierMobileView {
-  @apply rounded-xl;
-}
-
-/* Loading spinner */
-.cl-spinner {
-  @apply text-primary;
 }

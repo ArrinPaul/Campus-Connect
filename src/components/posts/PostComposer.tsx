@@ -9,13 +9,14 @@ import dynamic from "next/dynamic"
 import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 import { MentionAutocomplete } from "./MentionAutocomplete"
 import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
 
 // Lazy load the heavy Tiptap editor (~300KB)
 const RichTextEditor = dynamic(
   () => import("@/components/editor/RichTextEditor").then((m) => m.RichTextEditor),
   {
     loading: () => (
-      <div className="h-32 animate-pulse rounded-lg bg-muted" />
+      <div className="h-32 animate-pulse rounded-lg bg-canvas-parchment" />
     ),
     ssr: false,
   }
@@ -57,7 +58,6 @@ interface PostComposerProps {
 export function PostComposer({ onPostCreated, communityId }: PostComposerProps) {
   const { isSignedIn, isLoaded } = useUser()
   const isAuthenticated = isSignedIn ?? false
-  const isAuthLoading = !isLoaded
   
   const createPost = useMutation(api.posts.createPost)
   const generateUploadUrl = useMutation(api.media.generateUploadUrl)
@@ -87,7 +87,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
   } | null>(null)
   const [isFetchingPreview, setIsFetchingPreview] = useState(false)
 
-  // ── Poll state ─────────────────────────────────────────────────────────
+  // Poll state
   const [showPollUI, setShowPollUI] = useState(false)
   const [pollOptions, setPollOptions] = useState(["Option 1", "Option 2"])
   const [pollDuration, setPollDuration] = useState<number | undefined>(24)
@@ -98,11 +98,10 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
 
   const maxLength = 5000
 
-  // ── Link auto-detection ────────────────────────────────────────────────
+  // Link auto-detection
   const detectAndFetchLink = useCallback(
     (text: string) => {
       if (linkDebounceRef.current) clearTimeout(linkDebounceRef.current)
-      // Only detect if no files are already attached
       if (attachedFiles.length > 0) return
 
       linkDebounceRef.current = setTimeout(async () => {
@@ -125,17 +124,16 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
         }
       }, 800)
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [attachedFiles.length, detectedLink, fetchLinkPreview]
   )
 
-  // ── File validation & selection ───────────────────────────────────────
+  // File selection
   const handleFileSelect = useCallback(
     async (files: FileList | File[], type: "image" | "video" | "file") => {
       const fileArr = Array.from(files)
       if (fileArr.length === 0) return
 
-      // Validate
+      // Validation
       for (const file of fileArr) {
         if (type === "image") {
           if (!IMAGE_TYPES.includes(file.type)) {
@@ -178,7 +176,6 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
 
       setError("")
 
-      // Compress images client-side before storing (skip GIFs to preserve animation)
       let finalFiles = fileArr
       if (type === "image") {
         const compressionOptions = {
@@ -189,11 +186,11 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
         }
         finalFiles = await Promise.all(
           fileArr.map(async (file) => {
-            if (file.type === "image/gif") return file // preserve animated GIFs
+            if (file.type === "image/gif") return file
             try {
               return await imageCompression(file, compressionOptions)
             } catch {
-              return file // fall back to original if compression fails
+              return file
             }
           })
         )
@@ -201,9 +198,8 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
 
       setAttachedFiles(finalFiles)
       setAttachedType(type)
-      setLinkPreviewData(null) // Clear link preview when files attached
+      setLinkPreviewData(null)
 
-      // Generate object URL previews for images
       if (type === "image") {
         const previews = finalFiles.map((f) => URL.createObjectURL(f))
         setFilePreviews(previews)
@@ -230,35 +226,6 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
     []
   )
 
-  // ── Drag and drop ─────────────────────────────────────────────────────
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-  }, [])
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault()
-      e.stopPropagation()
-      const files = e.dataTransfer.files
-      if (!files || files.length === 0) return
-      const first = files[0]
-      if (IMAGE_TYPES.includes(first.type)) handleFileSelect(files, "image")
-      else if (VIDEO_TYPES.includes(first.type)) handleFileSelect([first], "video")
-      else handleFileSelect([first], "file")
-    },
-    [handleFileSelect]
-  )
-
-  // Cleanup object URLs on unmount
-  useEffect(() => {
-    return () => {
-      filePreviews.forEach((url) => URL.revokeObjectURL(url))
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-
   const hashtagSuggestions = useQuery(
     api.hashtags.searchHashtags,
     showHashtagAutocomplete && hashtagAutocompleteQuery.length > 0
@@ -266,9 +233,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
       : "skip"
   )
 
-  // Detect hashtag or mention being typed (string-based, no cursor dependency)
   useEffect(() => {
-    // Check for @ mention at end of content (last word starts with @)
     const lastAtMatch = content.match(/(?:^|\s)@([^\s@]*)$/);
     if (lastAtMatch) {
       setMentionAutocompleteQuery(lastAtMatch[1])
@@ -277,7 +242,6 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
       return
     }
 
-    // Check for # hashtag at end of content (last word starts with #)
     const lastHashMatch = content.match(/(?:^|\s)#([^\s#]*)$/)
     if (lastHashMatch) {
       setHashtagAutocompleteQuery(lastHashMatch[1])
@@ -291,7 +255,6 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
     setShowMentionAutocomplete(false)
   }, [content])
 
-  // Keyboard navigation for hashtag autocomplete (via onKeyDown on wrapper div)
   const handleWrapperKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (!showHashtagAutocomplete || !hashtagSuggestions || hashtagSuggestions.length === 0) return
     if (e.key === "ArrowDown") {
@@ -308,14 +271,12 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
     }
   }
 
-  // Insert selected hashtag (replace trailing #word at end of content)
   const insertHashtag = (tag: string) => {
     const newContent = content.replace(/(?:^|(?<=\s))#[^\s#]*$/, `#${tag} `)
     setContent(newContent !== content ? newContent : content + `#${tag} `)
     setShowHashtagAutocomplete(false)
   }
 
-  // Insert selected mention (replace trailing @word at end of content)
   const insertMention = (username: string) => {
     const newContent = content.replace(/(?:^|(?<=\s))@[^\s@]*$/, `@${username} `)
     setContent(newContent !== content ? newContent : content + `@${username} `)
@@ -331,14 +292,11 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
     e.preventDefault()
     setError("")
 
-    // Auth check - use app auth status
     if (!isAuthenticated) {
       setError("You must be signed in to create a post")
-      toast.error("Sign in required", { description: "Please sign in to create a post" })
       return
     }
 
-    // Client-side validation
     if (!content || content.trim().length === 0) {
       if (attachedFiles.length === 0) {
         setError("Post content cannot be empty")
@@ -346,34 +304,20 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
       }
     }
 
-    if (content.length > maxLength) {
-      setError(`Post content must not exceed ${maxLength} characters`)
-      return
-    }
-
     setIsSubmitting(true)
 
     try {
-      let postId: string | undefined
       let pollId: string | undefined
       let mediaUrls: string[] | undefined
       let finalMediaType: "image" | "video" | "file" | "link" | undefined
       let mediaFileNames: string[] | undefined
 
-      // ── Create poll first if active ──────────────────────────────────
       if (showPollUI) {
         const validOptions = pollOptions.map((o) => o.trim()).filter(Boolean)
         if (validOptions.length < 2) {
           setError("A poll needs at least 2 options")
           setIsSubmitting(false)
           return
-        }
-        for (const opt of validOptions) {
-          if (opt.length > 100) {
-            setError("Each poll option must be 100 characters or fewer")
-            setIsSubmitting(false)
-            return
-          }
         }
         pollId = await createPollMutation({
           options: validOptions,
@@ -382,7 +326,6 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
         }) as string
       }
 
-      // ── Upload files if any ──────────────────────────────────────────
       if (attachedFiles.length > 0 && attachedType) {
         setIsUploading(true)
         setUploadProgress(0)
@@ -393,49 +336,36 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
         for (let i = 0; i < attachedFiles.length; i++) {
           const file = attachedFiles[i]
           fileNames.push(file.name)
+          const uploadUrl = await generateUploadUrl({
+            fileType: file.type,
+            fileSize: file.size,
+            uploadType: attachedType,
+          })
 
-          try {
-            // 1. Get presigned upload URL with validation
-            const uploadUrl = await generateUploadUrl({
-              fileType: file.type,
-              fileSize: file.size,
-              uploadType: attachedType,
-            })
-
-            // 2. Upload file
-            const uploadRes = await fetch(uploadUrl, {
-              method: "POST",
-              body: file,
-              headers: { "Content-Type": file.type },
-            })
-            if (!uploadRes.ok) throw new Error(`Upload failed for ${file.name}`)
-
-            const { storageId } = await uploadRes.json()
-            storageIds.push(storageId)
-
-            setUploadProgress(Math.round(((i + 1) / attachedFiles.length) * 100))
-          } catch (err: unknown) {
-            setIsUploading(false)
-            throw new Error(`Failed to upload ${file.name}: ${err instanceof Error ? err.message : "Unknown error"}`)
-          }
+          const uploadRes = await fetch(uploadUrl, {
+            method: "POST",
+            body: file,
+            headers: { "Content-Type": file.type },
+          })
+          if (!uploadRes.ok) throw new Error(`Upload failed for ${file.name}`)
+          const { storageId } = await uploadRes.json()
+          storageIds.push(storageId)
+          setUploadProgress(Math.round(((i + 1) / attachedFiles.length) * 100))
         }
 
-        // 3. Resolve all storage IDs to public URLs
         const resolvedUrls = await resolveStorageUrls({
           storageIds: storageIds as Id<"_storage">[],
         })
-
         mediaUrls = resolvedUrls.filter((u): u is string => u !== null)
         finalMediaType = attachedType
         mediaFileNames = fileNames
         setIsUploading(false)
       } else if (linkPreviewData) {
-        // Link post — store link preview, set mediaType to "link"
         finalMediaType = "link"
       }
 
       const createdPost = await createPost({
-        content: content.trim() || " ", // Backend requires non-empty content; use space for media-only posts
+        content: content.trim() || " ",
         mediaUrls,
         mediaType: finalMediaType,
         mediaFileNames,
@@ -443,14 +373,12 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
         ...(pollId ? { pollId: pollId as Id<"polls"> } : {}),
         ...(communityId ? { communityId } : {}),
       })
-      postId = createdPost as string | undefined
+      const postId = createdPost as string | undefined
 
-      // Link poll to post (set two-way reference)
       if (pollId && postId) {
         await linkPollToPost({ pollId: pollId as Id<"polls">, postId: postId as Id<"posts"> })
       }
 
-      // Clear form after successful post
       setContent("")
       setAttachedFiles([])
       setAttachedType(null)
@@ -464,15 +392,10 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
       setPollDuration(24)
       setPollIsAnonymous(false)
 
-      if (onPostCreated) {
-        onPostCreated()
-      }
-
+      if (onPostCreated) onPostCreated()
       toast.success("Post published!")
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to create post"
-      setError(msg)
-      toast.error(msg)
+      setError(err instanceof Error ? err.message : "Failed to create post")
       setIsUploading(false)
     } finally {
       setIsSubmitting(false)
@@ -482,9 +405,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
   return (
     <form
       onSubmit={handleSubmit}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-      className="space-y-3 sm:space-y-4"
+      className="bg-canvas border border-hairline rounded-lg p-md space-y-md"
     >
       {/* Hidden file input */}
       <input
@@ -497,7 +418,6 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
           if (IMAGE_TYPES.includes(first.type)) handleFileSelect(e.target.files, "image")
           else if (VIDEO_TYPES.includes(first.type)) handleFileSelect([first], "video")
           else handleFileSelect([first], "file")
-          // Reset so the same file can be re-selected
           e.target.value = ""
         }}
         accept={[...IMAGE_TYPES, ...VIDEO_TYPES, ...FILE_TYPES].join(",")}
@@ -505,82 +425,59 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
       />
 
       <div className="relative" onKeyDown={handleWrapperKeyDown}>
-        <label className="block text-sm font-medium text-foreground">
-          What&apos;s on your mind?
-        </label>
+        <RichTextEditor
+          value={content}
+          onChange={handleContentChange}
+          placeholder="Share your thoughts..."
+          maxLength={maxLength}
+          minHeight="100px"
+          disabled={isSubmitting}
+        />
 
-        <div className="mt-1">
-          <RichTextEditor
-            value={content}
-            onChange={handleContentChange}
-            placeholder="Share your thoughts… (supports **markdown** syntax)"
-            maxLength={maxLength}
-            minHeight="120px"
-            disabled={isSubmitting}
-          />
-        </div>
-
-        {/* Hashtag autocomplete dropdown */}
+        {/* Hashtag autocomplete */}
         {showHashtagAutocomplete && hashtagSuggestions && hashtagSuggestions.length > 0 && (
-          <div className="absolute z-10 mt-1 w-64 rounded-md bg-card shadow-lg border border-border">
+          <div className="absolute z-50 mt-1 w-64 bg-canvas border border-hairline rounded-md shadow-product overflow-hidden">
             <ul className="py-1">
               {hashtagSuggestions.map((hashtag, index) => (
                 <li
                   key={hashtag._id}
-                  className={`px-4 py-2 cursor-pointer transition-colors ${
-                    index === selectedHashtagIndex
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground hover:bg-accent"
-                  }`}
+                  className={cn(
+                    "px-4 py-2 cursor-pointer text-caption transition-colors",
+                    index === selectedHashtagIndex ? "bg-canvas-parchment text-primary" : "text-ink hover:bg-canvas-parchment"
+                  )}
                   onClick={() => insertHashtag(hashtag.tag)}
                   onMouseEnter={() => setSelectedHashtagIndex(index)}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">#{hashtag.tag}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {hashtag.postCount} {hashtag.postCount === 1 ? "post" : "posts"}
-                    </span>
+                  <div className="flex items-center justify-between font-semibold">
+                    <span>#{hashtag.tag}</span>
+                    <span className="text-[10px] text-ink-muted-48">{hashtag.postCount}</span>
                   </div>
                 </li>
               ))}
             </ul>
-            <div className="px-4 py-2 text-xs text-muted-foreground border-t border-border">
-              <kbd className="px-1 py-0.5 rounded bg-muted">↑</kbd>
-              <kbd className="ml-1 px-1 py-0.5 rounded bg-muted">↓</kbd> to navigate,
-              <kbd className="ml-1 px-1 py-0.5 rounded bg-muted">Enter</kbd> to select
-            </div>
           </div>
         )}
 
-        {/* Mention autocomplete dropdown */}
+        {/* Mention autocomplete */}
         {showMentionAutocomplete && (
           <MentionAutocomplete
             query={mentionAutocompleteQuery}
             onSelect={insertMention}
             onClose={() => setShowMentionAutocomplete(false)}
-            position={{ top: 120, left: 16 }}
+            position={{ top: 100, left: 0 }}
           />
         )}
 
-        {error && (
-          <p className="mt-1 text-xs text-destructive">{error}</p>
-        )}
+        {error && <p className="mt-2 text-caption text-destructive">{error}</p>}
       </div>
 
-      {/* ── Media Toolbar ───────────────────────────────────────────────── */}
-      <div className="flex items-center gap-2 border-t border-border pt-2">
+      {/* Media Toolbar */}
+      <div className="flex items-center gap-xs border-t border-hairline pt-sm">
         <button
           type="button"
-          onClick={() => {
-            if (fileInputRef.current) {
-              fileInputRef.current.accept = IMAGE_TYPES.join(",")
-              fileInputRef.current.multiple = true
-              fileInputRef.current.click()
-            }
-          }}
+          onClick={() => fileInputRef.current?.click()}
           disabled={!!attachedType && attachedType !== "image"}
-          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent disabled:opacity-40 transition-colors"
-          title="Attach images"
+          className="btn-press flex items-center gap-1.5 rounded-pill px-3 py-1.5 text-caption font-semibold text-ink-muted-48 hover:bg-canvas-parchment hover:text-primary transition-colors disabled:opacity-30"
         >
           <ImageIcon className="h-4 w-4" />
           <span className="hidden sm:inline">Images</span>
@@ -588,167 +485,77 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
 
         <button
           type="button"
-          onClick={() => {
-            if (fileInputRef.current) {
-              fileInputRef.current.accept = VIDEO_TYPES.join(",")
-              fileInputRef.current.multiple = false
-              fileInputRef.current.click()
-            }
-          }}
-          disabled={!!attachedType && attachedType !== "video"}
-          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent disabled:opacity-40 transition-colors"
-          title="Attach video"
-        >
-          <Video className="h-4 w-4" />
-          <span className="hidden sm:inline">Video</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            if (fileInputRef.current) {
-              fileInputRef.current.accept = FILE_TYPES.join(",")
-              fileInputRef.current.multiple = true
-              fileInputRef.current.click()
-            }
-          }}
-          disabled={!!attachedType && attachedType !== "file"}
-          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent disabled:opacity-40 transition-colors"
-          title="Attach file"
-        >
-          <FileText className="h-4 w-4" />
-          <span className="hidden sm:inline">File</span>
-        </button>
-
-        {/* Poll toggle */}
-        <button
-          type="button"
           onClick={() => setShowPollUI((v) => !v)}
-          className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-            showPollUI
-              ? "bg-primary/10 text-primary"
-              : "text-muted-foreground hover:bg-accent"
-          }`}
-          title="Add poll"
+          className={cn(
+            "btn-press flex items-center gap-1.5 rounded-pill px-3 py-1.5 text-caption font-semibold transition-colors",
+            showPollUI ? "bg-canvas-parchment text-primary" : "text-ink-muted-48 hover:bg-canvas-parchment hover:text-primary"
+          )}
         >
           <BarChart2 className="h-4 w-4" />
           <span className="hidden sm:inline">Poll</span>
         </button>
 
         {isFetchingPreview && (
-          <div className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground">
+          <div className="ml-auto flex items-center gap-1.5 text-caption text-ink-muted-48 italic">
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            <span>Fetching preview…</span>
+            <span>Fetching preview...</span>
           </div>
         )}
       </div>
 
-      {/* ── Poll Creator ─────────────────────────────────────────────────── */}
+      {/* Poll Creator */}
       {showPollUI && (
-        <div className="rounded-xl border border-primary/20 bg-primary/10 p-4 space-y-3">
+        <div className="rounded-lg border border-hairline bg-canvas-parchment/30 p-md space-y-md animate-in">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-primary flex items-center gap-1.5">
-              <BarChart2 className="h-4 w-4" />
-              Create Poll
+            <span className="text-caption-strong text-ink flex items-center gap-1.5">
+              <BarChart2 className="h-4 w-4" /> Create Poll
             </span>
             <button
               type="button"
-              onClick={() => {
-                setShowPollUI(false)
-                setPollOptions(["Option 1", "Option 2"])
-              }}
-              className="text-muted-foreground hover:text-muted-foreground hover:text-foreground"
-              aria-label="Remove poll"
+              onClick={() => setShowPollUI(false)}
+              className="text-ink-muted-48 hover:text-ink transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
-
-          {/* Options */}
           <div className="space-y-2">
             {pollOptions.map((opt, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={opt}
-                  onChange={(e) => {
-                    const next = [...pollOptions]
-                    next[i] = e.target.value
-                    setPollOptions(next)
-                  }}
-                  placeholder={`Option ${i + 1}`}
-                  maxLength={100}
-                  className="flex-1 rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-                {pollOptions.length > 2 && (
-                  <button
-                    type="button"
-                    onClick={() => setPollOptions((prev) => prev.filter((_, idx) => idx !== i))}
-                    className="text-muted-foreground hover:text-destructive transition-colors"
-                    aria-label="Remove option"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
+              <input
+                key={i}
+                type="text"
+                value={opt}
+                onChange={(e) => {
+                  const next = [...pollOptions];
+                  next[i] = e.target.value;
+                  setPollOptions(next);
+                }}
+                placeholder={`Option ${i + 1}`}
+                className="w-full rounded-sm border border-hairline bg-canvas px-3 py-2 text-caption focus:outline-none focus:ring-1 focus:ring-primary"
+              />
             ))}
-            {pollOptions.length < 6 && (
+            {pollOptions.length < 5 && (
               <button
                 type="button"
-                onClick={() => setPollOptions((prev) => [...prev, ""])}
-                className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+                onClick={() => setPollOptions([...pollOptions, ""])}
+                className="text-caption text-primary font-semibold hover:opacity-80 transition-opacity"
               >
-                <Plus className="h-3.5 w-3.5" />
-                Add option
+                + Add Option
               </button>
             )}
-          </div>
-
-          {/* Duration & Anonymous */}
-          <div className="flex flex-wrap items-center gap-4 pt-1 border-t border-primary/20">
-            <div className="flex items-center gap-2">
-              <label className="text-xs text-muted-foreground whitespace-nowrap">Duration</label>
-              <select
-                value={pollDuration ?? ""}
-                onChange={(e) =>
-                  setPollDuration(e.target.value ? Number(e.target.value) : undefined)
-                }
-                className="rounded-lg border border-border bg-card px-2 py-1 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              >
-                <option value="1">1 hour</option>
-                <option value="6">6 hours</option>
-                <option value="12">12 hours</option>
-                <option value="24">1 day</option>
-                <option value="72">3 days</option>
-                <option value="168">1 week</option>
-                <option value="">No expiry</option>
-              </select>
-            </div>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={pollIsAnonymous}
-                onChange={(e) => setPollIsAnonymous(e.target.checked)}
-                className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
-              />
-              <span className="text-xs text-muted-foreground">Anonymous votes</span>
-            </label>
           </div>
         </div>
       )}
 
-      {/* ── Image Previews ───────────────────────────────────────────────── */}
+      {/* Image Previews */}
       {attachedType === "image" && filePreviews.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-xs">
           {filePreviews.map((src, i) => (
-            <div key={i} className="relative h-20 w-20 rounded-lg overflow-hidden border border-border">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt={`Attachment ${i + 1}`} className="h-full w-full object-cover" />
+            <div key={i} className="relative h-20 w-20 rounded-md overflow-hidden border border-hairline shadow-sm">
+              <img src={src} alt="Preview" className="h-full w-full object-cover" />
               <button
                 type="button"
                 onClick={() => removeFile(i)}
-                className="absolute top-0.5 right-0.5 rounded-full bg-black/60 p-0.5 text-primary-foreground hover:bg-black/80"
-                aria-label="Remove image"
+                className="absolute top-1 right-1 rounded-full bg-tile-black/60 p-1 text-white hover:bg-tile-black"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -757,95 +564,27 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
         </div>
       )}
 
-      {/* ── Video/File Attachment List ──────────────────────────────────── */}
-      {attachedType !== "image" && attachedFiles.length > 0 && (
-        <div className="flex flex-col gap-1">
-          {attachedFiles.map((file, i) => (
-            <div key={i} className="flex items-center gap-2 rounded-lg bg-muted bg-card px-3 py-2">
-              {attachedType === "video" ? (
-                <Video className="h-4 w-4 text-primary shrink-0" />
-              ) : (
-                <FileText className="h-4 w-4 text-primary shrink-0" />
-              )}
-              <span className="flex-1 truncate text-sm text-foreground">{file.name}</span>
-              <span className="shrink-0 text-xs text-muted-foreground">
-                {(file.size / (1024 * 1024)).toFixed(1)} MB
-              </span>
-              <button
-                type="button"
-                onClick={() => removeFile(i)}
-                className="shrink-0 text-muted-foreground hover:text-destructive transition-colors"
-                aria-label="Remove file"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* ── Upload progress ──────────────────────────────────────────────── */}
+      {/* Uploading Status */}
       {isUploading && (
-        <div className="space-y-1">
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Uploading…</span>
+        <div className="space-y-xs animate-pulse">
+          <div className="flex justify-between text-fine-print text-ink-muted-48 font-semibold">
+            <span>Uploading Assets</span>
             <span>{uploadProgress}%</span>
           </div>
-          <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
-            <div
-              className="h-full rounded-full bg-primary transition-all duration-300"
-              style={{ width: `${uploadProgress}%` }}
-            />
+          <div className="h-1 w-full rounded-full bg-hairline overflow-hidden">
+            <div className="h-full bg-primary transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
           </div>
         </div>
       )}
 
-      {/* ── Link Preview ─────────────────────────────────────────────────── */}
-      {linkPreviewData && attachedFiles.length === 0 && (
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => { setLinkPreviewData(null); setDetectedLink(null) }}
-            className="absolute -top-1 -right-1 z-10 rounded-full bg-muted p-0.5 hover:bg-muted dark:hover:bg-muted"
-            aria-label="Remove link preview"
-          >
-            <X className="h-3.5 w-3.5 text-muted-foreground" />
-          </button>
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
-            <LinkIcon className="h-3.5 w-3.5" />
-            <span>Link preview</span>
-          </div>
-          <div className="flex overflow-hidden rounded-xl border border-border bg-card">
-            {linkPreviewData.image && (
-              <div className="relative w-24 shrink-0">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={linkPreviewData.image} alt="" className="h-full w-full object-cover" />
-              </div>
-            )}
-            <div className="flex flex-col justify-center gap-0.5 px-3 py-2 min-w-0">
-              {linkPreviewData.title && (
-                <p className="truncate text-sm font-semibold text-foreground">{linkPreviewData.title}</p>
-              )}
-              {linkPreviewData.description && (
-                <p className="line-clamp-2 text-xs text-muted-foreground">{linkPreviewData.description}</p>
-              )}
-              <p className="truncate text-xs text-muted-foreground">{linkPreviewData.url}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div>
-        <button
-          type="submit"
-          disabled={isSubmitting || isUploading || (content.trim().length === 0 && attachedFiles.length === 0)}
-          className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 sm:text-base flex items-center justify-center gap-2"
-          style={{ minHeight: "44px" }}
-        >
-          {(isSubmitting || isUploading) && <ButtonLoadingSpinner />}
-          {isUploading ? `Uploading ${uploadProgress}%…` : isSubmitting ? "Posting..." : "Post"}
-        </button>
-      </div>
+      <Button
+        type="submit"
+        disabled={isSubmitting || isUploading || (content.trim().length === 0 && attachedFiles.length === 0)}
+        variant="primary"
+        className="w-full"
+      >
+        {isUploading ? `Uploading ${uploadProgress}%...` : isSubmitting ? "Posting..." : "Post"}
+      </Button>
     </form>
   )
 }

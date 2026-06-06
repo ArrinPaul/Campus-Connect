@@ -1,24 +1,22 @@
-﻿import React from 'react';
+import React from "react";
+import { GlobalNav } from "@/components/navigation/GlobalNav";
+import { SubNav } from "@/components/navigation/SubNav";
 
 type MainLayoutProps = {
   children: React.ReactNode;
-  sidebar: React.ReactNode;
-  mobileNav: React.ReactNode;
+  title?: string;
 };
 
-export function MainLayout({ children, sidebar, mobileNav }: MainLayoutProps) {
+export function MainLayout({ children, title = "Campus Connect" }: MainLayoutProps) {
   return (
-    <div className="flex h-screen bg-background">
-      {/* Desktop Sidebar — shown on md+ */}
-      <div className="hidden md:flex flex-shrink-0">{sidebar}</div>
-
-      {/* Main content — extra bottom padding on mobile to clear fixed bottom nav */}
-      <main className="flex-1 overflow-y-auto scrollbar-custom pb-16 md:pb-0">
+    <div className="min-h-screen bg-canvas">
+      <GlobalNav />
+      <SubNav title={title} />
+      <main className="scrollbar-custom">
         {children}
       </main>
-
-      {/* Mobile Navigation — MobileBottomNav handles its own fixed positioning */}
-      <div className="md:hidden">{mobileNav}</div>
+      
+      {/* Mobile-only bottom nav can be added here if still needed for mobile specific actions */}
     </div>
   );
 }

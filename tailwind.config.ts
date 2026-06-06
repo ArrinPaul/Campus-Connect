@@ -10,65 +10,90 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)", "Manrope", "sans-serif"],
-        display: ["var(--font-display)", "Syne", "sans-serif"],
+        sans: [
+          "SF Pro Text",
+          "Inter",
+          "system-ui",
+          "-apple-system",
+          "sans-serif",
+        ],
+        display: [
+          "SF Pro Display",
+          "Inter",
+          "system-ui",
+          "-apple-system",
+          "sans-serif",
+        ],
       },
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        border: "var(--hairline)",
+        input: "var(--hairline)",
+        ring: "var(--primary-focus)",
+        background: "var(--canvas)",
+        foreground: "var(--ink)",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "var(--primary)",
+          focus: "var(--primary-focus)",
+          dark: "var(--primary-on-dark)",
+          foreground: "#ffffff",
         },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+        ink: {
+          DEFAULT: "#1d1d1f",
+          muted: "#7a7a7a",
+          80: "#333333",
         },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+        canvas: {
+          DEFAULT: "#ffffff",
+          parchment: "#f5f5f7",
+          pearl: "#fafafc",
         },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+        tile: {
+          1: "#272729",
+          2: "#2a2a2c",
+          3: "#252527",
+          black: "#000000",
         },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+        surface: {
+          chip: "rgba(210, 210, 215, 0.64)",
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        none: "0px",
+        xs: "5px",
+        sm: "8px",
+        md: "11px",
+        lg: "18px",
+        pill: "9999px",
+      },
+      spacing: {
+        xxs: "4px",
+        xs: "8px",
+        sm: "12px",
+        md: "17px",
+        lg: "24px",
+        xl: "32px",
+        xxl: "48px",
+        section: "80px",
       },
       fontSize: {
-        "2xs": ["0.625rem", { lineHeight: "0.875rem" }],
+        "hero-display": ["56px", { lineHeight: "1.07", letterSpacing: "-0.28px", fontWeight: "600" }],
+        "display-lg": ["40px", { lineHeight: "1.1", letterSpacing: "0", fontWeight: "600" }],
+        "display-md": ["34px", { lineHeight: "1.47", letterSpacing: "-0.374px", fontWeight: "600" }],
+        "lead": ["28px", { lineHeight: "1.14", letterSpacing: "0.196px", fontWeight: "400" }],
+        "lead-airy": ["24px", { lineHeight: "1.5", letterSpacing: "0", fontWeight: "300" }],
+        "tagline": ["21px", { lineHeight: "1.19", letterSpacing: "0.231px", fontWeight: "600" }],
+        "body-strong": ["17px", { lineHeight: "1.24", letterSpacing: "-0.374px", fontWeight: "600" }],
+        "body": ["17px", { lineHeight: "1.47", letterSpacing: "-0.374px", fontWeight: "400" }],
+        "caption": ["14px", { lineHeight: "1.43", letterSpacing: "-0.224px", fontWeight: "400" }],
+        "caption-strong": ["14px", { lineHeight: "1.29", letterSpacing: "-0.224px", fontWeight: "600" }],
+        "fine-print": ["12px", { lineHeight: "1.0", letterSpacing: "-0.12px", fontWeight: "400" }],
+        "nav-link": ["12px", { lineHeight: "1.0", letterSpacing: "-0.12px", fontWeight: "400" }],
       },
-      keyframes: {
-        "slide-down-and-fade": {
-          from: { opacity: "0", transform: "translateY(-4px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
-        },
-        "slide-up-and-fade": {
-          from: { opacity: "0", transform: "translateY(4px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
-        },
+      boxShadow: {
+        product: "rgba(0, 0, 0, 0.22) 3px 5px 30px 0px",
       },
-      animation: {
-        "slide-in": "slide-down-and-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
-        "slide-out": "slide-up-and-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+      transitionProperty: {
+        'apple': 'transform, background-color, border-color, color, opacity, box-shadow',
       },
     },
   },

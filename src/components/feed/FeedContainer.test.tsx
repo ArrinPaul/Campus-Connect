@@ -6,29 +6,35 @@ import { Id } from "@/lib/api"
 // Mock data hooks
 const mockGetCurrentUser = jest.fn()
 const mockHasUserLikedPost = jest.fn()
-let queryCallCount = 0
 let mockQueryResults: any[] = []
+const mockQueryCache = new Map()
 
 jest.mock("@/lib/api", () => ({
   useQuery: jest.fn((fn: any, args?: any) => {
     if (fn === "users:getCurrentUser") return mockGetCurrentUser()
     if (fn === "posts:hasUserLikedPost") return mockHasUserLikedPost()
     if (fn && (fn.toString().includes("getFeedPosts") || fn.toString().includes("getUnifiedFeed") || fn.toString().includes("getRankedFeed") || fn.toString().includes("getTrendingFeed"))) {
-      // Handle multiple queries for pagination
-      const result = mockQueryResults[queryCallCount] || mockQueryResults[0]
-      if (args !== "skip") {
-        queryCallCount++
+      const cacheKey = JSON.stringify({ fn: fn.toString(), args })
+      if (mockQueryCache.has(cacheKey)) {
+        return mockQueryCache.get(cacheKey)
       }
+      
+      // Handle multiple queries for pagination stably based on cursor
+      const hasCursor = args && typeof args === "object" && args.cursor
+      const result = hasCursor ? (mockQueryResults[1] || mockQueryResults[0]) : mockQueryResults[0]
       if (!result) return result // undefined/null = loading state
+      
+      let finalResult = result
       // Convert items-format to posts-format for getFeedPosts queries
       if (fn.toString().includes("getFeedPosts") && result?.items !== undefined) {
-        return {
+        finalResult = {
           posts: result.items.map((item: any) => item.post ?? item),
           nextCursor: result.nextCursor ?? null,
           hasMore: result.hasMore ?? false,
         }
       }
-      return result
+      mockQueryCache.set(cacheKey, finalResult)
+      return finalResult
     }
     return null
   }),
@@ -141,8 +147,8 @@ const mockUseQuery = useQuery as jest.MockedFunction<typeof useQuery>
 describe("FeedContainer", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    queryCallCount = 0
     mockQueryResults = []
+    mockQueryCache.clear()
     mockGetCurrentUser.mockReturnValue(null)
     mockHasUserLikedPost.mockReturnValue(false)
   })
