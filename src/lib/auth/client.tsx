@@ -4,71 +4,64 @@ import type { ReactNode } from "react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Mail, Lock, User, Loader2, ArrowRight } from "lucide-react"
+import { Mail, Lock, User, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { createClient } from "@/lib/supabase/client"
 
-type NullableUser = {
+// ─── Types ──────────────────────────────────────────────────────────────────
+
+type AppUser = {
   id: string
-  fullName?: string
-  imageUrl?: string
-  emailAddresses?: Array<{ emailAddress: string }>
+  email: string
+  name: string
+  profilePicture?: string
 } | null
 
-function getDevUserId(): string | null {
-  if (process.env.NEXT_PUBLIC_ENABLE_DEV_AUTH_SHIM !== "true") return null
-  const value = process.env.NEXT_PUBLIC_DEV_USER_ID
-  return value && value.trim().length > 0 ? value.trim() : null
-}
-
-function useSessionUserId() {
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [userId, setUserId] = useState<string | null>(null)
-
-  useEffect(() => {
-    let mounted = true
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
-
-    void fetch(`${apiUrl}/api/auth/session`, { credentials: "include", cache: "no-store" })
-      .then((res) => (res.ok ? res.json() : { userId: null }))
-      .then((payload) => {
-        if (!mounted) return
-        const id = typeof payload?.userId === "string" ? payload.userId : null
-        setUserId(id || getDevUserId())
-      })
-      .catch(() => {
-        if (!mounted) return
-        setUserId(getDevUserId())
-      })
-      .finally(() => {
-        if (mounted) setIsLoaded(true)
-      })
-
-    return () => {
-      mounted = false
-    }
-  }, [])
-
-  return { isLoaded, userId }
-}
+// ─── Hooks ──────────────────────────────────────────────────────────────────
 
 export function useUser(): {
   isLoaded: boolean
   isSignedIn: boolean
-  user: NullableUser
+  user: AppUser
 } {
-  const { isLoaded, userId } = useSessionUserId()
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [user, setUser] = useState<AppUser>(null)
+  const supabase = createClient()
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user: authUser } }) => {
+      if (authUser) {
+        setUser({
+          id: authUser.id,
+          email: authUser.email ?? "",
+          name: authUser.user_metadata?.name ?? authUser.email?.split("@")[0] ?? "User",
+          profilePicture: authUser.user_metadata?.avatar_url,
+        })
+      }
+      setIsLoaded(true)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email ?? "",
+          name: session.user.user_metadata?.name ?? session.user.email?.split("@")[0] ?? "User",
+          profilePicture: session.user.user_metadata?.avatar_url,
+        })
+      } else {
+        setUser(null)
+      }
+      setIsLoaded(true)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
   return {
     isLoaded,
-    isSignedIn: Boolean(userId),
-    user: userId
-      ? {
-          id: userId,
-          fullName: "Local User",
-          imageUrl: "/favicon.ico",
-          emailAddresses: [{ emailAddress: "user@example.com" }],
-        }
-      : null,
+    isSignedIn: Boolean(user),
+    user,
   }
 }
 
@@ -78,31 +71,38 @@ export function useAuth(): {
   userId: string | null
   getToken: () => Promise<string | null>
 } {
-  const { isLoaded, userId } = useSessionUserId()
+  const { isLoaded, isSignedIn, user } = useUser()
+  const supabase = createClient()
+
   return {
     isLoaded,
-    isSignedIn: Boolean(userId),
-    userId,
-    getToken: async () => null,
+    isSignedIn,
+    userId: user?.id ?? null,
+    getToken: async () => {
+      const { data } = await supabase.auth.getSession()
+      return data.session?.access_token ?? null
+    },
   }
 }
 
-export function useAuthActions(): { signOut: (options?: { redirectUrl?: string }) => Promise<void> } {
+export function useAuthActions(): {
+  signOut: (options?: { redirectUrl?: string }) => Promise<void>
+} {
   const router = useRouter()
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+  const supabase = createClient()
+
   return {
     signOut: async (options) => {
-      await fetch(`${apiUrl}/api/auth/sign-out`, {
-        method: "POST",
-        credentials: "include",
-      }).catch(() => null)
+      await supabase.auth.signOut()
       router.push(options?.redirectUrl || "/sign-in")
       router.refresh()
     },
   }
 }
 
-export function AuthProvider({ children }: { children: ReactNode; [key: string]: unknown }) {
+// ─── Components ─────────────────────────────────────────────────────────────
+
+export function AuthProvider({ children }: { children: ReactNode }) {
   return children
 }
 
@@ -120,17 +120,19 @@ export function UserButton(_props: Record<string, unknown>) {
   const { user } = useUser()
   const { signOut } = useAuthActions()
   if (!user) return null
-  
+
   return (
-    <button 
+    <button
       onClick={() => signOut()}
-      className="btn-press flex h-10 w-10 items-center justify-center rounded-full bg-canvas-parchment text-ink text-sm font-semibold border border-hairline shadow-sm"
+      className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-soft text-ink-deep text-sm font-bold border border-hairline hover:bg-hairline-soft transition-colors"
       title="Sign Out"
     >
-      {user.id.substring(0, 2).toUpperCase()}
+      {user.name.substring(0, 2).toUpperCase()}
     </button>
   )
 }
+
+// ─── Sign In Form ───────────────────────────────────────────────────────────
 
 export function SignIn(_props: Record<string, unknown>) {
   const [email, setEmail] = useState("")
@@ -138,6 +140,7 @@ export function SignIn(_props: Record<string, unknown>) {
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
+  const supabase = createClient()
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -147,76 +150,78 @@ export function SignIn(_props: Record<string, unknown>) {
       return
     }
     setIsSubmitting(true)
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
     try {
-      const response = await fetch(`${apiUrl}/api/auth/sign-in`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email: email.trim(), password }),
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
       })
-      const payload = await response.json().catch(() => ({}))
-      if (!response.ok) {
-        setError(typeof payload?.error === "string" ? payload.error : "Unable to sign in")
+      if (authError) {
+        setError(authError.message)
         return
       }
       router.push("/feed")
       router.refresh()
+    } catch {
+      setError("Unable to sign in")
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-xl animate-in">
+    <div className="w-full max-w-md mx-auto space-y-8">
       <div className="text-center space-y-2">
-        <h1 className="text-display-md font-bold text-ink">Sign in to Campus Connect.</h1>
-        <p className="text-body text-ink-muted-48">Enter your details to continue.</p>
+        <h1 className="text-2xl font-bold text-ink-deep">Sign in to Campus Connect</h1>
+        <p className="text-body-sm text-steel">Enter your details to continue</p>
       </div>
 
-      <form onSubmit={handleSignIn} className="space-y-md">
-        <div className="space-y-4">
+      <form onSubmit={handleSignIn} className="space-y-4">
+        <div className="space-y-3">
           <div className="relative group">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted-48 group-focus-within:text-primary transition-colors" />
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-steel group-focus-within:text-primary transition-colors" />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email address"
-              className="w-full pl-11 pr-4 h-12 rounded-sm border border-hairline bg-canvas text-body focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm"
+              className="w-full pl-11 pr-4 h-11 rounded-lg border border-hairline bg-canvas text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
               required
             />
           </div>
           <div className="relative group">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted-48 group-focus-within:text-primary transition-colors" />
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-steel group-focus-within:text-primary transition-colors" />
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-              className="w-full pl-11 pr-4 h-12 rounded-sm border border-hairline bg-canvas text-body focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm"
+              className="w-full pl-11 pr-4 h-11 rounded-lg border border-hairline bg-canvas text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
               required
             />
           </div>
         </div>
 
-        {error && <p className="text-caption font-semibold text-destructive text-center bg-destructive/5 py-2 rounded-sm border border-destructive/10">{error}</p>}
+        {error && (
+          <p className="text-body-sm font-semibold text-critical text-center bg-critical/5 py-2 rounded-lg border border-critical/10">
+            {error}
+          </p>
+        )}
 
         <Button
           type="submit"
           disabled={isSubmitting}
           variant="primary"
           size="lg"
-          className="w-full h-12"
+          className="w-full h-11"
         >
           {isSubmitting ? <Loader2 className="animate-spin" /> : "Sign In"}
         </Button>
       </form>
 
-      <div className="text-center pt-md border-t border-hairline">
-        <p className="text-caption text-ink-muted-48">
+      <div className="text-center pt-4 border-t border-hairline-soft">
+        <p className="text-body-sm text-steel">
           Don&apos;t have an account?{" "}
-          <Link href="/sign-up" className="text-primary font-semibold hover:underline">
+          <Link href="/sign-up" className="text-primary font-bold hover:underline">
             Create one for free
           </Link>
         </p>
@@ -225,6 +230,8 @@ export function SignIn(_props: Record<string, unknown>) {
   )
 }
 
+// ─── Sign Up Form ───────────────────────────────────────────────────────────
+
 export function SignUp(_props: Record<string, unknown>) {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
@@ -232,6 +239,7 @@ export function SignUp(_props: Record<string, unknown>) {
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
+  const supabase = createClient()
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -245,87 +253,92 @@ export function SignUp(_props: Record<string, unknown>) {
       return
     }
     setIsSubmitting(true)
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
     try {
-      const response = await fetch(`${apiUrl}/api/auth/sign-up`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ name: name.trim(), email: email.trim(), password }),
+      const { error: authError } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          data: { name: name.trim() || "User" },
+        },
       })
-      const payload = await response.json().catch(() => ({}))
-      if (!response.ok) {
-        setError(typeof payload?.error === "string" ? payload.error : "Unable to sign up")
+      if (authError) {
+        setError(authError.message)
         return
       }
       router.push("/onboarding")
       router.refresh()
+    } catch {
+      setError("Unable to sign up")
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-xl animate-in">
+    <div className="w-full max-w-md mx-auto space-y-8">
       <div className="text-center space-y-2">
-        <h1 className="text-display-md font-bold text-ink">Create your account.</h1>
-        <p className="text-body text-ink-muted-48">Join the academic revolution today.</p>
+        <h1 className="text-2xl font-bold text-ink-deep">Create your account</h1>
+        <p className="text-body-sm text-steel">Join the academic community today</p>
       </div>
 
-      <form onSubmit={handleSignUp} className="space-y-md">
-        <div className="space-y-4">
+      <form onSubmit={handleSignUp} className="space-y-4">
+        <div className="space-y-3">
           <div className="relative group">
-            <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted-48 group-focus-within:text-primary transition-colors" />
+            <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-steel group-focus-within:text-primary transition-colors" />
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Full name"
-              className="w-full pl-11 pr-4 h-12 rounded-sm border border-hairline bg-canvas text-body focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm"
+              className="w-full pl-11 pr-4 h-11 rounded-lg border border-hairline bg-canvas text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
               required
             />
           </div>
           <div className="relative group">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted-48 group-focus-within:text-primary transition-colors" />
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-steel group-focus-within:text-primary transition-colors" />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email address"
-              className="w-full pl-11 pr-4 h-12 rounded-sm border border-hairline bg-canvas text-body focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm"
+              className="w-full pl-11 pr-4 h-11 rounded-lg border border-hairline bg-canvas text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
               required
             />
           </div>
           <div className="relative group">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted-48 group-focus-within:text-primary transition-colors" />
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-steel group-focus-within:text-primary transition-colors" />
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password (min 8 chars)"
-              className="w-full pl-11 pr-4 h-12 rounded-sm border border-hairline bg-canvas text-body focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm"
+              className="w-full pl-11 pr-4 h-11 rounded-lg border border-hairline bg-canvas text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
               required
             />
           </div>
         </div>
 
-        {error && <p className="text-caption font-semibold text-destructive text-center bg-destructive/5 py-2 rounded-sm border border-destructive/10">{error}</p>}
+        {error && (
+          <p className="text-body-sm font-semibold text-critical text-center bg-critical/5 py-2 rounded-lg border border-critical/10">
+            {error}
+          </p>
+        )}
 
         <Button
           type="submit"
           disabled={isSubmitting}
           variant="primary"
           size="lg"
-          className="w-full h-12"
+          className="w-full h-11"
         >
           {isSubmitting ? <Loader2 className="animate-spin" /> : "Create Account"}
         </Button>
       </form>
 
-      <div className="text-center pt-md border-t border-hairline">
-        <p className="text-caption text-ink-muted-48">
+      <div className="text-center pt-4 border-t border-hairline-soft">
+        <p className="text-body-sm text-steel">
           Already have an account?{" "}
-          <Link href="/sign-in" className="text-primary font-semibold hover:underline">
+          <Link href="/sign-in" className="text-primary font-bold hover:underline">
             Sign in here
           </Link>
         </p>
@@ -334,24 +347,24 @@ export function SignUp(_props: Record<string, unknown>) {
   )
 }
 
+// ─── Server-side Auth Helpers ───────────────────────────────────────────────
+
 export async function currentUser() {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
-  const payload = await fetch(`${apiUrl}/api/auth/session`, { credentials: "include", cache: "no-store" })
-    .then((res) => (res.ok ? res.json() : { userId: null }))
-    .catch(() => ({ userId: null }))
-  const userId = typeof payload?.userId === "string" ? payload.userId : getDevUserId()
-  if (!userId) return null
+  const { createClient } = await import("@/lib/supabase/server")
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
   return {
-    id: userId,
-    fullName: "Local User",
-    imageUrl: "/favicon.ico",
+    id: user.id,
+    name: user.user_metadata?.name ?? user.email?.split("@")[0] ?? "User",
+    email: user.email ?? "",
+    profilePicture: user.user_metadata?.avatar_url,
   }
 }
 
 export async function auth() {
-  const payload = await fetch("/api/auth/session", { credentials: "include", cache: "no-store" })
-    .then((res) => (res.ok ? res.json() : { userId: null }))
-    .catch(() => ({ userId: null }))
-  const userId = typeof payload?.userId === "string" ? payload.userId : getDevUserId()
-  return { userId }
+  const { createClient } = await import("@/lib/supabase/server")
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  return { userId: user?.id ?? null }
 }

@@ -168,25 +168,36 @@ All tables have Row Level Security (RLS) — users can only access what they're 
 ## File Structure
 
 ```
-src/
-  app/
-    api/              → All API routes (will be rewritten)
-    (auth)/           → Sign in, sign up pages
-    (onboarding)/     → Multi-step profile setup
-    (dashboard)/      → All feature pages (26 pages)
-  components/
-    ui/               → 21 Radix components (KEEP)
-    posts/            → PostCard, PostComposer, etc. (KEEP)
-    feed/             → FeedContainer, VirtualizedFeed (KEEP)
-    messages/         → ChatArea, ConversationList (KEEP)
-    communities/      → CommunityCard, etc. (KEEP)
-    profile/          → ProfileHeader, SkillsManager (KEEP)
-    navigation/       → GlobalNav, MobileNav (REBUILD)
-    ...etc
-  lib/
-    supabase/         → NEW: Supabase client setup
-    api.ts            → API client (REWRITE types)
-    auth/             → Auth hooks (REWRITE for Supabase)
-    validations.ts    → Zod schemas (KEEP)
-    utils.ts          → Helpers (KEEP)
+campus-connect/
+  DESIGN.md              ← Design system (source of truth)
+  README.md              ← Project overview
+  tailwind.config.ts     ← Mirrors DESIGN.md tokens
+  supabase/
+    migration.sql        ← Database schema (36 tables, RLS, triggers)
+  docs/
+    PLAN.md              ← This file
+    FEATURES.md          ← All 240 features
+    TASKS.md             ← Task breakdown
+    TRACKER.md           ← Progress tracking
+  src/
+    app/
+      api/               → All API routes (will be rewritten)
+      (auth)/            → Sign in, sign up pages
+      (onboarding)/      → Multi-step profile setup
+      (dashboard)/       → All feature pages (21 pages)
+    components/
+      ui/                → 21 Radix components (KEEP)
+      posts/             → PostCard, PostComposer, etc. (KEEP)
+      feed/              → FeedContainer, VirtualizedFeed (KEEP)
+      messages/          → ChatArea, ConversationList (KEEP)
+      communities/       → CommunityCard, etc. (KEEP)
+      profile/           → ProfileHeader, SkillsManager (KEEP)
+      navigation/        → GlobalNav, MobileNav (REBUILD)
+      ...etc
+    lib/
+      supabase/          → NEW: Supabase client setup
+      api.ts             → API client (REWRITE types)
+      auth/              → Auth hooks (REWRITE for Supabase)
+      validations.ts     → Zod schemas (KEEP)
+      utils.ts           → Helpers (KEEP)
 ```

@@ -69,39 +69,39 @@ DESIGN.md = source of truth. Meta/Facebook design. `tailwind.config.ts` mirrors 
 | Task | Status |
 |---|---|
 | Create Supabase project | ⬜ |
-| Create SQL migration (all tables + RLS) | ⬜ |
+| Create SQL migration (all tables + RLS) | ✅ |
 | Create storage buckets | ⬜ |
 | Add keys to .env.local | ⬜ |
-| Update .env.example | ⬜ |
+| Update .env.example | ✅ |
 
 ### Auth (A01-A04, A11 — 5 features)
 | Task | Status |
 |---|---|
-| Install @supabase/ssr | ⬜ |
-| Create src/lib/supabase/client.ts | ⬜ |
-| Create src/lib/supabase/server.ts | ⬜ |
-| Create src/lib/supabase/middleware.ts | ⬜ |
-| Rewrite src/middleware.ts | ⬜ |
-| Rewrite sign-in page | ⬜ |
-| Rewrite sign-up page | ⬜ |
-| Rewrite src/lib/auth/client.tsx | ⬜ |
+| Install @supabase/ssr | ✅ |
+| Create src/lib/supabase/client.ts | ✅ |
+| Create src/lib/supabase/server.ts | ✅ |
+| Create src/lib/supabase/middleware.ts | ✅ |
+| Rewrite src/middleware.ts | ✅ |
+| Rewrite sign-in page | ✅ |
+| Rewrite sign-up page | ✅ |
+| Rewrite src/lib/auth/client.tsx | ✅ |
 
-### Database Layer (14 modules)
+### Database Layer (13 modules)
 | Task | Status |
 |---|---|
-| Create src/server/db/users.ts | ⬜ |
-| Create src/server/db/posts.ts | ⬜ |
-| Create src/server/db/comments.ts | ⬜ |
-| Create src/server/db/reactions.ts | ⬜ |
-| Create src/server/db/messages.ts | ⬜ |
-| Create src/server/db/follows.ts | ⬜ |
-| Create src/server/db/communities.ts | ⬜ |
-| Create src/server/db/events-jobs.ts | ⬜ |
-| Create src/server/db/notifications.ts | ⬜ |
-| Create src/server/db/bookmarks.ts | ⬜ |
-| Create src/server/db/hashtags.ts | ⬜ |
-| Create src/server/db/content.ts | ⬜ |
-| Create src/server/db/misc.ts | ⬜ |
+| Create src/server/db/users.ts | ✅ |
+| Create src/server/db/posts.ts | ✅ |
+| Create src/server/db/comments.ts | ✅ |
+| Create src/server/db/reactions.ts | ✅ |
+| Create src/server/db/messages.ts | ✅ |
+| Create src/server/db/follows.ts | ✅ |
+| Create src/server/db/communities.ts | ✅ |
+| Create src/server/db/events-jobs.ts | ✅ |
+| Create src/server/db/notifications.ts | ✅ |
+| Create src/server/db/bookmarks.ts | ✅ |
+| Create src/server/db/hashtags.ts | ✅ |
+| Create src/server/db/content.ts | ✅ |
+| Create src/server/db/misc.ts | ✅ |
 
 ### API Routes (~100 routes)
 | Task | Status |
