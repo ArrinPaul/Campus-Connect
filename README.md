@@ -1,51 +1,61 @@
 # Campus Connect
 
-A next-generation academic social platform built with Next.js 14, local auth shims, Convex, Neo4j, and Redis.
-
-## Getting Started
-
-1. Install dependencies:
-```bash
-npm install
-```
-
-2. Set up environment variables:
-```bash
-cp .env.example .env.local
-# Add your local auth, Convex, Neo4j, and Redis environment values
-```
-
-3. Run the development server:
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser.
+A social media platform for college students — WhatsApp + Facebook + Discord + LinkedIn combined.
 
 ## Tech Stack
 
-- **Next.js 14** - React framework with App Router
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
-- **Local Auth Shim** - Header/cookie/dev-user based authentication compatibility layer
-- **Convex** - Real-time database
-- **Neo4j** - Graph relationships for suggestions/recommendations
-- **Redis (Upstash)** - Caching recommendation and suggestion payloads
+- **Next.js 14** — App Router, API routes
+- **React 18 + TypeScript** — Strict mode
+- **Tailwind CSS** — Meta/Facebook design system (see DESIGN.md)
+- **Radix UI** — 21 accessible component primitives
+- **TipTap** — Rich text editor with markdown, mentions, code blocks
+- **Supabase** — PostgreSQL database, auth, storage, realtime
+- **TanStack React Query** — Server state management
+- **Zustand** — Client state management
+- **Zod** — Runtime validation
+- **Sentry** — Error monitoring
+- **PostHog** — Analytics
 
-## Graph Recommendation APIs
+## Getting Started
 
-The recommendation and suggestion paths are now exposed through authenticated Next.js API routes backed by Neo4j + Redis cache:
+```bash
+npm install
+cp .env.example .env.local
+# Fill in Supabase keys in .env.local
+npm run dev
+```
 
-- `GET /api/graph/suggestions?limit=5`
-- `POST /api/graph/suggestions/dismiss`
-- `POST /api/graph/suggestions/refresh`
-- `GET /api/graph/recommendations?limit=10`
-- `POST /api/graph/follows`
+Open [http://localhost:3000](http://localhost:3000)
 
-### Graph Sync Endpoint
+## Project Structure
 
-Use `POST /api/graph/sync` to upsert users/follows/posts/interactions into Neo4j from background jobs or webhooks.
+```
+src/
+  app/
+    api/              # API routes (rewriting for Supabase)
+    (auth)/           # Sign in, sign up
+    (onboarding)/     # Multi-step profile setup
+    (dashboard)/      # 26 feature pages
+  components/
+    ui/               # 21 Radix primitives
+    posts/            # PostCard, PostComposer, etc.
+    feed/             # FeedContainer, VirtualizedFeed
+    messages/         # ChatArea, ConversationList
+    communities/      # CommunityCard, etc.
+    profile/          # ProfileHeader, SkillsManager
+    navigation/       # GlobalNav, MobileNav
+    ...etc
+  lib/
+    supabase/         # Supabase client (NEW)
+    api.ts            # Typed API client
+    auth/             # Auth hooks
+    validations.ts    # Zod schemas
+```
 
-Set `GRAPH_SYNC_TOKEN` and send it as:
+## Documentation
 
-`Authorization: Bearer <GRAPH_SYNC_TOKEN>`
+- `DESIGN.md` — Design system (source of truth for all UI)
+- `docs/PLAN.md` — Project roadmap
+- `docs/FEATURES.md` — All 240 features listed
+- `docs/TASKS.md` — Task breakdown
+- `docs/TRACKER.md` — Progress tracking
