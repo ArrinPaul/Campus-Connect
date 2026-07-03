@@ -132,22 +132,7 @@ export function useAction<A = any, T = any>(endpoint: Endpoint): (args?: A) => P
   }
 }
 
-// Legacy auth compatibility used by existing UI/tests.
-export function useConvexAuth() {
-  const { isLoaded, userId } = useAuth()
-  return { isLoading: !isLoaded, isAuthenticated: Boolean(userId) }
-}
-
-// Legacy symbols kept for test and migration compatibility.
-export class ConvexReactClient {
-  constructor(_url?: string) {}
-}
-
-export function ConvexProvider({ children }: { children: ReactNode; client?: unknown }) {
-  return children as unknown as ReactNode
-}
-
-// ─── api object (mirrors legacy generated api shape) ─────────────────────────
+// ─── api object ─────────────────────────────────────────────────────────────
 
 export const api: any = {
   // ── users ──────────────────────────────────────────────────────────────────
