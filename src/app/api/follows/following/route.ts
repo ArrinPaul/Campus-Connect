@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
 import { getFollowing } from "@/server/db/follows"
 

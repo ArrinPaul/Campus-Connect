@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getByTag, searchHashtags } from "@/server/db/hashtags"
+import { searchHashtags } from "@/server/db/hashtags"
 
 // GET /api/hashtags?tag=...  OR  /api/hashtags?q=...
 export async function GET(req: Request) {
@@ -14,9 +14,9 @@ export async function GET(req: Request) {
     }
 
     if (!tag) return NextResponse.json({ error: "tag or q required" }, { status: 400 })
-    const hashtag = await getByTag(tag)
-    if (!hashtag) return NextResponse.json({ error: "Not found" }, { status: 404 })
-    return NextResponse.json(hashtag)
+    const results = await searchHashtags(tag)
+    if (!results.length) return NextResponse.json({ error: "Not found" }, { status: 404 })
+    return NextResponse.json(results[0])
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }

@@ -1,16 +1,21 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
-import { getActiveAds, createAd, trackAdImpression, trackAdClick, getAdDashboard } from "@/server/db/misc"
-import { requireDbUser } from "@/server/db/client"
+import { createClient } from "@/lib/supabase/server"
 
-// GET /api/ads?placement=...
+// GET /api/ads?limit=...
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url)
     const limit = Number(searchParams.get("limit") ?? "3")
-
-    const ads = await getActiveAds(limit)
-    return NextResponse.json(ads)
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from("ads")
+      .select("*")
+      .eq("status", "active")
+      .order("created_at", { ascending: false })
+      .limit(limit)
+    if (error) throw error
+    return NextResponse.json(data ?? [])
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
@@ -19,15 +24,19 @@ export async function GET(req: Request) {
 // POST /api/ads  body: ad data
 export async function POST(req: Request) {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const me = await requireDbUser(authId)
     const body = await req.json()
-    const ad = await createAd(me.id as string, body)
-    return NextResponse.json(ad)
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from("ads")
+      .insert({ ...body, created_by: userId })
+      .select()
+      .single()
+    if (error) throw error
+    return NextResponse.json(data)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
-

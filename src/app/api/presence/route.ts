@@ -1,7 +1,6 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
 import { updatePresence, getUserStatuses } from "@/server/db/misc"
-import { requireDbUser } from "@/server/db/client"
 
 // GET /api/presence?userIds=...
 export async function GET(req: Request) {
@@ -21,15 +20,13 @@ export async function GET(req: Request) {
 // POST /api/presence  body: { status, lastSeen? }
 export async function POST(req: Request) {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { status } = await req.json()
-    const me = await requireDbUser(authId)
-    await updatePresence(me.id as string, status ?? "online")
+    await updatePresence(userId, status ?? "online")
     return NextResponse.json({ success: true })
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
-

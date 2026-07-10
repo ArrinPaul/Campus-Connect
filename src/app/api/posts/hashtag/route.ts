@@ -1,4 +1,3 @@
-import { auth } from "@/lib/auth/server"
 import { NextResponse } from "next/server"
 import { getPostsByHashtag } from "@/server/db/posts"
 

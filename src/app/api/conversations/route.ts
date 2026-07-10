@@ -1,16 +1,14 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
 import { getConversations, getOrCreateDMConversation, createGroupConversation } from "@/server/db/messages"
-import { requireDbUser } from "@/server/db/client"
 
 // GET /api/conversations
 export async function GET() {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const me = await requireDbUser(authId)
-    const conversations = await getConversations(me.id as string)
+    const conversations = await getConversations(userId)
     return NextResponse.json(conversations)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
@@ -20,17 +18,20 @@ export async function GET() {
 // POST /api/conversations  body: { participantId } for DM or { name, participantIds } for group
 export async function POST(req: Request) {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const me = await requireDbUser(authId)
     const body = await req.json()
 
     let conversation
     if (body.participantId) {
-      conversation = await getOrCreateDMConversation(me.id as string, body.participantId)
+      conversation = await getOrCreateDMConversation(userId, body.participantId)
     } else if (body.name && body.participantIds) {
-      conversation = await createGroupConversation(me.id as string, body.name, body.participantIds)
+      conversation = await createGroupConversation({
+        name: body.name,
+        createdBy: userId,
+        participantIds: body.participantIds,
+      })
     } else {
       return NextResponse.json({ error: "participantId or name+participantIds required" }, { status: 400 })
     }

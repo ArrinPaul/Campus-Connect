@@ -1,19 +1,17 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
-import { markAsSold } from "@/server/db/misc"
-import { requireDbUser } from "@/server/db/client"
+import { updateListing } from "@/server/db/misc"
 
 // POST /api/marketplace/sold  body: { listingId }
 export async function POST(req: Request) {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { listingId } = await req.json()
     if (!listingId) return NextResponse.json({ error: "listingId required" }, { status: 400 })
 
-    const me = await requireDbUser(authId)
-    await markAsSold(listingId, me.id as string)
+    await updateListing(listingId, { status: "sold" })
     return NextResponse.json({ success: true })
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

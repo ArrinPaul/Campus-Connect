@@ -1,16 +1,15 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
 import { getPapers, uploadPaper } from "@/server/db/content"
-import { requireDbUser } from "@/server/db/client"
 
-// GET /api/research?limit=...&cursor=...&tag=...
+// GET /api/research?limit=...&tag=...
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url)
     const limit = Number(searchParams.get("limit") ?? "20")
     const tag = searchParams.get("tag") ?? undefined
 
-    const result = await getPapers({ search: tag, field: tag }, limit)
+    const result = await getPapers(limit, 0, tag)
     return NextResponse.json(result)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
@@ -20,15 +19,13 @@ export async function GET(req: Request) {
 // POST /api/research  body: { title, abstract, authors, pdfUrl, tags? }
 export async function POST(req: Request) {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const me = await requireDbUser(authId)
     const body = await req.json()
-    const paper = await uploadPaper(me.id as string, body)
+    const paper = await uploadPaper({ ...body, uploaded_by: userId })
     return NextResponse.json(paper)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
-

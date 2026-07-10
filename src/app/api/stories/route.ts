@@ -1,16 +1,14 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
 import { getActiveStories, createStory } from "@/server/db/content"
-import { requireDbUser } from "@/server/db/client"
 
 // GET /api/stories
 export async function GET() {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const me = await requireDbUser(authId)
-    const stories = await getActiveStories(me.id as string)
+    const stories = await getActiveStories()
     return NextResponse.json(stories)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
@@ -20,15 +18,13 @@ export async function GET() {
 // POST /api/stories  body: { mediaUrl, mediaType, caption?, duration? }
 export async function POST(req: Request) {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const me = await requireDbUser(authId)
     const body = await req.json()
-    const story = await createStory(me.id as string, body)
+    const story = await createStory({ ...body, author_id: userId })
     return NextResponse.json(story)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
-

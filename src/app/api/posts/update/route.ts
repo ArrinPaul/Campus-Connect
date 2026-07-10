@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
 import { updatePost } from "@/server/db/posts"
 
@@ -11,7 +11,7 @@ export async function PATCH(req: Request) {
     const { postId, content } = await req.json()
     if (!postId || !content) return NextResponse.json({ error: "postId and content required" }, { status: 400 })
 
-    const post = await updatePost(postId, userId, content)
+    const post = await updatePost(postId, content)
     return NextResponse.json(post)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

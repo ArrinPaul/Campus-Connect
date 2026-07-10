@@ -110,6 +110,52 @@ export async function deleteListing(listingId: string) {
   await supabase.from("marketplace_listings").delete().eq("id", listingId)
 }
 
+// ─── Calls ──────────────────────────────────────────────────────────────────
+
+export async function initiateCall(callerId: string, recipientId: string, type: string = "video") {
+  const supabase = await getSupabase()
+  const { data: call, error } = await supabase
+    .from("calls")
+    .insert({ caller_id: callerId, recipient_id: recipientId, type, status: "ringing" })
+    .select("*, caller:users!calls_caller_id_fkey(id, name, username, profile_picture), recipient:users!calls_recipient_id_fkey(id, name, username, profile_picture)")
+    .single()
+  if (error) return null
+  return call
+}
+
+export async function updateCallStatus(callId: string, status: string) {
+  const supabase = await getSupabase()
+  const update: Record<string, unknown> = { status }
+  if (status === "ended" || status === "rejected") {
+    update.ended_at = new Date().toISOString()
+  }
+  await supabase.from("calls").update(update).eq("id", callId)
+}
+
+export async function getIncomingCall(userId: string) {
+  const supabase = await getSupabase()
+  const { data } = await supabase
+    .from("calls")
+    .select("*, caller:users!calls_caller_id_fkey(id, name, username, profile_picture)")
+    .eq("recipient_id", userId)
+    .eq("status", "ringing")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single()
+  return data ?? null
+}
+
+export async function getActiveCalls(userId: string) {
+  const supabase = await getSupabase()
+  const { data } = await supabase
+    .from("calls")
+    .select("*, caller:users!calls_caller_id_fkey(id, name, username, profile_picture), recipient:users!calls_recipient_id_fkey(id, name, username, profile_picture)")
+    .or(`caller_id.eq.${userId},recipient_id.eq.${userId}`)
+    .in("status", ["ringing", "active"])
+    .order("created_at", { ascending: false })
+  return data ?? []
+}
+
 // ─── Search ─────────────────────────────────────────────────────────────────
 
 export async function universalSearch(query: string) {

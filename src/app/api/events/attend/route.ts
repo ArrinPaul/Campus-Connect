@@ -1,19 +1,17 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
 import { attendEvent, unattendEvent } from "@/server/db/events-jobs"
-import { requireDbUser } from "@/server/db/client"
 
 // POST /api/events/attend  body: { eventId }
 export async function POST(req: Request) {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { eventId } = await req.json()
     if (!eventId) return NextResponse.json({ error: "eventId required" }, { status: 400 })
 
-    const me = await requireDbUser(authId)
-    await attendEvent(eventId, me.id as string)
+    await attendEvent(eventId, userId)
     return NextResponse.json({ success: true })
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
@@ -23,17 +21,15 @@ export async function POST(req: Request) {
 // DELETE /api/events/attend  body: { eventId }
 export async function DELETE(req: Request) {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { eventId } = await req.json()
     if (!eventId) return NextResponse.json({ error: "eventId required" }, { status: 400 })
 
-    const me = await requireDbUser(authId)
-    await unattendEvent(eventId, me.id as string)
+    await unattendEvent(eventId, userId)
     return NextResponse.json({ success: true })
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
-

@@ -1,7 +1,6 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
 import { getCommunities, createCommunity, getCommunityBySlug } from "@/server/db/communities"
-import { requireDbUser } from "@/server/db/client"
 
 // GET /api/communities?slug=...&limit=...&cursor=...
 export async function GET(req: Request) {
@@ -16,23 +15,30 @@ export async function GET(req: Request) {
     }
 
     const limit = Number(searchParams.get("limit") ?? "20")
-    const cursor = searchParams.get("cursor") ?? undefined
-    const result = await getCommunities(limit, cursor)
+    const offset = Number(searchParams.get("cursor") ?? "0")
+    const category = searchParams.get("category") ?? undefined
+    const search = searchParams.get("search") ?? undefined
+    const result = await getCommunities(limit, offset, { category, search })
     return NextResponse.json(result)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
 
-// POST /api/communities  body: { name, slug, description, category, isPrivate? }
+// POST /api/communities  body: { name, slug, description, category }
 export async function POST(req: Request) {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const me = await requireDbUser(authId)
     const body = await req.json()
-    const community = await createCommunity(me.id as string, body)
+    const community = await createCommunity({
+      name: body.name,
+      slug: body.slug,
+      description: body.description,
+      category: body.category,
+      created_by: userId,
+    })
     return NextResponse.json(community)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

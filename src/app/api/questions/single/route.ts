@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getQuestionById } from "@/server/db/content"
+import { createClient } from "@/lib/supabase/server"
 
 // GET /api/questions/single?id=...
 export async function GET(req: Request) {
@@ -8,9 +8,14 @@ export async function GET(req: Request) {
     const id = searchParams.get("id")
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 })
 
-    const question = await getQuestionById(id)
-    if (!question) return NextResponse.json({ error: "Not found" }, { status: 404 })
-    return NextResponse.json(question)
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from("questions")
+      .select("*, author:users!questions_author_id_fkey(id, name, profile_picture)")
+      .eq("id", id)
+      .single()
+    if (error || !data) return NextResponse.json({ error: "Not found" }, { status: 404 })
+    return NextResponse.json(data)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }

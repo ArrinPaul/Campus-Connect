@@ -1,26 +1,19 @@
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
+import { markAsRead } from "@/server/db/messages"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
+// POST /api/messages/read  body: { conversationId }
+export async function POST(req: Request) {
+  try {
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-export async function GET() {
-  return notImplemented()
-}
+    const { conversationId } = await req.json()
+    if (!conversationId) return NextResponse.json({ error: "conversationId required" }, { status: 400 })
 
-export async function POST() {
-  return notImplemented()
-}
-
-export async function PATCH() {
-  return notImplemented()
-}
-
-export async function DELETE() {
-  return notImplemented()
+    await markAsRead(conversationId, userId)
+    return NextResponse.json({ success: true })
+  } catch (err) {
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+  }
 }

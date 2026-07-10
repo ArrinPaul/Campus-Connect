@@ -1,6 +1,5 @@
-import { auth } from "@/lib/auth/server"
 import { NextResponse } from "next/server"
-import { getTrending, searchHashtags } from "@/server/db/hashtags"
+import { getTrendingHashtags } from "@/server/db/hashtags"
 
 // GET /api/hashtags/trending?limit=...
 export async function GET(req: Request) {
@@ -8,7 +7,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
     const limit = Number(searchParams.get("limit") ?? "10")
 
-    const trending = await getTrending(limit)
+    const trending = await getTrendingHashtags(limit)
     return NextResponse.json(trending)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

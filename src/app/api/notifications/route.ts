@@ -1,24 +1,20 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
 import { getNotifications } from "@/server/db/notifications"
-import { requireDbUser } from "@/server/db/client"
 
-// GET /api/notifications?limit=...&cursor=...
+// GET /api/notifications?limit=...&offset=...
 export async function GET(req: Request) {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const me = await requireDbUser(authId)
     const { searchParams } = new URL(req.url)
-    const filter = searchParams.get("filter") ?? undefined
-    const limit = Number(searchParams.get("limit") ?? "20")
-    const cursor = searchParams.get("cursor") ?? undefined
+    const limit = Number(searchParams.get("limit") ?? "30")
+    const offset = Number(searchParams.get("offset") ?? "0")
 
-    const result = await getNotifications(me.authId as string, filter, limit, cursor)
+    const result = await getNotifications(userId, limit, offset)
     return NextResponse.json(result)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
-

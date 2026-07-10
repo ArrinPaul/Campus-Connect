@@ -1,7 +1,5 @@
-import { auth } from "@/lib/auth/server"
 import { NextResponse } from "next/server"
-import { getEndorsements, endorseSkill } from "@/server/db/misc"
-import { requireDbUser } from "@/server/db/client"
+import { getEndorsements } from "@/server/db/misc"
 
 // GET /api/skills/endorsements?userId=...
 export async function GET(req: Request) {

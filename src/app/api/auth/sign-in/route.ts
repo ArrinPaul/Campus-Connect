@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server"
-import { createSessionToken, getSessionCookieName, getSessionTtlSeconds } from "@/lib/auth/session"
-import { verifyPassword } from "@/lib/auth/password"
-import { getAuthUserByEmail } from "@/server/db/users"
+import { createClient } from "@/lib/supabase/server"
 
 function sanitizeEmail(value: unknown): string {
   return typeof value === "string" ? value.trim().toLowerCase() : ""
@@ -21,36 +19,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 })
     }
 
-    const user = await getAuthUserByEmail(email)
-    if (!user?.passwordHash) {
+    const supabase = await createClient()
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+
+    if (error) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 })
     }
 
-    const valid = await verifyPassword(password, user.passwordHash)
-    if (!valid) {
-      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 })
-    }
-
-    const token = createSessionToken(user.authId)
-    const response = NextResponse.json({ ok: true, user: { id: user.authId, email: user.email, name: user.name } })
-
-    response.cookies.set(getSessionCookieName(), token, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: getSessionTtlSeconds(),
+    const user = data.user
+    return NextResponse.json({
+      ok: true,
+      user: {
+        id: user.id,
+        email: user.email ?? "",
+        name: user.user_metadata?.name ?? user.email?.split("@")[0] ?? "User",
+      },
     })
-
-    response.cookies.set("cc_user_id", user.authId, {
-      httpOnly: false,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: getSessionTtlSeconds(),
-    })
-
-    return response
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to sign in"
     return NextResponse.json({ error: message }, { status: 500 })

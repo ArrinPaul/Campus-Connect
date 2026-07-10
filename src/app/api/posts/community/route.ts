@@ -1,26 +1,19 @@
 import { NextResponse } from "next/server"
+import { getPostsByCommunity } from "@/server/db/posts"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
+// GET /api/posts/community?communityId=xxx&limit=20&cursor=xxx
+export async function GET(req: Request) {
+  try {
+    const url = new URL(req.url)
+    const communityId = url.searchParams.get("communityId")
+    if (!communityId) return NextResponse.json({ error: "communityId required" }, { status: 400 })
 
-export async function GET() {
-  return notImplemented()
-}
+    const limit = parseInt(url.searchParams.get("limit") ?? "20")
+    const cursor = url.searchParams.get("cursor") ?? undefined
 
-export async function POST() {
-  return notImplemented()
-}
-
-export async function PATCH() {
-  return notImplemented()
-}
-
-export async function DELETE() {
-  return notImplemented()
+    const result = await getPostsByCommunity(communityId, limit, cursor)
+    return NextResponse.json(result)
+  } catch (err) {
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+  }
 }

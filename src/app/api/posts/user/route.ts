@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
 import { getUserPosts } from "@/server/db/posts"
 
@@ -19,4 +19,3 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
-

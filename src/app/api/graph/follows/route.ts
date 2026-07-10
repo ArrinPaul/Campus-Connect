@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { followUser, unfollowUser } from "@/server/graph/graph-service"
 
 export const runtime = "nodejs"

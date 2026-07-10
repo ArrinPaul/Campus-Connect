@@ -1,26 +1,20 @@
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
+import { getUnreadCount } from "@/server/db/messages"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
+// GET /api/conversations/unread-count?conversationId=...
+export async function GET(req: Request) {
+  try {
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-export async function GET() {
-  return notImplemented()
-}
+    const { searchParams } = new URL(req.url)
+    const conversationId = searchParams.get("conversationId")
+    if (!conversationId) return NextResponse.json({ error: "conversationId required" }, { status: 400 })
 
-export async function POST() {
-  return notImplemented()
-}
-
-export async function PATCH() {
-  return notImplemented()
-}
-
-export async function DELETE() {
-  return notImplemented()
+    const count = await getUnreadCount(conversationId, userId)
+    return NextResponse.json({ count })
+  } catch (err) {
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+  }
 }

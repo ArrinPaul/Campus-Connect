@@ -1,18 +1,16 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
 import { updateCallStatus } from "@/server/db/misc"
-import { requireDbUser } from "@/server/db/client"
 
 // POST /api/calls/reject  body: { callId }
 export async function POST(req: Request) {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { callId } = await req.json()
     if (!callId) return NextResponse.json({ error: "callId required" }, { status: 400 })
 
-    await requireDbUser(authId)
     await updateCallStatus(callId, "rejected")
     return NextResponse.json({ success: true })
   } catch (err) {

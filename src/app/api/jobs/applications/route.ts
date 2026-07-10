@@ -1,16 +1,14 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
 import { getMyApplications } from "@/server/db/events-jobs"
-import { requireDbUser } from "@/server/db/client"
 
 // GET /api/jobs/applications
 export async function GET() {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const me = await requireDbUser(authId)
-    const applications = await getMyApplications(me.id as string)
+    const applications = await getMyApplications(userId)
     return NextResponse.json(applications)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

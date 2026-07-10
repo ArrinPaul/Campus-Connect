@@ -1,40 +1,36 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
 import { repost, isReposted } from "@/server/db/misc"
-import { requireDbUser } from "@/server/db/client"
 
-// GET /api/reposts/check?postId=...
+// GET /api/reposts?postId=...
 export async function GET(req: Request) {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { searchParams } = new URL(req.url)
     const postId = searchParams.get("postId")
     if (!postId) return NextResponse.json({ error: "postId required" }, { status: 400 })
 
-    const me = await requireDbUser(authId)
-    const reposted = await isReposted(postId, me.id as string)
+    const reposted = await isReposted(postId, userId)
     return NextResponse.json({ isReposted: reposted })
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
 
-// POST /api/reposts  body: { postId }
+// POST /api/reposts  body: { postId, content? }
 export async function POST(req: Request) {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { postId } = await req.json()
+    const { postId, content } = await req.json()
     if (!postId) return NextResponse.json({ error: "postId required" }, { status: 400 })
 
-    const me = await requireDbUser(authId)
-    await repost(postId, me.id as string)
+    await repost(postId, userId, content)
     return NextResponse.json({ success: true })
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
-

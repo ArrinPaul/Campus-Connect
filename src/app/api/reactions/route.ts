@@ -1,6 +1,6 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
-import { addReaction, removeReaction, getUserReaction, getReactionCounts } from "@/server/db/reactions"
+import { addReaction, getUserReaction, getReactionCounts } from "@/server/db/reactions"
 
 // POST /api/reactions  body: { targetId, targetType, type }
 export async function POST(req: Request) {
@@ -13,7 +13,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "targetId, targetType, type required" }, { status: 400 })
     }
 
-    const result = await addReaction(userId, targetId, targetType, type)
+    const result = await addReaction({
+      user_id: userId,
+      target_id: targetId,
+      target_type: targetType,
+      type,
+    })
     return NextResponse.json(result)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

@@ -1,26 +1,16 @@
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
+import { getIncomingCall } from "@/server/db/misc"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
-
+// GET /api/calls/incoming
 export async function GET() {
-  return notImplemented()
-}
+  try {
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-export async function POST() {
-  return notImplemented()
-}
-
-export async function PATCH() {
-  return notImplemented()
-}
-
-export async function DELETE() {
-  return notImplemented()
+    const call = await getIncomingCall(userId)
+    return NextResponse.json(call)
+  } catch (err) {
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+  }
 }

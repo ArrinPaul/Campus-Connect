@@ -1,19 +1,17 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
-import { joinCommunity, leaveCommunity } from "@/server/db/communities"
-import { requireDbUser } from "@/server/db/client"
+import { joinCommunity } from "@/server/db/communities"
 
 // POST /api/communities/join  body: { communityId }
 export async function POST(req: Request) {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { communityId } = await req.json()
     if (!communityId) return NextResponse.json({ error: "communityId required" }, { status: 400 })
 
-    const me = await requireDbUser(authId)
-    await joinCommunity(communityId, me.id as string)
+    await joinCommunity(communityId, userId)
     return NextResponse.json({ success: true })
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

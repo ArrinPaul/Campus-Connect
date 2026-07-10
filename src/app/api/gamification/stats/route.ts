@@ -1,29 +1,19 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
-import { getUserStats, getLeaderboard } from "@/server/db/misc"
-import { requireDbUser } from "@/server/db/client"
+import { getUserStats } from "@/server/db/misc"
 
 // GET /api/gamification/stats?userId=...
 export async function GET(req: Request) {
   try {
-    const { userId: authId } = await auth()
-    if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { searchParams } = new URL(req.url)
-    const userId = searchParams.get("userId")
+    const targetUserId = searchParams.get("userId") ?? userId
 
-    let targetId: string
-    if (userId) {
-      targetId = userId
-    } else {
-      const me = await requireDbUser(authId)
-      targetId = me.id as string
-    }
-
-    const stats = await getUserStats(targetId)
+    const stats = await getUserStats(targetUserId)
     return NextResponse.json(stats)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
-

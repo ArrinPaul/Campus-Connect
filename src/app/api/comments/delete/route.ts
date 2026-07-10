@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth/server"
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
 import { deleteComment } from "@/server/db/comments"
 
@@ -11,7 +11,7 @@ export async function DELETE(req: Request) {
     const { commentId } = await req.json()
     if (!commentId) return NextResponse.json({ error: "commentId required" }, { status: 400 })
 
-    await deleteComment(commentId, userId)
+    await deleteComment(commentId)
     return NextResponse.json({ success: true })
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

@@ -1,16 +1,34 @@
+import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
-import { getCommunityMembers } from "@/server/db/communities"
+import { getCommunityMembers, inviteMember } from "@/server/db/communities"
 
-// GET /api/communities/members?communityId=...&limit=...&cursor=...
+// GET /api/communities/members?communityId=...
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url)
     const communityId = searchParams.get("communityId")
     if (!communityId) return NextResponse.json({ error: "communityId required" }, { status: 400 })
 
-    const limit = Number(searchParams.get("limit") ?? "20")
-    const result = await getCommunityMembers(communityId, limit)
+    const result = await getCommunityMembers(communityId)
     return NextResponse.json(result)
+  } catch (err) {
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+  }
+}
+
+// POST /api/communities/members  body: { communityId, userId }
+export async function POST(req: Request) {
+  try {
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+    const { communityId, userId: inviteeId } = await req.json()
+    if (!communityId || !inviteeId) {
+      return NextResponse.json({ error: "communityId and userId required" }, { status: 400 })
+    }
+
+    await inviteMember(communityId, userId, inviteeId)
+    return NextResponse.json({ success: true })
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
