@@ -22,7 +22,8 @@ jest.mock('next/image', () => ({
 }))
 
 import { useQuery } from '@/lib/api'
-import { ConvexProvider, ConvexReactClient } from 'convex/react'
+const ConvexProvider = ({ children }: any) => children
+const ConvexReactClient = jest.fn()
 const mockUseQuery = useQuery as jest.MockedFunction<typeof useQuery>
 const mockConvexClient = new (ConvexReactClient as any)()
 

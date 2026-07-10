@@ -348,24 +348,4 @@ export function SignUp(_props: Record<string, unknown>) {
   )
 }
 
-// ─── Server-side Auth Helpers ───────────────────────────────────────────────
 
-export async function currentUser() {
-  const { createClient } = await import("@/lib/supabase/server")
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
-  return {
-    id: user.id,
-    name: user.user_metadata?.name ?? user.email?.split("@")[0] ?? "User",
-    email: user.email ?? "",
-    profilePicture: user.user_metadata?.avatar_url,
-  }
-}
-
-export async function auth() {
-  const { createClient } = await import("@/lib/supabase/server")
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  return { userId: user?.id ?? null }
-}

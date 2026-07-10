@@ -47,6 +47,9 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith("/api/auth")
 
   if (!isPublicRoute && !user) {
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
     const url = request.nextUrl.clone()
     url.pathname = "/sign-in"
     url.searchParams.set("redirect_url", pathname)

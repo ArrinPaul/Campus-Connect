@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth/client"
+import { auth } from "@/lib/auth/server"
 import { NextResponse } from "next/server"
 import { addSkill, removeSkill } from "@/server/db/users"
 
