@@ -46,6 +46,7 @@ export function ConversationList({ selectedConversationId }: Props) {
                         key={convo._id}
                         conversation={convo}
                         isSelected={selectedConversationId === convo._id}
+                        onClick={() => {}}
                     />
                 ))}
             </div>

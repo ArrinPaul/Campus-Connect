@@ -10,6 +10,7 @@ import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 import { MentionAutocomplete } from "./MentionAutocomplete"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 // Lazy load the heavy Tiptap editor (~300KB)
 const RichTextEditor = dynamic(
@@ -551,6 +552,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
         <div className="flex flex-wrap gap-xs">
           {filePreviews.map((src, i) => (
             <div key={i} className="relative h-20 w-20 rounded-md overflow-hidden border border-hairline shadow-sm">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={src} alt="Preview" className="h-full w-full object-cover" />
               <button
                 type="button"

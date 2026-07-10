@@ -5,10 +5,6 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Skip TypeScript type errors during build
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   images: {
     // Enable modern image formats
     formats: ["image/avif", "image/webp"],
@@ -49,9 +45,9 @@ const nextConfig = {
       "default-src 'self'",
       `script-src 'self' 'blob:' ${isDev ? "'unsafe-eval' 'unsafe-inline'" : "'unsafe-inline'"} https://challenges.cloudflare.com`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "img-src 'self' data: blob: https://images.unsplash.com",
+      "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co",
       "font-src 'self' https://fonts.gstatic.com",
-      `connect-src 'self' ${isDev ? "ws://localhost:* http://localhost:*" : ""} https://*.posthog.com https://*.sentry.io`,
+      `connect-src 'self' ${isDev ? "ws://localhost:* http://localhost:*" : ""} https://*.posthog.com https://*.sentry.io https://*.supabase.co`,
       "frame-src 'self' https://challenges.cloudflare.com",
       "object-src 'none'",
       "base-uri 'self'",

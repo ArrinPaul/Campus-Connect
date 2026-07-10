@@ -6,7 +6,7 @@ import { useQuery } from '@/lib/api';
 import { useUser } from '@/lib/auth/client';
 import { api } from '@/lib/api';
 import { SearchBar } from '../../(components)/search/SearchBar';
-import { PostCard } from '../../(components)/feed/PostCard';
+import { PostCard } from '@/components/posts/PostCard';
 import { UserCard } from '../../(components)/search/UserCard';
 import { HashtagCard } from '../../(components)/search/HashtagCard';
 import { Section, SectionHeader } from '@/components/ui/Section';
