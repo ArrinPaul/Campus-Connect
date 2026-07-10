@@ -10,9 +10,9 @@ async function getSupabase() {
 export async function followUser(followerId: string, followingId: string): Promise<void> {
   const supabase = await getSupabase()
   await supabase.from("follows").insert({ follower_id: followerId, following_id: followingId })
-  // Increment counts
-  await supabase.rpc("increment_field", { table_name: "users", field_name: "following_count", row_id: followerId }).catch(() => {})
-  await supabase.rpc("increment_field", { table_name: "users", field_name: "follower_count", row_id: followingId }).catch(() => {})
+  // Increment counts (best-effort)
+  try { await supabase.rpc("increment_field", { table_name: "users", field_name: "following_count", row_id: followerId }) } catch { /* ignore */ }
+  try { await supabase.rpc("increment_field", { table_name: "users", field_name: "follower_count", row_id: followingId }) } catch { /* ignore */ }
 }
 
 export async function unfollowUser(followerId: string, followingId: string): Promise<void> {

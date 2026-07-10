@@ -32,7 +32,7 @@ export async function linkPostToHashtags(postId: string, tags: string[]) {
   for (const tag of tags) {
     const hashtag = await getOrCreateHashtag(tag)
     if (hashtag) {
-      await supabase.from("post_hashtags").insert({ post_id: postId, hashtag_id: hashtag.id }).catch(() => {})
+      try { await supabase.from("post_hashtags").insert({ post_id: postId, hashtag_id: hashtag.id }) } catch { /* ignore duplicate */ }
       await supabase.from("hashtags").update({ post_count: (hashtag.post_count ?? 0) + 1 }).eq("id", hashtag.id)
     }
   }

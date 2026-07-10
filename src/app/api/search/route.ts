@@ -10,7 +10,7 @@ export async function GET(req: Request) {
 
     const limit = Number(searchParams.get("limit") ?? "10")
 
-    const results = await universalSearch(q, limit)
+    const results = await universalSearch(q)
     return NextResponse.json(results)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
 import { getUserPosts } from "@/server/db/posts"
 
-// GET /api/posts/user?userId=xxx&limit=20&cursor=xxx
+// GET /api/posts/user?userId=xxx&limit=20&offset=0
 export async function GET(req: Request) {
   try {
     const { userId: authId } = await auth()
@@ -11,9 +11,9 @@ export async function GET(req: Request) {
     if (!uid) return NextResponse.json({ error: "userId required" }, { status: 400 })
 
     const limit = parseInt(url.searchParams.get("limit") ?? "20")
-    const cursor = url.searchParams.get("cursor") ?? undefined
+    const offset = parseInt(url.searchParams.get("offset") ?? "0")
 
-    const result = await getUserPosts(uid, limit, cursor)
+    const result = await getUserPosts(uid, limit, offset)
     return NextResponse.json(result)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

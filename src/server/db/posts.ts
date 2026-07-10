@@ -208,26 +208,25 @@ export async function deletePost(postId: string): Promise<void> {
 
 export async function incrementLikeCount(postId: string): Promise<void> {
   const supabase = await getSupabase()
-  await supabase.rpc("increment_field", {
-    table_name: "posts",
-    field_name: "like_count",
-    row_id: postId,
-  }).catch(() => {
-    // Fallback: manual increment
-    supabase
+  try {
+    await supabase.rpc("increment_field", {
+      table_name: "posts",
+      field_name: "like_count",
+      row_id: postId,
+    })
+  } catch {
+    const { data } = await supabase
       .from("posts")
       .select("like_count")
       .eq("id", postId)
       .single()
-      .then(({ data }) => {
-        if (data) {
-          supabase
-            .from("posts")
-            .update({ like_count: (data.like_count ?? 0) + 1 })
-            .eq("id", postId)
-        }
-      })
-  })
+    if (data) {
+      await supabase
+        .from("posts")
+        .update({ like_count: (data.like_count ?? 0) + 1 })
+        .eq("id", postId)
+    }
+  }
 }
 
 export async function decrementLikeCount(postId: string): Promise<void> {

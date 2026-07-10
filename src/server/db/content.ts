@@ -22,7 +22,7 @@ export async function createStory(data: { author_id: string; content?: string; m
 
 export async function viewStory(storyId: string, userId: string) {
   const supabase = await getSupabase()
-  await supabase.from("story_views").insert({ story_id: storyId, user_id: userId }).catch(() => {})
+  try { await supabase.from("story_views").insert({ story_id: storyId, user_id: userId }) } catch { /* duplicate view, ignore */ }
   const { data } = await supabase.from("stories").select("view_count").eq("id", storyId).single()
   if (data) await supabase.from("stories").update({ view_count: (data.view_count ?? 0) + 1 }).eq("id", storyId)
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { getPostsByCommunity } from "@/server/db/posts"
 
-// GET /api/posts/community?communityId=xxx&limit=20&cursor=xxx
+// GET /api/posts/community?communityId=xxx&limit=20&offset=0
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url)
@@ -9,9 +9,9 @@ export async function GET(req: Request) {
     if (!communityId) return NextResponse.json({ error: "communityId required" }, { status: 400 })
 
     const limit = parseInt(url.searchParams.get("limit") ?? "20")
-    const cursor = url.searchParams.get("cursor") ?? undefined
+    const offset = parseInt(url.searchParams.get("offset") ?? "0")
 
-    const result = await getPostsByCommunity(communityId, limit, cursor)
+    const result = await getPostsByCommunity(communityId, limit, offset)
     return NextResponse.json(result)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

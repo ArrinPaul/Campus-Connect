@@ -171,3 +171,72 @@ export async function universalSearch(query: string) {
     communities: communities.data ?? [],
   }
 }
+
+// ─── Skill Endorsements ─────────────────────────────────────────────────────
+
+export async function endorseSkill(userId: string, endorserId: string, skill: string) {
+  const supabase = await getSupabase()
+  const { data, error } = await supabase
+    .from("skill_endorsements")
+    .upsert({ user_id: userId, endorser_id: endorserId, skill })
+    .select()
+    .single()
+  if (error) return null
+  return data
+}
+
+export async function getEndorsements(userId: string) {
+  const supabase = await getSupabase()
+  const { data } = await supabase
+    .from("skill_endorsements")
+    .select("*, endorser:users!skill_endorsements_endorser_id_fkey(id, name, username, profile_picture)")
+    .eq("user_id", userId)
+  return data ?? []
+}
+
+// ─── Portfolio ──────────────────────────────────────────────────────────────
+
+export async function getPortfolio(userId: string) {
+  const supabase = await getSupabase()
+  const [projects, certifications] = await Promise.all([
+    supabase.from("portfolio_projects").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
+    supabase.from("portfolio_certifications").select("*").eq("user_id", userId).order("date_obtained", { ascending: false }),
+  ])
+  return {
+    projects: projects.data ?? [],
+    certifications: certifications.data ?? [],
+  }
+}
+
+export async function addProject(userId: string, data: { title: string; description?: string; url?: string; image_url?: string }) {
+  const supabase = await getSupabase()
+  const { data: project, error } = await supabase
+    .from("portfolio_projects")
+    .insert({ user_id: userId, ...data })
+    .select()
+    .single()
+  if (error) return null
+  return project
+}
+
+// ─── Ads Tracking ───────────────────────────────────────────────────────────
+
+export async function trackAdImpression(adId: string) {
+  const supabase = await getSupabase()
+  try {
+    await supabase.rpc("increment_field", { table_name: "ads", field_name: "impressions", row_id: adId })
+  } catch {
+    const { data } = await supabase.from("ads").select("impressions").eq("id", adId).single()
+    if (data) await supabase.from("ads").update({ impressions: (data.impressions ?? 0) + 1 }).eq("id", adId)
+  }
+}
+
+export async function trackAdClick(adId: string) {
+  const supabase = await getSupabase()
+  try {
+    await supabase.rpc("increment_field", { table_name: "ads", field_name: "clicks", row_id: adId })
+  } catch {
+    const { data } = await supabase.from("ads").select("clicks").eq("id", adId).single()
+    if (data) await supabase.from("ads").update({ clicks: (data.clicks ?? 0) + 1 }).eq("id", adId)
+  }
+}

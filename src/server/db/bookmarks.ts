@@ -38,6 +38,6 @@ export async function isBookmarked(userId: string, postId: string): Promise<bool
 export async function getBookmarkCollections(userId: string) {
   const supabase = await getSupabase()
   const { data } = await supabase.from("bookmarks").select("collection_name").eq("user_id", userId)
-  const unique = [...new Set((data ?? []).map((b: any) => b.collection_name))]
+  const unique = Array.from(new Set((data ?? []).map((b: any) => b.collection_name)))
   return unique
 }

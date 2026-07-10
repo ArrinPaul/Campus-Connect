@@ -10,9 +10,9 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url)
     const limit = Number(searchParams.get("limit") ?? "20")
-    const cursor = searchParams.get("cursor") ?? undefined
+    const offset = Number(searchParams.get("offset") ?? "0")
 
-    const result = await getBookmarks(userId, limit, cursor)
+    const result = await getBookmarks(userId, limit, offset)
     return NextResponse.json(result)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

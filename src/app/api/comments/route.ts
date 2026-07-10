@@ -10,9 +10,9 @@ export async function GET(req: Request) {
     if (!postId) return NextResponse.json({ error: "postId required" }, { status: 400 })
 
     const limit = parseInt(url.searchParams.get("limit") ?? "20")
-    const cursor = url.searchParams.get("cursor") ?? undefined
+    const offset = parseInt(url.searchParams.get("offset") ?? "0")
 
-    const result = await getPostComments(postId, limit, cursor)
+    const result = await getPostComments(postId, limit, offset)
     return NextResponse.json(result)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

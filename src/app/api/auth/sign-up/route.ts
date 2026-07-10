@@ -48,11 +48,11 @@ export async function POST(req: Request) {
     const user = data.user
     return NextResponse.json({
       ok: true,
-      user: {
+      user: user ? {
         id: user.id,
         email: user.email ?? "",
         name: user.user_metadata?.name ?? name ?? "User",
-      },
+      } : null,
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to sign up"

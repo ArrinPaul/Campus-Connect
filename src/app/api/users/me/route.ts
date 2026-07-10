@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
-import { getUserByAuthId, updateUser, updatePrivacySettings, updateNotificationPreferences, deleteUserAccount, completeOnboarding, updateProfilePicture, addSkill, removeSkill, upsertUser } from "@/server/db/users"
+import { getUserById, updateUser, deleteUserAccount } from "@/server/db/users"
 
 // GET /api/users/me
 export async function GET() {
@@ -8,25 +8,8 @@ export async function GET() {
     const { userId } = await auth()
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    let user = await getUserByAuthId(userId)
-    if (!user) {
-      user = await upsertUser({
-        authId: userId,
-        email: `${userId}@local.dev`,
-        name: "Local User",
-      })
-    }
-
-    // Parse stored JSON strings back to objects
-    if (typeof user.socialLinks === "string") {
-      try { user.socialLinks = JSON.parse(user.socialLinks as unknown as string) } catch { user.socialLinks = {} }
-    }
-    if (typeof user.privacySettings === "string") {
-      try { user.privacySettings = JSON.parse(user.privacySettings as unknown as string) } catch { user.privacySettings = {} }
-    }
-    if (typeof user.notificationPreferences === "string") {
-      try { user.notificationPreferences = JSON.parse(user.notificationPreferences as unknown as string) } catch { user.notificationPreferences = {} }
-    }
+    const user = await getUserById(userId)
+    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 })
 
     return NextResponse.json(user)
   } catch (err) {

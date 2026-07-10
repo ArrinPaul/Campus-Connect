@@ -8,9 +8,9 @@ export async function GET(req: Request) {
     if (!tag) return NextResponse.json({ error: "tag required" }, { status: 400 })
 
     const limit = parseInt(url.searchParams.get("limit") ?? "20")
-    const cursor = url.searchParams.get("cursor") ?? undefined
+    const offset = parseInt(url.searchParams.get("offset") ?? "0")
 
-    const result = await getPostsByHashtag(tag, limit, cursor)
+    const result = await getPostsByHashtag(tag, limit, offset)
     return NextResponse.json(result)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

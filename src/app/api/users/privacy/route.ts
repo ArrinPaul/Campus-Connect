@@ -1,18 +1,14 @@
 import { auth } from "@/lib/auth/client"
 import { NextResponse } from "next/server"
-import { updatePrivacySettings, getUserByAuthId } from "@/server/db/users"
+import { updatePrivacySettings, getUserById } from "@/server/db/users"
 
 export async function GET() {
   try {
     const { userId } = await auth()
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const user = await getUserByAuthId(userId)
-    let settings = user?.privacySettings ?? {}
-    if (typeof settings === "string") {
-      try { settings = JSON.parse(settings as unknown as string) } catch { settings = {} }
-    }
-    return NextResponse.json(settings)
+    const user = await getUserById(userId)
+    return NextResponse.json(user?.social_links ?? {})
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
