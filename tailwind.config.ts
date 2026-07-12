@@ -20,22 +20,8 @@ const config: Config = {
       // Font: Optimistic VF (Meta's variable face)
       // Fallbacks: Montserrat, Helvetica, Arial, Noto Sans
       fontFamily: {
-        sans: [
-          "Optimistic VF",
-          "Montserrat",
-          "Helvetica",
-          "Arial",
-          "Noto Sans",
-          "sans-serif",
-        ],
-        display: [
-          "Optimistic VF",
-          "Montserrat",
-          "Helvetica",
-          "Arial",
-          "Noto Sans",
-          "sans-serif",
-        ],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "system-ui", "sans-serif"],
       },
 
       // ─── Colors (from DESIGN.md) ────────────────────────────────────────────
@@ -62,36 +48,36 @@ const config: Config = {
 
         // Surface
         canvas: {
-          DEFAULT: "#ffffff",    // {colors.canvas}
-          soft: "#f1f4f7",      // {colors.surface-soft}
+          DEFAULT: "var(--canvas)",    
+          soft: "var(--canvas-soft)",  
         },
-        "surface-soft": "#f1f4f7", // {colors.surface-soft}
+        "surface-soft": "var(--canvas-soft)", 
 
         // Text
-        "ink-deep": "#0a1317",   // {colors.ink-deep} — primary headlines
+        "ink-deep": "var(--ink-deep)",   
         ink: {
-          DEFAULT: "#1c1e21",    // {colors.ink} — standard body
-          button: "#000000",     // {colors.ink-button}
-          muted: "#7a7a7a",      // legacy compat
+          DEFAULT: "var(--ink)",    
+          button: "var(--ink-button)",     
+          muted: "var(--ink-muted)",      
         },
-        charcoal: "#444950",     // {colors.charcoal}
-        slate: "#4b4c4f",        // {colors.slate}
-        steel: "#5d6c7b",        // {colors.steel}
-        stone: "#8595a4",        // {colors.stone}
+        charcoal: "var(--charcoal)",     
+        slate: "var(--slate)",        
+        steel: "var(--steel)",        
+        stone: "var(--stone)",        
 
         // Hairlines
         hairline: {
-          DEFAULT: "#ced0d4",    // {colors.hairline}
-          soft: "#dee3e9",       // {colors.hairline-soft}
+          DEFAULT: "var(--hairline)",    
+          soft: "var(--hairline-soft)",       
         },
-        "disabled-text": "#bcc0c4", // {colors.disabled-text}
+        "disabled-text": "var(--disabled-text)", 
 
         // Legacy compat (map to new tokens)
-        border: "#ced0d4",
-        input: "#ced0d4",
-        ring: "#0064e0",
-        background: "#ffffff",
-        foreground: "#0a1317",
+        border: "var(--hairline)",
+        input: "var(--hairline)",
+        ring: "var(--primary)",
+        background: "var(--canvas)",
+        foreground: "var(--ink)",
       },
 
       // ─── Border Radius (from DESIGN.md) ─────────────────────────────────────

@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, memo, useRef, useEffect } from "react"
+import { motion } from "framer-motion"
+import Link from "next/link"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { useUser } from "@/lib/auth/client"
 import { useMutation, useQuery } from "@/lib/api"
@@ -271,7 +273,13 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
   const role = roleConfig[author.role] ?? roleConfig.Student
 
   return (
-    <article className="group/post w-full bg-canvas border-b border-hairline py-lg md:py-xl transition-colors hover:bg-canvas-parchment/30">
+    <motion.article 
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="group/post w-full bg-canvas/70 dark:bg-canvas/40 backdrop-blur-md border-b border-hairline py-lg md:py-xl transition-all hover:bg-canvas-soft/50"
+    >
       <div className="max-w-2xl mx-auto px-4 md:px-0">
         {/* Author Info */}
         <div className="flex items-start justify-between">
@@ -307,7 +315,9 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
                   {role.label}
                 </span>
               </div>
-              <p className="text-caption text-ink-muted-48">{formatTimestamp(post.createdAt)}</p>
+              <Link href={`/post/${post._id}`} className="hover:underline">
+                <p className="text-caption text-ink-muted-48">{formatTimestamp(post.createdAt)}</p>
+              </Link>
             </div>
           </div>
 
@@ -529,6 +539,6 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
         onClose={() => setShowRepostModal(false)}
         onSuccess={() => {}}
       />
-    </article>
+    </motion.article>
   )
 })
