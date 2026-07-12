@@ -1,10 +1,12 @@
-import { auth } from "@/lib/auth/server"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { completeOnboarding } from "@/server/db/users"
 
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const body = await req.json()
@@ -19,8 +21,8 @@ export async function POST(req: Request) {
         : [],
     }
 
-    const user = await completeOnboarding(userId, payload)
-    return NextResponse.json(user)
+    const dbUser = await completeOnboarding(userId, payload)
+    return NextResponse.json(dbUser)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }

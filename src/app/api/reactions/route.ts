@@ -1,11 +1,13 @@
-import { auth } from "@/lib/auth/server"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { addReaction, getUserReaction, getReactionCounts } from "@/server/db/reactions"
 
 // POST /api/reactions  body: { targetId, targetType, type }
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { targetId, targetType, type } = await req.json()
@@ -28,7 +30,9 @@ export async function POST(req: Request) {
 // GET /api/reactions?targetId=xxx&targetType=post
 export async function GET(req: Request) {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
     const url = new URL(req.url)
     const targetId = url.searchParams.get("targetId")
     const targetType = url.searchParams.get("targetType") as "post" | "comment"

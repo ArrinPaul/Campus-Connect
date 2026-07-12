@@ -1,11 +1,13 @@
-import { auth } from "@/lib/auth/server"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { markAllAsRead } from "@/server/db/notifications"
 
 // POST /api/notifications/read-all
 export async function POST() {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     await markAllAsRead(userId)

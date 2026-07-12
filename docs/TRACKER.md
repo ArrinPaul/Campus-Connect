@@ -106,20 +106,20 @@ DESIGN.md = source of truth. Meta/Facebook design. `tailwind.config.ts` mirrors 
 ### API Routes (~100 routes)
 | Task | Status |
 |---|---|
-| Rewrite auth routes (4 routes) | ⬜ |
-| Rewrite user routes (8 routes) | ⬜ |
-| Rewrite post routes (8 routes) | ⬜ |
-| Rewrite comment routes (3 routes) | ⬜ |
-| Rewrite reaction routes (4 routes) | ⬜ |
-| Rewrite message routes (4 routes) | ⬜ |
-| Rewrite conversation routes (5 routes) | ⬜ |
-| Rewrite community routes (10 routes) | ⬜ |
-| Rewrite event routes (5 routes) | ⬜ |
-| Rewrite job routes (4 routes) | ⬜ |
-| Rewrite story routes (3 routes) | ⬜ |
-| Rewrite notification routes (4 routes) | ⬜ |
-| Rewrite bookmark routes (4 routes) | ⬜ |
-| Rewrite remaining routes (30+ routes) | ⬜ |
+| Rewrite auth routes (4 routes) | ✅ |
+| Rewrite user routes (8 routes) | ✅ |
+| Rewrite post routes (8 routes) | ✅ |
+| Rewrite comment routes (3 routes) | ✅ |
+| Rewrite reaction routes (4 routes) | ✅ |
+| Rewrite message routes (4 routes) | ✅ |
+| Rewrite conversation routes (5 routes) | ✅ |
+| Rewrite community routes (10 routes) | ✅ |
+| Rewrite event routes (5 routes) | ✅ |
+| Rewrite job routes (4 routes) | ✅ |
+| Rewrite story routes (3 routes) | ✅ |
+| Rewrite notification routes (4 routes) | ✅ |
+| Rewrite bookmark routes (4 routes) | ✅ |
+| Rewrite remaining routes (30+ routes) | ✅ |
 
 ### Config
 | Task | Status |

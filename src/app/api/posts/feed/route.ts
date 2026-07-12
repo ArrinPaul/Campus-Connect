@@ -1,11 +1,13 @@
-import { auth } from "@/lib/auth/server"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { getFeedPosts } from "@/server/db/posts"
 
 // GET /api/posts/feed?limit=10&offset=0
 export async function GET(req: Request) {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
     if (!userId) return NextResponse.json({ posts: [], hasMore: false })
 
     const url = new URL(req.url)

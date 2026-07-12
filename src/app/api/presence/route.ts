@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth/server"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { updatePresence, getUserStatuses } from "@/server/db/misc"
 
@@ -20,7 +20,9 @@ export async function GET(req: Request) {
 // POST /api/presence  body: { status, lastSeen? }
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { status } = await req.json()

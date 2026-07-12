@@ -1,11 +1,13 @@
-import { auth } from "@/lib/auth/server"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { followUser, unfollowUser, isFollowing, getFollowers, getFollowing } from "@/server/db/follows"
 
 // POST /api/follows  body: { userId }
 export async function POST(req: Request) {
   try {
-    const { userId: authId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const authId = user?.id
     if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { userId } = await req.json()
@@ -21,7 +23,9 @@ export async function POST(req: Request) {
 // GET /api/follows?check=true&userId=xxx  OR just for compatibility
 export async function GET(req: Request) {
   try {
-    const { userId: authId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const authId = user?.id
     const url = new URL(req.url)
     const targetUserId = url.searchParams.get("userId")
 

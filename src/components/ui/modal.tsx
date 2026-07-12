@@ -3,14 +3,14 @@
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 
 export function Modal({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     router.back();
-  };
+  }, [router]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -22,7 +22,7 @@ export function Modal({ children }: { children: React.ReactNode }) {
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'unset';
     };
-  }, []);
+  }, [handleClose]);
 
   return (
     <AnimatePresence>

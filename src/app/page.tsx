@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { GlobalNav } from '@/components/navigation/GlobalNav';
 import { MobileBottomNav } from '@/components/navigation/mobile-bottom-nav';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import {
   MessageSquare,
   Users,
@@ -19,12 +19,12 @@ import {
   Zap,
 } from 'lucide-react';
 
-const FADE_DOWN = {
+const FADE_DOWN: Variants = {
   hidden: { opacity: 0, y: -20 },
   show: { opacity: 1, y: 0, transition: { type: 'spring', duration: 0.8 } },
 };
 
-const FADE_UP = {
+const FADE_UP: Variants = {
   hidden: { opacity: 0, y: 30 },
   show: { opacity: 1, y: 0, transition: { type: 'spring', duration: 1, bounce: 0.3 } },
 };
@@ -86,7 +86,7 @@ export default function RootPage() {
             animate="show"
             variants={{
               hidden: {},
-              show: { staggerChildren: 0.15 }
+              show: { transition: { staggerChildren: 0.15 } }
             }}
             className="relative z-10 max-w-5xl mx-auto text-center flex flex-col items-center pt-16 md:pt-0"
           >
@@ -177,7 +177,8 @@ export default function RootPage() {
                 </div>
                 <h3 className="text-heading-md text-ink-deep mb-4">{feature.title}</h3>
                 <p className="text-body-md text-steel leading-relaxed">
-                  {feature.description || feature.desc}
+                  {/* @ts-ignore */}
+                  {feature.desc || feature.description}
                 </p>
                 
                 <div className="absolute right-8 bottom-8 opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 transition-all duration-300">

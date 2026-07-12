@@ -1,11 +1,13 @@
-import { auth } from "@/lib/auth/server"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { unfollowUser } from "@/server/db/follows"
 
 // DELETE /api/follows/unfollow  body: { userId }
 export async function DELETE(req: Request) {
   try {
-    const { userId: authId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const authId = user?.id
     if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { userId } = await req.json()

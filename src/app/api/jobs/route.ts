@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth/server"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { getJobs, createJob } from "@/server/db/events-jobs"
 
@@ -18,7 +18,9 @@ export async function GET(req: Request) {
 // POST /api/jobs  body: job data
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const body = await req.json()
