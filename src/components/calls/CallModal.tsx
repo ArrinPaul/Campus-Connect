@@ -82,10 +82,15 @@ export function CallModal({
   const endCall = useMutation(api.calls.endCall)
 
   // Watch call state via reactive query
-  const activeCall = useQuery(api.calls.getActiveCall, { conversationId })
+  const activeCalls = useQuery(api.calls.getActiveCall, { conversationId })
 
   // Sync call state with backend
   useEffect(() => {
+    // getActiveCall returns an array of calls, so we need to find the one for this conversation
+    const activeCall = Array.isArray(activeCalls) 
+      ? activeCalls.find((c: any) => c.conversationId === conversationId || c.id === callId)
+      : activeCalls;
+
     if (!activeCall) {
       if (callState !== "ended") {
         setCallState("ended")
@@ -104,7 +109,7 @@ export function CallModal({
     ) {
       setCallState("ended")
     }
-  }, [activeCall, callState, isIncoming])
+  }, [activeCalls, callState, isIncoming, conversationId, callId])
 
   // Start WebRTC when call connects
   useEffect(() => {

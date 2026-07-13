@@ -14,7 +14,7 @@ jest.mock("@sentry/nextjs", () => ({
   withScope: (cb: (scope: any) => void) => mockWithScope(cb),
   captureException: (e: unknown) => mockCaptureException(e),
   captureMessage: (m: string, l: string) => mockCaptureMessage(m, l),
-}), { virtual: true })
+}))
 
 import { createLogger, logger } from "@/lib/logger"
 
