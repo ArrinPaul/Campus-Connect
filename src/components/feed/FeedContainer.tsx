@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useEffect, useRef } from "react"
+import { useState, useCallback, useEffect, useRef, useMemo } from "react"
 import Link from "next/link"
 import { useUser } from "@/lib/auth/client"
 import { useQuery } from "@/lib/api"
@@ -68,7 +68,7 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
   )
 
   // Normalize getFeedPosts response ({posts}) → shared {items, nextCursor, hasMore} shape
-  const followingData = followingDataRaw
+  const followingData = useMemo(() => followingDataRaw
     ? {
         items: (followingDataRaw.posts.filter(Boolean) as NonNullable<typeof followingDataRaw.posts[number]>[]).map((post) => ({
           type: "post" as const,
@@ -80,9 +80,9 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
         nextCursor: followingDataRaw.nextCursor,
         hasMore: followingDataRaw.hasMore,
       }
-    : undefined
+    : undefined, [followingDataRaw])
 
-  const moreFollowingData = moreFollowingDataRaw
+  const moreFollowingData = useMemo(() => moreFollowingDataRaw
     ? {
         items: (moreFollowingDataRaw.posts.filter(Boolean) as NonNullable<typeof moreFollowingDataRaw.posts[number]>[]).map((post) => ({
           type: "post" as const,
@@ -94,7 +94,7 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
         nextCursor: moreFollowingDataRaw.nextCursor,
         hasMore: moreFollowingDataRaw.hasMore,
       }
-    : undefined
+    : undefined, [moreFollowingDataRaw])
 
   // Select active feed data based on feedType
   const feedData =

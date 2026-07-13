@@ -323,6 +323,7 @@ describe("FeedContainer", () => {
     expect(screen.queryByText("New real-time post")).not.toBeInTheDocument()
 
     // Simulate real-time update with new post
+    mockQueryCache.clear()
     mockQueryResults = [
       {
         items: [makePostItem(newPost), makePostItem(initialPost)],
