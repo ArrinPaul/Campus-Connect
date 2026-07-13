@@ -63,7 +63,7 @@ DESIGN.md = source of truth. Meta/Facebook design. `tailwind.config.ts` mirrors 
 
 ---
 
-## Phase 1: Foundation ⬜ NEXT
+## Phase 1: Foundation ✅ DONE
 
 ### Supabase Setup
 | Task | Status |
@@ -131,15 +131,15 @@ DESIGN.md = source of truth. Meta/Facebook design. `tailwind.config.ts` mirrors 
 
 ---
 
-## Phase 2: Core Features ⬜
+## Phase 2: Core Features ✅ DONE
 
 | Task | Status |
 |---|---|
 | Rebuild GlobalNav (L01 — user avatar, notification badge) | ✅ |
 | Build mobile nav (L03 — hamburger menu) | ✅ |
 | Rebuild landing page (L06 — real content) | ✅ |
-| Add video stories (ST07) | ⬜ |
-| Fix story navigation (ST08) | ⬜ |
+| Add video stories (ST07) | ✅ |
+| Fix story navigation (ST08) | ✅ |
 | Add job search/filters (J07) | ✅ |
 | Build community settings (C15 — moderation) | ✅ |
 | Add portfolio section (U18 — projects, certs) | ✅ |
@@ -147,7 +147,7 @@ DESIGN.md = source of truth. Meta/Facebook design. `tailwind.config.ts` mirrors 
 
 ---
 
-## Phase 3: Real-time ⬜
+## Phase 3: Real-time ⬜ NEXT
 
 | Task | Status |
 |---|---|
