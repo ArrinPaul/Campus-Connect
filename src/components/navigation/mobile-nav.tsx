@@ -36,7 +36,7 @@ interface MobileNavProps {
 
 const mainLinks = [
   { label: "Feed", href: "/feed", icon: Home },
-  { label: "Discover", href: "/discover", icon: Compass },
+  { label: "Explore", href: "/explore", icon: Compass },
   { label: "Messages", href: "/messages", icon: MessageSquare },
   { label: "Bookmarks", href: "/bookmarks", icon: Bookmark },
   { label: "Notifications", href: "/notifications", icon: Bell },
