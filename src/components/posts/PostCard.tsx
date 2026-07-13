@@ -3,6 +3,7 @@
 import { useState, memo, useRef, useEffect } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { useUser } from "@/lib/auth/client"
 import { useMutation, useQuery } from "@/lib/api"
@@ -71,6 +72,12 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
     isLoaded && isSignedIn ? {} : "skip"
   )
 
+  const router = useRouter()
+  const shareDropdownRef = useRef<HTMLDivElement>(null)
+  const createRepost = useMutation(api.reposts.createRepost)
+
+  const isOwnPost = currentUser?._id === post.authorId
+
   const [isDeleting, setIsDeleting] = useState(false)
   const [showComments, setShowComments] = useState(false)
   const [showReactionModal, setShowReactionModal] = useState(false)
@@ -81,11 +88,6 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
   const [commentCursor, setCommentCursor] = useState<string | undefined>(undefined)
   const [allComments, setAllComments] = useState<any[]>([])
   const [isLoadingMoreComments, setIsLoadingMoreComments] = useState(false)
-  
-  const shareDropdownRef = useRef<HTMLDivElement>(null)
-  const createRepost = useMutation(api.reposts.createRepost)
-
-  const isOwnPost = currentUser?._id === post.authorId
 
   // Only fetch comments when expanded — paginated
   const commentsData = useQuery(
@@ -270,6 +272,15 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
     }
   }
 
+  const handlePostClick = (e: React.MouseEvent) => {
+    // If clicking on interactive elements, don't navigate
+    const target = e.target as HTMLElement
+    if (target.closest('button') || target.closest('a') || target.closest('.no-nav')) {
+      return
+    }
+    router.push(`/post/${post._id}`)
+  }
+
   const role = roleConfig[author.role] ?? roleConfig.Student
 
   return (
@@ -278,181 +289,188 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="group/post w-full bg-canvas/70 dark:bg-canvas/40 backdrop-blur-md border-b border-hairline py-lg md:py-xl transition-all hover:bg-canvas-soft/50"
+      onClick={handlePostClick}
+      className="group/post w-full bg-canvas/70 dark:bg-canvas/40 backdrop-blur-md border-b border-hairline py-lg md:py-xl transition-all hover:bg-canvas-soft/50 cursor-pointer"
     >
-      <div className="max-w-2xl mx-auto px-4 md:px-0">
-        {/* Author Info */}
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-md">
-            {/* Avatar */}
-            <AvatarWithStatus userId={author._id} size="sm">
-              <div className="relative h-10 w-10 flex-shrink-0">
-                {author.profilePicture ? (
-                  <OptimizedImage
-                    src={author.profilePicture}
-                    alt={author.name}
-                    fill
-                    isAvatar
-                    sizes="40px"
-                    className="rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-canvas-parchment text-sm font-semibold text-ink">
-                    {author.name.charAt(0).toUpperCase()}
-                  </div>
-                )}
-              </div>
-            </AvatarWithStatus>
+      <div className="max-w-2xl mx-auto px-4 md:px-0 flex gap-3 md:gap-4">
+        {/* Left Column: Avatar */}
+        <div className="shrink-0 mt-1">
+          <AvatarWithStatus userId={author._id} size="sm">
+            <div className="relative h-10 w-10 flex-shrink-0">
+              {author.profilePicture ? (
+                <OptimizedImage
+                  src={author.profilePicture}
+                  alt={author.name}
+                  fill
+                  isAvatar
+                  sizes="40px"
+                  className="rounded-full object-cover"
+                />
+              ) : (
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-canvas-soft text-sm font-semibold text-ink border border-hairline">
+                  {author.name.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+          </AvatarWithStatus>
+        </div>
 
-            {/* Name, Role Badge, and Timestamp */}
+        {/* Right Column: Content */}
+        <div className="flex-1 min-w-0">
+          {/* Header */}
+          <div className="flex items-start justify-between">
             <div className="min-w-0">
-              <div className="flex items-center gap-xs">
-                <p className="text-body-strong text-ink truncate">{author.name}</p>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <p className="text-body-strong text-ink truncate hover:underline cursor-pointer">{author.name}</p>
                 <span className={cn(
-                  "inline-flex items-center rounded-pill border px-2 py-0 text-[10px] font-semibold uppercase tracking-wide",
+                  "inline-flex items-center rounded-full border px-1.5 py-0 text-[10px] font-semibold uppercase tracking-wide",
                   role.className
                 )}>
                   {role.label}
                 </span>
+                <span className="text-ink-muted-48">·</span>
+                <Link href={`/post/${post._id}`} className="hover:underline">
+                  <p className="text-caption text-ink-muted-48">{formatTimestamp(post.createdAt)}</p>
+                </Link>
               </div>
-              <Link href={`/post/${post._id}`} className="hover:underline">
-                <p className="text-caption text-ink-muted-48">{formatTimestamp(post.createdAt)}</p>
-              </Link>
             </div>
+
+            {/* Post Menu (own posts) */}
+            {isOwnPost && (
+              <div className="relative shrink-0 ml-2" ref={menuRef}>
+                <button
+                  onClick={() => setShowMenu(!showMenu)}
+                  className="btn-press rounded-full p-2 text-ink-muted-48 opacity-0 group-hover/post:opacity-100 hover:bg-canvas-soft hover:text-ink transition-all"
+                  aria-label="Post options"
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </button>
+
+                {/* Delete Confirmation Dropdown */}
+                {showMenu && (
+                  <div className="absolute right-0 top-full mt-1 z-50 w-44 bg-canvas border border-hairline rounded-md shadow-product overflow-hidden">
+                    {!showDeleteConfirm ? (
+                      <button
+                        onClick={() => setShowDeleteConfirm(true)}
+                        className="w-full px-4 py-2.5 text-left text-caption text-destructive hover:bg-destructive/5 flex items-center gap-2.5 transition-colors"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span>Delete post</span>
+                      </button>
+                    ) : (
+                      <div className="p-3 space-y-2">
+                        <p className="text-[10px] text-ink-muted-48 uppercase font-semibold">Confirm Delete?</p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={handleDelete}
+                            disabled={isDeleting}
+                            className="flex-1 rounded-sm bg-destructive px-3 py-1.5 text-xs font-semibold text-white hover:bg-destructive/90 disabled:opacity-50"
+                          >
+                            {isDeleting ? "..." : "Delete"}
+                          </button>
+                          <button
+                            onClick={() => { setShowDeleteConfirm(false); setShowMenu(false) }}
+                            className="flex-1 rounded-sm bg-canvas-soft px-3 py-1.5 text-xs font-semibold text-ink hover:bg-hairline"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Post Menu (own posts) */}
-          {isOwnPost && (
-            <div className="relative" ref={menuRef}>
-              <button
-                onClick={() => setShowMenu(!showMenu)}
-                className="btn-press rounded-full p-2 text-ink-muted-48 opacity-0 group-hover/post:opacity-100 hover:bg-divider-soft hover:text-ink transition-all"
-                aria-label="Post options"
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </button>
+          {/* Post Content */}
+          <div className="mt-1">
+            <PostContent
+              content={post.content}
+              className="text-[15px] text-ink leading-relaxed"
+            />
+          </div>
 
-              {/* Delete Confirmation Dropdown */}
-              {showMenu && (
-                <div className="absolute right-0 top-full mt-1 z-50 w-44 bg-canvas border border-hairline rounded-md shadow-product overflow-hidden">
-                  {!showDeleteConfirm ? (
-                    <button
-                      onClick={() => setShowDeleteConfirm(true)}
-                      className="w-full px-4 py-2.5 text-left text-caption text-destructive hover:bg-destructive/5 flex items-center gap-2.5 transition-colors"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                      <span>Delete post</span>
-                    </button>
-                  ) : (
-                    <div className="p-3 space-y-2">
-                      <p className="text-[10px] text-ink-muted-48 uppercase font-semibold">Confirm Delete?</p>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={handleDelete}
-                          disabled={isDeleting}
-                          className="flex-1 rounded-sm bg-destructive px-3 py-1.5 text-xs font-semibold text-white hover:bg-destructive/90 disabled:opacity-50"
-                        >
-                          {isDeleting ? "..." : "Delete"}
-                        </button>
-                        <button
-                          onClick={() => { setShowDeleteConfirm(false); setShowMenu(false) }}
-                          className="flex-1 rounded-sm bg-canvas-parchment px-3 py-1.5 text-xs font-semibold text-ink hover:bg-divider-soft"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
+          {/* Media Gallery */}
+          {post.mediaUrls && post.mediaUrls.length > 0 && post.mediaType && post.mediaType !== "link" && (
+            <div className="mt-3 rounded-xl overflow-hidden border border-hairline bg-canvas-soft">
+              <MediaGallery
+                mediaUrls={post.mediaUrls}
+                mediaType={post.mediaType as "image" | "video" | "file"}
+                mediaFileNames={post.mediaFileNames}
+                altPrefix={`${author.name}'s post media`}
+              />
             </div>
           )}
-        </div>
 
-        {/* Post Content */}
-        <div className="mt-md">
-          <PostContent
-            content={post.content}
-            className="text-body text-ink leading-relaxed"
-          />
-        </div>
+          {/* Link Preview */}
+          {post.linkPreview && (
+            <div className="mt-3 rounded-xl overflow-hidden border border-hairline hover:bg-canvas-soft/50 transition-colors">
+              <LinkPreviewCard
+                url={post.linkPreview.url}
+                title={post.linkPreview.title}
+                description={post.linkPreview.description}
+                image={post.linkPreview.image}
+                favicon={post.linkPreview.favicon}
+              />
+            </div>
+          )}
 
-        {/* Media Gallery */}
-        {post.mediaUrls && post.mediaUrls.length > 0 && post.mediaType && post.mediaType !== "link" && (
-          <div className="mt-md rounded-lg overflow-hidden shadow-product border border-hairline">
-            <MediaGallery
-              mediaUrls={post.mediaUrls}
-              mediaType={post.mediaType as "image" | "video" | "file"}
-              mediaFileNames={post.mediaFileNames}
-              altPrefix={`${author.name}'s post media`}
-            />
-          </div>
-        )}
+          {/* Poll */}
+          {post.pollId && (
+            <div className="mt-3 rounded-xl border border-hairline p-md bg-canvas-soft/50">
+              <PollCard pollId={post.pollId} />
+            </div>
+          )}
 
-        {/* Link Preview */}
-        {post.linkPreview && (
-          <div className="mt-md rounded-lg overflow-hidden border border-hairline hover:bg-canvas-parchment/50 transition-colors">
-            <LinkPreviewCard
-              url={post.linkPreview.url}
-              title={post.linkPreview.title}
-              description={post.linkPreview.description}
-              image={post.linkPreview.image}
-              favicon={post.linkPreview.favicon}
-            />
-          </div>
-        )}
-
-        {/* Poll */}
-        {post.pollId && (
-          <div className="mt-md rounded-lg border border-hairline p-md bg-canvas-parchment/10">
-            <PollCard pollId={post.pollId} />
-          </div>
-        )}
-
-        {/* Engagement Stats and Actions */}
-        <div className="mt-md flex items-center gap-xs">
-          {/* Reaction Picker */}
-          {currentUser && (
-            <ReactionPicker
+          {/* Engagement Stats and Actions */}
+          <div className="mt-3 flex items-center justify-between pr-4">
+            {/* Reaction Picker */}
+            {currentUser && (
+              <ReactionPicker
+                targetId={post._id}
+                targetType="post"
+              />
+            )}
+            
+            {/* Reaction Summary */}
+            <ReactionSummary
               targetId={post._id}
               targetType="post"
+              onClick={() => setShowReactionModal(true)}
             />
-          )}
-          
-          {/* Reaction Summary */}
-          <ReactionSummary
-            targetId={post._id}
-            targetType="post"
-            onClick={() => setShowReactionModal(true)}
-          />
 
           <div className="flex-1" />
 
           {/* Comment Toggle Button */}
-          <button
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
             onClick={() => setShowComments(!showComments)}
             className={cn(
-              "btn-press flex items-center gap-1.5 rounded-pill px-3 py-1.5 text-ink-muted-48 transition-colors hover:bg-canvas-parchment hover:text-primary",
-              showComments && "text-primary bg-canvas-parchment"
+              "btn-press flex items-center gap-1.5 rounded-full px-3 py-1.5 text-ink-muted-48 transition-colors hover:bg-canvas-soft hover:text-primary",
+              showComments && "text-primary bg-canvas-soft"
             )}
             aria-label={showComments ? "Hide comments" : "Show comments"}
           >
             <MessageCircle className="h-[18px] w-[18px]" />
             <span className="text-caption font-semibold">{post.commentCount}</span>
-          </button>
+          </motion.button>
 
           {/* Share Button with Dropdown */}
           <div className="relative" ref={shareDropdownRef}>
-            <button
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
               onClick={() => setShowShareDropdown(!showShareDropdown)}
-              className="btn-press flex items-center gap-1.5 rounded-pill px-3 py-1.5 text-ink-muted-48 transition-colors hover:bg-canvas-parchment hover:text-primary"
+              className="btn-press flex items-center gap-1.5 rounded-full px-3 py-1.5 text-ink-muted-48 transition-colors hover:bg-canvas-soft hover:text-primary"
               aria-label="Share post"
             >
               <Share2 className="h-[18px] w-[18px]" />
               {post.shareCount > 0 && (
                 <span className="text-caption font-semibold">{post.shareCount}</span>
               )}
-            </button>
+            </motion.button>
 
             {/* Share Dropdown Menu */}
             {showShareDropdown && (
@@ -519,6 +537,7 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
             </div>
           </div>
         )}
+        </div>
       </div>
 
       {/* Reaction Modal */}

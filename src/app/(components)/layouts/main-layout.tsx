@@ -19,20 +19,20 @@ export function MainLayout({ children, title = "Campus Connect" }: MainLayoutPro
 
       <div className="mx-auto flex w-full max-w-7xl justify-center">
         {/* Left Sidebar - Desktop */}
-        <aside className="hidden md:flex w-[250px] lg:w-[280px] shrink-0 sticky top-0 h-screen overflow-y-auto border-r border-hairline-soft">
+        <aside className="hidden md:flex w-[250px] lg:w-[280px] shrink-0 sticky top-0 h-screen overflow-y-auto">
           <DesktopSidebar />
         </aside>
         
         {/* Main Feed Column */}
-        <main className="flex-1 max-w-[600px] min-w-0 min-h-screen scrollbar-custom pb-16 md:pb-0">
-          <div className="hidden md:block">
+        <main className="flex-1 max-w-[600px] min-w-0 min-h-screen scrollbar-custom border-x border-hairline pb-16 md:pb-0 bg-canvas relative">
+          <div className="hidden md:block sticky top-0 z-10 bg-canvas/70 backdrop-blur-md">
             <SubNav title={title} />
           </div>
           {children}
         </main>
         
         {/* Right Context Column - Desktop */}
-        <aside className="hidden lg:block w-[320px] shrink-0 sticky top-0 h-screen overflow-y-auto pl-8 py-6">
+        <aside className="hidden lg:block w-[350px] shrink-0 sticky top-0 h-screen overflow-y-auto pl-8 py-4">
            <div id="right-sidebar-portal"></div>
         </aside>
       </div>

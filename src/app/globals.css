@@ -30,16 +30,17 @@
   }
 
   .dark {
-    --primary: #fafafa;
-    --primary-deep: #ffffff;
-    --primary-soft: #e4e4e7;
+    --primary: #ffffff;
+    --primary-deep: #f4f4f5;
+    --primary-soft: #27272a;
     
-    --canvas: #09090b;
-    --canvas-soft: #18181b;
+    /* True Black for immersive dark mode */
+    --canvas: #000000;
+    --canvas-soft: #09090b;
     
     --ink: #fafafa;
     --ink-deep: #ffffff;
-    --ink-button: #09090b;
+    --ink-button: #000000;
     --ink-muted: #a1a1aa;
     
     --charcoal: #d4d4d8;

@@ -17,7 +17,7 @@ export function MobileTopBar() {
   );
 
   return (
-    <nav className="flex items-center justify-between h-14 px-4 bg-canvas/80 backdrop-blur-md border-b border-hairline-soft">
+    <nav className="flex items-center justify-between h-14 px-4 bg-white/70 dark:bg-black/70 backdrop-blur-xl border-b border-hairline-soft sticky top-0 z-50">
       {/* Left: Logo */}
       <Link href="/feed" className="flex items-center gap-2 shrink-0">
         <div className="h-8 w-8 rounded-xl bg-primary flex items-center justify-center">
