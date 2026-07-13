@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { internalError } from "@/lib/api-error"
 import { getPostsByCommunity } from "@/server/db/posts"
 
 // GET /api/posts/community?communityId=xxx&limit=20&offset=0
@@ -14,6 +15,6 @@ export async function GET(req: Request) {
     const result = await getPostsByCommunity(communityId, limit, offset)
     return NextResponse.json(result)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

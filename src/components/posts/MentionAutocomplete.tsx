@@ -39,7 +39,7 @@ export function MentionAutocomplete({
 
   // Query users based on the mention query
   const users = useQuery(
-    api.users.searchUsersByUsername,
+    api.users.searchUsers,
     query.trim().length > 0 ? { query, limit: 5 } : "skip"
   ) as MentionUser[] | undefined
 

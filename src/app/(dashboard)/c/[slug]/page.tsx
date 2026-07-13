@@ -16,7 +16,7 @@ type PageProps = {
 };
 
 function CommunityPageContent({ slug }: { slug: string }) {
-    const community = useQuery(api.communities.getCommunity, { slug });
+    const community = useQuery(api.communities.getCommunityBySlug, { slug });
 
     if (community === undefined) {
         return (

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { getCommunities, createCommunity, getCommunityBySlug } from "@/server/db/communities"
 
@@ -21,7 +22,7 @@ export async function GET(req: Request) {
     const result = await getCommunities(limit, offset, { category, search })
     return NextResponse.json(result)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
     })
     return NextResponse.json(community)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 

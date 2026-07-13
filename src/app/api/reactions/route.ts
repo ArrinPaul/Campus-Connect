@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { addReaction, getUserReaction, getReactionCounts } from "@/server/db/reactions"
 
@@ -23,7 +24,7 @@ export async function POST(req: Request) {
     })
     return NextResponse.json(result)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 
@@ -48,6 +49,6 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ counts, userReaction })
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

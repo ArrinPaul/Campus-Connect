@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { internalError } from "@/lib/api-error"
 import { getPostById } from "@/server/db/posts"
 
 // GET /api/posts/single?id=xxx
@@ -13,6 +14,6 @@ export async function GET(req: Request) {
 
     return NextResponse.json(post)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

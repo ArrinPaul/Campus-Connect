@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { createPoll, getPollResults } from "@/server/db/misc"
 
@@ -14,7 +15,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json(results)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 
@@ -38,6 +39,6 @@ export async function POST(req: Request) {
     })
     return NextResponse.json(poll, { status: 201 })
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

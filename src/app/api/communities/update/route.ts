@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { internalError } from "@/lib/api-error"
 import { createClient } from "@/lib/supabase/server"
 import { updateCommunity } from "@/server/db/communities"
 
@@ -28,6 +29,6 @@ export async function PATCH(req: Request) {
     const updated = await updateCommunity(communityId, { name, description, type, category })
     return NextResponse.json(updated)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

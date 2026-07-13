@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { internalError } from "@/lib/api-error"
 import { getTrendingHashtags } from "@/server/db/hashtags"
 
 // GET /api/hashtags/trending?limit=...
@@ -10,6 +11,6 @@ export async function GET(req: Request) {
     const trending = await getTrendingHashtags(limit)
     return NextResponse.json(trending)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 
 // POST /api/media/upload-url
@@ -27,6 +28,6 @@ export async function POST(req: Request) {
       path
     })
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

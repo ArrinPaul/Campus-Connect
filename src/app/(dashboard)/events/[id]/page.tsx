@@ -20,8 +20,8 @@ type PageProps = {
 };
 
 export default function EventDetailPage({ params }: PageProps) {
-    const event = useQuery(api.events.getEvent, { eventId: params.id });
-    const rsvpEvent = useMutation(api.events.rsvpEvent);
+    const event = useQuery(api.events.getEventById, { eventId: params.id });
+    const rsvpEvent = useMutation(api.events.attendEvent);
     const [isRsvping, setIsRsvping] = useState(false);
 
     const handleRsvp = async (status: 'going' | 'maybe' | 'not_going') => {

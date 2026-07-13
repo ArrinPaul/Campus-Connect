@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { initiateCall } from "@/server/db/misc"
 
@@ -16,7 +17,7 @@ export async function POST(req: Request) {
     const call = await initiateCall(userId, recipientId, type ?? "video")
     return NextResponse.json(call)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 

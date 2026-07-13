@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { getMembership } from "@/server/db/communities"
 
@@ -17,6 +18,6 @@ export async function GET(req: Request) {
     const membership = await getMembership(communityId, userId)
     return NextResponse.json(membership ?? { role: null })
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

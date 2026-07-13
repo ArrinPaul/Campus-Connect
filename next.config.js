@@ -15,10 +15,13 @@ const nextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
-      // Allow user-submitted image URLs (listings, stories, profile pictures)
       {
         protocol: "https",
-        hostname: "**",
+        hostname: "*.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "*.supabase.in",
       },
     ],
 

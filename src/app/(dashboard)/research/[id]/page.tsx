@@ -16,7 +16,7 @@ type PageProps = {
 };
 
 export default function ResearchDetailPage({ params }: PageProps) {
-    const paper = useQuery(api.papers.getPaper, { paperId: params.id });
+    const paper = useQuery(api.papers.getPaperById, { paperId: params.id });
 
     if (paper === undefined) {
         return <div className="text-center py-16">Loading...</div>;

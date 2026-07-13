@@ -29,7 +29,7 @@ const CommunitySettingsPageSkeleton = () => (
 
 function CommunitySettingsPageContent({ slug }: { slug: string }) {
     const router = useRouter();
-    const community = useQuery(api.communities.getCommunity, { slug });
+    const community = useQuery(api.communities.getCommunityBySlug, { slug });
     const updateCommunity = useMutation(api.communities.updateCommunity);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({

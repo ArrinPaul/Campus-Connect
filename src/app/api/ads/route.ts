@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { internalError } from "@/lib/api-error"
 import { createClient } from "@/lib/supabase/server"
 
 // GET /api/ads?limit=...
@@ -16,7 +17,7 @@ export async function GET(req: Request) {
     if (error) throw error
     return NextResponse.json(data ?? [])
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 
@@ -37,6 +38,6 @@ export async function POST(req: Request) {
     if (error) throw error
     return NextResponse.json(data)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

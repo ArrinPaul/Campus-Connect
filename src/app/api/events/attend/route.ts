@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { attendEvent, unattendEvent } from "@/server/db/events-jobs"
 
@@ -16,7 +17,7 @@ export async function POST(req: Request) {
     await attendEvent(eventId, userId)
     return NextResponse.json({ success: true })
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 
@@ -34,6 +35,6 @@ export async function DELETE(req: Request) {
     await unattendEvent(eventId, userId)
     return NextResponse.json({ success: true })
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

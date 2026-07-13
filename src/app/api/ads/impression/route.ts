@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { internalError } from "@/lib/api-error"
 import { trackAdImpression, trackAdClick } from "@/server/db/misc"
 
 // POST /api/ads/impression  body: { adId }
@@ -10,6 +11,6 @@ export async function POST(req: Request) {
     await trackAdImpression(adId)
     return NextResponse.json({ success: true })
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

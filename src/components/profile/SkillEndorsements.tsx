@@ -15,12 +15,12 @@ export function SkillEndorsements({
   userId,
   isOwnProfile,
 }: SkillEndorsementsProps) {
-  const endorsements = useQuery(api.skill_endorsements.getEndorsements, {
+  const endorsements = useQuery(api.skillEndorsements.getEndorsements, {
     userId,
   })
-  const endorseSkill = useMutation(api.skill_endorsements.endorseSkill)
+  const endorseSkill = useMutation(api.skillEndorsements.endorseSkill)
   const removeEndorsement = useMutation(
-    api.skill_endorsements.removeEndorsement
+    api.skillEndorsements.removeEndorsement
   )
 
   const [loadingSkill, setLoadingSkill] = useState<string | null>(null)

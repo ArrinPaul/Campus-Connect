@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { getMessages, sendMessage } from "@/server/db/messages"
 
@@ -20,7 +21,7 @@ export async function GET(req: Request) {
     const result = await getMessages(conversationId, limit, offset)
     return NextResponse.json(result)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 
@@ -44,6 +45,6 @@ export async function POST(req: Request) {
     })
     return NextResponse.json(message)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

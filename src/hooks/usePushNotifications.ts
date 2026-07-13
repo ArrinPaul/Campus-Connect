@@ -24,8 +24,8 @@ export function usePushNotifications() {
   const [isLoading, setIsLoading] = useState(true);
   const [permission, setPermission] = useState<NotificationPermission>('default');
 
-  const subscribeToPush = useMutation(api.pushNotifications.subscribeToPush);
-  const unsubscribeFromPush = useMutation(api.pushNotifications.unsubscribeFromPush);
+  const subscribeToPush = useMutation(api.pushNotifications.subscribe);
+  const unsubscribeFromPush = useMutation(api.pushNotifications.unsubscribe);
   const subscriptions = useQuery(
     api.pushNotifications.getUserSubscriptions,
     isAuthenticated ? {} : 'skip'

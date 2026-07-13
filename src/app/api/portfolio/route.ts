@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { getPortfolio, addProject } from "@/server/db/misc"
 
@@ -17,7 +18,7 @@ export async function GET(req: Request) {
     const portfolio = await getPortfolio(targetId)
     return NextResponse.json(portfolio)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
     const project = await addProject(authId, body)
     return NextResponse.json(project)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 

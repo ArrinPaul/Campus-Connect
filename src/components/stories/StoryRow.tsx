@@ -16,7 +16,7 @@ export function StoryRow() {
   const router = useRouter()
   const { isSignedIn } = useUser()
   const isAuthenticated = isSignedIn ?? false
-  const allStories = useQuery(api.stories.getStories, isAuthenticated ? {} : 'skip')
+  const allStories = useQuery(api.stories.getActiveStories, isAuthenticated ? {} : 'skip')
   const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : 'skip')
   const [composerOpen, setComposerOpen] = useState(false)
 

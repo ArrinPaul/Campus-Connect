@@ -37,7 +37,7 @@ export function CommentComposer({
   onCommentAdded,
   onCancel,
 }: CommentComposerProps) {
-  const createComment = useMutation(api.comments.createComment)
+  const createComment = useMutation(api.comments.addComment)
 
   const [content, setContent] = useState("")
   const [error, setError] = useState("")

@@ -13,8 +13,8 @@ import { cn } from '@/lib/utils';
 
 export function MyInvitesBanner() {
     const invites = useQuery(api.communities.getMyInvites);
-    const acceptInvite = useMutation(api.communities.acceptInvite);
-    const declineInvite = useMutation(api.communities.declineInvite);
+    const acceptInvite = useMutation(api.communities.respondToInvite);
+    const declineInvite = useMutation(api.communities.respondToInvite);
     const [processing, setProcessing] = useState<string | null>(null);
 
     if (!invites || invites.length === 0) return null;

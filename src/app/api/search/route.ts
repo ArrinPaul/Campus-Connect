@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { internalError } from "@/lib/api-error"
 import { universalSearch } from "@/server/db/misc"
 
 // GET /api/search?q=...&type=...&limit=...
@@ -13,6 +14,6 @@ export async function GET(req: Request) {
     const results = await universalSearch(q)
     return NextResponse.json(results)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

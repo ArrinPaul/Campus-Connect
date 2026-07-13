@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { getQuestions, createQuestion } from "@/server/db/content"
 
@@ -15,7 +16,7 @@ export async function GET(req: Request) {
     const result = await getQuestions(limit, offset, { sort: sort ?? undefined, tag: tag ?? undefined, search: search ?? undefined })
     return NextResponse.json(result)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 
@@ -31,6 +32,6 @@ export async function POST(req: Request) {
     const question = await createQuestion({ ...body, author_id: userId })
     return NextResponse.json(question)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

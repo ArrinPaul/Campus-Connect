@@ -29,7 +29,7 @@ type Props = {
 export function AnswerCard({ answer, isQuestionOwner, onAccept }: Props) {
     const answererName = answer.answerer?.name || 'Anonymous';
     const answererAvatar = answer.answerer?.profilePicture;
-    const vote = useMutation(api.questions.vote);
+    const vote = useMutation(api.questions.voteOnAnswer);
 
     const handleVote = async (voteType: 'up' | 'down') => {
         try {

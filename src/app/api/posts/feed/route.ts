@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { getFeedPosts } from "@/server/db/posts"
 
@@ -17,6 +18,6 @@ export async function GET(req: Request) {
     const posts = await getFeedPosts(userId, limit, offset)
     return NextResponse.json({ posts, hasMore: posts.length === limit })
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

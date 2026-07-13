@@ -19,7 +19,7 @@ type PageProps = {
 };
 
 export default function ListingDetailPage({ params }: PageProps) {
-    const listing = useQuery(api.marketplace.getListing, { listingId: params.id });
+    const listing = useQuery(api.marketplace.getListingById, { listingId: params.id });
     const markAsSold = useMutation(api.marketplace.markAsSold);
     const purchaseListing = useMutation(api.marketplace.purchaseListing);
     const completeTransaction = useMutation(api.marketplace.completeTransaction);

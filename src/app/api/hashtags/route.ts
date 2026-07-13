@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { internalError } from "@/lib/api-error"
 import { searchHashtags } from "@/server/db/hashtags"
 
 // GET /api/hashtags?tag=...  OR  /api/hashtags?q=...
@@ -18,6 +19,6 @@ export async function GET(req: Request) {
     if (!results.length) return NextResponse.json({ error: "Not found" }, { status: 404 })
     return NextResponse.json(results[0])
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

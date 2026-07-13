@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { internalError } from "@/lib/api-error"
 import { createClient } from "@/lib/supabase/server"
 // GET /api/ads/dashboard
 export async function GET() {
@@ -16,6 +17,6 @@ export async function GET() {
     if (error) throw error
     return NextResponse.json(data ?? [])
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

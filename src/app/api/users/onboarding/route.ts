@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { completeOnboarding } from "@/server/db/users"
 
@@ -24,6 +25,6 @@ export async function POST(req: Request) {
     const dbUser = await completeOnboarding(userId, payload)
     return NextResponse.json(dbUser)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

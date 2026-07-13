@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { isBookmarked } from "@/server/db/bookmarks"
 
@@ -17,7 +18,7 @@ export async function GET(req: Request) {
     const bookmarked = await isBookmarked(userId, postId)
     return NextResponse.json({ isBookmarked: bookmarked })
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 

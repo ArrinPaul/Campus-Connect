@@ -17,7 +17,7 @@ type PageProps = {
 };
 
 export default function JobDetailPage({ params }: PageProps) {
-    const job = useQuery(api.jobs.getJob, { jobId: params.id });
+    const job = useQuery(api.jobs.getJobById, { jobId: params.id });
     const applyToJob = useMutation(api.jobs.applyToJob);
     const [isApplying, setIsApplying] = useState(false);
 

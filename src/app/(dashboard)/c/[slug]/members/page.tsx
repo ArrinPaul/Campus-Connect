@@ -46,7 +46,7 @@ function MemberActionMenu({ member, communityId, viewerRole }: { member: Member;
     const [open, setOpen] = useState(false);
     const removeMember = useMutation(api.communities.removeMember);
     const updateMemberRole = useMutation(api.communities.updateMemberRole);
-    const approveJoinRequest = useMutation(api.communities.approveJoinRequest);
+    const approveJoinRequest = useMutation(api.communities.approveMember);
 
     // Only admins and owners can moderate
     if (viewerRole !== 'owner' && viewerRole !== 'admin') return null;
@@ -210,7 +210,7 @@ function CommunityMembersPageContent({ slug }: { slug: string }) {
     const [showPending, setShowPending] = useState(false);
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [showInvites, setShowInvites] = useState(false);
-    const community = useQuery(api.communities.getCommunity, { slug });
+    const community = useQuery(api.communities.getCommunityBySlug, { slug });
     const viewerRole = (community as any)?.viewerRole || null;
     const isAdmin = viewerRole === 'owner' || viewerRole === 'admin';
 

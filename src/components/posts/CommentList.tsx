@@ -75,7 +75,7 @@ export function CommentList({
 }: CommentListProps) {
   const { isLoaded, isSignedIn } = useUser()
   const deleteComment = useMutation(api.comments.deleteComment)
-  const createComment = useMutation(api.comments.createComment)
+  const createComment = useMutation(api.comments.addComment)
   const currentUser = useQuery(
     api.users.getCurrentUser,
     isLoaded && isSignedIn ? {} : "skip"

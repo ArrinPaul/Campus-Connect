@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { createPost } from "@/server/db/posts"
 
@@ -23,6 +24,6 @@ export async function POST(req: Request) {
     })
     return NextResponse.json(post, { status: 201 })
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

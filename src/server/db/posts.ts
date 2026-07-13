@@ -208,68 +208,40 @@ export async function deletePost(postId: string): Promise<void> {
 
 export async function incrementLikeCount(postId: string): Promise<void> {
   const supabase = await getSupabase()
-  try {
-    await supabase.rpc("increment_field", {
-      table_name: "posts",
-      field_name: "like_count",
-      row_id: postId,
-    })
-  } catch {
-    const { data } = await supabase
-      .from("posts")
-      .select("like_count")
-      .eq("id", postId)
-      .single()
-    if (data) {
-      await supabase
-        .from("posts")
-        .update({ like_count: (data.like_count ?? 0) + 1 })
-        .eq("id", postId)
-    }
-  }
+  await supabase.rpc("increment_field", {
+    table_name: "posts",
+    field_name: "like_count",
+    row_id: postId,
+    increment_by: 1,
+  })
 }
 
 export async function decrementLikeCount(postId: string): Promise<void> {
   const supabase = await getSupabase()
-  const { data } = await supabase
-    .from("posts")
-    .select("like_count")
-    .eq("id", postId)
-    .single()
-  if (data) {
-    await supabase
-      .from("posts")
-      .update({ like_count: Math.max(0, (data.like_count ?? 0) - 1) })
-      .eq("id", postId)
-  }
+  await supabase.rpc("increment_field", {
+    table_name: "posts",
+    field_name: "like_count",
+    row_id: postId,
+    increment_by: -1,
+  })
 }
 
 export async function incrementCommentCount(postId: string): Promise<void> {
   const supabase = await getSupabase()
-  const { data } = await supabase
-    .from("posts")
-    .select("comment_count")
-    .eq("id", postId)
-    .single()
-  if (data) {
-    await supabase
-      .from("posts")
-      .update({ comment_count: (data.comment_count ?? 0) + 1 })
-      .eq("id", postId)
-  }
+  await supabase.rpc("increment_field", {
+    table_name: "posts",
+    field_name: "comment_count",
+    row_id: postId,
+    increment_by: 1,
+  })
 }
 
 export async function incrementShareCount(postId: string): Promise<void> {
   const supabase = await getSupabase()
-  const { data } = await supabase
-    .from("posts")
-    .select("share_count")
-    .eq("id", postId)
-    .single()
-  if (data) {
-    await supabase
-      .from("posts")
-      .update({ share_count: (data.share_count ?? 0) + 1 })
-      .eq("id", postId)
-  }
+  await supabase.rpc("increment_field", {
+    table_name: "posts",
+    field_name: "share_count",
+    row_id: postId,
+    increment_by: 1,
+  })
 }

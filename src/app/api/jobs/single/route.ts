@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { internalError } from "@/lib/api-error"
 import { getJobById } from "@/server/db/events-jobs"
 
 // GET /api/jobs/single?id=...
@@ -12,6 +13,6 @@ export async function GET(req: Request) {
     if (!job) return NextResponse.json({ error: "Not found" }, { status: 404 })
     return NextResponse.json(job)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

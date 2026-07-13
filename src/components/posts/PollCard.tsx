@@ -31,9 +31,9 @@ function formatVoteCount(n: number): string {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function PollCard({ pollId }: PollCardProps) {
-  const poll = useQuery(api.polls.getPollResults, { pollId })
+  const poll = useQuery(api.polls.getPoll, { pollId })
   const userVote = useQuery(api.polls.getUserVote, { pollId })
-  const voteMutation = useMutation(api.polls.vote)
+  const voteMutation = useMutation(api.polls.votePoll)
 
   const [optimisticVote, setOptimisticVote] = useState<string | null>(null)
   const [isVoting, setIsVoting] = useState(false)

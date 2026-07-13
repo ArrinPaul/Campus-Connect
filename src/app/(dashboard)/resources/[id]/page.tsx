@@ -79,7 +79,7 @@ function ResourceDetailContent({ id }: { id: string }) {
     const { isSignedIn } = useUser();
     const isAuthenticated = isSignedIn ?? false;
     const resource = useQuery(
-        api.resources.getResource,
+        api.resources.getResourceById,
         isAuthenticated ? { resourceId: id as Id<'resources'> } : 'skip'
     );
     const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : 'skip');

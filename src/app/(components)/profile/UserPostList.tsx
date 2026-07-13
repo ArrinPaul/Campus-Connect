@@ -7,7 +7,7 @@ import { PostCard } from '../../(components)/feed/PostCard';
 import type { FeedItem } from '../../(components)/feed/types';
 
 export function UserPostList({ userId }: { userId: Id<'users'> }) {
-    const posts = useQuery(api.posts.getPostsByUserId, { userId });
+    const posts = useQuery(api.posts.getUserPosts, { userId });
 
     if (posts === undefined) {
         return (

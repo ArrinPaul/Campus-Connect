@@ -22,7 +22,7 @@ const StoriesPageSkeleton = () => (
 );
 
 function StoriesPageContent() {
-    const stories = useQuery(api.stories.getStories, {});
+    const stories = useQuery(api.stories.getActiveStories, {});
     const [composerOpen, setComposerOpen] = useState(false);
 
     if (stories === undefined) {

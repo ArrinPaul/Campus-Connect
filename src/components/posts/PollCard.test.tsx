@@ -7,9 +7,9 @@ jest.mock("@/lib/api", () => ({
   useMutation: jest.fn(() => jest.fn()),
   api: {
     polls: {
-      getPollResults: "polls:getPollResults",
+      getPoll: "polls:getPoll",
       getUserVote: "polls:getUserVote",
-      vote: "polls:vote",
+      votePoll: "polls:votePoll",
     },
   },
 }))
@@ -54,7 +54,7 @@ describe("PollCard", () => {
 
   it("renders nothing when poll is null (deleted)", () => {
     ;(useQuery as jest.Mock).mockImplementation((query: string) => {
-      if (query === "polls:getPollResults") return null
+      if (query === "polls:getPoll") return null
       return null
     })
     const { container } = render(<PollCard pollId={mockPollId} />)
@@ -63,7 +63,7 @@ describe("PollCard", () => {
 
   it("shows vote options as clickable buttons when user has not voted", () => {
     ;(useQuery as jest.Mock).mockImplementation((query: string) => {
-      if (query === "polls:getPollResults") return makePoll()
+      if (query === "polls:getPoll") return makePoll()
       return null // no user vote
     })
     render(<PollCard pollId={mockPollId} />)
@@ -74,7 +74,7 @@ describe("PollCard", () => {
 
   it("shows progress bars with percentages after user has voted", () => {
     ;(useQuery as jest.Mock).mockImplementation((query: string) => {
-      if (query === "polls:getPollResults") return makePoll()
+      if (query === "polls:getPoll") return makePoll()
       return "opt_a" // user has voted
     })
     render(<PollCard pollId={mockPollId} />)
@@ -86,7 +86,7 @@ describe("PollCard", () => {
 
   it("shows total vote count", () => {
     ;(useQuery as jest.Mock).mockImplementation((query: string) => {
-      if (query === "polls:getPollResults") return makePoll()
+      if (query === "polls:getPoll") return makePoll()
       return "opt_a"
     })
     render(<PollCard pollId={mockPollId} />)
@@ -97,7 +97,7 @@ describe("PollCard", () => {
     const mockVote = jest.fn().mockResolvedValue(undefined)
     ;(useMutation as jest.Mock).mockReturnValue(mockVote)
     ;(useQuery as jest.Mock).mockImplementation((query: string) => {
-      if (query === "polls:getPollResults") return makePoll()
+      if (query === "polls:getPoll") return makePoll()
       return null
     })
     render(<PollCard pollId={mockPollId} />)
@@ -113,7 +113,7 @@ describe("PollCard", () => {
 
   it("shows 'Final Results' badge when poll is expired", () => {
     ;(useQuery as jest.Mock).mockImplementation((query: string) => {
-      if (query === "polls:getPollResults")
+      if (query === "polls:getPoll")
         return makePoll({ isExpired: true, endsAt: Date.now() - 1000 })
       return null
     })
@@ -123,7 +123,7 @@ describe("PollCard", () => {
 
   it("shows time remaining when poll is active and has endsAt", () => {
     ;(useQuery as jest.Mock).mockImplementation((query: string) => {
-      if (query === "polls:getPollResults")
+      if (query === "polls:getPoll")
         return makePoll({ endsAt: Date.now() + 3 * 3_600_000 }) // 3h from now
       return null
     })
@@ -133,7 +133,7 @@ describe("PollCard", () => {
 
   it("shows anonymous badge when poll.isAnonymous is true", () => {
     ;(useQuery as jest.Mock).mockImplementation((query: string) => {
-      if (query === "polls:getPollResults") return makePoll({ isAnonymous: true })
+      if (query === "polls:getPoll") return makePoll({ isAnonymous: true })
       return null
     })
     render(<PollCard pollId={mockPollId} />)
@@ -142,7 +142,7 @@ describe("PollCard", () => {
 
   it("shows optional question text when provided", () => {
     ;(useQuery as jest.Mock).mockImplementation((query: string) => {
-      if (query === "polls:getPollResults")
+      if (query === "polls:getPoll")
         return makePoll({ question: "What is your favorite color?" })
       return null
     })
@@ -152,7 +152,7 @@ describe("PollCard", () => {
 
   it("shows checkmark on the option the user voted for", () => {
     ;(useQuery as jest.Mock).mockImplementation((query: string) => {
-      if (query === "polls:getPollResults") return makePoll()
+      if (query === "polls:getPoll") return makePoll()
       return "opt_b" // voted for opt_b
     })
     render(<PollCard pollId={mockPollId} />)
@@ -164,7 +164,7 @@ describe("PollCard", () => {
 
   it("shows 'Vote to see results' hint when user has not voted", () => {
     ;(useQuery as jest.Mock).mockImplementation((query: string) => {
-      if (query === "polls:getPollResults") return makePoll()
+      if (query === "polls:getPoll") return makePoll()
       return null
     })
     render(<PollCard pollId={mockPollId} />)

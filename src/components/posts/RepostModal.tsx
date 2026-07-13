@@ -36,7 +36,7 @@ interface RepostModalProps {
  * - Plain repost or quote post options
  */
 export function RepostModal({ post, isOpen, onClose, onSuccess }: RepostModalProps) {
-  const createRepost = useMutation(api.reposts.createRepost)
+  const createRepost = useMutation(api.reposts.repost)
   
   const [quoteContent, setQuoteContent] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)

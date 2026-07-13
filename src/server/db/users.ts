@@ -15,6 +15,8 @@ export interface DbUser {
   projects?: { title: string; url: string; description: string }[]
   certifications?: { name: string; issuer: string; date: string; url: string }[]
   social_links?: Record<string, string>
+  privacy_settings?: Record<string, unknown>
+  notification_preferences?: Record<string, boolean>
   follower_count?: number
   following_count?: number
   post_count?: number
@@ -58,10 +60,12 @@ export async function searchUsers(
   viewerId?: string
 ): Promise<DbUser[]> {
   const supabase = await getSupabase()
+  // Escape ILIKE special characters to prevent pattern injection
+  const escaped = query.replace(/[%_]/g, (m) => `\\${m}`)
   let q = supabase
     .from("users")
     .select("*")
-    .or(`name.ilike.%${query}%,username.ilike.%${query}%,email.ilike.%${query}%`)
+    .or(`name.ilike.%${escaped}%,username.ilike.%${escaped}%,email.ilike.%${escaped}%`)
     .order("follower_count", { ascending: false })
     .limit(limit)
   if (viewerId) {
@@ -180,7 +184,7 @@ export async function updatePrivacySettings(
   const supabase = await getSupabase()
   await supabase
     .from("users")
-    .update({ social_links: settings })
+    .update({ privacy_settings: settings })
     .eq("id", userId)
 }
 
@@ -191,7 +195,7 @@ export async function updateNotificationPreferences(
   const supabase = await getSupabase()
   await supabase
     .from("users")
-    .update({ social_links: prefs })
+    .update({ notification_preferences: prefs })
     .eq("id", userId)
 }
 

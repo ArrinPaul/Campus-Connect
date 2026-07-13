@@ -15,7 +15,7 @@ type ActivityFilter = 'all' | 'posts' | 'comments' | 'likes';
 export function UserActivityFeed({ userId }: { userId: Id<'users'> }) {
     const [filter, setFilter] = useState<ActivityFilter>('all');
 
-    const posts = useQuery(api.posts.getPostsByUserId, { userId, limit: 20 });
+    const posts = useQuery(api.posts.getUserPosts, { userId, limit: 20 });
     const comments = useQuery(api.comments.getCommentsByUser, { userId, limit: 20 });
 
     const isLoading = posts === undefined || comments === undefined;

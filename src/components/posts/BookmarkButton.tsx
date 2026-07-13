@@ -42,8 +42,8 @@ export function BookmarkButton({
   const addBookmark = useMutation(api.bookmarks.addBookmark)
   const removeBookmark = useMutation(api.bookmarks.removeBookmark)
   const isBookmarked = useQuery(api.bookmarks.isBookmarked, { postId })
-  const bookmarkDetails = useQuery(api.bookmarks.getBookmarkDetails, { postId })
-  const collections = useQuery(api.bookmarks.getCollections)
+  const bookmarkDetails = useQuery(api.bookmarks.getBookmarks, { postId })
+  const collections = useQuery(api.bookmarks.getBookmarkCollections)
 
   const handleToggleBookmark = async () => {
     try {

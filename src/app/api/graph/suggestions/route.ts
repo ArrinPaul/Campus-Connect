@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { internalError } from "@/lib/api-error"
 import { createClient } from "@/lib/supabase/server"
 
 export async function GET(req: Request) {
@@ -49,6 +50,6 @@ export async function GET(req: Request) {
 
     return NextResponse.json(formatted)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

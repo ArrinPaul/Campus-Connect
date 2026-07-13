@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { getUserById, updateUser, deleteUserAccount } from "@/server/db/users"
 
@@ -15,7 +16,7 @@ export async function GET() {
 
     return NextResponse.json(dbUser)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 
@@ -28,10 +29,35 @@ export async function PATCH(req: Request) {
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const body = await req.json()
-    const dbUser = await updateUser(userId, body)
+
+    // Whitelist allowed fields — never allow is_admin, follower_count, post_count, etc.
+    const allowedFields = [
+      "name",
+      "username",
+      "bio",
+      "university",
+      "role",
+      "experience_level",
+      "profile_picture",
+      "social_links",
+      "skills",
+    ] as const
+
+    const safeUpdate: Record<string, unknown> = {}
+    for (const key of allowedFields) {
+      if (key in body) {
+        safeUpdate[key] = body[key]
+      }
+    }
+
+    if (Object.keys(safeUpdate).length === 0) {
+      return NextResponse.json({ error: "No valid fields to update" }, { status: 400 })
+    }
+
+    const dbUser = await updateUser(userId, safeUpdate)
     return NextResponse.json(dbUser)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 
@@ -46,6 +72,6 @@ export async function DELETE() {
     await deleteUserAccount(userId)
     return NextResponse.json({ success: true })
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

@@ -30,7 +30,7 @@ export function NotificationBell() {
   const { isSignedIn } = useUser()
   const isAuthenticated = isSignedIn ?? false
   const unreadCount = useQuery(api.notifications.getUnreadCount, isAuthenticated ? {} : 'skip')
-  const recentNotifications = useQuery(api.notifications.getRecentNotifications, isAuthenticated ? {} : 'skip')
+  const recentNotifications = useQuery(api.notifications.getNotifications, isAuthenticated ? {} : 'skip')
 
   // Close dropdown when clicking outside
   useEffect(() => {

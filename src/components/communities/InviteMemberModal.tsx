@@ -30,7 +30,7 @@ export function InviteMemberModal({ communityId, communityName, onClose }: Invit
     }, [searchQuery]);
 
     const searchResults = useQuery(
-        api.search.searchUsersEnhanced,
+        api.search.searchUsers,
         debouncedQuery.length >= 2 ? { query: debouncedQuery } : 'skip'
     );
 

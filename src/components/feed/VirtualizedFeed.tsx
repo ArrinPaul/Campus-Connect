@@ -6,6 +6,7 @@ import { PostCard } from "@/components/posts/PostCard"
 import { InfiniteScrollTrigger } from "./InfiniteScrollTrigger"
 import { Repeat2 } from "lucide-react"
 import type { FeedItem } from "@/app/(components)/feed/types"
+import type { Post, PostAuthor } from "@/types"
 
 type FeedQueryItem = FeedItem & {
   reposter?: { name?: string; username?: string } | null
@@ -73,7 +74,7 @@ export function VirtualizedFeed({
               style={{ top: `${virtualItem.start}px` }}
             >
               {item.type === "post" && item.post.author && (
-                <PostCard post={item.post} author={item.post.author} />
+                <PostCard post={item.post as unknown as Post} author={item.post.author as unknown as PostAuthor} />
               )}
 
               {(item as any).type === "repost" &&
@@ -95,8 +96,8 @@ export function VirtualizedFeed({
                       </div>
                     )}
                     <PostCard
-                      post={item.post}
-                      author={item.post.author}
+                      post={item.post as unknown as Post}
+                      author={item.post.author as unknown as PostAuthor}
                     />
                   </div>
                 )}

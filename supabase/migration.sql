@@ -25,6 +25,8 @@ CREATE TABLE IF NOT EXISTS users (
   post_count INT DEFAULT 0,
   onboarding_completed BOOLEAN DEFAULT FALSE,
   is_admin BOOLEAN DEFAULT FALSE,
+  privacy_settings JSONB DEFAULT '{}',
+  notification_preferences JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -94,7 +96,7 @@ CREATE TABLE IF NOT EXISTS conversations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   type TEXT DEFAULT 'direct' CHECK (type IN ('direct', 'group')),
   name TEXT,
-  created_by UUID REFERENCES users(id),
+  created_by UUID REFERENCES users(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -498,6 +500,22 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 );
 
 -- ============================================================================
+-- 37. CONTENT REPORTS
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS content_reports (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  reporter_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  target_id UUID NOT NULL,
+  target_type TEXT NOT NULL CHECK (target_type IN ('post', 'comment', 'message', 'user')),
+  reason TEXT NOT NULL CHECK (reason IN ('spam', 'harassment', 'hate_speech', 'inappropriate', 'misinformation', 'other')),
+  description TEXT DEFAULT '',
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'reviewed', 'resolved', 'dismissed')),
+  reviewed_by UUID REFERENCES users(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(reporter_id, target_id, target_type)
+);
+
+-- ============================================================================
 -- INDEXES
 -- ============================================================================
 CREATE INDEX IF NOT EXISTS idx_posts_author ON posts(author_id);
@@ -524,6 +542,9 @@ CREATE INDEX IF NOT EXISTS idx_events_start ON events(start_time);
 CREATE INDEX IF NOT EXISTS idx_marketplace_status ON marketplace_listings(status);
 CREATE INDEX IF NOT EXISTS idx_questions_author ON questions(author_id);
 CREATE INDEX IF NOT EXISTS idx_research_papers_author ON research_papers(uploaded_by);
+CREATE INDEX IF NOT EXISTS idx_posts_feed ON posts(created_at DESC, author_id);
+CREATE INDEX IF NOT EXISTS idx_content_reports_status ON content_reports(status);
+CREATE INDEX IF NOT EXISTS idx_content_reports_target ON content_reports(target_id, target_type);
 
 -- ============================================================================
 -- ROW LEVEL SECURITY (RLS)
@@ -566,6 +587,7 @@ ALTER TABLE portfolio_projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE portfolio_certifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE content_reports ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================================
 -- RLS POLICIES
@@ -686,9 +708,10 @@ CREATE POLICY "Record story views" ON story_views FOR INSERT WITH CHECK (auth.ui
 CREATE POLICY "View story stats" ON story_views FOR SELECT
   USING (EXISTS (SELECT 1 FROM stories WHERE id = story_id AND author_id = auth.uid()));
 
--- NOTIFICATIONS: only owner can read/update
+-- NOTIFICATIONS: only owner can read/update, server can insert
 CREATE POLICY "Own notifications" ON notifications FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Update own notifications" ON notifications FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Insert notifications" ON notifications FOR INSERT WITH CHECK (true);
 
 -- BOOKMARKS: only self can read/create/delete
 CREATE POLICY "Own bookmarks" ON bookmarks FOR SELECT USING (auth.uid() = user_id);
@@ -782,9 +805,34 @@ CREATE POLICY "Own subscriptions" ON subscriptions FOR SELECT USING (auth.uid() 
 CREATE POLICY "Create subscription" ON subscriptions FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Update own subscription" ON subscriptions FOR UPDATE USING (auth.uid() = user_id);
 
+-- CONTENT REPORTS: reporter can read own, admin can read all
+CREATE POLICY "View own reports" ON content_reports FOR SELECT
+  USING (auth.uid() = reporter_id OR EXISTS (
+    SELECT 1 FROM users WHERE id = auth.uid() AND is_admin = true
+  ));
+CREATE POLICY "Create reports" ON content_reports FOR INSERT WITH CHECK (auth.uid() = reporter_id);
+CREATE POLICY "Admin update reports" ON content_reports FOR UPDATE
+  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND is_admin = true));
+
 -- ============================================================================
 -- FUNCTIONS
 -- ============================================================================
+
+-- Atomic increment/decrement for counter fields (avoids race conditions)
+CREATE OR REPLACE FUNCTION increment_field(
+  table_name TEXT,
+  field_name TEXT,
+  row_id UUID,
+  increment_by INT DEFAULT 1
+)
+RETURNS VOID AS $$
+BEGIN
+  EXECUTE format(
+    'UPDATE %I SET %I = GREATEST(0, %I + $1) WHERE id = $2',
+    table_name, field_name, field_name
+  ) USING increment_by, row_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Auto-update updated_at on row changes
 CREATE OR REPLACE FUNCTION update_updated_at()

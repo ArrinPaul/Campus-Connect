@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { internalError } from "@/lib/api-error"
 import { getEndorsements } from "@/server/db/misc"
 
 // GET /api/skills/endorsements?userId=...
@@ -11,6 +12,6 @@ export async function GET(req: Request) {
     const endorsements = await getEndorsements(userId)
     return NextResponse.json(endorsements)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { updatePost } from "@/server/db/posts"
 
@@ -16,6 +17,6 @@ export async function PATCH(req: Request) {
     const post = await updatePost(postId, content)
     return NextResponse.json(post)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

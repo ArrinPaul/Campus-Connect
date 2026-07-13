@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 
 export async function GET() {
@@ -8,8 +9,8 @@ export async function GET() {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { data: userData } = await supabase.from("users").select("role").eq("id", userId).single()
-    if (!userData || userData.role !== "admin") {
+    const { data: userData } = await supabase.from("users").select("is_admin").eq("id", userId).single()
+    if (!userData || !userData.is_admin) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
@@ -17,7 +18,7 @@ export async function GET() {
     
     return NextResponse.json(data ?? [])
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 
@@ -28,8 +29,8 @@ export async function POST(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { data: userData } = await supabase.from("users").select("role").eq("id", userId).single()
-    if (!userData || userData.role !== "admin") {
+    const { data: userData } = await supabase.from("users").select("is_admin").eq("id", userId).single()
+    if (!userData || !userData.is_admin) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
@@ -41,11 +42,11 @@ export async function POST(req: Request) {
     } else if (action === "suspend") {
       await supabase.from("users").update({ role: "suspended" }).eq("id", targetUserId)
     } else if (action === "restore") {
-      await supabase.from("users").update({ role: "student" }).eq("id", targetUserId)
+      await supabase.from("users").update({ role: "Student" }).eq("id", targetUserId)
     }
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

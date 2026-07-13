@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { getPapers, uploadPaper } from "@/server/db/content"
 
@@ -12,7 +13,7 @@ export async function GET(req: Request) {
     const result = await getPapers(limit, 0, tag)
     return NextResponse.json(result)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 
@@ -28,6 +29,6 @@ export async function POST(req: Request) {
     const paper = await uploadPaper({ ...body, uploaded_by: userId })
     return NextResponse.json(paper)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

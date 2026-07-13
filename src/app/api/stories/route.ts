@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { getActiveStories, createStory } from "@/server/db/content"
 
@@ -13,7 +14,7 @@ export async function GET() {
     const stories = await getActiveStories()
     return NextResponse.json(stories)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 
@@ -29,6 +30,6 @@ export async function POST(req: Request) {
     const story = await createStory({ ...body, author_id: userId })
     return NextResponse.json(story)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

@@ -26,7 +26,8 @@ function getBaseUrl(path: string): string {
 }
 
 export type Id<_T extends string = string> = string
-export type Doc<_T extends string = string> = any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Doc<_T extends string = string> = Record<string, any>
 
 export interface Endpoint {
   readonly _path: string
@@ -108,7 +109,9 @@ export function useMutation<A = any, T = any>(
       return res.json() as T
     },
     onSuccess: () => {
-      queryClient.invalidateQueries()
+      // Invalidate queries related to this endpoint's path prefix
+      const pathPrefix = endpoint._path.split("/").slice(0, 3).join("/")
+      queryClient.invalidateQueries({ queryKey: [pathPrefix] })
     },
   })
 
@@ -140,7 +143,6 @@ export const api = {
     getCurrentUser: ep("/api/users/me"),
     getUserById: ep("/api/users/profile"),
     searchUsers: ep("/api/users/search"),
-    searchUsersByUsername: ep("/api/users/search"),
     updateProfile: ep("/api/users/me", "PATCH"),
     addSkill: ep("/api/users/skills", "POST"),
     removeSkill: ep("/api/users/skills", "DELETE"),
@@ -156,7 +158,6 @@ export const api = {
       "/api/users/notification-preferences",
       "PATCH"
     ),
-    getBillingInfo: ep("/api/subscriptions"),
     getSubscription: ep("/api/subscriptions"),
   },
 
@@ -172,14 +173,12 @@ export const api = {
     getPostsByHashtag: ep("/api/posts/hashtag"),
     getPostsByCommunity: ep("/api/posts/community"),
     getUserActivityFeed: ep("/api/posts/activity"),
-    getPostsByUserId: ep("/api/posts/user"),
   },
 
   // ── comments ───────────────────────────────────────────────────────────────
   comments: {
     getPostComments: ep("/api/comments"),
     addComment: ep("/api/comments", "POST"),
-    createComment: ep("/api/comments", "POST"),
     deleteComment: ep("/api/comments/delete", "DELETE"),
     getReplies: ep("/api/comments/replies"),
     getCommentsByUser: ep("/api/comments/user"),
@@ -210,16 +209,13 @@ export const api = {
     addBookmark: ep("/api/bookmarks", "POST"),
     removeBookmark: ep("/api/bookmarks/remove", "DELETE"),
     getBookmarks: ep("/api/bookmarks"),
-    getBookmarkDetails: ep("/api/bookmarks"),
     getBookmarkCollections: ep("/api/bookmarks/collections"),
-    getCollections: ep("/api/bookmarks/collections"),
     isBookmarked: ep("/api/bookmarks/check"),
   },
 
   // ── notifications ──────────────────────────────────────────────────────────
   notifications: {
     getNotifications: ep("/api/notifications"),
-    getRecentNotifications: ep("/api/notifications"),
     markAsRead: ep("/api/notifications/read", "POST"),
     markAllAsRead: ep("/api/notifications/read-all", "POST"),
     getUnreadCount: ep("/api/notifications/unread-count"),
@@ -253,12 +249,6 @@ export const api = {
     demoteFromAdmin: ep("/api/conversations/admin", "DELETE"),
     leaveGroup: ep("/api/conversations/leave", "POST"),
     getTotalUnreadCount: ep("/api/conversations/unread"),
-    getConversationById: ep("/api/conversations/single"),
-    createGroupConversation: ep("/api/conversations/group", "POST"),
-    updateGroup: ep("/api/conversations/group", "PATCH"),
-    leaveConversation: ep("/api/conversations/leave", "POST"),
-    addParticipant: ep("/api/conversations/participants", "POST"),
-    removeParticipant: ep("/api/conversations/participants", "DELETE"),
     muteConversation: ep("/api/conversations/mute", "POST"),
     getUnreadCount: ep("/api/conversations/unread-count"),
   },
@@ -288,21 +278,16 @@ export const api = {
     joinCommunity: ep("/api/communities/join", "POST"),
     inviteUser: ep("/api/communities/invite", "POST"),
     getCommunityInvites: ep("/api/communities/invites"),
-    acceptInvite: ep("/api/communities/invite/respond", "POST"),
-    declineInvite: ep("/api/communities/invite/respond", "POST"),
+    respondToInvite: ep("/api/communities/invite/respond", "POST"),
     leaveCommunity: ep("/api/communities/leave", "POST"),
     updateCommunity: ep("/api/communities/update", "PATCH"),
     getCommunityMembers: ep("/api/communities/members"),
-    inviteMember: ep("/api/communities/invite", "POST"),
     revokeInvite: ep("/api/communities/invite/revoke", "DELETE"),
-    respondToInvite: ep("/api/communities/invite/respond", "POST"),
     getMyInvites: ep("/api/communities/my-invites"),
     approveMember: ep("/api/communities/members/approve", "POST"),
-    approveJoinRequest: ep("/api/communities/members/approve", "POST"),
     removeMember: ep("/api/communities/members/remove", "POST"),
     updateMemberRole: ep("/api/communities/members/role", "PATCH"),
     getMembership: ep("/api/communities/membership"),
-    getCommunity: ep("/api/communities/slug"),
   },
 
   // ── events ─────────────────────────────────────────────────────────────────
@@ -313,10 +298,8 @@ export const api = {
     updateEvent: ep("/api/events/update", "PATCH"),
     deleteEvent: ep("/api/events/delete", "DELETE"),
     attendEvent: ep("/api/events/attend", "POST"),
-    rsvpEvent: ep("/api/events/attend", "POST"),
     unattendEvent: ep("/api/events/attend", "DELETE"),
     getMyEvents: ep("/api/events/my-events"),
-    getEvent: ep("/api/events/single"),
     getUpcomingEvents: ep("/api/events/upcoming"),
   },
 
@@ -325,21 +308,16 @@ export const api = {
     getJobs: ep("/api/jobs"),
     getJobById: ep("/api/jobs/single"),
     createJob: ep("/api/jobs", "POST"),
-    postJob: ep("/api/jobs", "POST"),
     updateJob: ep("/api/jobs/update", "PATCH"),
     deleteJob: ep("/api/jobs/delete", "DELETE"),
     applyToJob: ep("/api/jobs/apply", "POST"),
     getMyApplications: ep("/api/jobs/applications"),
-    getUserApplications: ep("/api/jobs/applications"),
     getJobApplications: ep("/api/jobs/job-applications"),
-    searchJobs: ep("/api/jobs"),
-    getJob: ep("/api/jobs/single"),
   },
 
   // ── stories ────────────────────────────────────────────────────────────────
   stories: {
     getActiveStories: ep("/api/stories"),
-    getStories: ep("/api/stories"),
     getUserStories: ep("/api/stories/user"),
     createStory: ep("/api/stories", "POST"),
     viewStory: ep("/api/stories/view", "POST"),
@@ -352,7 +330,6 @@ export const api = {
     getQuestions: ep("/api/questions"),
     askQuestion: ep("/api/questions", "POST"),
     getQuestionById: ep("/api/questions/single"),
-    createQuestion: ep("/api/questions", "POST"),
     updateQuestion: ep("/api/questions/update", "PATCH"),
     deleteQuestion: ep("/api/questions/delete", "DELETE"),
     answerQuestion: ep("/api/questions/answer", "POST"),
@@ -360,10 +337,7 @@ export const api = {
     markAnswerAccepted: ep("/api/questions/accept", "POST"),
     searchQuestions: ep("/api/questions/search"),
     getAnswers: ep("/api/questions/answers"),
-    getQuestion: ep("/api/questions/single"),
     incrementViewCount: ep("/api/questions/view", "POST"),
-    vote: ep("/api/questions/vote", "POST"),
-    acceptAnswer: ep("/api/questions/accept", "POST"),
   },
 
   // ── resources ──────────────────────────────────────────────────────────────
@@ -374,7 +348,6 @@ export const api = {
     updateResource: ep("/api/resources/update", "PATCH"),
     deleteResource: ep("/api/resources/delete", "DELETE"),
     downloadResource: ep("/api/resources/download", "POST"),
-    getResource: ep("/api/resources/single"),
     rateResource: ep("/api/resources/rate", "POST"),
   },
 
@@ -388,7 +361,6 @@ export const api = {
     votePaper: ep("/api/research/vote", "POST"),
     searchPapers: ep("/api/research/search"),
     addReview: ep("/api/research/review", "POST"),
-    getPaper: ep("/api/research/single"),
   },
 
   // ── marketplace ────────────────────────────────────────────────────────────
@@ -401,7 +373,6 @@ export const api = {
     contactSeller: ep("/api/marketplace/contact", "POST"),
     markAsSold: ep("/api/marketplace/sold", "POST"),
     getMyListings: ep("/api/marketplace/my-listings"),
-    getListing: ep("/api/marketplace/single"),
     purchaseListing: ep("/api/marketplace/purchase", "POST"),
     completeTransaction: ep("/api/marketplace/complete", "POST"),
     cancelTransaction: ep("/api/marketplace/cancel", "POST"),
@@ -411,18 +382,15 @@ export const api = {
   // ── polls ──────────────────────────────────────────────────────────────────
   polls: {
     getPoll: ep("/api/polls/single"),
-    getPollResults: ep("/api/polls/single"),
     getUserVote: ep("/api/polls/user-vote"),
     createPoll: ep("/api/polls", "POST"),
     votePoll: ep("/api/polls/vote", "POST"),
-    vote: ep("/api/polls/vote", "POST"),
     linkPollToPost: ep("/api/polls/link", "POST"),
   },
 
   // ── reposts ────────────────────────────────────────────────────────────────
   reposts: {
     repost: ep("/api/reposts", "POST"),
-    createRepost: ep("/api/reposts", "POST"),
     undoRepost: ep("/api/reposts/undo", "DELETE"),
     isReposted: ep("/api/reposts/check"),
   },
@@ -433,9 +401,6 @@ export const api = {
     getUserStatuses: ep("/api/presence"),
     setOnlineStatus: ep("/api/presence/status", "POST"),
     getTypingUsers: ep("/api/presence/typing"),
-    getUserPresence: ep("/api/presence"),
-    updateStatus: ep("/api/presence/status", "POST"),
-    setCustomStatus: ep("/api/presence/status", "POST"),
     heartbeat: ep("/api/presence/heartbeat", "POST"),
     setTyping: ep("/api/presence/typing", "POST"),
   },
@@ -445,11 +410,9 @@ export const api = {
     initiateCall: ep("/api/calls", "POST"),
     acceptCall: ep("/api/calls/accept", "POST"),
     getIncomingCalls: ep("/api/calls/incoming"),
-    answerCall: ep("/api/calls/answer", "POST"),
     endCall: ep("/api/calls/end", "POST"),
     rejectCall: ep("/api/calls/reject", "POST"),
     getActiveCall: ep("/api/calls/active"),
-    getIncomingCall: ep("/api/calls/incoming"),
   },
 
   // ── ads ────────────────────────────────────────────────────────────────────
@@ -470,7 +433,6 @@ export const api = {
   // ── portfolio ──────────────────────────────────────────────────────────────
   portfolio: {
     getPortfolio: ep("/api/portfolio"),
-    getOtherUserPortfolio: ep("/api/portfolio"),
     addProject: ep("/api/portfolio/projects", "POST"),
     updateProject: ep("/api/portfolio/projects", "PATCH"),
     deleteProject: ep("/api/portfolio/projects", "DELETE"),
@@ -485,13 +447,6 @@ export const api = {
     getEndorsements: ep("/api/skills/endorsements"),
     endorseSkill: ep("/api/skills/endorse", "POST"),
     removeEndorsement: ep("/api/skills/endorse", "DELETE"),
-    getSkillEndorsements: ep("/api/skills/endorsements"),
-  },
-  skill_endorsements: {
-    getEndorsements: ep("/api/skills/endorsements"),
-    endorseSkill: ep("/api/skills/endorse", "POST"),
-    removeEndorsement: ep("/api/skills/endorse", "DELETE"),
-    getSkillEndorsements: ep("/api/skills/endorsements"),
   },
 
   // ── feed_ranking ──────────────────────────────────────────────────────────
@@ -503,7 +458,6 @@ export const api = {
   // ── search ─────────────────────────────────────────────────────────────────
   search: {
     universalSearch: ep("/api/search"),
-    searchUsersEnhanced: ep("/api/search/users"),
     searchPosts: ep("/api/search/posts"),
     searchUsers: ep("/api/search/users"),
     searchCommunities: ep("/api/search/communities"),
@@ -541,9 +495,7 @@ export const api = {
   // ── push notifications ─────────────────────────────────────────────────────
   pushNotifications: {
     subscribe: ep("/api/push/subscribe", "POST"),
-    subscribeToPush: ep("/api/push/subscribe", "POST"),
     unsubscribe: ep("/api/push/unsubscribe", "POST"),
-    unsubscribeFromPush: ep("/api/push/unsubscribe", "POST"),
     getUserSubscriptions: ep("/api/push/subscriptions"),
     updatePreferences: ep("/api/push/preferences", "PATCH"),
     getEndpoint: ep("/api/push/endpoint"),
@@ -559,5 +511,11 @@ export const api = {
   // ── monitoring ─────────────────────────────────────────────────────────────
   monitoring: {
     logError: ep("/api/monitoring/error", "POST"),
+  },
+
+  // ── reports ────────────────────────────────────────────────────────────────
+  reports: {
+    createReport: ep("/api/reports", "POST"),
+    getReports: ep("/api/reports"),
   },
 } as const

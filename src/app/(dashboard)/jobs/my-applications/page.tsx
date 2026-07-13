@@ -15,7 +15,7 @@ const statusStyles: Record<string, { icon: typeof Clock; text: string; color: st
 };
 
 export default function MyApplicationsPage() {
-    const applications = useQuery(api.jobs.getUserApplications);
+    const applications = useQuery(api.jobs.getMyApplications);
 
     return (
         <div className="max-w-4xl mx-auto py-8 px-4">

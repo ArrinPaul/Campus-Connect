@@ -84,7 +84,7 @@ export function OnlineStatusDot({
 }: OnlineStatusDotProps) {
   // Fetch presence from API if userId is provided and no direct status
   const presence = useQuery(
-    api.presence.getUserPresence,
+    api.presence.getUserStatuses,
     userId && !directStatus ? { userId } : "skip"
   )
 

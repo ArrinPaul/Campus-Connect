@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { internalError } from "@/lib/api-error"
 import { createClient } from "@/lib/supabase/server"
 
 // DELETE /api/ads/delete  body: { adId: string }
@@ -21,6 +22,6 @@ export async function DELETE(req: Request) {
     if (error) throw error
     return NextResponse.json({ success: true })
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

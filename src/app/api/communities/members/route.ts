@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { getCommunityMembers, inviteMember } from "@/server/db/communities"
 
@@ -12,7 +13,7 @@ export async function GET(req: Request) {
     const result = await getCommunityMembers(communityId)
     return NextResponse.json(result)
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }
 
@@ -32,6 +33,6 @@ export async function POST(req: Request) {
     await inviteMember(communityId, userId, inviteeId)
     return NextResponse.json({ success: true })
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+    return internalError(err)
   }
 }

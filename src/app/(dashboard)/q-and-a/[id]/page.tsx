@@ -37,10 +37,10 @@ const QuestionDetailPageSkeleton = () => (
 function QuestionDetailPageContent({ questionId }: { questionId: Id<'questions'> }) {
     const { isSignedIn } = useUser();
     const isAuthenticated = isSignedIn ?? false;
-    const question = useQuery(api.questions.getQuestion, { questionId });
+    const question = useQuery(api.questions.getQuestionById, { questionId });
     const incrementViewCount = useMutation(api.questions.incrementViewCount);
-    const vote = useMutation(api.questions.vote);
-    const acceptAnswer = useMutation(api.questions.acceptAnswer);
+    const vote = useMutation(api.questions.voteOnAnswer);
+    const acceptAnswer = useMutation(api.questions.markAnswerAccepted);
     const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : 'skip');
     const hasIncrementedRef = useRef(false);
 

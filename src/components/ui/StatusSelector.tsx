@@ -60,8 +60,8 @@ export function StatusSelector({
   const [customStatus, setCustomStatus] = useState(currentCustomStatus)
   const [isUpdating, setIsUpdating] = useState(false)
 
-  const updateStatus = useMutation(api.presence.updateStatus)
-  const setCustomStatusMutation = useMutation(api.presence.setCustomStatus)
+  const updateStatus = useMutation(api.presence.setOnlineStatus)
+  const setCustomStatusMutation = useMutation(api.presence.setOnlineStatus)
 
   const handleStatusChange = async (status: Status) => {
     setSelectedStatus(status)

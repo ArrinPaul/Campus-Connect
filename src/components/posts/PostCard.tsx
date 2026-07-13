@@ -74,7 +74,7 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
 
   const router = useRouter()
   const shareDropdownRef = useRef<HTMLDivElement>(null)
-  const createRepost = useMutation(api.reposts.createRepost)
+  const createRepost = useMutation(api.reposts.repost)
 
   const isOwnPost = currentUser?._id === post.authorId
 

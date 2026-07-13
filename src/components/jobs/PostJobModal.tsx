@@ -13,7 +13,7 @@ interface PostJobModalProps {
 
 export function PostJobModal({ onClose }: PostJobModalProps) {
   const router = useRouter();
-  const postJob = useMutation(api.jobs.postJob);
+  const postJob = useMutation(api.jobs.createJob);
   const [title, setTitle] = useState('');
   const [company, setCompany] = useState('');
   const [description, setDescription] = useState('');

@@ -28,7 +28,7 @@ export default function JobsPage() {
     if (debouncedQuery) queryParams.q = debouncedQuery;
     if (jobType !== 'All') queryParams.type = jobType;
 
-    const jobs = useQuery(api.jobs.searchJobs, queryParams);
+    const jobs = useQuery(api.jobs.getJobs, queryParams);
 
     return (
         <div className="max-w-4xl mx-auto py-8 px-4">
