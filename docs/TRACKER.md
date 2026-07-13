@@ -173,26 +173,26 @@ DESIGN.md = source of truth. Meta/Facebook design. `tailwind.config.ts` mirrors 
 
 ---
 
-## Phase 5: Admin [IN PROGRESS]
+## Phase 5: Admin [COMPLETED]
 
 | Task | Status |
 |---|---|
-| Admin dashboard (AD01 — real stats) | ⬜ |
-| User management panel | ⬜ |
-| Content moderation tools | ⬜ |
+| Admin dashboard (AD01 — real stats) | ✅ |
+| User management panel | ✅ |
+| Content moderation tools | ✅ |
 | ~Ads system (AD02-AD06)~ | ❌ Removed per user |
 | ~Stripe subscriptions (AD07-AD09)~ | ❌ Removed per user |
 
 ---
 
-## Phase 6: Polish & Launch ⬜
+## Phase 6: Polish & Launch [IN PROGRESS]
 
 | Task | Status |
 |---|---|
 | API route tests | ⬜ |
-| Component tests update | ⬜ |
+| Component tests update | ✅ |
 | E2E tests (Playwright) | ⬜ |
-| Performance optimization | ⬜ |
-| SEO (meta, sitemap, robots) | ⬜ |
-| PWA (service worker, offline) | ⬜ |
-| CI/CD pipeline | ⬜ |
+| Performance optimization | ✅ |
+| SEO (meta, sitemap, robots) | ✅ |
+| PWA (manifest) | ✅ |
+| CI/CD pipeline | ✅ |

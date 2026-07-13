@@ -83,14 +83,14 @@ export function CallModal({
 
   // Watch call state via reactive query
   const activeCalls = useQuery(api.calls.getActiveCall, { conversationId })
+  
+  // getActiveCall returns an array of calls, so we need to find the one for this conversation
+  const activeCall = Array.isArray(activeCalls) 
+    ? activeCalls.find((c: any) => c.conversationId === conversationId || c.id === callId)
+    : activeCalls;
 
   // Sync call state with backend
   useEffect(() => {
-    // getActiveCall returns an array of calls, so we need to find the one for this conversation
-    const activeCall = Array.isArray(activeCalls) 
-      ? activeCalls.find((c: any) => c.conversationId === conversationId || c.id === callId)
-      : activeCalls;
-
     if (!activeCall) {
       if (callState !== "ended") {
         setCallState("ended")
