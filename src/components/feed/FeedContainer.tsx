@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useEffect, useRef } from "react"
+import { useState, useCallback, useEffect, useRef, useMemo } from "react"
 import Link from "next/link"
 import { useUser } from "@/lib/auth/client"
 import { useQuery } from "@/lib/api"
@@ -12,6 +12,7 @@ import { Repeat2 } from "lucide-react"
 import { SuggestedUsers } from "@/components/discover/SuggestedUsers"
 import { TrendingHashtags } from "@/components/trending/TrendingHashtags"
 import type { FeedItem } from "@/app/(components)/feed/types"
+import { useRealtimeFeed } from "@/hooks/useRealtimeFeed"
 
 type FeedType = "following" | "for-you" | "trending"
 
@@ -22,6 +23,7 @@ interface FeedContainerProps {
 }
 
 export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
+  useRealtimeFeed()
   const { isLoaded, isSignedIn } = useUser()
   const isAuthenticated = isSignedIn ?? false
   const [allItems, setAllItems] = useState<FeedQueryItem[]>([])
@@ -66,7 +68,7 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
   )
 
   // Normalize getFeedPosts response ({posts}) → shared {items, nextCursor, hasMore} shape
-  const followingData = followingDataRaw
+  const followingData = useMemo(() => followingDataRaw
     ? {
         items: (followingDataRaw.posts.filter(Boolean) as NonNullable<typeof followingDataRaw.posts[number]>[]).map((post) => ({
           type: "post" as const,
@@ -78,9 +80,9 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
         nextCursor: followingDataRaw.nextCursor,
         hasMore: followingDataRaw.hasMore,
       }
-    : undefined
+    : undefined, [followingDataRaw])
 
-  const moreFollowingData = moreFollowingDataRaw
+  const moreFollowingData = useMemo(() => moreFollowingDataRaw
     ? {
         items: (moreFollowingDataRaw.posts.filter(Boolean) as NonNullable<typeof moreFollowingDataRaw.posts[number]>[]).map((post) => ({
           type: "post" as const,
@@ -92,7 +94,7 @@ export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
         nextCursor: moreFollowingDataRaw.nextCursor,
         hasMore: moreFollowingDataRaw.hasMore,
       }
-    : undefined
+    : undefined, [moreFollowingDataRaw])
 
   // Select active feed data based on feedType
   const feedData =

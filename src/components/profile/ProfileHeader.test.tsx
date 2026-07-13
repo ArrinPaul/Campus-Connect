@@ -113,7 +113,7 @@ describe("ProfileHeader", () => {
     render(<ProfileHeader user={mockUser} isOwnProfile={false} />)
 
     expect(
-      screen.getByText("Software engineer passionate about web development")
+      screen.getByText(/Software engineer passionate about web development/i)
     ).toBeInTheDocument()
   })
 

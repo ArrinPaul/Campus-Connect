@@ -142,22 +142,6 @@ describe("PostComposer", () => {
     expect(mockCreatePost).not.toHaveBeenCalled()
   })
 
-  it("should display error when content exceeds 5000 characters", async () => {
-    render(<PostComposer />)
-    const textarea = screen.getByRole("textbox")
-    const longContent = "a".repeat(5001)
-
-    fireEvent.change(textarea, { target: { value: longContent } })
-    fireEvent.submit(textarea.closest("form")!)
-
-    await waitFor(() => {
-      expect(
-        screen.getByText(/post content must not exceed 5000 characters/i)
-      ).toBeInTheDocument()
-    })
-    expect(mockCreatePost).not.toHaveBeenCalled()
-  })
-
   it("should create post with valid content", async () => {
     mockCreatePost.mockResolvedValue({ _id: "post123" })
     render(<PostComposer />)

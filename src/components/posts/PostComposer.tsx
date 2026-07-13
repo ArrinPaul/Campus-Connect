@@ -380,6 +380,16 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
         await linkPollToPost({ pollId: pollId as Id<"polls">, postId: postId as Id<"posts"> })
       }
 
+      // Broadcast the new post to trigger realtime feed updates
+      import("@/lib/supabase/client").then(({ createClient }) => {
+        const supabase = createClient()
+        supabase.channel('public:posts').send({
+          type: "broadcast",
+          event: "new_post",
+          payload: { id: postId },
+        })
+      })
+
       setContent("")
       setAttachedFiles([])
       setAttachedType(null)

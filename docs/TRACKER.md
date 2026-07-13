@@ -63,7 +63,7 @@ DESIGN.md = source of truth. Meta/Facebook design. `tailwind.config.ts` mirrors 
 
 ---
 
-## Phase 1: Foundation ⬜ NEXT
+## Phase 1: Foundation ✅ DONE
 
 ### Supabase Setup
 | Task | Status |
@@ -131,15 +131,15 @@ DESIGN.md = source of truth. Meta/Facebook design. `tailwind.config.ts` mirrors 
 
 ---
 
-## Phase 2: Core Features ⬜
+## Phase 2: Core Features ✅ DONE
 
 | Task | Status |
 |---|---|
 | Rebuild GlobalNav (L01 — user avatar, notification badge) | ✅ |
 | Build mobile nav (L03 — hamburger menu) | ✅ |
 | Rebuild landing page (L06 — real content) | ✅ |
-| Add video stories (ST07) | ⬜ |
-| Fix story navigation (ST08) | ⬜ |
+| Add video stories (ST07) | ✅ |
+| Fix story navigation (ST08) | ✅ |
 | Add job search/filters (J07) | ✅ |
 | Build community settings (C15 — moderation) | ✅ |
 | Add portfolio section (U18 — projects, certs) | ✅ |
@@ -147,19 +147,21 @@ DESIGN.md = source of truth. Meta/Facebook design. `tailwind.config.ts` mirrors 
 
 ---
 
-## Phase 3: Real-time ⬜
+## Phase 3: Real-Time Engine [COMPLETED]
 
-| Task | Status |
-|---|---|
-| Set up Supabase Realtime | ⬜ |
-| Live messaging (M13 — real-time delivery) | ⬜ |
-| Live feed updates (F15 — new posts appear) | ⬜ |
-| Live typing indicators (M14 — Supabase Realtime) | ⬜ |
-| Push notifications (PN06 — server-side send) | ⬜ |
+**Goal:** Transform static interactions into live experiences.
 
----
+- [x] **Setup Supabase Realtime** (`supabase.channel()`)
+- [x] **Live Messaging (M13):**
+  - Implement real-time delivery via postgres_changes and broadcast fallback in `ChatArea`.
+- [x] **Live Feed Updates (F15):**
+  - Use broadcast and postgres_changes to push new posts to the feed immediately.
+- [x] **Live Typing Indicators (M14):**
+  - Implemented custom `useTypingIndicator` hook using Supabase Presence in `MessageComposer` and `ChatArea`.
+- [x] **Push Notifications (PN06):**
+  - Send server-side events and broadcast `new_notification` to in-app bell via `useRealtimeNotifications` hook.
 
-## Phase 4: Calls & Video ⬜
+## Phase 4: Campus Services & Integrations / Calls & Video [NEXT]
 
 | Task | Status |
 |---|---|

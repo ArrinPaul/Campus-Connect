@@ -1,5 +1,5 @@
 import "server-only"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
 
 async function getSupabase() {
   return await createClient()
@@ -41,6 +41,19 @@ export async function createNotification(data: {
   reference_type?: string
   from_user_id?: string
 }) {
-  const supabase = await getSupabase()
-  await supabase.from("notifications").insert(data)
+  const adminSupabase = createAdminClient()
+  const { data: notif } = await adminSupabase.from("notifications").insert(data).select().single()
+
+  // Broadcast the new notification to the user's channel as a fallback
+  if (notif) {
+    const channel = adminSupabase.channel(`notifications:${data.user_id}`)
+    await channel.send({
+      type: "broadcast",
+      event: "new_notification",
+      payload: notif,
+    })
+    // we don't necessarily need to removeChannel immediately on server side, 
+    // but good practice to clean up if we had a persistent connection.
+    adminSupabase.removeChannel(channel)
+  }
 }
