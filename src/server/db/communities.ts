@@ -9,7 +9,10 @@ export async function getCommunities(limit = 20, offset = 0, filters?: { categor
   const supabase = await getSupabase()
   let q = supabase.from("communities").select("*").order("member_count", { ascending: false })
   if (filters?.category && filters.category !== "All") q = q.eq("category", filters.category)
-  if (filters?.search) q = q.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%`)
+  if (filters?.search) {
+    const escaped = filters.search.replace(/[%_]/g, (m) => `\\${m}`)
+    q = q.or(`name.ilike.%${escaped}%,description.ilike.%${escaped}%`)
+  }
   const { data, error } = await q.range(offset, offset + limit - 1)
   if (error) return []
   return data ?? []

@@ -28,10 +28,10 @@ export function useRealtimeFeed() {
             queryKey: ['/api/posts/feed'],
           })
           queryClient.invalidateQueries({
-            queryKey: ['/api/feed/ranked'],
+            queryKey: ['/api/graph/recommendations'],
           })
           queryClient.invalidateQueries({
-            queryKey: ['/api/feed/trending'],
+            queryKey: ['/api/posts/explore'],
           })
         }
       )
@@ -44,10 +44,10 @@ export function useRealtimeFeed() {
             queryKey: ['/api/posts/feed'],
           })
           queryClient.invalidateQueries({
-            queryKey: ['/api/feed/ranked'],
+            queryKey: ['/api/graph/recommendations'],
           })
           queryClient.invalidateQueries({
-            queryKey: ['/api/feed/trending'],
+            queryKey: ['/api/posts/explore'],
           })
         }
       )

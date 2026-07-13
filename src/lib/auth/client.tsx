@@ -1,7 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Mail, Lock, User, Loader2 } from "lucide-react"
@@ -26,7 +26,7 @@ export function useUser(): {
 } {
   const [isLoaded, setIsLoaded] = useState(false)
   const [user, setUser] = useState<AppUser>(null)
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user: authUser } }) => {
@@ -73,7 +73,7 @@ export function useAuth(): {
   getToken: () => Promise<string | null>
 } {
   const { isLoaded, isSignedIn, user } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   return {
     isLoaded,
@@ -90,7 +90,7 @@ export function useAuthActions(): {
   signOut: (options?: { redirectUrl?: string }) => Promise<void>
 } {
   const router = useRouter()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   return {
     signOut: async (options) => {

@@ -55,7 +55,8 @@ export async function getJobs(limit = 20, offset = 0, filters?: { query?: string
   }
   
   if (filters?.query) {
-    q = q.or(`title.ilike.%${filters.query}%,company.ilike.%${filters.query}%`)
+    const escaped = filters.query.replace(/[%_]/g, (m) => `\\${m}`)
+    q = q.or(`title.ilike.%${escaped}%,company.ilike.%${escaped}%`)
   }
   
   const { data, error } = await q.range(offset, offset + limit - 1)

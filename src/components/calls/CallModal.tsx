@@ -113,18 +113,13 @@ export function CallModal({
 
   // Start WebRTC when call connects
   useEffect(() => {
-    if (callState === "connecting" && !isIncoming) {
-      // For outgoing call, maybe wait until accepted?
-      // Actually caller sends offer after getting 'active' or right away?
-      // Standard: Wait until callee accepts (active state).
-    }
     if (callState === "active") {
       startCall()
     }
     if (callState === "ended") {
       cleanup()
     }
-  }, [callState, isIncoming, startCall, cleanup])
+  }, [callState, startCall, cleanup])
 
   // Duration timer
   useEffect(() => {

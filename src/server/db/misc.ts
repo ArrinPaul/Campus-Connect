@@ -144,10 +144,12 @@ export async function getActiveCalls(userId: string) {
 
 export async function universalSearch(query: string) {
   const supabase = await getSupabase()
+  // Escape ILIKE special characters to prevent pattern injection
+  const escaped = query.replace(/[%_]/g, (m) => `\\${m}`)
   const [users, posts, communities] = await Promise.all([
-    supabase.from("users").select("id, name, username, profile_picture").or(`name.ilike.%${query}%,username.ilike.%${query}%`).limit(5),
-    supabase.from("posts").select("id, content, author_id").ilike("content", `%${query}%`).limit(5),
-    supabase.from("communities").select("id, name, slug, cover_image").or(`name.ilike.%${query}%,description.ilike.%${query}%`).limit(5),
+    supabase.from("users").select("id, name, username, profile_picture").or(`name.ilike.%${escaped}%,username.ilike.%${escaped}%`).limit(5),
+    supabase.from("posts").select("id, content, author_id").ilike("content", `%${escaped}%`).limit(5),
+    supabase.from("communities").select("id, name, slug, cover_image").or(`name.ilike.%${escaped}%,description.ilike.%${escaped}%`).limit(5),
   ])
   return {
     users: users.data ?? [],

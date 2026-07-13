@@ -22,9 +22,15 @@ export async function createStory(data: { author_id: string; content?: string; m
 
 export async function viewStory(storyId: string, userId: string) {
   const supabase = await getSupabase()
-  try { await supabase.from("story_views").insert({ story_id: storyId, user_id: userId }) } catch { /* duplicate view, ignore */ }
-  const { data } = await supabase.from("stories").select("view_count").eq("id", storyId).single()
-  if (data) await supabase.from("stories").update({ view_count: (data.view_count ?? 0) + 1 }).eq("id", storyId)
+  // Insert view record (ignore duplicate via unique constraint)
+  await supabase.from("story_views").insert({ story_id: storyId, user_id: userId }).select().single()
+  // Use atomic increment to avoid race condition
+  await supabase.rpc("increment_field", {
+    table_name: "stories",
+    field_name: "view_count",
+    row_id: storyId,
+    increment_by: 1,
+  })
 }
 
 // ─── Resources ──────────────────────────────────────────────────────────────
@@ -32,8 +38,11 @@ export async function viewStory(storyId: string, userId: string) {
 export async function getResources(limit = 20, offset = 0, filters?: { course?: string; search?: string }) {
   const supabase = await getSupabase()
   let q = supabase.from("resources").select("*, uploader:users!resources_uploaded_by_fkey(id, name, profile_picture)").order("created_at", { ascending: false })
-  if (filters?.course) q = q.ilike("course", `%${filters.course}%`)
-  if (filters?.search) q = q.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`)
+  if (filters?.course) q = q.ilike("course", `%${filters.course.replace(/[%_]/g, (m) => `\\${m}`)}%`)
+  if (filters?.search) {
+    const escaped = filters.search.replace(/[%_]/g, (m) => `\\${m}`)
+    q = q.or(`title.ilike.%${escaped}%,description.ilike.%${escaped}%`)
+  }
   const { data, error } = await q.range(offset, offset + limit - 1)
   if (error) return []
   return data ?? []
@@ -51,7 +60,10 @@ export async function uploadResource(data: any) {
 export async function getPapers(limit = 20, offset = 0, query?: string) {
   const supabase = await getSupabase()
   let q = supabase.from("research_papers").select("*, uploader:users!research_papers_uploaded_by_fkey(id, name, profile_picture)").order("created_at", { ascending: false })
-  if (query) q = q.or(`title.ilike.%${query}%,abstract.ilike.%${query}%`)
+  if (query) {
+    const escaped = query.replace(/[%_]/g, (m) => `\\${m}`)
+    q = q.or(`title.ilike.%${escaped}%,abstract.ilike.%${escaped}%`)
+  }
   const { data, error } = await q.range(offset, offset + limit - 1)
   if (error) return []
   return data ?? []
@@ -70,7 +82,10 @@ export async function getQuestions(limit = 20, offset = 0, filters?: { sort?: st
   const supabase = await getSupabase()
   let q = supabase.from("questions").select("*, author:users!questions_author_id_fkey(id, name, profile_picture)")
   if (filters?.tag) q = q.contains("tags", [filters.tag])
-  if (filters?.search) q = q.or(`title.ilike.%${filters.search}%,content.ilike.%${filters.search}%`)
+  if (filters?.search) {
+    const escaped = filters.search.replace(/[%_]/g, (m) => `\\${m}`)
+    q = q.or(`title.ilike.%${escaped}%,content.ilike.%${escaped}%`)
+  }
   if (filters?.sort === "votes") q = q.order("vote_count", { ascending: false })
   else if (filters?.sort === "unanswered") q = q.eq("answer_count", 0).order("created_at", { ascending: false })
   else q = q.order("created_at", { ascending: false })
@@ -90,7 +105,12 @@ export async function answerQuestion(questionId: string, authorId: string, conte
   const supabase = await getSupabase()
   const { data: answer, error } = await supabase.from("question_answers").insert({ question_id: questionId, author_id: authorId, content }).select().single()
   if (error) return null
-  const { data: q } = await supabase.from("questions").select("answer_count").eq("id", questionId).single()
-  if (q) await supabase.from("questions").update({ answer_count: (q.answer_count ?? 0) + 1 }).eq("id", questionId)
+  // Use atomic increment to avoid race condition
+  await supabase.rpc("increment_field", {
+    table_name: "questions",
+    field_name: "answer_count",
+    row_id: questionId,
+    increment_by: 1,
+  })
   return answer
 }

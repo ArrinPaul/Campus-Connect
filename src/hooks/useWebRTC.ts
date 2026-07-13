@@ -156,17 +156,19 @@ export function useWebRTC({ callId, isIncoming, callType, onCallEnded }: UseWebR
     
     if (isScreenSharing) {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-        const videoTrack = stream.getVideoTracks()[0];
+        // Revert to camera: get fresh camera stream
+        const cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        const cameraTrack = cameraStream.getVideoTracks()[0];
         const sender = peerConnectionRef.current.getSenders().find(s => s.track?.kind === 'video');
-        if (sender) sender.replaceTrack(videoTrack);
+        if (sender) sender.replaceTrack(cameraTrack);
         if (localStreamRef.current) {
+          // Stop and remove old screen share track
           const oldTrack = localStreamRef.current.getVideoTracks()[0];
           if (oldTrack) {
             oldTrack.stop();
             localStreamRef.current.removeTrack(oldTrack);
           }
-          localStreamRef.current.addTrack(videoTrack);
+          localStreamRef.current.addTrack(cameraTrack);
         }
         if (localVideoRef.current) localVideoRef.current.srcObject = localStreamRef.current;
         setIsScreenSharing(false);
@@ -179,14 +181,18 @@ export function useWebRTC({ callId, isIncoming, callType, onCallEnded }: UseWebR
         const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
         const screenTrack = screenStream.getVideoTracks()[0];
         
+        // When user stops sharing via browser UI, auto-revert
         screenTrack.onended = () => {
-          // Automatically revert when user stops sharing via browser UI
-          toggleScreenShare();
+          // Use setTimeout to avoid state update during render
+          setTimeout(() => {
+            toggleScreenShare();
+          }, 0);
         };
         
         const sender = peerConnectionRef.current.getSenders().find(s => s.track?.kind === 'video');
         if (sender) sender.replaceTrack(screenTrack);
         if (localStreamRef.current) {
+          // Stop and remove old camera track
           const oldTrack = localStreamRef.current.getVideoTracks()[0];
           if (oldTrack) {
             oldTrack.stop();

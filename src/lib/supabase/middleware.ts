@@ -1,6 +1,10 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
+// In-memory cache for soft-delete checks (resets on server restart, which is fine)
+const deletedUsersCache = new Map<string, number>()
+const CACHE_TTL_MS = 60_000 // 1 minute
+
 /**
  * Supabase middleware client.
  * Updates session cookies on every request and handles auth redirects.
@@ -64,14 +68,33 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Block soft-deleted accounts
+  // Block soft-deleted accounts (cached to avoid DB query on every request)
   if (user) {
-    const { data: profile } = await supabase
-      .from("users")
-      .select("deleted_at")
-      .eq("id", user.id)
-      .single()
-    if (profile?.deleted_at) {
+    const now = Date.now()
+    const cached = deletedUsersCache.get(user.id)
+    const isDeleted = cached !== undefined && cached > now
+
+    if (cached === undefined) {
+      // Not in cache — check DB and cache the result
+      const { data: profile } = await supabase
+        .from("users")
+        .select("deleted_at")
+        .eq("id", user.id)
+        .single()
+      if (profile?.deleted_at) {
+        deletedUsersCache.set(user.id, now + CACHE_TTL_MS)
+        if (pathname.startsWith("/api/")) {
+          return NextResponse.json({ error: "Account has been deleted" }, { status: 403 })
+        }
+        const url = request.nextUrl.clone()
+        url.pathname = "/sign-in"
+        url.searchParams.set("error", "deleted")
+        return NextResponse.redirect(url)
+      } else {
+        // Not deleted — cache negative result for 5 minutes
+        deletedUsersCache.set(user.id, now + 300_000)
+      }
+    } else if (isDeleted) {
       if (pathname.startsWith("/api/")) {
         return NextResponse.json({ error: "Account has been deleted" }, { status: 403 })
       }

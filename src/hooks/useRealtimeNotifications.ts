@@ -34,9 +34,6 @@ export function useRealtimeNotifications() {
             queryKey: ['/api/notifications/unread-count'],
           })
           queryClient.invalidateQueries({
-            queryKey: ['/api/notifications/recent'],
-          })
-          queryClient.invalidateQueries({
             queryKey: ['/api/notifications'],
           })
 
@@ -57,9 +54,6 @@ export function useRealtimeNotifications() {
           
           queryClient.invalidateQueries({
             queryKey: ['/api/notifications/unread-count'],
-          })
-          queryClient.invalidateQueries({
-            queryKey: ['/api/notifications/recent'],
           })
           queryClient.invalidateQueries({
             queryKey: ['/api/notifications'],
