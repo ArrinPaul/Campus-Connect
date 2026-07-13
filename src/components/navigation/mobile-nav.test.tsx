@@ -126,7 +126,7 @@ describe("MobileNav", () => {
     
     await waitFor(() => {
       expect(screen.getByText("Feed")).toBeInTheDocument()
-      expect(screen.getByText("Discover")).toBeInTheDocument()
+      expect(screen.getAllByText("Explore")[0]).toBeInTheDocument()
       expect(screen.getByText("Profile")).toBeInTheDocument()
       expect(screen.getByText("Settings")).toBeInTheDocument()
     })
@@ -198,13 +198,13 @@ describe("MobileNav", () => {
     
     // Verify navigation links exist and have proper padding classes
     const feedLink = screen.getByText("Feed").closest("a")
-    const discoverLink = screen.getByText("Discover").closest("a")
-    const profileLink = screen.getByText("Profile").closest("a")
-    const settingsLink = screen.getByText("Settings").closest("a")
+    const exploreLink = screen.getAllByText("Explore")[0].closest("a")
+    const profileLink = screen.getAllByText("Profile")[0].closest("a")
+    const settingsLink = screen.getAllByText("Settings")[0].closest("a")
     
     // Check that links have proper padding for touch targets (py-2.5 provides vertical padding)
     expect(feedLink?.className).toContain("py-2.5")
-    expect(discoverLink?.className).toContain("py-2.5")
+    expect(exploreLink?.className).toContain("py-2.5")
     expect(profileLink?.className).toContain("py-2.5")
     expect(settingsLink?.className).toContain("py-2.5")
   })
