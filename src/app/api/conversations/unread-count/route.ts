@@ -1,11 +1,13 @@
-import { auth } from "@/lib/auth/client"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { getUnreadCount } from "@/server/db/messages"
 
 // GET /api/conversations/unread-count?conversationId=...
 export async function GET(req: Request) {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { searchParams } = new URL(req.url)

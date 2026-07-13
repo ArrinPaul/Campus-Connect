@@ -22,6 +22,7 @@ import { createLogger } from "@/lib/logger"
 import { toast } from "sonner"
 
 const log = createLogger("BookmarkButton")
+import { motion } from "framer-motion"
 import { Bookmark, BookmarkCheck, FolderPlus } from "lucide-react"
 
 interface BookmarkButtonProps {
@@ -85,21 +86,23 @@ export function BookmarkButton({
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex items-center gap-1">
-                <button
+                <motion.button
+                  whileTap={{ scale: 0.85 }}
+                  whileHover={{ scale: 1.05 }}
                   onClick={handleToggleBookmark}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all hover:bg-accent ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all hover:bg-canvas-soft ${
                     isBookmarked
                       ? "text-primary"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-primary"
                   } ${compact ? "px-2 py-1 text-sm" : ""}`}
                   aria-label={isBookmarked ? "Remove bookmark" : "Bookmark post"}
                 >
                   {isBookmarked ? (
-                    <BookmarkCheck className="h-5 w-5" />
+                    <BookmarkCheck className="h-[18px] w-[18px]" />
                   ) : (
-                    <Bookmark className="h-5 w-5" />
+                    <Bookmark className="h-[18px] w-[18px]" />
                   )}
-                </button>
+                </motion.button>
 
                 {/* Collection Menu Trigger */}
                 {isBookmarked && (
@@ -143,8 +146,8 @@ export function BookmarkButton({
 
           {/* Existing collections */}
           {collections
-            ?.filter((c) => c.name !== "Saved")
-            .map((collection) => (
+            ?.filter((c: any) => c.name !== "Saved")
+            .map((collection: any) => (
               <DropdownMenuItem
                 key={collection.name}
                 onClick={() => handleAddToCollection(collection.name)}

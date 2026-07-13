@@ -139,10 +139,10 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
   const isGroup = conversation.type === "group"
   const displayName = isGroup
     ? conversation.name || "Group"
-    : conversation.participants?.find((p) => !isCurrentParticipant(p))?.name || "Chat"
+    : conversation.participants?.find((p: any) => !isCurrentParticipant(p))?.name || "Chat"
 
   const otherParticipant = !isGroup
-    ? conversation.participants?.find((p) => !isCurrentParticipant(p))
+    ? conversation.participants?.find((p: any) => !isCurrentParticipant(p))
     : null
 
   function isCurrentParticipant(p: NonNullable<typeof conversation>["participants"][number]) {
@@ -198,7 +198,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
               ) : (
                 displayName
                   .split(" ")
-                  .map((n) => n[0])
+                  .map((n: any) => n[0])
                   .join("")
                   .toUpperCase()
                   .slice(0, 2)
@@ -379,7 +379,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
           {searchResults.length === 0 ? (
             <p className="text-sm text-muted-foreground px-4 py-3">No results found</p>
           ) : (
-            searchResults.map((result) => (
+            searchResults.map((result: any) => (
               <div
                 key={result._id}
                 className="px-4 py-2 hover:bg-accent cursor-pointer"
@@ -417,7 +417,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
               </div>
             )}
 
-            {messages.map((msg, index) => {
+            {messages.map((msg: any, index: any) => {
               const prevMsg = index > 0 ? messages[index - 1] : null
               const showSenderName =
                 isGroup &&

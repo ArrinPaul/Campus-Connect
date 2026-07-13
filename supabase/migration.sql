@@ -827,3 +827,43 @@ CREATE OR REPLACE TRIGGER on_auth_user_created
 -- ============================================================================
 -- DONE
 -- ============================================================================
+
+-- Storage Buckets for Media Uploads
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values 
+  ('media', 'media', true, 52428800, '{image/*,video/*,audio/*,application/pdf}'),
+  ('avatars', 'avatars', true, 5242880, '{image/*}');
+
+-- RLS for media bucket
+create policy "Media items are publicly accessible."
+  on storage.objects for select
+  using ( bucket_id = 'media' );
+
+create policy "Authenticated users can upload media."
+  on storage.objects for insert
+  with check ( bucket_id = 'media' and auth.role() = 'authenticated' );
+
+create policy "Users can update their own media."
+  on storage.objects for update
+  using ( bucket_id = 'media' and auth.uid() = owner );
+
+create policy "Users can delete their own media."
+  on storage.objects for delete
+  using ( bucket_id = 'media' and auth.uid() = owner );
+
+-- RLS for avatars bucket
+create policy "Avatar items are publicly accessible."
+  on storage.objects for select
+  using ( bucket_id = 'avatars' );
+
+create policy "Authenticated users can upload avatars."
+  on storage.objects for insert
+  with check ( bucket_id = 'avatars' and auth.role() = 'authenticated' );
+
+create policy "Users can update their own avatars."
+  on storage.objects for update
+  using ( bucket_id = 'avatars' and auth.uid() = owner );
+
+create policy "Users can delete their own avatars."
+  on storage.objects for delete
+  using ( bucket_id = 'avatars' and auth.uid() = owner );

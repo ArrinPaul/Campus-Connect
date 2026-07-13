@@ -1,11 +1,13 @@
-import { auth } from "@/lib/auth/client"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { getConversations, getOrCreateDMConversation, createGroupConversation } from "@/server/db/messages"
 
 // GET /api/conversations
 export async function GET() {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const conversations = await getConversations(userId)
@@ -18,7 +20,9 @@ export async function GET() {
 // POST /api/conversations  body: { participantId } for DM or { name, participantIds } for group
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const body = await req.json()

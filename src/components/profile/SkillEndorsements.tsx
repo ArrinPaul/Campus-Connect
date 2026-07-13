@@ -68,7 +68,7 @@ export function SkillEndorsements({
       {error && (
         <p className="text-xs text-destructive mb-2">{error}</p>
       )}
-      {endorsements.skills.map((skill) => (
+      {endorsements.skills.map((skill: any) => (
         <div
           key={skill.name}
           className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2 border-border bg-card"

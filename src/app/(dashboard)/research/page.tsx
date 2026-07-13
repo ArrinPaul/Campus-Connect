@@ -50,7 +50,7 @@ export default function ResearchPage() {
                  {papers === undefined && (
                     [...Array(5)].map((_, i) => <ResearchPaperCardSkeleton key={i} />)
                 )}
-                {papers?.map(paper => (
+                {papers?.map((paper: any) => (
                     <ResearchPaperCard key={paper._id} paper={paper as any} />
                 ))}
                 {papers?.length === 0 && (

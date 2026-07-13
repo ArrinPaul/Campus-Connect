@@ -1,10 +1,12 @@
-import { auth } from "@/lib/auth/client"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { updateProfilePicture } from "@/server/db/users"
 
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { profilePicture } = await req.json()

@@ -10,6 +10,7 @@ import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
 import { MentionAutocomplete } from "./MentionAutocomplete"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 // Lazy load the heavy Tiptap editor (~300KB)
 const RichTextEditor = dynamic(
@@ -356,7 +357,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
         const resolvedUrls = await resolveStorageUrls({
           storageIds: storageIds as Id<"_storage">[],
         })
-        mediaUrls = resolvedUrls.filter((u): u is string => u !== null)
+        mediaUrls = resolvedUrls.filter((u: any): u is string => u !== null)
         finalMediaType = attachedType
         mediaFileNames = fileNames
         setIsUploading(false)
@@ -438,7 +439,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
         {showHashtagAutocomplete && hashtagSuggestions && hashtagSuggestions.length > 0 && (
           <div className="absolute z-50 mt-1 w-64 bg-canvas border border-hairline rounded-md shadow-product overflow-hidden">
             <ul className="py-1">
-              {hashtagSuggestions.map((hashtag, index) => (
+              {hashtagSuggestions.map((hashtag: any, index: any) => (
                 <li
                   key={hashtag._id}
                   className={cn(
@@ -551,6 +552,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
         <div className="flex flex-wrap gap-xs">
           {filePreviews.map((src, i) => (
             <div key={i} className="relative h-20 w-20 rounded-md overflow-hidden border border-hairline shadow-sm">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={src} alt="Preview" className="h-full w-full object-cover" />
               <button
                 type="button"

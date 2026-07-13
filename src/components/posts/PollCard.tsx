@@ -59,7 +59,7 @@ export function PollCard({ pollId }: PollCardProps) {
   const showResults = hasVoted || isExpired
 
   // Calculate the winning option(s) for styling
-  const maxVotes = Math.max(...poll.options.map((o) => o.voteCount), 0)
+  const maxVotes = Math.max(...poll.options.map((o: any) => o.voteCount), 0)
 
   async function handleVote(optionId: string) {
     if (isVoting || isExpired) return
@@ -107,7 +107,7 @@ export function PollCard({ pollId }: PollCardProps) {
 
       {/* Options */}
       <div className="space-y-2">
-        {poll.options.map((option) => {
+        {poll.options.map((option: any) => {
           const isSelected = currentVote === option.id
           const isWinner = showResults && option.voteCount === maxVotes && maxVotes > 0
           const percentage =

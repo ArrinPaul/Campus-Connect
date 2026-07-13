@@ -17,10 +17,13 @@ jest.mock('@/lib/api', () => ({
 // Mock next/image to render a plain <img> so src attributes are testable
 jest.mock('next/image', () => ({
   __esModule: true,
+  // eslint-disable-next-line @next/next/no-img-element
   default: ({ src, alt, ...props }: any) => <img src={src} alt={alt} {...props} />,
 }))
 
-import { useQuery, ConvexProvider, ConvexReactClient } from '@/lib/api'
+import { useQuery } from '@/lib/api'
+const ConvexProvider = ({ children }: any) => children
+const ConvexReactClient = jest.fn()
 const mockUseQuery = useQuery as jest.MockedFunction<typeof useQuery>
 const mockConvexClient = new (ConvexReactClient as any)()
 

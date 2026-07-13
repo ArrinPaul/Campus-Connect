@@ -30,7 +30,7 @@ export function CommunityPostFeed({ communityId }: { communityId: Id<'communitie
 
     return (
         <div className="space-y-4 mt-8">
-            {posts.map(post => (
+            {posts.map((post: any) => (
                 <PostCard key={post._id} item={{ type: 'post', post: post as any, _id: post._id, createdAt: post.createdAt }} />
             ))}
         </div>

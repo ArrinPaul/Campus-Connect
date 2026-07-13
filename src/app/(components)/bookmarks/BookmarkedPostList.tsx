@@ -25,7 +25,7 @@ export function BookmarkedPostList() {
     }
     
     // Transform the bookmark data into the FeedItem format that PostCard expects
-    const feedItems = bookmarks.map(bookmark => ({
+    const feedItems = bookmarks.map((bookmark: any) => ({
         type: 'post' as const,
         _id: bookmark.post._id,
         createdAt: bookmark.post.createdAt,
@@ -37,7 +37,7 @@ export function BookmarkedPostList() {
 
     return (
         <div className="space-y-4">
-            {feedItems.map(item => (
+            {feedItems.map((item: any) => (
                 <PostCard key={item._id} item={item as any} />
             ))}
         </div>

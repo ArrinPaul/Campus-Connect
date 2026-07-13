@@ -38,7 +38,7 @@ export function ExplorePostGrid() {
         if (isLoadingMore) {
             // Append new page to existing posts
             if (newPosts && newPosts.length > 0) {
-                setPosts(prev => [...prev, ...newPosts.map(post => ({
+                setPosts(prev => [...prev, ...newPosts.map((post: any) => ({
                     type: 'post' as const,
                     _id: post._id,
                     createdAt: post.createdAt,
@@ -50,7 +50,7 @@ export function ExplorePostGrid() {
             setIsLoadingMore(false);
         } else if (cursor === null && posts.length === 0) {
             // Initial load
-            setPosts(newPosts.map(post => ({
+            setPosts(newPosts.map((post: any) => ({
                 type: 'post' as const,
                 _id: post._id,
                 createdAt: post.createdAt,

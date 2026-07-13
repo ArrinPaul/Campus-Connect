@@ -60,7 +60,7 @@ export default function ResearchDetailPage({ params }: PageProps) {
                     <div className="mt-6">
                         <h3 className="font-bold text-lg mb-2">Tags</h3>
                         <div className="flex flex-wrap gap-2">
-                            {paper.tags.map(tag => (
+                            {paper.tags.map((tag: any) => (
                                 <Link href={`/hashtag/${tag}`} key={tag} className="px-3 py-1 rounded-full text-sm font-medium bg-muted hover:bg-muted/80">
                                     #{tag}
                                 </Link>

@@ -6,7 +6,7 @@ import { useQuery } from '@/lib/api';
 import { useUser } from '@/lib/auth/client';
 import { api } from '@/lib/api';
 import { SearchBar } from '../../(components)/search/SearchBar';
-import { PostCard } from '../../(components)/feed/PostCard';
+import { PostCard } from '@/components/posts/PostCard';
 import { UserCard } from '../../(components)/search/UserCard';
 import { HashtagCard } from '../../(components)/search/HashtagCard';
 import { Section, SectionHeader } from '@/components/ui/Section';
@@ -99,7 +99,7 @@ function SearchResultsContent() {
             case 'hashtags':
                 return hashtags.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {hashtags.map(hashtag => <HashtagCard key={hashtag._id} hashtag={hashtag as any} />)}
+                        {hashtags.map((hashtag: any) => <HashtagCard key={hashtag._id} hashtag={hashtag as any} />)}
                     </div>
                 ) : <p className="text-center py-8">No hashtags found.</p>;
             case 'all':
@@ -122,7 +122,7 @@ function SearchResultsContent() {
                             <div className="space-y-4">
                                 <div className="text-fine-print text-ink-muted-48 font-bold uppercase tracking-widest border-b border-hairline pb-2">Academic Hashtags</div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {hashtags.map(hashtag => <HashtagCard key={hashtag._id} hashtag={hashtag as any} />)}
+                                    {hashtags.map((hashtag: any) => <HashtagCard key={hashtag._id} hashtag={hashtag as any} />)}
                                 </div>
                             </div>
                         )}

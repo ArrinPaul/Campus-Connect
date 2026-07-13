@@ -15,6 +15,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
+import { motion } from "framer-motion"
+
 export type ReactionType = "like" | "love" | "laugh" | "wow" | "sad" | "scholarly"
 
 export const reactionEmojis: Record<ReactionType, string> = {
@@ -116,14 +118,16 @@ export function ReactionPicker({
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <button
+            <motion.button
+              whileTap={{ scale: 0.85 }}
+              whileHover={{ scale: 1.05 }}
               onClick={handleClick}
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all hover:bg-accent ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all hover:bg-canvas-soft ${
                 userReaction
                   ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-primary"
               } ${compact ? "px-2 py-1 text-sm" : ""}`}
               aria-label={userReaction ? `You reacted with ${reactionLabels[userReaction as ReactionType]}` : "React to this post"}
             >
@@ -135,7 +139,7 @@ export function ReactionPicker({
               {totalReactions > 0 && (
                 <span className="text-sm font-medium">{totalReactions}</span>
               )}
-            </button>
+            </motion.button>
           </TooltipTrigger>
           <TooltipContent>
             {userReaction
@@ -198,11 +202,12 @@ export function ReactionSummary({ targetId, targetType, onClick }: ReactionSumma
       className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
     >
       <div className="flex -space-x-1">
-        {topReactions.map(({ type }) => (
+        {topReactions.map(({ type }: any) => (
           <span
             key={type}
             className="inline-flex items-center justify-center w-5 h-5 text-xs bg-background border border-border rounded-full"
           >
+            {/* @ts-ignore */}
             {reactionEmojis[type]}
           </span>
         ))}

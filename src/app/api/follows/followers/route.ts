@@ -1,11 +1,13 @@
-import { auth } from "@/lib/auth/client"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { getFollowers } from "@/server/db/follows"
 
 // GET /api/follows/followers?userId=...&limit=...&cursor=...
 export async function GET(req: Request) {
   try {
-    const { userId: authId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const authId = user?.id
     if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { searchParams } = new URL(req.url)

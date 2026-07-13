@@ -110,7 +110,7 @@ function QuestionDetailPageContent({ questionId }: { questionId: Id<'questions'>
 
                 {question.tags && question.tags.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-4">
-                        {question.tags.map(tag => (
+                        {question.tags.map((tag: any) => (
                             <Link href={`/hashtag/${tag}`} key={tag} className="px-3 py-1 rounded-full text-sm font-medium bg-muted hover:bg-muted/80">
                                 #{tag}
                             </Link>
@@ -150,7 +150,7 @@ function QuestionDetailPageContent({ questionId }: { questionId: Id<'questions'>
 
             <h2 className="text-2xl font-bold mt-10 mb-6">Answers ({question.answers?.length || 0})</h2>
             <div className="space-y-4">
-                {question.answers?.map(answer => (
+                {question.answers?.map((answer: any) => (
                     <AnswerCard 
                         key={answer._id} 
                         answer={answer as any} 

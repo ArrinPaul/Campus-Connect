@@ -17,7 +17,7 @@ export default function NotificationsPage() {
   const markAllAsRead = useMutation(api.notifications.markAllAsRead);
 
   const notifications = data?.notifications;
-  const unreadCount = notifications?.filter((n) => !n.isRead).length ?? 0;
+  const unreadCount = notifications?.filter((n: any) => !n.isRead).length ?? 0;
 
   if (isLoading) {
     return (
@@ -98,7 +98,7 @@ export default function NotificationsPage() {
                    </div>
                 </div>
                 <div className="border-t border-hairline">
-                  {notifications.map((notification) => (
+                  {notifications.map((notification: any) => (
                     <NotificationItem key={notification._id} notification={notification} />
                   ))}
                 </div>

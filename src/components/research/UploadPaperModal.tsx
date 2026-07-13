@@ -121,7 +121,7 @@ export function UploadPaperModal({ onClose }: UploadPaperModalProps) {
           storageIds: [storageId as Id<'_storage'>],
         });
 
-        pdfUrl = resolvedUrls.filter((u): u is string => u !== null)[0];
+        pdfUrl = resolvedUrls.filter((u: any): u is string => u !== null)[0];
         setUploadProgress(90);
       }
 

@@ -6,6 +6,9 @@ import { StoryRow } from '@/components/stories/StoryRow';
 import { FeedContainer } from '@/components/feed/FeedContainer';
 import { Section } from '@/components/ui/Section';
 import { cn } from '@/lib/utils';
+import { FeedRightSidebar } from './FeedRightSidebar';
+import { createPortal } from 'react-dom';
+import { useEffect } from 'react';
 
 type FeedType = 'following' | 'for-you' | 'trending';
 
@@ -17,9 +20,15 @@ const TABS: { key: FeedType; label: string }[] = [
 
 export function Feed() {
   const [activeTab, setActiveTab] = useState<FeedType>('for-you');
+  const [rightSidebarNode, setRightSidebarNode] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setRightSidebarNode(document.getElementById('right-sidebar-portal'));
+  }, []);
 
   return (
     <div className="w-full flex flex-col items-center">
+      {rightSidebarNode && createPortal(<FeedRightSidebar />, rightSidebarNode)}
       {/* Top Stories/Create Area */}
       <div className="w-full max-w-2xl px-4 md:px-0 mt-md space-y-md">
         <StoryRow />

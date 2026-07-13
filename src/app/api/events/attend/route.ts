@@ -1,11 +1,13 @@
-import { auth } from "@/lib/auth/client"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { attendEvent, unattendEvent } from "@/server/db/events-jobs"
 
 // POST /api/events/attend  body: { eventId }
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { eventId } = await req.json()
@@ -21,7 +23,9 @@ export async function POST(req: Request) {
 // DELETE /api/events/attend  body: { eventId }
 export async function DELETE(req: Request) {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { eventId } = await req.json()

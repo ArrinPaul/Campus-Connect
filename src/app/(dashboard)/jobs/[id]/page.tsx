@@ -90,7 +90,7 @@ export default function JobDetailPage({ params }: PageProps) {
                     <div className="mt-6">
                         <h3 className="font-bold text-lg mb-2">Skills Required</h3>
                         <div className="flex flex-wrap gap-2">
-                            {job.skillsRequired.map(skill => (
+                            {job.skillsRequired.map((skill: any) => (
                                 <div key={skill} className="px-3 py-1 rounded-full text-sm font-medium bg-muted">
                                     {skill}
                                 </div>

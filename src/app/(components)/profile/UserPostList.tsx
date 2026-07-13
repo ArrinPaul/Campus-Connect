@@ -35,7 +35,7 @@ export function UserPostList({ userId }: { userId: Id<'users'> }) {
 
     return (
         <div className="space-y-4 mt-8 max-w-xl mx-auto">
-            {posts.map((post) => {
+            {posts.map((post: any) => {
                 if (!post) return null;
                 const item: FeedItem = {
                     type: 'post',

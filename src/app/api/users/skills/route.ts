@@ -1,11 +1,13 @@
-import { auth } from "@/lib/auth/client"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { addSkill, removeSkill } from "@/server/db/users"
 
 // POST /api/users/skills  body: { skill: string }
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { skill } = await req.json()
@@ -21,7 +23,9 @@ export async function POST(req: Request) {
 // DELETE /api/users/skills  body: { skill: string }
 export async function DELETE(req: Request) {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const { skill } = await req.json()

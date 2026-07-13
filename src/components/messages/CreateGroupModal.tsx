@@ -38,7 +38,7 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
   const filteredResults = useMemo(() => {
     if (!searchResults) return []
     return searchResults.filter(
-      (user) => !selectedMembers.some((m) => m._id === user._id)
+      (user: any) => !selectedMembers.some((m) => m._id === user._id)
     )
   }, [searchResults, selectedMembers])
 
@@ -203,7 +203,7 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
                 ) : filteredResults.length === 0 ? (
                   <div className="p-3 text-sm text-muted-foreground">No users found</div>
                 ) : (
-                  filteredResults.map((user) => {
+                  filteredResults.map((user: any) => {
                     const isSelected = selectedMembers.some(
                       (m) => m._id === user._id
                     )

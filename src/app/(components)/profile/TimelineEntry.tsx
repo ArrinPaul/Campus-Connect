@@ -18,7 +18,7 @@ const TYPE_ICONS = {
 };
 
 export function TimelineEntry({ item }: Props) {
-    const Icon = TYPE_ICONS[item.type];
+    const Icon = TYPE_ICONS[(item as any).type as keyof typeof TYPE_ICONS] || Calendar;
     const formattedDate = format(new Date(item.date), 'MMM yyyy');
 
     return (

@@ -31,7 +31,7 @@ export default function AdsDashboardPage() {
                  {ads === undefined && (
                     [...Array(3)].map((_, i) => <AdCardSkeleton key={i} />)
                 )}
-                {ads?.map(ad => (
+                {ads?.map((ad: any) => (
                     <AdCard key={ad._id} ad={ad as any} />
                 ))}
                 {ads?.length === 0 && (

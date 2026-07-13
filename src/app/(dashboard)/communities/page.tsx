@@ -177,7 +177,7 @@ export default function CommunitiesPage() {
                                     {sortedCommunities.length} {sortedCommunities.length === 1 ? 'Community' : 'Communities'} found
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-lg">
-                                    {sortedCommunities.map(community => (
+                                    {sortedCommunities.map((community: any) => (
                                         <CommunityCard key={community._id} community={community as any} />
                                     ))}
                                 </div>

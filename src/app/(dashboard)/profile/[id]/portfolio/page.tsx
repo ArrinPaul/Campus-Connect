@@ -75,7 +75,7 @@ function PortfolioPageContent({ userId }: { userId: Id<'users'> }) {
                     {projects.length === 0 ? (
                         <p className="col-span-full text-muted-foreground">No projects added yet.</p>
                     ) : (
-                        projects.map(project => <ProjectCard key={project._id} project={project as any} />)
+                        projects.map((project: any) => <ProjectCard key={project._id} project={project as any} />)
                     )}
                 </div>
             </section>
@@ -93,7 +93,7 @@ function PortfolioPageContent({ userId }: { userId: Id<'users'> }) {
                     {timeline.length === 0 ? (
                         <p className="text-muted-foreground">No timeline entries yet.</p>
                     ) : (
-                        timeline.map(item => <TimelineEntry key={item._id} item={item as any} />)
+                        timeline.map((item: any) => <TimelineEntry key={item._id} item={item as any} />)
                     )}
                 </div>
             </section>

@@ -1,21 +1,30 @@
-import { auth } from "@/lib/auth/client"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 
 // POST /api/media/upload-url
 // Returns a pre-signed URL for direct upload to storage (Cloudinary / S3 compatible)
 // Adapt this endpoint to your chosen storage provider
-export async function POST() {
+export async function POST(req: Request) {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    // TODO: integrate with your storage provider (Cloudinary, AWS S3, Vercel Blob, etc.)
-    // Example for Vercel Blob:
-    // const { url } = await put(filename, body, { access: 'public' })
-    // For now, return a placeholder response structure
+    const { filename, bucket = 'media' } = await req.json().catch(() => ({}))
+    if (!filename) return NextResponse.json({ error: "Filename required" }, { status: 400 })
+
+    const path = `${userId}/${Date.now()}-${filename}`
+    const { data, error } = await supabase.storage.from(bucket).createSignedUploadUrl(path)
+
+    if (error) throw error
+
+    const { data: publicData } = supabase.storage.from(bucket).getPublicUrl(path)
+
     return NextResponse.json({
-      uploadUrl: null,
-      message: "Configure your storage provider in src/app/api/media/upload-url/route.ts",
+      uploadUrl: data.signedUrl,
+      publicUrl: publicData.publicUrl,
+      path
     })
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

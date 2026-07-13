@@ -40,7 +40,7 @@ export default function MyApplicationsPage() {
                 )}
                 
                 <ul className="divide-y">
-                    {applications?.map(app => {
+                    {applications?.map((app: any) => {
                         if (!app.job) return null; // Don't render if job has been deleted
                         
                         const status = statusStyles[app.status];

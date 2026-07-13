@@ -132,7 +132,7 @@ export function KeyboardShortcutsModal({
 
         <div className="mt-4 flex justify-end border-t border-border pt-4">
           <DialogClose asChild>
-            <Button variant="outline" size="sm">
+            <Button variant="secondary" size="sm">
               Close
             </Button>
           </DialogClose>

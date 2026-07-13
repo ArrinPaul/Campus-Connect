@@ -101,7 +101,7 @@ export function ReactionModal({
             <TabsContent value={selectedReaction} className="mt-0">
               {reactionUsers && reactionUsers.length > 0 ? (
                 <div className="space-y-2">
-                  {reactionUsers.filter((item) => item.user !== null).map((item, index) => (
+                  {reactionUsers.filter((item: any) => item.user !== null).map((item: any, index: any) => (
                     <Link
                       key={index}
                       href={`/profile/${item.user!._id}`}

@@ -50,7 +50,7 @@ export default function EventsPage() {
                  {events === undefined && (
                     [...Array(5)].map((_, i) => <EventCardSkeleton key={i} />)
                 )}
-                {events?.map(event => (
+                {events?.map((event: any) => (
                     <EventCard key={event._id} event={event as any} />
                 ))}
                 {events?.length === 0 && (

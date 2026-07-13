@@ -7,8 +7,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuthActions } from '@/lib/auth/client';
-import { ThemeToggle } from '@/components/theme/theme-toggle';
+import { useUser, useAuthActions } from '@/lib/auth/client';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 type NavItem = { href: string; icon: React.ElementType; label: string };
 
@@ -42,10 +42,10 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
   return (
     <Link
       href={item.href}
-      className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+      className={`flex items-center gap-3 rounded-xl px-3 py-2 text-body-sm font-medium transition-colors ${
         active
-          ? 'bg-primary text-primary-foreground'
-          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+          ? 'bg-primary/10 text-primary'
+          : 'text-steel hover:bg-surface-soft hover:text-ink-deep'
       }`}
     >
       <item.icon className="h-4 w-4 flex-shrink-0" />
@@ -56,17 +56,38 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
 
 export function PrimarySidebar() {
   const pathname = usePathname();
+  const { user } = useUser();
   const { signOut } = useAuthActions();
 
   return (
-    <div className="flex h-full w-60 flex-col border-r bg-card">
+    <aside className="hidden lg:flex h-full w-60 flex-col border-r border-hairline-soft bg-canvas">
       {/* Logo */}
-      <div className="flex items-center gap-2 px-4 py-5 border-b">
+      <div className="flex items-center gap-2 px-4 py-4 border-b border-hairline-soft">
         <Link href="/feed" className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-lg bg-primary flex-shrink-0" />
-          <span className="font-bold text-base tracking-tight">Campus Connect</span>
+          <div className="h-8 w-8 rounded-xl bg-primary flex items-center justify-center shrink-0">
+            <span className="text-white text-sm font-bold">CC</span>
+          </div>
+          <span className="font-bold text-ink-deep text-body-md-bold tracking-tight">Campus Connect</span>
         </Link>
       </div>
+
+      {/* User profile summary */}
+      {user && (
+        <div className="px-3 py-3 border-b border-hairline-soft">
+          <Link href="/profile/me" className="flex items-center gap-3 p-2 rounded-xl hover:bg-surface-soft transition-colors">
+            <Avatar className="h-9 w-9">
+              <AvatarImage src={user.profilePicture} alt={user.name} />
+              <AvatarFallback className="bg-primary text-white text-caption-bold">
+                {user.name.substring(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <p className="text-body-sm-bold text-ink-deep truncate">{user.name}</p>
+              <p className="text-caption text-steel truncate">{user.email}</p>
+            </div>
+          </Link>
+        </div>
+      )}
 
       {/* Scrollable nav */}
       <div className="flex-1 overflow-y-auto py-3 px-2 space-y-5 scrollbar-thin">
@@ -79,7 +100,7 @@ export function PrimarySidebar() {
 
         {/* Academic */}
         <div>
-          <p className="px-3 mb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <p className="px-3 mb-1 text-caption-bold font-semibold text-stone uppercase tracking-wider">
             Academic
           </p>
           <nav className="space-y-1">
@@ -91,7 +112,7 @@ export function PrimarySidebar() {
 
         {/* Campus Life */}
         <div>
-          <p className="px-3 mb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <p className="px-3 mb-1 text-caption-bold font-semibold text-stone uppercase tracking-wider">
             Campus Life
           </p>
           <nav className="space-y-1">
@@ -102,23 +123,17 @@ export function PrimarySidebar() {
         </div>
       </div>
 
-      {/* Bottom: profile, settings, theme, logout */}
-      <div className="border-t px-2 py-3 space-y-1">
-        <NavLink item={{ href: '/profile/me', icon: User, label: 'Profile' }} pathname={pathname} />
+      {/* Bottom: settings, logout */}
+      <div className="border-t border-hairline-soft px-2 py-3 space-y-1">
         <NavLink item={{ href: '/settings', icon: Settings, label: 'Settings' }} pathname={pathname} />
-        <div className="flex items-center justify-between px-3 py-1">
-          <span className="text-sm font-medium text-muted-foreground">Theme</span>
-          <ThemeToggle />
-        </div>
         <button
           onClick={() => signOut({ redirectUrl: '/' })}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-body-sm font-medium text-steel transition-colors hover:bg-critical/5 hover:text-critical"
         >
           <LogOut className="h-4 w-4 flex-shrink-0" />
-          <span>Log Out</span>
+          <span>Sign Out</span>
         </button>
       </div>
-    </div>
+    </aside>
   );
 }
-

@@ -95,8 +95,8 @@ export function CommunityHeader({ community }: Props) {
                                     <span>{community.memberCount} members</span>
                                 </div>
                                 <div className="flex items-center gap-1.5 border-l border-hairline pl-4">
-                                    {React.createElement(typeInfo[community.type].icon, { size: 16, className: 'text-primary' })}
-                                    <span>{typeInfo[community.type].text}</span>
+                                    {React.createElement(typeInfo[community.type as keyof typeof typeInfo]?.icon || typeInfo.public.icon, { size: 16, className: 'text-primary' })}
+                                    <span>{typeInfo[community.type as keyof typeof typeInfo]?.text || typeInfo.public.text}</span>
                                 </div>
                             </div>
                             <p className="text-body text-ink-muted-48 max-w-2xl mt-4 leading-relaxed">

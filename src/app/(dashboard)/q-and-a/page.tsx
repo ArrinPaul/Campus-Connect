@@ -70,7 +70,7 @@ export default function QuestionsPage() {
                  {questions === undefined && (
                     [...Array(5)].map((_, i) => <QuestionCardSkeleton key={i} />)
                 )}
-                {questions?.map(question => (
+                {questions?.map((question: any) => (
                     <QuestionCard key={question._id} question={question as any} />
                 ))}
                 {questions?.length === 0 && (
