@@ -31,7 +31,6 @@ const academicNavItems: NavItem[] = [
 const campusNavItems: NavItem[] = [
   { href: '/jobs',           icon: Briefcase,  label: 'Jobs' },
   { href: '/marketplace',    icon: ShoppingBag,label: 'Marketplace' },
-  { href: '/leaderboard',    icon: Trophy,     label: 'Leaderboard' },
   { href: '/find-experts',   icon: UserSearch, label: 'Find Experts' },
   { href: '/find-partners',  icon: Handshake,  label: 'Find Partners' },
   { href: '/stories',        icon: BookOpen,   label: 'Stories' },

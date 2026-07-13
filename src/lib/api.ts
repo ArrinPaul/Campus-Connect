@@ -156,7 +156,6 @@ export const api = {
       "/api/users/notification-preferences",
       "PATCH"
     ),
-    getReputation: ep("/api/gamification/reputation"),
     getBillingInfo: ep("/api/subscriptions"),
     getSubscription: ep("/api/subscriptions"),
   },
@@ -325,7 +324,7 @@ export const api = {
     getMyApplications: ep("/api/jobs/applications"),
     getUserApplications: ep("/api/jobs/applications"),
     getJobApplications: ep("/api/jobs/job-applications"),
-    searchJobs: ep("/api/jobs/search"),
+    searchJobs: ep("/api/jobs"),
     getJob: ep("/api/jobs/single"),
   },
 
@@ -458,15 +457,7 @@ export const api = {
     getAdAnalytics: ep("/api/ads/analytics"),
   },
 
-  // ── gamification ───────────────────────────────────────────────────────────
-  gamification: {
-    getUserStats: ep("/api/gamification/stats"),
-    getLeaderboard: ep("/api/gamification/leaderboard"),
-    getBadges: ep("/api/gamification"),
-    claimBadge: ep("/api/gamification/badges", "POST"),
-    getReputation: ep("/api/gamification/reputation"),
-    getAchievements: ep("/api/gamification/achievements"),
-  },
+
 
   // ── portfolio ──────────────────────────────────────────────────────────────
   portfolio: {

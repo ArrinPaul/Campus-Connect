@@ -46,9 +46,19 @@ export async function unattendEvent(eventId: string, userId: string) {
 
 // ─── Jobs ───────────────────────────────────────────────────────────────────
 
-export async function getJobs(limit = 20, offset = 0) {
+export async function getJobs(limit = 20, offset = 0, filters?: { query?: string; type?: string }) {
   const supabase = await getSupabase()
-  const { data, error } = await supabase.from("jobs").select("*, poster:users!jobs_posted_by_fkey(id, name, profile_picture)").order("created_at", { ascending: false }).range(offset, offset + limit - 1)
+  let q = supabase.from("jobs").select("*, poster:users!jobs_posted_by_fkey(id, name, profile_picture)").order("created_at", { ascending: false })
+  
+  if (filters?.type && filters.type !== "All") {
+    q = q.eq("employment_type", filters.type)
+  }
+  
+  if (filters?.query) {
+    q = q.or(`title.ilike.%${filters.query}%,company.ilike.%${filters.query}%`)
+  }
+  
+  const { data, error } = await q.range(offset, offset + limit - 1)
   if (error) return []
   return data ?? []
 }

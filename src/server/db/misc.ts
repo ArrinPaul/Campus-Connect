@@ -64,22 +64,6 @@ export async function getUserStatuses(userIds: string[]) {
   return data ?? []
 }
 
-// ─── Gamification ───────────────────────────────────────────────────────────
-
-export async function getUserStats(userId: string) {
-  const supabase = await getSupabase()
-  const { data } = await supabase.from("user_reputation").select("*").eq("user_id", userId).single()
-  return data ?? { points: 0, level: 1, badges: [] }
-}
-
-export async function getLeaderboard(limit = 20, filters?: { period?: string; university?: string }) {
-  const supabase = await getSupabase()
-  let q = supabase.from("user_reputation").select("*, user:users!user_reputation_user_id_fkey(id, name, username, profile_picture, university)").order("points", { ascending: false })
-  if (filters?.university) q = q.eq("user.university", filters.university)
-  const { data, error } = await q.limit(limit)
-  if (error) return []
-  return data ?? []
-}
 
 // ─── Marketplace ────────────────────────────────────────────────────────────
 

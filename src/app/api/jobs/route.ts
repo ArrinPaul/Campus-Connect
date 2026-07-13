@@ -2,13 +2,16 @@ import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { getJobs, createJob } from "@/server/db/events-jobs"
 
-// GET /api/jobs?limit=...&offset=...
+// GET /api/jobs?limit=...&offset=...&q=...&type=...
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url)
     const limit = Number(searchParams.get("limit") ?? "20")
     const offset = Number(searchParams.get("offset") ?? "0")
-    const result = await getJobs(limit, offset)
+    const query = searchParams.get("q") ?? undefined
+    const type = searchParams.get("type") ?? undefined
+    
+    const result = await getJobs(limit, offset, { query, type })
     return NextResponse.json(result)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
