@@ -64,6 +64,24 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Block soft-deleted accounts
+  if (user) {
+    const { data: profile } = await supabase
+      .from("users")
+      .select("deleted_at")
+      .eq("id", user.id)
+      .single()
+    if (profile?.deleted_at) {
+      if (pathname.startsWith("/api/")) {
+        return NextResponse.json({ error: "Account has been deleted" }, { status: 403 })
+      }
+      const url = request.nextUrl.clone()
+      url.pathname = "/sign-in"
+      url.searchParams.set("error", "deleted")
+      return NextResponse.redirect(url)
+    }
+  }
+
   // Redirect signed-in users away from auth pages
   if (user && (pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up"))) {
     const url = request.nextUrl.clone()

@@ -67,22 +67,33 @@ export async function markAsRead(conversationId: string, userId: string) {
 
 export async function getConversations(userId: string) {
   const supabase = await getSupabase()
+  // Single query using RPC-like approach: get conversations where user is a participant
   const { data: participants } = await supabase
     .from("conversation_participants")
-    .select("conversation_id")
+    .select("conversation_id, last_read_at, muted")
     .eq("user_id", userId)
   if (!participants?.length) return []
+
   const convIds = participants.map((p) => p.conversation_id)
+  const participantMap = new Map(participants.map((p) => [p.conversation_id, p]))
+
+  // Single query for all conversations with last message
   const { data } = await supabase
     .from("conversations")
     .select(`
       *,
-      participants:conversation_participants(user_id, last_read_at, muted),
       last_message:messages!messages_conversation_id_fkey(content, created_at, sender_id)
     `)
     .in("id", convIds)
     .order("updated_at", { ascending: false })
-  return data ?? []
+
+  // Attach participant data without extra queries
+  return (data ?? []).map((conv) => ({
+    ...conv,
+    participants: participantMap.get(conv.id)
+      ? [{ ...participantMap.get(conv.id), user_id: userId }]
+      : [],
+  }))
 }
 
 export async function getConversationById(conversationId: string) {
@@ -101,28 +112,37 @@ export async function getConversationById(conversationId: string) {
 
 export async function getOrCreateDMConversation(userId1: string, userId2: string) {
   const supabase = await getSupabase()
-  // Check if DM already exists
+
+  // Find existing DM by joining both users' participants in a single query
   const { data: p1 } = await supabase
     .from("conversation_participants")
     .select("conversation_id")
     .eq("user_id", userId1)
-  const { data: p2 } = await supabase
-    .from("conversation_participants")
-    .select("conversation_id")
-    .eq("user_id", userId2)
-  if (p1?.length && p2?.length) {
-    const common = p1
-      .map((x) => x.conversation_id)
-      .filter((id) => p2.some((y) => y.conversation_id === id))
-    if (common.length) {
-      const { data } = await supabase
+
+  if (p1?.length) {
+    const convIds = p1.map((x) => x.conversation_id)
+    // Find conversations where both users are participants
+    const { data: shared } = await supabase
+      .from("conversation_participants")
+      .select("conversation_id")
+      .in("conversation_id", convIds)
+      .eq("user_id", userId2)
+
+    if (shared?.length) {
+      // Get the most recent DM (in case of duplicates from race conditions)
+      const sharedIds = shared.map((s) => s.conversation_id)
+      const { data: conv } = await supabase
         .from("conversations")
         .select("*")
-        .eq("id", common[0])
+        .eq("type", "direct")
+        .in("id", sharedIds)
+        .order("created_at", { ascending: false })
+        .limit(1)
         .single()
-      return data
+      if (conv) return conv
     }
   }
+
   // Create new DM conversation
   const { data: conv } = await supabase
     .from("conversations")
@@ -130,10 +150,33 @@ export async function getOrCreateDMConversation(userId1: string, userId2: string
     .select()
     .single()
   if (!conv) return null
-  await supabase.from("conversation_participants").insert([
+
+  // Insert both participants — if race creates duplicate, the DB unique constraint catches it
+  const { error } = await supabase.from("conversation_participants").insert([
     { conversation_id: conv.id, user_id: userId1 },
     { conversation_id: conv.id, user_id: userId2 },
   ])
+
+  // If insert failed (duplicate from race), find the existing conversation
+  if (error) {
+    const { data: existing } = await supabase
+      .from("conversation_participants")
+      .select("conversation_id")
+      .eq("user_id", userId2)
+    if (existing?.length) {
+      const { data: retryConv } = await supabase
+        .from("conversations")
+        .select("*")
+        .eq("type", "direct")
+        .in("id", existing.map((e) => e.conversation_id))
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single()
+      if (retryConv) return retryConv
+    }
+    return null
+  }
+
   return conv
 }
 

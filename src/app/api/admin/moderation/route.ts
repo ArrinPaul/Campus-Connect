@@ -14,22 +14,17 @@ export async function GET() {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    // Because there is no reports table, we just mock some flagged posts for moderation demo
-    const { data: posts } = await supabase
-      .from("posts")
-      .select("*, author:users!posts_author_id_fkey(id, name, username, profile_picture)")
+    const { data: reports } = await supabase
+      .from("content_reports")
+      .select(`
+        *,
+        reporter:users!content_reports_reporter_id_fkey(id, name, username, profile_picture)
+      `)
+      .eq("status", "pending")
       .order("created_at", { ascending: false })
-      .limit(5)
-    
-    // Add fake report metadata to posts
-    const reportedPosts = (posts || []).map(post => ({
-        ...post,
-        reportCount: Math.floor(Math.random() * 5) + 1,
-        reportReason: ["Spam", "Harassment", "Inappropriate content", "Hate speech"][Math.floor(Math.random() * 4)],
-        type: "post"
-    }))
+      .limit(50)
 
-    return NextResponse.json(reportedPosts)
+    return NextResponse.json(reports ?? [])
   } catch (err) {
     return internalError(err)
   }
@@ -47,13 +42,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    const { targetId, action, type } = await req.json()
+    const { targetId, action, type, reportId } = await req.json()
     if (!targetId || !action) return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
 
     if (type === "post") {
-        if (action === "delete") {
-            await supabase.from("posts").delete().eq("id", targetId)
-        }
+      if (action === "delete") {
+        await supabase.from("posts").delete().eq("id", targetId)
+      }
+    }
+
+    // Update report status
+    if (reportId) {
+      await supabase
+        .from("content_reports")
+        .update({ status: action === "delete" ? "resolved" : "reviewed", reviewed_by: userId })
+        .eq("id", reportId)
     }
 
     return NextResponse.json({ success: true })

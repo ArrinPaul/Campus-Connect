@@ -22,6 +22,7 @@ export interface DbUser {
   post_count?: number
   onboarding_completed?: boolean
   is_admin?: boolean
+  deleted_at?: string | null
   created_at?: string
   updated_at?: string
 }
@@ -201,5 +202,9 @@ export async function updateNotificationPreferences(
 
 export async function deleteUserAccount(userId: string): Promise<void> {
   const supabase = await getSupabase()
-  await supabase.from("users").delete().eq("id", userId)
+  // Soft-delete: set deleted_at timestamp; hard delete runs via cron after 30 days
+  await supabase
+    .from("users")
+    .update({ deleted_at: new Date().toISOString() })
+    .eq("id", userId)
 }

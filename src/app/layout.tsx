@@ -7,6 +7,7 @@ import { PostHogProvider } from "@/components/providers/posthog-provider";
 import { PostHogPageView } from "@/components/analytics/posthog-pageview";
 import { LiveRegionProvider } from "@/components/accessibility/LiveRegion";
 import { SkipLink } from "@/components/accessibility/SkipLink";
+import { ServiceWorkerRegister } from "@/components/providers/sw-register";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -78,6 +79,7 @@ export default function RootLayout({
       >
         <body className="font-sans antialiased">
           <SkipLink />
+          <ServiceWorkerRegister />
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

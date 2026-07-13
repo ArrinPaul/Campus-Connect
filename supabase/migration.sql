@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS users (
   is_admin BOOLEAN DEFAULT FALSE,
   privacy_settings JSONB DEFAULT '{}',
   notification_preferences JSONB DEFAULT '{}',
+  deleted_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

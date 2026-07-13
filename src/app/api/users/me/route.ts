@@ -61,16 +61,27 @@ export async function PATCH(req: Request) {
   }
 }
 
-// DELETE /api/users/me
-export async function DELETE() {
+// DELETE /api/users/me — soft-delete account (30-day grace period)
+export async function DELETE(req: Request) {
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+    const body = await req.json().catch(() => ({}))
+    if (!body.confirm) {
+      return NextResponse.json(
+        { error: "Please confirm account deletion by sending { confirm: true }" },
+        { status: 400 }
+      )
+    }
+
     await deleteUserAccount(userId)
-    return NextResponse.json({ success: true })
+    return NextResponse.json({
+      success: true,
+      message: "Account scheduled for deletion. You have 30 days to reactivate by signing in.",
+    })
   } catch (err) {
     return internalError(err)
   }
