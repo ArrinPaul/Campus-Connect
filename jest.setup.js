@@ -95,3 +95,11 @@ class MockIntersectionObserver {
   takeRecords = () => []
 }
 global.IntersectionObserver = MockIntersectionObserver;
+
+// Mock next/image
+jest.mock("next/image", () => {
+  return function MockImage({ src, alt, fill, priority, ...props }) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={src} alt={alt} {...props} />
+  }
+})

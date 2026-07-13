@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import Image from "next/image"
+import { useWebRTC } from "@/hooks/useWebRTC"
 import { useMutation, useQuery } from "@/lib/api"
 import { api } from "@/lib/api"
 import { Id } from "@/lib/api"
@@ -51,22 +52,45 @@ export function CallModal({
 }: CallModalProps) {
   const [isMuted, setIsMuted] = useState(false)
   const [isVideoOff, setIsVideoOff] = useState(callType === "audio")
-  const [isScreenSharing, setIsScreenSharing] = useState(false)
+
   const [callDuration, setCallDuration] = useState(0)
   const [callState, setCallState] = useState<"ringing" | "connecting" | "active" | "ended">(
     isIncoming ? "ringing" : "connecting"
   )
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
+  const {
+    localVideoRef,
+    remoteVideoRef,
+    isMuted: isWebRTCMuted,
+    isVideoOff: isWebRTCVideoOff,
+    isScreenSharing,
+    toggleMute: toggleWebRTCMute,
+    toggleVideo: toggleWebRTCVideo,
+    toggleScreenShare: toggleWebRTCScreenShare,
+    startCall,
+    cleanup,
+  } = useWebRTC({
+    callId: callId as string,
+    isIncoming,
+    callType,
+    onCallEnded: () => setCallState("ended")
+  })
+
   const acceptCall = useMutation(api.calls.acceptCall)
   const rejectCall = useMutation(api.calls.rejectCall)
   const endCall = useMutation(api.calls.endCall)
 
   // Watch call state via reactive query
-  const activeCall = useQuery(api.calls.getActiveCall, { conversationId })
+  const activeCalls = useQuery(api.calls.getActiveCall, { conversationId })
 
   // Sync call state with backend
   useEffect(() => {
+    // getActiveCall returns an array of calls, so we need to find the one for this conversation
+    const activeCall = Array.isArray(activeCalls) 
+      ? activeCalls.find((c: any) => c.conversationId === conversationId || c.id === callId)
+      : activeCalls;
+
     if (!activeCall) {
       if (callState !== "ended") {
         setCallState("ended")
@@ -85,7 +109,22 @@ export function CallModal({
     ) {
       setCallState("ended")
     }
-  }, [activeCall, callState, isIncoming])
+  }, [activeCalls, callState, isIncoming, conversationId, callId])
+
+  // Start WebRTC when call connects
+  useEffect(() => {
+    if (callState === "connecting" && !isIncoming) {
+      // For outgoing call, maybe wait until accepted?
+      // Actually caller sends offer after getting 'active' or right away?
+      // Standard: Wait until callee accepts (active state).
+    }
+    if (callState === "active") {
+      startCall()
+    }
+    if (callState === "ended") {
+      cleanup()
+    }
+  }, [callState, isIncoming, startCall, cleanup])
 
   // Duration timer
   useEffect(() => {
@@ -144,9 +183,19 @@ export function CallModal({
     setCallState("ended")
   }, [endCall, callId])
 
-  const toggleMute = useCallback(() => setIsMuted((m) => !m), [])
-  const toggleVideo = useCallback(() => setIsVideoOff((v) => !v), [])
-  const toggleScreenShare = useCallback(() => setIsScreenSharing((s) => !s), [])
+  const toggleMute = useCallback(() => {
+    setIsMuted((m) => !m)
+    toggleWebRTCMute()
+  }, [toggleWebRTCMute])
+  
+  const toggleVideo = useCallback(() => {
+    setIsVideoOff((v) => !v)
+    toggleWebRTCVideo()
+  }, [toggleWebRTCVideo])
+  
+  const toggleScreenShare = useCallback(() => {
+    toggleWebRTCScreenShare()
+  }, [toggleWebRTCScreenShare])
 
   // Connected participants
   const connectedParticipants = activeCall?.participants?.filter(
@@ -230,21 +279,34 @@ export function CallModal({
 
         {/* Video area (placeholder for WebRTC) */}
         {callType === "video" && callState === "active" && (
-          <div className="flex flex-1 items-center justify-center w-full max-w-2xl my-8">
-            <div className="flex w-full gap-4">
-              {/* Remote video placeholder */}
-              <div className="flex-1 aspect-video rounded-2xl bg-card flex items-center justify-center border border-border">
-                <div className="text-center text-muted-foreground">
-                  <Video className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">Remote video</p>
-                  <p className="text-xs text-muted-foreground mt-1">WebRTC integration required</p>
+          <div className="flex flex-1 items-center justify-center w-full max-w-2xl my-8 relative">
+            <div className="flex w-full h-full relative rounded-2xl overflow-hidden bg-black shadow-2xl">
+              {/* Remote video */}
+              <video
+                ref={remoteVideoRef}
+                autoPlay
+                playsInline
+                className="w-full h-full object-cover"
+              />
+              {!remoteVideoRef.current?.srcObject && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center text-muted-foreground animate-pulse">
+                    <Video className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">Connecting...</p>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Local video (picture-in-picture style) */}
               {!isVideoOff && (
-                <div className="w-32 aspect-video rounded-xl bg-muted flex items-center justify-center border border-border self-end">
-                  <p className="text-xs text-muted-foreground">You</p>
+                <div className="absolute bottom-4 right-4 w-32 aspect-video rounded-xl bg-muted flex items-center justify-center border-2 border-border overflow-hidden shadow-lg z-10">
+                  <video
+                    ref={localVideoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="w-full h-full object-cover transform scale-x-[-1]"
+                  />
                 </div>
               )}
             </div>

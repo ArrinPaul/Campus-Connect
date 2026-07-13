@@ -271,7 +271,15 @@ export const api = {
     getPostsByHashtag: ep("/api/hashtags/posts"),
   },
 
-  // ── communities ────────────────────────────────────────────────────────────
+  admin: {
+    getDashboardStats: ep("/api/admin/stats"),
+    getUsers: ep("/api/admin/users"),
+    manageUser: ep("/api/admin/users", "POST"),
+    getReportedContent: ep("/api/admin/moderation"),
+    moderateContent: ep("/api/admin/moderation", "POST"),
+  },
+  
+  // ── communities ─────────────────────────────────────────────────────────────
   communities: {
     getCommunities: ep("/api/communities"),
     getCommunityPosts: ep("/api/posts/community"),

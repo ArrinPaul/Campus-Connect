@@ -21,6 +21,12 @@ export function DesktopSidebar() {
     isSignedIn ? {} : 'skip'
   );
 
+  const currentUser = useQuery(
+    api.users.getCurrentUser,
+    isSignedIn ? {} : 'skip'
+  );
+  const isAdmin = currentUser && (currentUser.is_admin || currentUser.role === "admin");
+
   const isActive = (href: string) =>
     pathname === href || (href !== '/' && pathname.startsWith(href));
 
@@ -29,6 +35,7 @@ export function DesktopSidebar() {
     { href: '/communities', label: 'Communities', icon: Users },
     { href: '/jobs', label: 'Jobs', icon: Briefcase },
     { href: '/marketplace', label: 'Marketplace', icon: Store },
+    ...(isAdmin ? [{ href: '/admin/dashboard', label: 'Admin', icon: require('lucide-react').ShieldAlert }] : []),
   ];
 
   return (

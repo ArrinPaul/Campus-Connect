@@ -161,27 +161,27 @@ DESIGN.md = source of truth. Meta/Facebook design. `tailwind.config.ts` mirrors 
 - [x] **Push Notifications (PN06):**
   - Send server-side events and broadcast `new_notification` to in-app bell via `useRealtimeNotifications` hook.
 
-## Phase 4: Campus Services & Integrations / Calls & Video [NEXT]
+## Phase 4: Campus Services & Integrations / Calls & Video [COMPLETED]
 
 | Task | Status |
 |---|---|
-| WebRTC signaling via Supabase Realtime | ⬜ |
-| Build call modal UI (CA01-CA06) | ⬜ |
-| Voice call implementation | ⬜ |
-| Video call implementation | ⬜ |
-| Screen sharing | ⬜ |
+| WebRTC signaling via Supabase Realtime | ✅ |
+| Build call modal UI (CA01-CA06) | ✅ |
+| Voice call implementation | ✅ |
+| Video call implementation | ✅ |
+| Screen sharing | ✅ |
 
 ---
 
-## Phase 5: Admin & Monetization ⬜
+## Phase 5: Admin [IN PROGRESS]
 
 | Task | Status |
 |---|---|
 | Admin dashboard (AD01 — real stats) | ⬜ |
 | User management panel | ⬜ |
 | Content moderation tools | ⬜ |
-| Ads system (AD02-AD06) | ⬜ |
-| Stripe subscriptions (AD07-AD09) | ⬜ |
+| ~Ads system (AD02-AD06)~ | ❌ Removed per user |
+| ~Stripe subscriptions (AD07-AD09)~ | ❌ Removed per user |
 
 ---
 
