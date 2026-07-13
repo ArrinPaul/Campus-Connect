@@ -10,10 +10,16 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
+  const authHeader = request.headers.get('Authorization')
+  const globalHeaders = authHeader ? { Authorization: authHeader } : {}
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      global: {
+        headers: globalHeaders
+      },
       cookies: {
         getAll() {
           return request.cookies.getAll()

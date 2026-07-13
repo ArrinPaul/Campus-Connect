@@ -41,7 +41,7 @@ describe("NotificationsPage", () => {
 
     render(<NotificationsPage />)
 
-    expect(screen.getByText("Notifications")).toBeInTheDocument()
+    expect(screen.getByText("Notifications.")).toBeInTheDocument()
   })
 
   it("should show unread count badge when there are unread notifications", () => {
@@ -53,8 +53,8 @@ describe("NotificationsPage", () => {
 
     render(<NotificationsPage />)
 
-    // Unread count badge shows next to title
-    expect(screen.getByText("2")).toBeInTheDocument()
+    // Unread count shows in "Recent Activity (2 unread)"
+    expect(screen.getByText("Recent Activity (2 unread)")).toBeInTheDocument()
   })
 
   it("should show Mark all as read button when there are unread notifications", () => {
@@ -65,7 +65,7 @@ describe("NotificationsPage", () => {
 
     render(<NotificationsPage />)
 
-    expect(screen.getByText("Mark all as read")).toBeInTheDocument()
+    expect(screen.getByText(/Mark all as read/i)).toBeInTheDocument()
   })
 
   it("should not show Mark all as read button when no unread notifications", () => {
@@ -76,7 +76,7 @@ describe("NotificationsPage", () => {
 
     render(<NotificationsPage />)
 
-    expect(screen.queryByText("Mark all as read")).not.toBeInTheDocument()
+    expect(screen.queryByText(/Mark all as read/i)).not.toBeInTheDocument()
   })
 
   it("should show empty state when no notifications", () => {
@@ -84,7 +84,7 @@ describe("NotificationsPage", () => {
 
     render(<NotificationsPage />)
 
-    expect(screen.getByText("No notifications yet")).toBeInTheDocument()
+    expect(screen.getByText("All caught up.")).toBeInTheDocument()
   })
 
   it("should render notification items when notifications exist", () => {
@@ -121,7 +121,7 @@ describe("NotificationsPage", () => {
 
     render(<NotificationsPage />)
 
-    expect(screen.getByText("Sign in to view notifications")).toBeInTheDocument()
+    expect(screen.getByText(/Sign in to view your notifications/i)).toBeInTheDocument()
   })
 
   it("should call markAllAsRead when clicking Mark all as read button", () => {
@@ -132,7 +132,7 @@ describe("NotificationsPage", () => {
 
     render(<NotificationsPage />)
 
-    const markAllButton = screen.getByText("Mark all as read")
+    const markAllButton = screen.getByText(/Mark all as read/i)
     fireEvent.click(markAllButton)
 
     expect(mockMarkAllAsRead).toHaveBeenCalled()

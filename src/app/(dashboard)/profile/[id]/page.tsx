@@ -5,7 +5,7 @@ import { ProfileSkeleton } from '../../../(components)/profile/skeletons';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { UserPostList } from '../../../(components)/profile/UserPostList';
 import { ProfileSkillsSection } from '../../../(components)/profile/ProfileSkillsSection';
-import { ProfileBadges } from '../../../(components)/profile/ProfileBadges';
+import { ErrorBoundary } from '../../../(components)/errors/ErrorBoundary';
 import { notFound } from 'next/navigation';
 
 type ProfilePageProps = {
@@ -39,14 +39,6 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
                             Academic Expertise
                         </div>
                         <ProfileSkillsSection userId={userId} skills={(userProfile as any).skills || []} />
-                    </div>
-
-                    {/* Badges Section */}
-                    <div className="w-full">
-                        <div className="text-fine-print text-ink-muted-48 font-bold uppercase tracking-widest mb-md border-b border-hairline pb-2">
-                            Achievements & Recognition
-                        </div>
-                        <ProfileBadges userId={userId} />
                     </div>
 
                     {/* Posts Section */}

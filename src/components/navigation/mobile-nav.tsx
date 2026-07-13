@@ -50,7 +50,6 @@ const exploreLinks = [
   { label: "Research", href: "/research", icon: FlaskConical },
   { label: "Resources", href: "/resources", icon: FolderOpen },
   { label: "Q&A", href: "/q-and-a", icon: HelpCircle },
-  { label: "Leaderboard", href: "/leaderboard", icon: Trophy },
 ]
 
 export function MobileNav({ currentUserId }: MobileNavProps) {

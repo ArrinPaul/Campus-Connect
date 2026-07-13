@@ -292,7 +292,7 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
       onClick={handlePostClick}
       className="group/post w-full bg-canvas/70 dark:bg-canvas/40 backdrop-blur-md border-b border-hairline py-lg md:py-xl transition-all hover:bg-canvas-soft/50 cursor-pointer"
     >
-      <div className="max-w-2xl mx-auto px-4 md:px-0 flex gap-3 md:gap-4">
+      <div className="max-w-2xl mx-auto px-4 md:px-5 flex gap-3 md:gap-4">
         {/* Left Column: Avatar */}
         <div className="shrink-0 mt-1">
           <AvatarWithStatus userId={author._id} size="sm">

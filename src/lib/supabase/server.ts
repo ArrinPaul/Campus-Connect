@@ -1,17 +1,24 @@
 import { createServerClient } from "@supabase/ssr"
-import { cookies } from "next/headers"
+import { cookies, headers } from "next/headers"
 
 /**
  * Supabase client for server components and route handlers.
- * Reads/writes auth session via Next.js cookies.
+ * Reads/writes auth session via Next.js cookies, and falls back to Bearer token.
  */
 export async function createClient() {
   const cookieStore = await cookies()
+  const headerStore = await headers()
+  const authHeader = headerStore.get('Authorization')
+  
+  const globalHeaders = authHeader ? { Authorization: authHeader } : {}
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      global: {
+        headers: globalHeaders
+      },
       cookies: {
         getAll() {
           return cookieStore.getAll()
