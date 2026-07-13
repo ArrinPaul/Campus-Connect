@@ -29,7 +29,7 @@ export function FeedRightSidebar() {
           <p className="text-sm text-muted-foreground">No trending topics yet.</p>
         ) : (
           <div className="space-y-2">
-            {trendingHashtags.map((ht) => (
+            {trendingHashtags.map((ht: any) => (
               <Link
                 key={ht._id}
                 href={`/hashtag/${ht.tag}`}

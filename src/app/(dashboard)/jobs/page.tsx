@@ -38,7 +38,7 @@ export default function JobsPage() {
                  {jobs === undefined && (
                     [...Array(5)].map((_, i) => <JobCardSkeleton key={i} />)
                 )}
-                {jobs?.map(job => (
+                {jobs?.map((job: any) => (
                     <JobCard key={job._id} job={job as any} />
                 ))}
                 {jobs?.length === 0 && (

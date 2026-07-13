@@ -357,7 +357,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
         const resolvedUrls = await resolveStorageUrls({
           storageIds: storageIds as Id<"_storage">[],
         })
-        mediaUrls = resolvedUrls.filter((u): u is string => u !== null)
+        mediaUrls = resolvedUrls.filter((u: any): u is string => u !== null)
         finalMediaType = attachedType
         mediaFileNames = fileNames
         setIsUploading(false)
@@ -439,7 +439,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
         {showHashtagAutocomplete && hashtagSuggestions && hashtagSuggestions.length > 0 && (
           <div className="absolute z-50 mt-1 w-64 bg-canvas border border-hairline rounded-md shadow-product overflow-hidden">
             <ul className="py-1">
-              {hashtagSuggestions.map((hashtag, index) => (
+              {hashtagSuggestions.map((hashtag: any, index: any) => (
                 <li
                   key={hashtag._id}
                   className={cn(

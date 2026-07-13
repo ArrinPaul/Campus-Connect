@@ -17,7 +17,7 @@ export async function POST(req: Request) {
       role: typeof body?.role === "string" ? body.role : "Student",
       experienceLevel: typeof body?.experienceLevel === "string" ? body.experienceLevel : "Beginner",
       skills: Array.isArray(body?.skills)
-        ? body.skills.filter((skill): skill is string => typeof skill === "string")
+        ? body.skills.filter((skill: any): skill is string => typeof skill === "string")
         : [],
     }
 

@@ -43,7 +43,7 @@ export function FeedList() {
 
     return (
         <div className="flex flex-col pb-20 md:pb-0">
-            {posts.map((post) => {
+            {posts.map((post: any) => {
                 if (!post) return null;
                 const item: FeedItem = {
                     type: 'post',

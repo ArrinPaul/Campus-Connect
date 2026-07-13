@@ -65,7 +65,7 @@ export function AnswerCard({ answer, isQuestionOwner, onAccept }: Props) {
                     <p className="text-sm text-muted-foreground mb-2 whitespace-pre-wrap">{answer.content}</p>
                     {answer.mediaUrls && answer.mediaUrls.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-3">
-                            {answer.mediaUrls.map((url, index) => (
+                            {answer.mediaUrls.map((url: any, index: any) => (
                                 <a key={index} href={url} target="_blank" rel="noopener noreferrer">
                                     <Image
                                         src={url}

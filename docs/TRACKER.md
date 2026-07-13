@@ -70,7 +70,7 @@ DESIGN.md = source of truth. Meta/Facebook design. `tailwind.config.ts` mirrors 
 |---|---|
 | Create Supabase project | ⬜ |
 | Create SQL migration (all tables + RLS) | ✅ |
-| Create storage buckets | ⬜ |
+| Create storage buckets | ✅ |
 | Add keys to .env.local | ⬜ |
 | Update .env.example | ✅ |
 

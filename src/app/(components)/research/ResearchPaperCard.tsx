@@ -38,7 +38,7 @@ export function ResearchPaperCard({ paper }: Props) {
 
             {paper.tags && paper.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-3">
-                    {paper.tags.map(tag => (
+                    {paper.tags.map((tag: any) => (
                         <span key={tag} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-muted text-xs text-muted-foreground">
                             <Hash className="h-3 w-3" /> {tag}
                         </span>

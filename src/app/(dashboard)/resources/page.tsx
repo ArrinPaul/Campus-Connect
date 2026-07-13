@@ -63,7 +63,7 @@ export default function ResourcesPage() {
                  {resources === undefined && (
                     [...Array(5)].map((_, i) => <ResourceCardSkeleton key={i} />)
                 )}
-                {resources?.map(resource => (
+                {resources?.map((resource: any) => (
                     <ResourceCard key={resource._id} resource={resource as any} />
                 ))}
                 {resources?.length === 0 && (

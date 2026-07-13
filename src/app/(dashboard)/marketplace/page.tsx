@@ -20,7 +20,7 @@ export default function MarketplacePage() {
         category: categoryFilter === 'all' ? undefined : categoryFilter,
     });
 
-    const filteredListings = listings?.filter(listing => 
+    const filteredListings = listings?.filter((listing: any) => 
         searchQuery ? (
             listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             listing.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -68,7 +68,7 @@ export default function MarketplacePage() {
                  {listings === undefined && (
                     [...Array(5)].map((_, i) => <ListingCardSkeleton key={i} />)
                 )}
-                {filteredListings?.map(listing => (
+                {filteredListings?.map((listing: any) => (
                     <ListingCard key={listing._id} listing={listing as any} />
                 ))}
                 {filteredListings?.length === 0 && (

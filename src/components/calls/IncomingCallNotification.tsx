@@ -22,12 +22,12 @@ export function IncomingCallNotification() {
 
   // Filter out dismissed calls
   const pendingCalls = (incomingCalls || []).filter(
-    (call) => !dismissedCallIds.has(call._id)
+    (call: any) => !dismissedCallIds.has(call._id)
   )
 
   // If there's an active call modal, show it
   const activeCallData = activeCallId
-    ? (incomingCalls || []).find((c) => c._id === activeCallId)
+    ? (incomingCalls || []).find((c: any) => c._id === activeCallId)
     : null
 
   const handleAccept = useCallback(
@@ -72,7 +72,7 @@ export function IncomingCallNotification() {
   // Clean up dismissed calls that are no longer in the list
   useEffect(() => {
     if (!incomingCalls) return
-    const currentIds = new Set(incomingCalls.map((c) => c._id))
+    const currentIds = new Set(incomingCalls.map((c: any) => c._id))
     setDismissedCallIds((prev) => {
       const next = new Set<string>()
       prev.forEach((id) => {
@@ -101,7 +101,7 @@ export function IncomingCallNotification() {
 
   return (
     <>
-      {pendingCalls.map((call) => (
+      {pendingCalls.map((call: any) => (
         <div
           key={call._id}
           className="fixed top-4 right-4 z-[90] w-80 animate-in slide-in-from-top-2 fade-in duration-300"

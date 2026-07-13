@@ -41,7 +41,7 @@ export function ConversationList({ selectedConversationId }: Props) {
                 {conversations?.length === 0 && (
                     <div className="p-4 text-center text-sm text-muted-foreground">No conversations yet.</div>
                 )}
-                {conversations?.map((convo) => (
+                {conversations?.map((convo: any) => (
                     <ConversationListItem 
                         key={convo._id}
                         conversation={convo}

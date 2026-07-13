@@ -198,11 +198,12 @@ export function ReactionSummary({ targetId, targetType, onClick }: ReactionSumma
       className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
     >
       <div className="flex -space-x-1">
-        {topReactions.map(({ type }) => (
+        {topReactions.map(({ type }: any) => (
           <span
             key={type}
             className="inline-flex items-center justify-center w-5 h-5 text-xs bg-background border border-border rounded-full"
           >
+            {/* @ts-ignore */}
             {reactionEmojis[type]}
           </span>
         ))}

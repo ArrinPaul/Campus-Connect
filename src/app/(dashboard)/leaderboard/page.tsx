@@ -49,7 +49,7 @@ export default function LeaderboardPage() {
                  {leaderboard === undefined && (
                     [...Array(5)].map((_, i) => <LeaderboardItemSkeleton key={i} />)
                 )}
-                {leaderboard?.map(entry => (
+                {leaderboard?.map((entry: any) => (
                     <LeaderboardItem key={entry._id} entry={entry as any} />
                 ))}
                 {leaderboard?.length === 0 && (

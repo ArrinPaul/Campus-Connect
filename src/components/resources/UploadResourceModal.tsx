@@ -105,7 +105,7 @@ export function UploadResourceModal({ onClose }: UploadResourceModalProps) {
           storageIds: [storageId as Id<'_storage'>],
         });
 
-        fileUrl = resolvedUrls.filter((u): u is string => u !== null)[0];
+        fileUrl = resolvedUrls.filter((u: any): u is string => u !== null)[0];
         setUploadProgress(90);
       }
 

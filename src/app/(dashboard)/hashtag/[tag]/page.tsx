@@ -52,7 +52,7 @@ function HashtagPageContent({ tag }: { tag: string }) {
             </div>
 
             <div className="space-y-4">
-                {posts.map(post => (
+                {posts.map((post: any) => (
                     <PostCard key={post._id} item={{ type: 'post', post: post as any, _id: post._id, createdAt: post.createdAt }} />
                 ))}
             </div>

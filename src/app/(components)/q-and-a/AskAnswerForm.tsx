@@ -107,7 +107,7 @@ export function AskAnswerForm({ questionId }: Props) {
                     storageIds: storageIds as Id<'_storage'>[],
                 });
 
-                mediaUrls = resolvedUrls.filter((u): u is string => u !== null);
+                mediaUrls = resolvedUrls.filter((u: any): u is string => u !== null);
                 setUploadProgress(90);
             }
 

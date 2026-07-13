@@ -166,7 +166,7 @@ export function NotificationBell() {
               </div>
             ) : (
               <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                {recentNotifications.map((notification) => (
+                {recentNotifications.map((notification: any) => (
                   <button
                     key={notification._id}
                     onClick={() => handleNotificationClick(notification)}

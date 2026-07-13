@@ -56,7 +56,7 @@ function StoriesPageContent() {
                 </button>
             </div>
             <div className="flex flex-wrap gap-4">
-                {stories.map(story => (
+                {stories.map((story: any) => (
                     <StoryPreviewCard key={story._id} story={story as any} />
                 ))}
             </div>

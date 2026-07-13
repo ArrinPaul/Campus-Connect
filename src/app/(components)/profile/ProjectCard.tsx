@@ -32,7 +32,7 @@ export function ProjectCard({ project }: Props) {
 
             {project.links && project.links.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3 border-t pt-3">
-                    {project.links.map((link, i) => (
+                    {project.links.map((link: any, i: any) => (
                         <a key={i} href={link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline text-xs">
                             <ExternalLink className="h-3 w-3" /> Link
                         </a>

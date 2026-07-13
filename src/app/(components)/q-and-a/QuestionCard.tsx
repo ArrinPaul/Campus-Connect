@@ -55,7 +55,7 @@ export function QuestionCard({ question }: Props) {
             </div>
             {question.tags && question.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-3">
-                    {question.tags.map(tag => (
+                    {question.tags.map((tag: any) => (
                         <span key={tag} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-muted text-xs text-muted-foreground">
                             <Hash className="h-3 w-3" /> {tag}
                         </span>

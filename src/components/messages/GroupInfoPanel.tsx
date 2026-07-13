@@ -159,10 +159,10 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
 
   // Filter search results to exclude existing members
   const existingMemberIds = new Set(
-    conversation.participants?.map((p) => p._id) || []
+    conversation.participants?.map((p: any) => p._id) || []
   )
   const filteredSearchResults = searchResults?.filter(
-    (u) => !existingMemberIds.has(u._id)
+    (u: any) => !existingMemberIds.has(u._id)
   )
 
   return (
@@ -274,7 +274,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
 
           {showPinned && pinnedMessages && pinnedMessages.length > 0 && (
             <div className="px-4 pb-3 space-y-2">
-              {pinnedMessages.map((msg) => (
+              {pinnedMessages.map((msg: any) => (
                 <div
                   key={msg._id}
                   className="p-2 bg-muted/50 bg-muted rounded-lg text-sm"
@@ -329,7 +329,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
                           {filteredSearchResults.length === 0 ? (
                             <p className="text-xs text-muted-foreground p-2">No users found</p>
                           ) : (
-                            filteredSearchResults.map((user) => (
+                            filteredSearchResults.map((user: any) => (
                               <button
                                 key={user._id}
                                 onClick={() => handleAddMember(user._id)}
@@ -369,7 +369,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
               )}
 
               {/* Member list */}
-              {conversation.participants?.map((member) => (
+              {conversation.participants?.map((member: any) => (
                 <div
                   key={member._id}
                   className="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-accent group"

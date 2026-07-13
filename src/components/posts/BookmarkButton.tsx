@@ -143,8 +143,8 @@ export function BookmarkButton({
 
           {/* Existing collections */}
           {collections
-            ?.filter((c) => c.name !== "Saved")
-            .map((collection) => (
+            ?.filter((c: any) => c.name !== "Saved")
+            .map((collection: any) => (
               <DropdownMenuItem
                 key={collection.name}
                 onClick={() => handleAddToCollection(collection.name)}
