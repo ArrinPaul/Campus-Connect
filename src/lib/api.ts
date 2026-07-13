@@ -324,7 +324,7 @@ export const api = {
     getMyApplications: ep("/api/jobs/applications"),
     getUserApplications: ep("/api/jobs/applications"),
     getJobApplications: ep("/api/jobs/job-applications"),
-    searchJobs: ep("/api/jobs/search"),
+    searchJobs: ep("/api/jobs"),
     getJob: ep("/api/jobs/single"),
   },
 

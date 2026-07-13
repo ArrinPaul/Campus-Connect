@@ -11,7 +11,7 @@ export async function updateSession(request: NextRequest) {
   })
 
   const authHeader = request.headers.get('Authorization')
-  const globalHeaders = authHeader ? { Authorization: authHeader } : {}
+  const globalHeaders: Record<string, string> = authHeader ? { Authorization: authHeader } : {}
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,7 +24,7 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: any[]) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           )

@@ -5,7 +5,7 @@ import { ProfileSkeleton } from '../../../(components)/profile/skeletons';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { UserPostList } from '../../../(components)/profile/UserPostList';
 import { ProfileSkillsSection } from '../../../(components)/profile/ProfileSkillsSection';
-import { ErrorBoundary } from '../../../(components)/errors/ErrorBoundary';
+import { PortfolioSection } from '../../../(components)/profile/PortfolioSection';
 import { notFound } from 'next/navigation';
 
 type ProfilePageProps = {
@@ -39,6 +39,18 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
                             Academic Expertise
                         </div>
                         <ProfileSkillsSection userId={userId} skills={(userProfile as any).skills || []} />
+                    </div>
+
+                    {/* Portfolio Section */}
+                    <div className="w-full">
+                        <div className="text-fine-print text-ink-muted-48 font-bold uppercase tracking-widest mb-md border-b border-hairline pb-2">
+                            Portfolio & Credentials
+                        </div>
+                        <PortfolioSection 
+                            userId={userId} 
+                            projects={(userProfile as any).projects || []} 
+                            certifications={(userProfile as any).certifications || []} 
+                        />
                     </div>
 
                     {/* Posts Section */}

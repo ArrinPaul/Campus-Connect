@@ -12,6 +12,8 @@ export interface DbUser {
   experience_level?: string
   profile_picture?: string
   skills?: string[]
+  projects?: { title: string; url: string; description: string }[]
+  certifications?: { name: string; issuer: string; date: string; url: string }[]
   social_links?: Record<string, string>
   follower_count?: number
   following_count?: number

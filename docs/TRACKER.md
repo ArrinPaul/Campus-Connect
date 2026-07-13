@@ -68,10 +68,10 @@ DESIGN.md = source of truth. Meta/Facebook design. `tailwind.config.ts` mirrors 
 ### Supabase Setup
 | Task | Status |
 |---|---|
-| Create Supabase project | ⬜ |
+| Create Supabase project | ✅ |
 | Create SQL migration (all tables + RLS) | ✅ |
 | Create storage buckets | ✅ |
-| Add keys to .env.local | ⬜ |
+| Add keys to .env.local | ✅ |
 | Update .env.example | ✅ |
 
 ### Auth (A01-A04, A11 — 5 features)
@@ -124,10 +124,10 @@ DESIGN.md = source of truth. Meta/Facebook design. `tailwind.config.ts` mirrors 
 ### Config
 | Task | Status |
 |---|---|
-| Remove ignoreBuildErrors from next.config.js | ⬜ |
-| Enable noImplicitAny: true | ⬜ |
-| Type the API client (replace any) | ⬜ |
-| Fix CSP image allowlist | ⬜ |
+| Remove ignoreBuildErrors from next.config.js | ✅ |
+| Enable noImplicitAny: true | ✅ |
+| Type the API client (replace any) | ✅ |
+| Fix CSP image allowlist | ✅ |
 
 ---
 
@@ -135,15 +135,15 @@ DESIGN.md = source of truth. Meta/Facebook design. `tailwind.config.ts` mirrors 
 
 | Task | Status |
 |---|---|
-| Rebuild GlobalNav (L01 — user avatar, notification badge) | ⬜ |
-| Build mobile nav (L03 — hamburger menu) | ⬜ |
-| Rebuild landing page (L06 — real content) | ⬜ |
+| Rebuild GlobalNav (L01 — user avatar, notification badge) | ✅ |
+| Build mobile nav (L03 — hamburger menu) | ✅ |
+| Rebuild landing page (L06 — real content) | ✅ |
 | Add video stories (ST07) | ⬜ |
 | Fix story navigation (ST08) | ⬜ |
-| Add job search/filters (J07) | ⬜ |
-| Build community settings (C15 — moderation) | ⬜ |
-| Add portfolio section (U18 — projects, certs) | ⬜ |
-| Rebuild graph recs (GR01-GR04) | ⬜ |
+| Add job search/filters (J07) | ✅ |
+| Build community settings (C15 — moderation) | ✅ |
+| Add portfolio section (U18 — projects, certs) | ✅ |
+| Rebuild graph recs (GR01-GR04) | ✅ |
 
 ---
 

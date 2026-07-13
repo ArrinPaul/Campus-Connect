@@ -90,3 +90,23 @@ export async function getMembership(communityId: string, userId: string) {
     .single()
   return data
 }
+
+export async function updateCommunity(id: string, updates: Partial<{ name: string; description: string; type: string; category: string; slug: string }>) {
+  const supabase = await getSupabase()
+  
+  // if name is provided, generate a new slug (basic logic)
+  let updateData = { ...updates }
+  if (updates.name) {
+    updateData = { ...updateData, slug: updates.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') }
+  }
+
+  const { data: community, error } = await supabase
+    .from("communities")
+    .update(updateData)
+    .eq("id", id)
+    .select()
+    .single()
+    
+  if (error) throw new Error(error.message)
+  return community
+}
