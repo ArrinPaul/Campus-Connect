@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
 import { useLiveRegion } from "@/components/accessibility/LiveRegion"
+import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications"
 
 /**
  * NotificationBell component
@@ -23,6 +24,8 @@ export function NotificationBell() {
   const prevUnreadRef = useRef<number | undefined>(undefined)
   const router = useRouter()
   const { announce } = useLiveRegion()
+
+  useRealtimeNotifications()
 
   const { isSignedIn } = useUser()
   const isAuthenticated = isSignedIn ?? false

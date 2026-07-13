@@ -12,6 +12,7 @@ import { Repeat2 } from "lucide-react"
 import { SuggestedUsers } from "@/components/discover/SuggestedUsers"
 import { TrendingHashtags } from "@/components/trending/TrendingHashtags"
 import type { FeedItem } from "@/app/(components)/feed/types"
+import { useRealtimeFeed } from "@/hooks/useRealtimeFeed"
 
 type FeedType = "following" | "for-you" | "trending"
 
@@ -22,6 +23,7 @@ interface FeedContainerProps {
 }
 
 export function FeedContainer({ feedType = "following" }: FeedContainerProps) {
+  useRealtimeFeed()
   const { isLoaded, isSignedIn } = useUser()
   const isAuthenticated = isSignedIn ?? false
   const [allItems, setAllItems] = useState<FeedQueryItem[]>([])

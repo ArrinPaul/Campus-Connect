@@ -19,6 +19,7 @@ interface MessageComposerProps {
   conversationId: Id<"conversations">
   replyingTo: ReplyTo | null
   onCancelReply: () => void
+  setTyping: (isTyping: boolean) => Promise<void>
 }
 
 /**
@@ -30,6 +31,7 @@ export function MessageComposer({
   conversationId,
   replyingTo,
   onCancelReply,
+  setTyping,
 }: MessageComposerProps) {
   const [content, setContent] = useState("")
   const [isSending, setIsSending] = useState(false)
@@ -39,7 +41,6 @@ export function MessageComposer({
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const sendMessage = useMutation(api.messages.sendMessage)
-  const setTyping = useMutation(api.presence.setTyping)
 
   // Auto-resize textarea
   useEffect(() => {
@@ -59,7 +60,7 @@ export function MessageComposer({
 
   // Handle typing indicator
   const handleTyping = useCallback(() => {
-    setTyping({ conversationId, isTyping: true }).catch(() => {})
+    setTyping(true).catch(() => {})
 
     // Clear previous timeout
     if (typingTimeoutRef.current) {
@@ -68,9 +69,9 @@ export function MessageComposer({
 
     // Set typing to false after 3 seconds of no input
     typingTimeoutRef.current = setTimeout(() => {
-      setTyping({ conversationId, isTyping: false }).catch(() => {})
+      setTyping(false).catch(() => {})
     }, 3000)
-  }, [conversationId, setTyping])
+  }, [setTyping])
 
   // Cleanup typing timeout on unmount
   useEffect(() => {
@@ -87,11 +88,21 @@ export function MessageComposer({
 
     setIsSending(true)
     try {
-      await sendMessage({
+      const result = await sendMessage({
         conversationId,
         content: trimmed,
         messageType: "text",
         replyToId: replyingTo?._id,
+      })
+
+      // Broadcast the new message as a fallback if Postgres CDC isn't enabled
+      import("@/lib/supabase/client").then(({ createClient }) => {
+        const supabase = createClient()
+        supabase.channel(`messages:${conversationId}`).send({
+          type: "broadcast",
+          event: "new_message",
+          payload: result,
+        })
       })
 
       setContent("")
@@ -101,7 +112,7 @@ export function MessageComposer({
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current)
       }
-      setTyping({ conversationId, isTyping: false }).catch(() => {})
+      setTyping(false).catch(() => {})
 
       // Re-focus textarea
       textareaRef.current?.focus()

@@ -12,6 +12,8 @@ import { GroupInfoPanel } from "@/components/messages/GroupInfoPanel"
 import { OnlineStatusDot } from "@/components/ui/OnlineStatusDot"
 import { CallModal } from "@/components/calls/CallModal"
 import { createLogger } from "@/lib/logger"
+import { useRealtimeMessages } from "@/hooks/useRealtime"
+import { useTypingIndicator } from "@/hooks/useTypingIndicator"
 
 const log = createLogger("ChatArea")
 
@@ -40,6 +42,9 @@ interface ChatAreaProps {
  * Main chat interface with header, message list, and composer
  */
 export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
+  // Initialize realtime listener for this conversation
+  useRealtimeMessages(conversationId)
+
   const [showSearch, setShowSearch] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [showMenu, setShowMenu] = useState(false)
@@ -66,15 +71,17 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
     conversationId,
     limit: 50,
   })
-  const typingUsers = useQuery(api.presence.getTypingUsers, {
-    conversationId,
-  })
+  
   const searchResults = useQuery(
     api.messages.searchMessages,
     showSearch && searchQuery.trim()
       ? { conversationId, searchQuery, limit: 20 }
       : "skip"
   )
+
+  // Realtime hooks
+  useRealtimeMessages(conversationId)
+  const { typingUsers, setTyping } = useTypingIndicator(conversationId)
 
   // Mutations
   const markAsRead = useMutation(api.messages.markAsRead)
@@ -462,6 +469,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
         conversationId={conversationId}
         replyingTo={replyingTo}
         onCancelReply={() => setReplyingTo(null)}
+        setTyping={setTyping}
       />
 
       {/* Group Info Panel (slide-in) */}

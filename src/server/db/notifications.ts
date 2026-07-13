@@ -42,5 +42,18 @@ export async function createNotification(data: {
   from_user_id?: string
 }) {
   const supabase = await getSupabase()
-  await supabase.from("notifications").insert(data)
+  const { data: notif } = await supabase.from("notifications").insert(data).select().single()
+
+  // Broadcast the new notification to the user's channel as a fallback
+  if (notif) {
+    const channel = supabase.channel(`notifications:${data.user_id}`)
+    await channel.send({
+      type: "broadcast",
+      event: "new_notification",
+      payload: notif,
+    })
+    // we don't necessarily need to removeChannel immediately on server side, 
+    // but good practice to clean up if we had a persistent connection.
+    supabase.removeChannel(channel)
+  }
 }
