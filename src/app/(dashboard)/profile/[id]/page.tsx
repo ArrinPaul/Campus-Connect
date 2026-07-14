@@ -35,7 +35,7 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
                     
                     {/* Skills Section */}
                     <div className="w-full">
-                        <div className="text-fine-print text-ink-muted-48 font-bold uppercase tracking-widest mb-md border-b border-hairline pb-2">
+                        <div className="text-caption-bold text-steel uppercase tracking-wide mb-md border-b border-hairline pb-2">
                             Academic Expertise
                         </div>
                         <ProfileSkillsSection userId={userId} skills={(userProfile as any).skills || []} />
@@ -43,7 +43,7 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
 
                     {/* Portfolio Section */}
                     <div className="w-full">
-                        <div className="text-fine-print text-ink-muted-48 font-bold uppercase tracking-widest mb-md border-b border-hairline pb-2">
+                        <div className="text-caption-bold text-steel uppercase tracking-wide mb-md border-b border-hairline pb-2">
                             Portfolio & Credentials
                         </div>
                         <PortfolioSection 
@@ -55,7 +55,7 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
 
                     {/* Posts Section */}
                     <div className="w-full">
-                        <div className="text-fine-print text-ink-muted-48 font-bold uppercase tracking-widest mb-md border-b border-hairline pb-2">
+                        <div className="text-caption-bold text-steel uppercase tracking-wide mb-md border-b border-hairline pb-2">
                             Recent Contributions
                         </div>
                         <UserPostList userId={userId} />

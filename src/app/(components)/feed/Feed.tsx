@@ -35,24 +35,16 @@ export function Feed() {
         <CreatePost />
       </div>
 
-      {/* Feed Tabs - Apple Style */}
-      <div className="w-full sticky top-[96px] z-30 glass bg-canvas/80 border-b border-hairline mt-md">
-        <div className="max-w-2xl mx-auto flex items-center justify-center gap-xl h-[44px]">
+      {/* Feed Tabs - Meta Pill Nav */}
+      <div className="w-full sticky top-[64px] z-30 bg-canvas/90 backdrop-blur-md border-b border-hairline py-md">
+        <div className="max-w-2xl mx-auto flex items-center justify-center gap-sm">
           {TABS.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={cn(
-                "relative h-full flex items-center text-caption font-semibold transition-colors btn-press",
-                activeTab === tab.key
-                  ? "text-primary"
-                  : "text-ink-muted-48 hover:text-ink"
-              )}
+              className={activeTab === tab.key ? "button-pill-tab-active" : "button-pill-tab"}
             >
               {tab.label}
-              {activeTab === tab.key && (
-                <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full" />
-              )}
             </button>
           ))}
         </div>

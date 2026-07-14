@@ -4,116 +4,191 @@
 
 @layer base {
   :root {
-    /* ── Modern Design Tokens ──────────────────────────── */
-    --primary: #18181b; 
-    --primary-deep: #09090b;
-    --primary-soft: #27272a;
+    /* Brand */
+    --primary: 0 100 224; /* #0064e0 */
+    --primary-deep: 4 87 203; /* #0457cb */
+    --primary-soft: 0 145 255; /* #0091ff */
+    --on-primary: 255 255 255;
     
-    --canvas: #ffffff;
-    --canvas-soft: #f4f4f5;
+    --ink-button: 0 0 0;
+    --on-ink-button: 255 255 255;
     
-    --ink: #09090b;
-    --ink-deep: #000000;
-    --ink-button: #ffffff;
-    --ink-muted: #71717a;
-    
-    --charcoal: #3f3f46;
-    --slate: #52525b;
-    --steel: #71717a;
-    --stone: #a1a1aa;
-    
-    --hairline: #e4e4e7;
-    --hairline-soft: #f4f4f5;
-    --disabled-text: #a1a1aa;
+    --fb-blue: 24 118 242; /* #1876f2 */
+    --meta-link: 56 88 152; /* #385898 */
+    --oculus-purple: 161 33 206; /* #a121ce */
 
-    --radius: 0.5rem;
+    /* Semantic */
+    --success: 49 162 76; /* #31a24c */
+    --success-bg: 36 228 0; /* #24e400 */
+    --attention: 242 169 24; /* #f2a918 */
+    --warning: 247 185 40; /* #f7b928 */
+    --warning-bg: 255 226 0; /* #ffe200 */
+    --critical: 228 30 63; /* #e41e3f */
+    --critical-strong: 240 40 74; /* #f0284a */
+
+    /* Surface */
+    --canvas: 255 255 255;
+    --surface-soft: 241 244 247; /* #f1f4f7 */
+
+    /* Text */
+    --ink-deep: 10 19 23; /* #0a1317 */
+    --ink: 28 30 33; /* #1c1e21 */
+    --charcoal: 68 73 80; /* #444950 */
+    --slate: 75 76 79; /* #4b4c4f */
+    --steel: 93 108 123; /* #5d6c7b */
+    --stone: 133 149 164; /* #8595a4 */
+
+    /* Borders */
+    --hairline: 206 208 212; /* #ced0d4 */
+    --hairline-soft: 222 227 233; /* #dee3e9 */
+    --disabled-text: 188 192 196; /* #bcc0c4 */
   }
 
   .dark {
-    --primary: #ffffff;
-    --primary-deep: #f4f4f5;
-    --primary-soft: #27272a;
+    /* Brand - Facebook Dark Mode Inspired */
+    --primary: 45 136 255; /* #2d88ff */
+    --primary-deep: 24 118 242; /* #1876f2 */
+    --primary-soft: 80 160 255; /* #50a0ff */
+    --on-primary: 255 255 255;
     
-    /* True Black for immersive dark mode */
-    --canvas: #000000;
-    --canvas-soft: #09090b;
+    --ink-button: 255 255 255; /* Reversed for dark mode */
+    --on-ink-button: 10 19 23; /* Dark text on white button */
     
-    --ink: #fafafa;
-    --ink-deep: #ffffff;
-    --ink-button: #000000;
-    --ink-muted: #a1a1aa;
-    
-    --charcoal: #d4d4d8;
-    --slate: #a1a1aa;
-    --steel: #71717a;
-    --stone: #52525b;
-    
-    --hairline: #27272a;
-    --hairline-soft: #18181b;
-    --disabled-text: #52525b;
+    --fb-blue: 45 136 255;
+    --meta-link: 80 160 255;
+    --oculus-purple: 186 78 227;
+
+    /* Semantic */
+    --success: 49 162 76;
+    --success-bg: 36 228 0;
+    --attention: 242 169 24;
+    --warning: 247 185 40;
+    --warning-bg: 255 226 0;
+    --critical: 240 40 74;
+    --critical-strong: 255 80 100;
+
+    /* Surface */
+    --canvas: 24 25 26; /* #18191a */
+    --surface-soft: 36 37 38; /* #242526 */
+
+    /* Text */
+    --ink-deep: 228 230 235; /* #e4e6eb */
+    --ink: 176 179 184; /* #b0b3b8 */
+    --charcoal: 140 147 157;
+    --slate: 100 103 107;
+    --steel: 90 92 95;
+    --stone: 62 64 66;
+
+    /* Borders */
+    --hairline: 58 59 60; /* #3a3b3c */
+    --hairline-soft: 47 48 49; /* #2f3031 */
+    --disabled-text: 90 92 95;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-hairline;
   }
   
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
-    background-color: var(--canvas);
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-canvas text-ink;
     font-feature-settings: "rlig" 1, "calt" 1;
     font-family: var(--font-sans);
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display text-foreground;
-    letter-spacing: -0.015em;
+    @apply font-display text-ink-deep;
+    /* Stylistic sets from DESIGN.md */
+    font-feature-settings: "ss01", "ss02";
   }
 
   :focus-visible {
-    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-canvas;
   }
 }
 
 @layer components {
-  /* Signature Apple Micro-interaction */
-  .btn-press {
-    @apply transition-all duration-200 active:scale-[0.95];
+  /* Buttons from DESIGN.md */
+  .button-primary {
+    @apply bg-ink-button text-on-ink-button text-button-md rounded-full px-[30px] py-[14px] hover:bg-charcoal disabled:bg-disabled-text disabled:text-canvas transition-colors inline-flex items-center justify-center;
+  }
+  
+  .button-buy-cta {
+    @apply bg-primary text-on-primary text-button-md rounded-full px-[30px] py-[14px] hover:bg-primary-deep transition-colors inline-flex items-center justify-center;
   }
 
-  /* Frosted Glass Effect */
-  .glass {
-    @apply bg-opacity-80 backdrop-blur-xl saturate-[180%];
+  .button-secondary {
+    @apply bg-transparent text-ink-deep text-button-md rounded-full px-[28px] py-[12px] border-2 border-ink-deep hover:bg-surface-soft transition-colors inline-flex items-center justify-center;
   }
 
-  /* Custom scrollbar - Minimal */
-  .scrollbar-custom::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  .button-ghost {
+    @apply bg-transparent text-ink-deep text-button-md rounded-full px-[22px] py-[10px] border-2 border-ink-deep/10 hover:bg-surface-soft transition-colors inline-flex items-center justify-center;
   }
-  .scrollbar-custom::-webkit-scrollbar-track {
-    background: transparent;
+
+  .button-pill-tab {
+    @apply bg-canvas text-ink text-body-sm-bold rounded-full px-[16px] py-[8px] border border-hairline hover:bg-surface-soft transition-colors inline-flex items-center justify-center;
   }
-  .scrollbar-custom::-webkit-scrollbar-thumb {
-    background: var(--hairline);
-    border-radius: 3px;
+
+  .button-pill-tab-active {
+    @apply bg-ink-deep text-canvas text-body-sm-bold rounded-full px-[16px] py-[8px] border border-transparent transition-colors inline-flex items-center justify-center;
+  }
+
+  /* Cards from DESIGN.md */
+  .card-product-feature {
+    @apply bg-canvas rounded-xxxl p-xxl border border-hairline-soft overflow-hidden;
+  }
+  
+  .card-feature-photo {
+    @apply bg-canvas rounded-xxxl p-0 border-none overflow-hidden relative;
+  }
+
+  .card-promo-strip {
+    @apply bg-ink-deep text-canvas rounded-xxxl p-section overflow-hidden;
+  }
+
+  .card-icon-feature {
+    @apply bg-canvas rounded-xl p-xl border border-hairline-soft;
+  }
+
+  .why-buy-tile {
+    @apply bg-canvas rounded-xl py-xxl px-xl border border-hairline-soft flex flex-col gap-4;
+  }
+
+  /* Inputs from DESIGN.md */
+  .text-input {
+    @apply bg-canvas text-ink text-body-md rounded-lg p-md border border-hairline h-[44px] focus:border-fb-blue focus:border-2 focus:ring-0 outline-none transition-all;
+  }
+
+  .search-pill {
+    @apply bg-surface-soft text-steel text-body-sm rounded-full px-lg py-md h-[40px] border-transparent focus:border-fb-blue focus:bg-canvas focus:border-2 outline-none transition-all flex items-center;
+  }
+  
+  /* Badges from DESIGN.md */
+  .badge-promo-yellow {
+    @apply bg-warning text-ink-deep text-caption-bold rounded-full px-[10px] py-[4px] inline-flex items-center;
+  }
+
+  /* Promo Banner from DESIGN.md */
+  .promo-banner {
+    @apply bg-ink-deep text-canvas text-body-sm-bold px-xl py-md w-full flex justify-center items-center gap-4 text-center;
+  }
+  .promo-banner.yellow {
+    @apply bg-warning text-ink-deep;
   }
 }
 
-/* ─── SELECTION HIGHLIGHT ────────────────────────────────────── */
 ::selection {
-  background: rgba(0, 102, 204, 0.1);
-  color: inherit;
+  background: rgb(var(--primary-soft) / 0.3);
+  color: rgb(var(--ink-deep));
 }
 
-/* ─── REDUCED MOTION ─────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

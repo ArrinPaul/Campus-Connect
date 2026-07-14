@@ -3,9 +3,7 @@ import type { Config } from "tailwindcss"
 /**
  * Campus Connect Design System
  *
- * All design tokens come from DESIGN.md (Meta/Facebook design system analysis).
- * Do NOT add tokens here that aren't in DESIGN.md.
- * If you need a new token, add it to DESIGN.md first, then mirror it here.
+ * Implements the exact tokens from DESIGN.md (Meta/Facebook design system).
  */
 const config: Config = {
   darkMode: "class",
@@ -17,8 +15,6 @@ const config: Config = {
   theme: {
     extend: {
       // ─── Typography ─────────────────────────────────────────────────────────
-      // Font: Optimistic VF (Meta's variable face)
-      // Fallbacks: Montserrat, Helvetica, Arial, Noto Sans
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
         display: ["var(--font-display)", "system-ui", "sans-serif"],
@@ -28,123 +24,120 @@ const config: Config = {
       colors: {
         // Brand & Accent
         primary: {
-          DEFAULT: "#0064e0",    // {colors.primary} — Cobalt
-          deep: "#0457cb",       // {colors.primary-deep}
-          soft: "#0091ff",       // {colors.primary-soft}
-          foreground: "#ffffff", // {colors.on-primary}
+          DEFAULT: "rgb(var(--primary) / <alpha-value>)",
+          deep: "rgb(var(--primary-deep) / <alpha-value>)",
+          soft: "rgb(var(--primary-soft) / <alpha-value>)",
         },
-        "fb-blue": "#1876f2",    // {colors.fb-blue}
-        "meta-link": "#385898",  // {colors.meta-link}
-        "oculus-purple": "#a121ce", // {colors.oculus-purple}
+        "on-primary": "rgb(var(--on-primary) / <alpha-value>)",
+        
+        "ink-button": "rgb(var(--ink-button) / <alpha-value>)",
+        "on-ink-button": "rgb(var(--on-ink-button) / <alpha-value>)",
+        
+        "fb-blue": "rgb(var(--fb-blue) / <alpha-value>)",
+        "meta-link": "rgb(var(--meta-link) / <alpha-value>)",
+        "oculus-purple": "rgb(var(--oculus-purple) / <alpha-value>)",
 
         // Semantic
-        success: "#31a24c",      // {colors.success}
-        "success-bg": "#24e400", // {colors.success-bg}
-        attention: "#f2a918",    // {colors.attention}
-        warning: "#f7b928",      // {colors.warning}
-        "warning-bg": "#ffe200", // {colors.warning-bg}
-        critical: "#e41e3f",     // {colors.critical}
-        "critical-strong": "#f0284a", // {colors.critical-strong}
+        success: {
+          DEFAULT: "rgb(var(--success) / <alpha-value>)",
+          bg: "rgb(var(--success-bg) / <alpha-value>)",
+        },
+        attention: "rgb(var(--attention) / <alpha-value>)",
+        warning: {
+          DEFAULT: "rgb(var(--warning) / <alpha-value>)",
+          bg: "rgb(var(--warning-bg) / <alpha-value>)",
+        },
+        critical: {
+          DEFAULT: "rgb(var(--critical) / <alpha-value>)",
+          strong: "rgb(var(--critical-strong) / <alpha-value>)",
+        },
 
         // Surface
         canvas: {
-          DEFAULT: "var(--canvas)",    
-          soft: "var(--canvas-soft)",  
+          DEFAULT: "rgb(var(--canvas) / <alpha-value>)",    
         },
-        "surface-soft": "var(--canvas-soft)", 
+        "surface-soft": "rgb(var(--surface-soft) / <alpha-value>)", 
 
         // Text
-        "ink-deep": "var(--ink-deep)",   
+        "ink-deep": "rgb(var(--ink-deep) / <alpha-value>)",   
         ink: {
-          DEFAULT: "var(--ink)",    
-          button: "var(--ink-button)",     
-          muted: "var(--ink-muted)",      
+          DEFAULT: "rgb(var(--ink) / <alpha-value>)",         
         },
-        charcoal: "var(--charcoal)",     
-        slate: "var(--slate)",        
-        steel: "var(--steel)",        
-        stone: "var(--stone)",        
+        charcoal: "rgb(var(--charcoal) / <alpha-value>)",     
+        slate: "rgb(var(--slate) / <alpha-value>)",        
+        steel: "rgb(var(--steel) / <alpha-value>)",        
+        stone: "rgb(var(--stone) / <alpha-value>)",        
 
-        // Hairlines
+        // Borders
         hairline: {
-          DEFAULT: "var(--hairline)",    
-          soft: "var(--hairline-soft)",       
+          DEFAULT: "rgb(var(--hairline) / <alpha-value>)",    
+          soft: "rgb(var(--hairline-soft) / <alpha-value>)",       
         },
-        "disabled-text": "var(--disabled-text)", 
+        "disabled-text": "rgb(var(--disabled-text) / <alpha-value>)", 
 
-        // Legacy compat (map to new tokens)
-        border: "var(--hairline)",
-        input: "var(--hairline)",
-        ring: "var(--primary)",
-        background: "var(--canvas)",
-        foreground: "var(--ink)",
+        // Legacy Compat
+        border: "rgb(var(--hairline) / <alpha-value>)",
+        input: "rgb(var(--hairline) / <alpha-value>)",
+        ring: "rgb(var(--primary) / <alpha-value>)",
+        background: "rgb(var(--canvas) / <alpha-value>)",
+        foreground: "rgb(var(--ink) / <alpha-value>)",
       },
 
       // ─── Border Radius (from DESIGN.md) ─────────────────────────────────────
       borderRadius: {
-        none: "0px",     // {rounded.none} — not in DESIGN.md but useful
-        xs: "2px",       // {rounded.xs}
-        sm: "4px",       // {rounded.sm}
-        md: "6px",       // {rounded.md}
-        lg: "8px",       // {rounded.lg}
-        xl: "16px",      // {rounded.xl}
-        xxl: "24px",     // {rounded.xxl}
-        xxxl: "32px",    // {rounded.xxxl}
-        feature: "40px", // {rounded.feature}
-        full: "100px",   // {rounded.full} — pill buttons
-        circle: "9999px",// {rounded.circle}
+        none: "0px",
+        xs: "2px",       
+        sm: "4px",       
+        md: "6px",       
+        lg: "8px",       
+        xl: "16px",      
+        xxl: "24px",     
+        xxxl: "32px",    
+        feature: "40px", 
+        full: "100px",   
+        circle: "9999px",
       },
 
       // ─── Spacing (from DESIGN.md) ───────────────────────────────────────────
       spacing: {
-        xxs: "4px",      // {spacing.xxs}
-        xs: "8px",       // {spacing.xs}
-        sm: "10px",      // {spacing.sm}
-        md: "12px",      // {spacing.md}
-        base: "16px",    // {spacing.base}
-        lg: "20px",      // {spacing.lg}
-        xl: "24px",      // {spacing.xl}
-        xxl: "32px",     // {spacing.xxl}
-        xxxl: "40px",    // {spacing.xxxl}
-        "section-sm": "48px", // {spacing.section-sm}
-        section: "64px",      // {spacing.section}
-        "section-lg": "80px", // {spacing.section-lg}
-        hero: "120px",        // {spacing.hero}
+        xxs: "4px",      
+        xs: "8px",       
+        sm: "10px",      
+        md: "12px",      
+        base: "16px",    
+        lg: "20px",      
+        xl: "24px",      
+        xxl: "32px",     
+        xxxl: "40px",    
+        "section-sm": "48px", 
+        section: "64px",      
+        "section-lg": "80px", 
+        hero: "120px",        
       },
 
-      // ─── Font Size (from DESIGN.md typography hierarchy) ─────────────────────
+      // ─── Typography (from DESIGN.md) ─────────────────────────────────────────
       fontSize: {
-        "hero-display": ["64px", { lineHeight: "1.16", fontWeight: "500" }],
-        "display-lg": ["48px", { lineHeight: "1.17", fontWeight: "500" }],
-        "heading-lg": ["36px", { lineHeight: "1.28", fontWeight: "500" }],
-        "heading-md": ["28px", { lineHeight: "1.21", fontWeight: "300" }],
-        "heading-sm": ["24px", { lineHeight: "1.25", fontWeight: "500" }],
-        "subtitle-lg": ["18px", { lineHeight: "1.44", fontWeight: "700" }],
-        "subtitle-md": ["18px", { lineHeight: "1.44", fontWeight: "400" }],
-        "body-md": ["16px", { lineHeight: "1.50", letterSpacing: "-0.16px", fontWeight: "400" }],
+        "hero-display": ["64px", { lineHeight: "1.16", fontWeight: "500", letterSpacing: "0px" }],
+        "display-lg": ["48px", { lineHeight: "1.17", fontWeight: "500", letterSpacing: "0px" }],
+        "heading-lg": ["36px", { lineHeight: "1.28", fontWeight: "500", letterSpacing: "0px" }],
+        "heading-md": ["28px", { lineHeight: "1.21", fontWeight: "300", letterSpacing: "0px" }],
+        "heading-sm": ["24px", { lineHeight: "1.25", fontWeight: "500", letterSpacing: "0px" }],
+        "subtitle-lg": ["18px", { lineHeight: "1.44", fontWeight: "700", letterSpacing: "0px" }],
+        "subtitle-md": ["18px", { lineHeight: "1.44", fontWeight: "400", letterSpacing: "0px" }],
         "body-md-bold": ["16px", { lineHeight: "1.50", letterSpacing: "-0.16px", fontWeight: "700" }],
-        "body-sm": ["14px", { lineHeight: "1.43", letterSpacing: "-0.14px", fontWeight: "400" }],
+        "body-md": ["16px", { lineHeight: "1.50", letterSpacing: "-0.16px", fontWeight: "400" }],
         "body-sm-bold": ["14px", { lineHeight: "1.43", letterSpacing: "-0.14px", fontWeight: "700" }],
-        "caption": ["12px", { lineHeight: "1.33", fontWeight: "400" }],
-        "caption-bold": ["12px", { lineHeight: "1.33", fontWeight: "700" }],
+        "body-sm": ["14px", { lineHeight: "1.43", letterSpacing: "-0.14px", fontWeight: "400" }],
+        "caption-bold": ["12px", { lineHeight: "1.33", fontWeight: "700", letterSpacing: "0px" }],
+        "caption": ["12px", { lineHeight: "1.33", fontWeight: "400", letterSpacing: "0px" }],
         "button-md": ["14px", { lineHeight: "1.43", letterSpacing: "-0.14px", fontWeight: "700" }],
         "link-md": ["16px", { lineHeight: "1.50", letterSpacing: "-0.16px", fontWeight: "700" }],
       },
 
       // ─── Shadows (from DESIGN.md) ───────────────────────────────────────────
       boxShadow: {
-        // Level 0: flat — no shadow (default cards)
-        // Level 1: subtle — pill-tab activation
         subtle: "rgba(0, 0, 0, 0.2) 1px 1px 0px 0px",
-        // Level 2: sticky panel — checkout summary, mobile bar
         "sticky-panel": "rgba(20, 22, 26, 0.3) 0px 1px 4px 0px",
-        // Legacy compat
-        product: "rgba(20, 22, 26, 0.3) 0px 1px 4px 0px",
-      },
-
-      // ─── Transitions ────────────────────────────────────────────────────────
-      transitionProperty: {
-        apple: "transform, background-color, border-color, color, opacity, box-shadow",
       },
     },
   },

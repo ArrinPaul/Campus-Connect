@@ -64,12 +64,12 @@ export function CreatePost({ communityId }: Props) {
   if (isLoading) {
     // Show loading skeleton while auth is initializing
     return (
-      <div className="rounded-lg border bg-card p-3 sm:p-4 mb-4 animate-pulse">
+      <div className="rounded-xl border border-hairline bg-canvas p-4 mb-4 animate-pulse">
         <div className="flex items-start gap-3">
-          <div className="h-10 w-10 rounded-full bg-muted flex-shrink-0" />
+          <div className="h-10 w-10 rounded-full bg-surface-soft flex-shrink-0" />
           <div className="w-full space-y-2">
-            <div className="h-12 bg-muted rounded" />
-            <div className="h-8 bg-muted rounded w-1/4" />
+            <div className="h-12 bg-surface-soft rounded" />
+            <div className="h-8 bg-surface-soft rounded w-1/4" />
           </div>
         </div>
       </div>
@@ -79,14 +79,14 @@ export function CreatePost({ communityId }: Props) {
   if (!isAuthenticated) {
     // Show sign-in prompt
     return (
-      <div className="rounded-lg border bg-card p-6 mb-4 text-center">
-        <LogIn className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
-        <h3 className="font-semibold mb-2">Sign in to post</h3>
-        <p className="text-muted-foreground mb-4 text-sm">
+      <div className="rounded-xl border border-hairline bg-canvas p-section mb-4 text-center">
+        <LogIn className="h-8 w-8 mx-auto mb-3 text-steel" />
+        <h3 className="text-heading-sm mb-2 text-ink-deep">Sign in to post</h3>
+        <p className="text-body-md text-ink mb-xl">
           Join the conversation by signing in to your account.
         </p>
         <Link href="/sign-in">
-          <button className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors font-medium">
+          <button className="button-buy-cta">
             Sign In
           </button>
         </Link>
@@ -95,9 +95,9 @@ export function CreatePost({ communityId }: Props) {
   }
 
   return (
-    <div className="rounded-lg border bg-card p-3 sm:p-4 mb-4">
+    <div className="rounded-xl border border-hairline bg-canvas p-4 mb-4">
       <div className="flex items-start gap-3">
-        <div className="h-10 w-10 rounded-full bg-muted flex-shrink-0">
+        <div className="h-10 w-10 rounded-full bg-surface-soft flex-shrink-0 overflow-hidden">
           {currentUser?.profilePicture ? (
             <Image src={currentUser.profilePicture} alt={currentUser.name ?? ''} width={40} height={40} className="h-full w-full rounded-full object-cover" />
           ) : (
@@ -109,31 +109,31 @@ export function CreatePost({ communityId }: Props) {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder={communityId ? "Post to this community..." : "What's on your mind?"}
-                className="w-full bg-transparent text-base sm:text-lg focus:outline-none placeholder-muted-foreground resize-none"
+                className="w-full bg-transparent text-body-md focus:outline-none placeholder:text-steel resize-none text-ink"
                 rows={3}
                 disabled={isSubmitting}
             />
-            <div className="flex items-center justify-between mt-2">
-                <div className="flex items-center gap-1 text-muted-foreground">
-                    <button className="p-2 rounded-full hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-50" disabled={isSubmitting}>
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-hairline-soft">
+                <div className="flex items-center gap-1 text-steel">
+                    <button className="button-icon-circular text-ink-deep hover:bg-surface-soft transition-colors disabled:opacity-50" disabled={isSubmitting}>
                         <ImageIcon className="h-5 w-5" />
                     </button>
-                    <button className="p-2 rounded-full hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-50" disabled={isSubmitting}>
+                    <button className="button-icon-circular text-ink-deep hover:bg-surface-soft transition-colors disabled:opacity-50" disabled={isSubmitting}>
                         <ChartBar className="h-5 w-5" />
                     </button>
-                    <button className="p-2 rounded-full hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-50" disabled={isSubmitting}>
+                    <button className="button-icon-circular text-ink-deep hover:bg-surface-soft transition-colors disabled:opacity-50" disabled={isSubmitting}>
                         <File className="h-5 w-5" />
                     </button>
                 </div>
                 <button 
                     onClick={handleSubmit}
                     disabled={isSubmitting || content.trim().length === 0}
-                    className="bg-primary text-primary-foreground rounded-full p-2.5 shadow-md hover:bg-primary/90 transition-colors btn-press disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="button-buy-cta py-[8px] px-[20px] disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-disabled-text"
                 >
                     {isSubmitting ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                        <Send className="h-4 w-4" />
+                        <span className="flex items-center gap-2">Post <Send className="h-4 w-4" /></span>
                     )}
                 </button>
             </div>

@@ -126,16 +126,16 @@ export function DesktopSidebar() {
           </button>
         </div>
       ) : isLoaded && !isSignedIn ? (
-        <div className="mt-auto pt-4 space-y-2">
+        <div className="mt-auto pt-4 flex flex-col gap-sm px-2">
           <Link
             href="/sign-in"
-            className="block w-full py-3 text-center rounded-full text-button-md text-ink-deep border border-ink-deep hover:bg-surface-soft transition-colors"
+            className="button-ghost w-full"
           >
             Log In
           </Link>
           <Link
             href="/sign-up"
-            className="block w-full py-3 text-center rounded-full text-button-md bg-ink-deep text-canvas hover:opacity-90 transition-colors"
+            className="button-primary w-full"
           >
             Sign Up
           </Link>
