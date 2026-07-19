@@ -18,7 +18,7 @@ type Props = {
 
 export function ResearchPaperCard({ paper }: Props) {
     return (
-        <Link href={`/research/${paper._id}`} className="block p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors">
+        <Link href={`/research/${paper._id}`} className="block p-4 border border-hairline rounded-xl bg-surface-soft hover:bg-canvas transition-colors">
             <h3 className="font-bold text-lg text-primary line-clamp-2">{paper.title}</h3>
             <p className="text-sm text-muted-foreground mt-1 line-clamp-3">{paper.abstract}</p>
             
@@ -39,7 +39,7 @@ export function ResearchPaperCard({ paper }: Props) {
             {paper.tags && paper.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-3">
                     {paper.tags.map((tag: any) => (
-                        <span key={tag} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-muted text-xs text-muted-foreground">
+                        <span key={tag} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-canvas border border-hairline text-xs text-slate">
                             <Hash className="h-3 w-3" /> {tag}
                         </span>
                     ))}

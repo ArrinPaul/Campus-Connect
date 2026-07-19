@@ -118,7 +118,7 @@ describe("RepostModal", () => {
     
     // Check that count is shown in red when over limit
     const charCount = screen.getByText("501/500")
-    expect(charCount).toHaveClass("text-destructive", "dark:text-red-400")
+    expect(charCount).toHaveClass("text-critical", "dark:text-red-400")
   })
 
   it("should accept quote content within limit", () => {

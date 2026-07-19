@@ -37,6 +37,11 @@ export async function POST(req: Request) {
       options: body.options,
       created_by: userId,
     })
+    
+    if (!poll) {
+      return NextResponse.json({ error: "Failed to create poll" }, { status: 500 })
+    }
+    
     return NextResponse.json(poll, { status: 201 })
   } catch (err) {
     return internalError(err)

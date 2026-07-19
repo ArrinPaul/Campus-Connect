@@ -4,109 +4,148 @@
 
 @layer base {
   :root {
-    /* Brand */
-    --primary: 0 100 224; /* #0064e0 */
-    --primary-deep: 4 87 203; /* #0457cb */
-    --primary-soft: 0 145 255; /* #0091ff */
+    /* ── Brand — Apple Minimal System ─────────────────────────────────────── */
+    --primary: 0 122 255;        /* #007AFF Apple System Blue */
+    --primary-deep: 0 102 204;   /* #0066CC */
+    --primary-soft: 90 200 250;  /* #5AC8FA */
     --on-primary: 255 255 255;
-    
-    --ink-button: 0 0 0;
+
+    --ink-button: 29 29 31;      /* #1D1D1F */
     --on-ink-button: 255 255 255;
-    
-    --fb-blue: 24 118 242; /* #1876f2 */
-    --meta-link: 56 88 152; /* #385898 */
-    --oculus-purple: 161 33 206; /* #a121ce */
 
-    /* Semantic */
-    --success: 49 162 76; /* #31a24c */
-    --success-bg: 36 228 0; /* #24e400 */
-    --attention: 242 169 24; /* #f2a918 */
-    --warning: 247 185 40; /* #f7b928 */
-    --warning-bg: 255 226 0; /* #ffe200 */
-    --critical: 228 30 63; /* #e41e3f */
-    --critical-strong: 240 40 74; /* #f0284a */
+    --fb-blue: 0 122 255;
+    --meta-link: 0 102 204;
+    --oculus-purple: 175 82 222;
 
-    /* Surface */
-    --canvas: 255 255 255;
-    --surface-soft: 241 244 247; /* #f1f4f7 */
+    /* ── Semantic ──────────────────────────────────────────────────────────── */
+    --success: 52 199 89;        /* #34C759 */
+    --success-bg: 234 250 238;
+    --attention: 255 149 0;      /* #FF9500 */
+    --warning: 255 204 0;        /* #FFCC00 */
+    --warning-bg: 255 250 230;
+    --critical: 255 59 48;       /* #FF3B30 */
+    --critical-strong: 215 0 21;
 
-    /* Text */
-    --ink-deep: 10 19 23; /* #0a1317 */
-    --ink: 28 30 33; /* #1c1e21 */
-    --charcoal: 68 73 80; /* #444950 */
-    --slate: 75 76 79; /* #4b4c4f */
-    --steel: 93 108 123; /* #5d6c7b */
-    --stone: 133 149 164; /* #8595a4 */
+    /* ── Surfaces ──────────────────────────────────────────────────────────── */
+    --canvas: 245 245 247;       /* #F5F5F7 Apple Page Background */
+    --surface-soft: 255 255 255; /* #FFFFFF Card/Sheet Surface */
 
-    /* Borders */
-    --hairline: 206 208 212; /* #ced0d4 */
-    --hairline-soft: 222 227 233; /* #dee3e9 */
-    --disabled-text: 188 192 196; /* #bcc0c4 */
+    /* ── Text ──────────────────────────────────────────────────────────────── */
+    --ink-deep: 29 29 31;        /* #1D1D1F Primary Label */
+    --ink: 60 60 67;             /* #3C3C43 Secondary Label */
+    --charcoal: 99 99 102;       /* #636366 */
+    --slate: 142 142 147;        /* #8E8E93 Tertiary Label */
+    --steel: 174 174 178;        /* #AEAEB2 Quaternary */
+    --stone: 197 197 202;        /* #C5C5CA Placeholder */
+
+    /* ── Borders ───────────────────────────────────────────────────────────── */
+    --hairline: 229 229 234;     /* #E5E5EA */
+    --hairline-soft: 242 242 247;/* #F2F2F7 */
+    --disabled-text: 199 199 204;
+
+    /* ── Legacy Compat Aliases ─────────────────────────────────────────────── */
+    --muted: 245 245 247;
+    --muted-foreground: 142 142 147;
+    --card: 255 255 255;
+    --card-foreground: 29 29 31;
+    --border: 229 229 234;
+    --input: 229 229 234;
+    --ring: 0 122 255;
+    --background: 245 245 247;
+    --foreground: 29 29 31;
+    --destructive: 255 59 48;
+    --destructive-foreground: 255 255 255;
+    --accent: 245 245 247;
+    --accent-foreground: 29 29 31;
+    --popover: 255 255 255;
+    --popover-foreground: 29 29 31;
+    --secondary: 242 242 247;
+    --secondary-foreground: 29 29 31;
   }
 
   .dark {
-    /* Brand - Facebook Dark Mode Inspired */
-    --primary: 45 136 255; /* #2d88ff */
-    --primary-deep: 24 118 242; /* #1876f2 */
-    --primary-soft: 80 160 255; /* #50a0ff */
+    /* ── Brand — Apple Dark Mode ───────────────────────────────────────────── */
+    --primary: 10 132 255;       /* #0A84FF */
+    --primary-deep: 0 113 227;
+    --primary-soft: 100 210 255;
     --on-primary: 255 255 255;
-    
-    --ink-button: 255 255 255; /* Reversed for dark mode */
-    --on-ink-button: 10 19 23; /* Dark text on white button */
-    
-    --fb-blue: 45 136 255;
-    --meta-link: 80 160 255;
-    --oculus-purple: 186 78 227;
 
-    /* Semantic */
-    --success: 49 162 76;
-    --success-bg: 36 228 0;
-    --attention: 242 169 24;
-    --warning: 247 185 40;
-    --warning-bg: 255 226 0;
-    --critical: 240 40 74;
-    --critical-strong: 255 80 100;
+    --ink-button: 255 255 255;
+    --on-ink-button: 0 0 0;
 
-    /* Surface */
-    --canvas: 24 25 26; /* #18191a */
-    --surface-soft: 36 37 38; /* #242526 */
+    --fb-blue: 10 132 255;
+    --meta-link: 100 210 255;
+    --oculus-purple: 191 90 242;
 
-    /* Text */
-    --ink-deep: 228 230 235; /* #e4e6eb */
-    --ink: 176 179 184; /* #b0b3b8 */
-    --charcoal: 140 147 157;
-    --slate: 100 103 107;
-    --steel: 90 92 95;
-    --stone: 62 64 66;
+    /* ── Semantic ──────────────────────────────────────────────────────────── */
+    --success: 48 209 88;
+    --success-bg: 25 45 30;
+    --attention: 255 159 10;
+    --warning: 255 214 10;
+    --warning-bg: 45 40 20;
+    --critical: 255 69 58;
+    --critical-strong: 255 100 90;
 
-    /* Borders */
-    --hairline: 58 59 60; /* #3a3b3c */
-    --hairline-soft: 47 48 49; /* #2f3031 */
-    --disabled-text: 90 92 95;
+    /* ── Surfaces ──────────────────────────────────────────────────────────── */
+    --canvas: 0 0 0;             /* #000000 True Black */
+    --surface-soft: 28 28 30;   /* #1C1C1E Elevated Dark Surface */
+
+    /* ── Text ──────────────────────────────────────────────────────────────── */
+    --ink-deep: 245 245 247;
+    --ink: 235 235 245;
+    --charcoal: 174 174 178;
+    --slate: 142 142 147;
+    --steel: 99 99 102;
+    --stone: 78 78 80;
+
+    /* ── Borders ───────────────────────────────────────────────────────────── */
+    --hairline: 44 44 46;        /* #2C2C2E */
+    --hairline-soft: 58 58 60;   /* #3A3A3C */
+    --disabled-text: 99 99 102;
+
+    /* ── Legacy Compat Aliases ─────────────────────────────────────────────── */
+    --muted: 28 28 30;
+    --muted-foreground: 142 142 147;
+    --card: 28 28 30;
+    --card-foreground: 245 245 247;
+    --border: 44 44 46;
+    --input: 44 44 46;
+    --ring: 10 132 255;
+    --background: 0 0 0;
+    --foreground: 245 245 247;
+    --destructive: 255 69 58;
+    --destructive-foreground: 255 255 255;
+    --accent: 28 28 30;
+    --accent-foreground: 245 245 247;
+    --popover: 28 28 30;
+    --popover-foreground: 245 245 247;
+    --secondary: 44 44 46;
+    --secondary-foreground: 245 245 247;
   }
 }
 
 @layer base {
   * {
     @apply border-hairline;
+    box-sizing: border-box;
   }
-  
+
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
   }
 
   body {
     @apply bg-canvas text-ink;
-    font-feature-settings: "rlig" 1, "calt" 1;
-    font-family: var(--font-sans);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display text-ink-deep;
-    /* Stylistic sets from DESIGN.md */
-    font-feature-settings: "ss01", "ss02";
+    @apply font-display text-ink-deep tracking-tight;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
   }
 
   :focus-visible {
@@ -115,78 +154,145 @@
 }
 
 @layer components {
-  /* Buttons from DESIGN.md */
+  /* ── Buttons ─────────────────────────────────────────────────────────────── */
   .button-primary {
-    @apply bg-ink-button text-on-ink-button text-button-md rounded-full px-[30px] py-[14px] hover:bg-charcoal disabled:bg-disabled-text disabled:text-canvas transition-colors inline-flex items-center justify-center;
+    @apply bg-ink-button text-on-ink-button text-button-md rounded-full px-6 py-3
+           hover:opacity-90 active:scale-[0.98] disabled:opacity-40
+           transition-all inline-flex items-center justify-center font-semibold;
   }
-  
+
   .button-buy-cta {
-    @apply bg-primary text-on-primary text-button-md rounded-full px-[30px] py-[14px] hover:bg-primary-deep transition-colors inline-flex items-center justify-center;
+    @apply bg-primary text-on-primary text-button-md rounded-full px-6 py-3
+           hover:bg-primary-deep active:scale-[0.98]
+           transition-all inline-flex items-center justify-center font-semibold;
   }
 
   .button-secondary {
-    @apply bg-transparent text-ink-deep text-button-md rounded-full px-[28px] py-[12px] border-2 border-ink-deep hover:bg-surface-soft transition-colors inline-flex items-center justify-center;
+    @apply bg-surface-soft text-ink-deep text-button-md rounded-full px-6 py-3
+           border border-hairline hover:bg-canvas active:scale-[0.98]
+           transition-all inline-flex items-center justify-center font-semibold;
   }
 
   .button-ghost {
-    @apply bg-transparent text-ink-deep text-button-md rounded-full px-[22px] py-[10px] border-2 border-ink-deep/10 hover:bg-surface-soft transition-colors inline-flex items-center justify-center;
+    @apply bg-transparent text-ink-deep text-button-md rounded-full px-5 py-2.5
+           hover:bg-surface-soft active:scale-[0.98]
+           transition-all inline-flex items-center justify-center font-medium;
   }
 
   .button-pill-tab {
-    @apply bg-canvas text-ink text-body-sm-bold rounded-full px-[16px] py-[8px] border border-hairline hover:bg-surface-soft transition-colors inline-flex items-center justify-center;
+    @apply bg-surface-soft text-ink text-body-sm-bold rounded-full px-4 py-2
+           border border-hairline hover:border-slate/40
+           transition-all inline-flex items-center justify-center;
   }
 
   .button-pill-tab-active {
-    @apply bg-ink-deep text-canvas text-body-sm-bold rounded-full px-[16px] py-[8px] border border-transparent transition-colors inline-flex items-center justify-center;
+    @apply bg-ink-deep text-canvas text-body-sm-bold rounded-full px-4 py-2
+           border border-transparent
+           transition-all inline-flex items-center justify-center;
   }
 
-  /* Cards from DESIGN.md */
+  /* ── Cards ───────────────────────────────────────────────────────────────── */
   .card-product-feature {
-    @apply bg-canvas rounded-xxxl p-xxl border border-hairline-soft overflow-hidden;
+    @apply bg-surface-soft rounded-2xl p-6 border border-hairline
+           shadow-[0_1px_4px_rgba(0,0,0,0.05)] overflow-hidden transition-all;
   }
-  
+
   .card-feature-photo {
-    @apply bg-canvas rounded-xxxl p-0 border-none overflow-hidden relative;
+    @apply bg-surface-soft rounded-2xl border border-hairline overflow-hidden relative;
   }
 
   .card-promo-strip {
-    @apply bg-ink-deep text-canvas rounded-xxxl p-section overflow-hidden;
+    @apply bg-ink-deep text-canvas rounded-2xl p-8 overflow-hidden;
   }
 
   .card-icon-feature {
-    @apply bg-canvas rounded-xl p-xl border border-hairline-soft;
+    @apply bg-surface-soft rounded-xl p-6 border border-hairline
+           shadow-[0_1px_2px_rgba(0,0,0,0.04)];
   }
 
   .why-buy-tile {
-    @apply bg-canvas rounded-xl py-xxl px-xl border border-hairline-soft flex flex-col gap-4;
+    @apply bg-surface-soft rounded-xl py-6 px-6 border border-hairline
+           flex flex-col gap-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)];
   }
 
-  /* Inputs from DESIGN.md */
+  /* ── Inputs ──────────────────────────────────────────────────────────────── */
   .text-input {
-    @apply bg-canvas text-ink text-body-md rounded-lg p-md border border-hairline h-[44px] focus:border-fb-blue focus:border-2 focus:ring-0 outline-none transition-all;
+    @apply bg-surface-soft text-ink-deep text-body-md rounded-xl px-4 py-3
+           border border-hairline
+           focus:border-primary focus:ring-2 focus:ring-primary/20
+           outline-none transition-all;
   }
 
   .search-pill {
-    @apply bg-surface-soft text-steel text-body-sm rounded-full px-lg py-md h-[40px] border-transparent focus:border-fb-blue focus:bg-canvas focus:border-2 outline-none transition-all flex items-center;
-  }
-  
-  /* Badges from DESIGN.md */
-  .badge-promo-yellow {
-    @apply bg-warning text-ink-deep text-caption-bold rounded-full px-[10px] py-[4px] inline-flex items-center;
+    @apply bg-surface-soft text-ink text-body-sm rounded-full px-4 py-2
+           border border-hairline
+           focus:border-primary focus:ring-2 focus:ring-primary/20
+           outline-none transition-all flex items-center gap-2;
   }
 
-  /* Promo Banner from DESIGN.md */
-  .promo-banner {
-    @apply bg-ink-deep text-canvas text-body-sm-bold px-xl py-md w-full flex justify-center items-center gap-4 text-center;
+  /* ── Badges ──────────────────────────────────────────────────────────────── */
+  .badge-promo-yellow {
+    @apply bg-warning/15 text-ink-deep text-caption-bold rounded-full px-3 py-1
+           inline-flex items-center font-semibold border border-warning/25;
   }
-  .promo-banner.yellow {
-    @apply bg-warning text-ink-deep;
+
+  .promo-banner {
+    @apply bg-ink-deep text-canvas text-body-sm-bold px-6 py-3 w-full
+           flex justify-center items-center gap-4 text-center;
+  }
+
+  /* ── Feed / Post Cards ───────────────────────────────────────────────────── */
+  .post-card {
+    @apply bg-surface-soft border-b border-hairline py-4 px-4
+           hover:bg-canvas transition-colors cursor-pointer;
+  }
+
+  /* ── Sidebar / Nav ───────────────────────────────────────────────────────── */
+  .nav-link {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-body-sm font-medium
+           text-ink transition-colors hover:bg-surface-soft;
+  }
+
+  .nav-link-active {
+    @apply bg-surface-soft text-ink-deep font-semibold;
+  }
+
+  /* ── Modals / Sheets ─────────────────────────────────────────────────────── */
+  .modal-overlay {
+    @apply fixed inset-0 bg-ink-deep/40 backdrop-blur-[2px] z-50
+           flex items-center justify-center p-4;
+  }
+
+  .modal-panel {
+    @apply bg-surface-soft border border-hairline rounded-2xl shadow-lg w-full max-w-lg;
   }
 }
 
+/* ── Keyframes ────────────────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
 ::selection {
-  background: rgb(var(--primary-soft) / 0.3);
+  background: rgb(var(--primary) / 0.15);
   color: rgb(var(--ink-deep));
+}
+
+/* ── Gradient / Glass Overrides (disabled) ───────────────────────────────── */
+@layer components {
+  .gradient-mesh     { background: rgb(var(--canvas)); }
+  .floating-orb      { display: none; }
+  .glass-card        {
+    background: rgb(var(--surface-soft));
+    border: 1px solid rgb(var(--hairline));
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .dark .glass-card  { box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
+  .auth-gradient-panel {
+    background: rgb(var(--surface-soft));
+    border-right: 1px solid rgb(var(--hairline));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

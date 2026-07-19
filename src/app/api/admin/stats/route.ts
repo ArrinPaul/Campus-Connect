@@ -10,25 +10,33 @@ export async function GET() {
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     // Verify admin status
-    const { data: userData } = await supabase.from("users").select("role").eq("id", userId).single()
-    if (!userData || userData.role !== "admin") {
+    const { data: userData } = await supabase.from("users").select("role, is_admin").eq("id", userId).single()
+    if (!userData || (!userData.is_admin && userData.role !== "admin")) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    // Fetch stats
-    const [{ count: usersCount }, { count: postsCount }, { count: commentsCount }] = await Promise.all([
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+
+    // Fetch actual db counts
+    const [
+      { count: usersCount },
+      { count: newUsersThisWeek },
+      { count: reportedPosts },
+      { count: reportedComments }
+    ] = await Promise.all([
       supabase.from("users").select("*", { count: "exact", head: true }),
-      supabase.from("posts").select("*", { count: "exact", head: true }),
-      supabase.from("comments").select("*", { count: "exact", head: true }),
+      supabase.from("users").select("*", { count: "exact", head: true }).gt("created_at", sevenDaysAgo),
+      supabase.from("content_reports").select("*", { count: "exact", head: true }).eq("target_type", "post").eq("status", "pending"),
+      supabase.from("content_reports").select("*", { count: "exact", head: true }).eq("target_type", "comment").eq("status", "pending"),
     ])
 
     return NextResponse.json({
       totalUsers: usersCount || 0,
-      newUsersThisWeek: Math.floor((usersCount || 0) * 0.1), // Mock data
-      reportedPosts: Math.floor((postsCount || 0) * 0.05), // Mock data
-      reportedComments: Math.floor((commentsCount || 0) * 0.05), // Mock data
-      apiUsage: "8.4k requests",
-      dbSize: "2.4 MB"
+      newUsersThisWeek: newUsersThisWeek || 0,
+      reportedPosts: reportedPosts || 0,
+      reportedComments: reportedComments || 0,
+      apiUsage: "Dynamic",
+      dbSize: "Dynamic"
     })
   } catch (err) {
     return internalError(err)

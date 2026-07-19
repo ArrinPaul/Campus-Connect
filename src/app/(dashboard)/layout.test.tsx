@@ -13,7 +13,7 @@ jest.mock("@/app/(components)/layouts/main-layout", () => ({
 describe("DashboardLayout", () => {
   it("should render MainLayout", () => {
     render(
-      <DashboardLayout>
+      <DashboardLayout modal={null}>
         <div>Test Content</div>
       </DashboardLayout>
     )
@@ -23,7 +23,7 @@ describe("DashboardLayout", () => {
 
   it("should render children content", () => {
     render(
-      <DashboardLayout>
+      <DashboardLayout modal={null}>
         <div data-testid="child-content">Test Content</div>
       </DashboardLayout>
     )

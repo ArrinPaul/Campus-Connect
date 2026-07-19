@@ -38,16 +38,61 @@ export async function getFeedPosts(
   offset = 0
 ): Promise<DbPost[]> {
   const supabase = await getSupabase()
-  const { data, error } = await supabase
+
+  // Get users current user follows
+  const { data: followed } = await supabase
+    .from("follows")
+    .select("following_id")
+    .eq("follower_id", userId)
+  const followedIds = new Set(followed?.map((f) => f.following_id) || [])
+
+  // Fetch a larger pool of recent posts to rank in memory
+  const poolLimit = Math.max(100, offset + limit * 2)
+  const { data: posts, error } = await supabase
     .from("posts")
     .select(`
       *,
       author:users!posts_author_id_fkey(id, name, username, profile_picture, role)
     `)
     .order("created_at", { ascending: false })
-    .range(offset, offset + limit - 1)
-  if (error) return []
-  return (data ?? []) as DbPost[]
+    .limit(poolLimit)
+
+  if (error || !posts) return []
+
+  const now = new Date()
+  const scoredPosts = posts.map((post) => {
+    // 1. Affinity
+    let affinity = 1.0
+    if (post.author_id === userId) {
+      affinity = 1.5
+    } else if (followedIds.has(post.author_id)) {
+      affinity = 2.0
+    }
+
+    // 2. Engagement Weight (likes, comments, shares)
+    const likes = post.like_count || 0
+    const comments = post.comment_count || 0
+    const shares = post.share_count || 0
+    const engagementWeight = likes + comments * 2.0 + shares * 3.0
+    const engagementScore = Math.log10(1 + engagementWeight)
+
+    // 3. Time Decay (gravity)
+    const createdAt = new Date(post.created_at || now)
+    const diffMs = now.getTime() - createdAt.getTime()
+    const diffHours = Math.max(0, diffMs / (1000 * 60 * 60))
+    const recencyScore = 1 / Math.pow(diffHours + 2, 1.5)
+
+    const score = affinity * (1 + engagementScore) * recencyScore
+
+    return { post, score }
+  })
+
+  // Sort descending by calculated score
+  scoredPosts.sort((a, b) => b.score - a.score)
+
+  // Paginate from the ranked list
+  const paginated = scoredPosts.slice(offset, offset + limit).map((item) => item.post)
+  return paginated as DbPost[]
 }
 
 export async function getPostById(postId: string): Promise<DbPost | null> {
@@ -189,9 +234,12 @@ export async function updatePost(
   const supabase = await getSupabase()
   const { data, error } = await supabase
     .from("posts")
-    .update({ content })
+    .update({ content, updated_at: new Date().toISOString() })
     .eq("id", postId)
-    .select()
+    .select(`
+      *,
+      author:users!posts_author_id_fkey(id, name, username, profile_picture, role)
+    `)
     .single()
   if (error) return null
   return data as DbPost

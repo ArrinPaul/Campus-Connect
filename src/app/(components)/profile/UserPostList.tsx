@@ -3,49 +3,59 @@
 import { useQuery } from '@/lib/api';
 import { api } from '@/lib/api';
 import type { Id } from '@/lib/api';
-import { PostCard } from '../../(components)/feed/PostCard';
-import type { FeedItem } from '../../(components)/feed/types';
+import { PostCard } from '@/components/posts/PostCard';
 
 export function UserPostList({ userId }: { userId: Id<'users'> }) {
-    const posts = useQuery(api.posts.getUserPosts, { userId });
+    const postsData = useQuery(api.posts.getUserPosts, userId ? { userId } : "skip");
 
-    if (posts === undefined) {
+    if (postsData === undefined) {
         return (
              <div className="space-y-4 max-w-xl mx-auto">
-                <div className="rounded-lg border bg-card p-4 animate-pulse">
+                <div className="rounded-xl border border-hairline bg-surface-soft p-4 animate-pulse">
                     <div className="space-y-2">
-                        <div className="h-4 w-full bg-muted/50" />
-                        <div className="h-4 w-5/6 bg-muted/50" />
+                        <div className="h-4 w-full bg-canvas rounded" />
+                        <div className="h-4 w-5/6 bg-canvas rounded" />
                     </div>
                 </div>
             </div>
         );
     }
 
+    const posts = Array.isArray(postsData) ? postsData : (postsData as any)?.posts || [];
+
     if (posts.length === 0) {
         return (
-            <div className="rounded-lg border bg-card p-8 text-center mt-8 max-w-xl mx-auto">
-                <h3 className="text-lg font-semibold">No posts yet</h3>
-                <p className="text-muted-foreground mt-2">
-                    This user hasn&apos;t posted anything.
+            <div className="rounded-xl border border-hairline bg-surface-soft p-8 text-center mt-4 max-w-xl mx-auto">
+                <h3 className="text-lg font-semibold text-ink-deep">No posts yet</h3>
+                <p className="text-slate text-sm mt-1">
+                    No posts to display.
                 </p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-4 mt-8 max-w-xl mx-auto">
-            {posts.map((post: any) => {
+        <div className="space-y-4 mt-4 max-w-xl mx-auto">
+            {posts.map((post: any, idx: number) => {
                 if (!post) return null;
-                const item: FeedItem = {
-                    type: 'post',
-                    _id: post._id,
-                    createdAt: post.createdAt,
-                    post: post as any,
+                const postId = post._id || post.id || `user-post-${idx}`;
+                const author = post.author || {
+                    _id: post.author_id || post.authorId || userId,
+                    name: 'User',
+                    role: 'Student'
                 };
-                return <PostCard key={post._id} item={item} />;
+                return (
+                    <PostCard
+                        key={postId}
+                        post={{
+                            ...post,
+                            _id: postId,
+                            authorId: author._id || author.id,
+                        }}
+                        author={author}
+                    />
+                );
             })}
         </div>
     );
 }
-

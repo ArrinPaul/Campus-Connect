@@ -16,8 +16,8 @@ const config: Config = {
     extend: {
       // ─── Typography ─────────────────────────────────────────────────────────
       fontFamily: {
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
-        display: ["var(--font-display)", "system-ui", "sans-serif"],
+        sans: ["-apple-system", "BlinkMacSystemFont", "SF Pro Text", "var(--font-sans)", "Inter", "system-ui", "sans-serif"],
+        display: ["-apple-system", "BlinkMacSystemFont", "SF Pro Display", "var(--font-display)", "Inter", "system-ui", "sans-serif"],
       },
 
       // ─── Colors (from DESIGN.md) ────────────────────────────────────────────
@@ -75,12 +75,51 @@ const config: Config = {
         },
         "disabled-text": "rgb(var(--disabled-text) / <alpha-value>)", 
 
-        // Legacy Compat
+        // Legacy Compat — maps old/shadcn/stale tokens → Apple Minimal values
         border: "rgb(var(--hairline) / <alpha-value>)",
         input: "rgb(var(--hairline) / <alpha-value>)",
         ring: "rgb(var(--primary) / <alpha-value>)",
         background: "rgb(var(--canvas) / <alpha-value>)",
-        foreground: "rgb(var(--ink) / <alpha-value>)",
+        foreground: "rgb(var(--ink-deep) / <alpha-value>)",
+
+        // Canvas soft alias
+        "canvas-soft": "rgb(var(--canvas) / <alpha-value>)",
+
+        // Muted (shadcn compat)
+        muted: {
+          DEFAULT: "rgb(var(--muted) / <alpha-value>)",
+          foreground: "rgb(var(--muted-foreground) / <alpha-value>)",
+        },
+
+        // Card (shadcn compat)
+        card: {
+          DEFAULT: "rgb(var(--card) / <alpha-value>)",
+          foreground: "rgb(var(--card-foreground) / <alpha-value>)",
+        },
+
+        // Destructive (shadcn compat → critical)
+        destructive: {
+          DEFAULT: "rgb(var(--critical) / <alpha-value>)",
+          foreground: "rgb(var(--on-primary) / <alpha-value>)",
+        },
+
+        // Accent (shadcn compat)
+        accent: {
+          DEFAULT: "rgb(var(--accent) / <alpha-value>)",
+          foreground: "rgb(var(--accent-foreground) / <alpha-value>)",
+        },
+
+        // Secondary (shadcn compat)
+        secondary: {
+          DEFAULT: "rgb(var(--secondary) / <alpha-value>)",
+          foreground: "rgb(var(--secondary-foreground) / <alpha-value>)",
+        },
+
+        // Popover (shadcn compat)
+        popover: {
+          DEFAULT: "rgb(var(--popover) / <alpha-value>)",
+          foreground: "rgb(var(--popover-foreground) / <alpha-value>)",
+        },
       },
 
       // ─── Border Radius (from DESIGN.md) ─────────────────────────────────────
@@ -134,10 +173,21 @@ const config: Config = {
         "link-md": ["16px", { lineHeight: "1.50", letterSpacing: "-0.16px", fontWeight: "700" }],
       },
 
-      // ─── Shadows (from DESIGN.md) ───────────────────────────────────────────
+      // ─── Shadows ────────────────────────────────────────────────────────────
       boxShadow: {
-        subtle: "rgba(0, 0, 0, 0.2) 1px 1px 0px 0px",
-        "sticky-panel": "rgba(20, 22, 26, 0.3) 0px 1px 4px 0px",
+        subtle:          "0 1px 2px rgba(0,0,0,0.06)",
+        sm:              "0 1px 4px rgba(0,0,0,0.08)",
+        DEFAULT:         "0 2px 8px rgba(0,0,0,0.10)",
+        md:              "0 4px 12px rgba(0,0,0,0.10)",
+        lg:              "0 8px 24px rgba(0,0,0,0.12)",
+        xl:              "0 16px 40px rgba(0,0,0,0.14)",
+        // Named aliases used by components
+        product:         "0 2px 8px rgba(0,0,0,0.08)",
+        elevated:        "0 4px 16px rgba(0,0,0,0.10)",
+        float:           "0 8px 32px rgba(0,0,0,0.12)",
+        "sticky-panel":  "0 1px 4px rgba(20,22,26,0.18)",
+        "dialog":        "0 20px 60px rgba(0,0,0,0.20)",
+        none:            "none",
       },
     },
   },

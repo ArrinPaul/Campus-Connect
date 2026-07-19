@@ -22,7 +22,7 @@ export function ResourceCard({ resource }: Props) {
     const uploaderAvatar = resource.uploader?.profilePicture;
 
     return (
-        <Link href={`/resources/${resource._id}`} className="block p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors">
+        <Link href={`/resources/${resource._id}`} className="block p-4 border border-hairline rounded-xl bg-surface-soft hover:bg-canvas transition-colors">
             <h3 className="font-bold text-lg text-primary line-clamp-2">{resource.title}</h3>
             <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{resource.description}</p>
             

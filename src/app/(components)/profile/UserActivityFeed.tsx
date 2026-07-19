@@ -3,35 +3,34 @@
 import { useQuery } from '@/lib/api';
 import { api } from '@/lib/api';
 import type { Id } from '@/lib/api';
-import { PostCard } from '../../(components)/feed/PostCard';
-import type { FeedItem } from '../../(components)/feed/types';
-import { MessageSquare, Heart, Repeat2, FileText } from 'lucide-react';
+import { PostCard } from '@/components/posts/PostCard';
+import { MessageSquare } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 import { useState } from 'react';
 
-type ActivityFilter = 'all' | 'posts' | 'comments' | 'likes';
+type ActivityFilter = 'all' | 'posts' | 'comments';
 
 export function UserActivityFeed({ userId }: { userId: Id<'users'> }) {
     const [filter, setFilter] = useState<ActivityFilter>('all');
 
-    const posts = useQuery(api.posts.getUserPosts, { userId, limit: 20 });
-    const comments = useQuery(api.comments.getCommentsByUser, { userId, limit: 20 });
+    const postsData = useQuery(api.posts.getUserPosts, userId ? { userId, limit: 20 } : "skip");
+    const commentsData = useQuery(api.comments.getCommentsByUser, userId ? { userId, limit: 20 } : "skip");
 
-    const isLoading = posts === undefined || comments === undefined;
+    const isLoading = postsData === undefined || commentsData === undefined;
 
     if (isLoading) {
         return (
             <div className="space-y-4 mt-4">
-                {[...Array(5)].map((_, i) => (
-                    <div key={i} className="rounded-lg border bg-card p-4 animate-pulse">
+                {[...Array(3)].map((_, i) => (
+                    <div key={i} className="rounded-xl border border-hairline bg-surface-soft p-4 animate-pulse">
                         <div className="flex items-center gap-3 mb-3">
-                            <div className="h-8 w-8 rounded-full bg-muted/50" />
-                            <div className="h-4 w-32 bg-muted/50 rounded" />
+                            <div className="h-8 w-8 rounded-full bg-canvas" />
+                            <div className="h-4 w-32 bg-canvas rounded" />
                         </div>
                         <div className="space-y-2">
-                            <div className="h-4 w-full bg-muted/50 rounded" />
-                            <div className="h-4 w-3/4 bg-muted/50 rounded" />
+                            <div className="h-4 w-full bg-canvas rounded" />
+                            <div className="h-4 w-3/4 bg-canvas rounded" />
                         </div>
                     </div>
                 ))}
@@ -39,7 +38,9 @@ export function UserActivityFeed({ userId }: { userId: Id<'users'> }) {
         );
     }
 
-    // Build unified activity items
+    const posts = Array.isArray(postsData) ? postsData : (postsData as any)?.posts || [];
+    const comments = Array.isArray(commentsData) ? commentsData : (commentsData as any)?.comments || [];
+
     type ActivityItem = {
         type: 'post' | 'comment';
         timestamp: number;
@@ -49,26 +50,27 @@ export function UserActivityFeed({ userId }: { userId: Id<'users'> }) {
     const activityItems: ActivityItem[] = [];
 
     if (filter === 'all' || filter === 'posts') {
-        for (const post of posts || []) {
+        for (const post of posts) {
+            if (!post) continue;
             activityItems.push({
                 type: 'post',
-                timestamp: post.createdAt,
+                timestamp: new Date(post.createdAt || post.created_at || Date.now()).getTime(),
                 data: post,
             });
         }
     }
 
     if (filter === 'all' || filter === 'comments') {
-        for (const comment of comments || []) {
+        for (const comment of comments) {
+            if (!comment) continue;
             activityItems.push({
                 type: 'comment',
-                timestamp: comment.createdAt,
+                timestamp: new Date(comment.createdAt || comment.created_at || Date.now()).getTime(),
                 data: comment,
             });
         }
     }
 
-    // Sort chronologically descending
     activityItems.sort((a, b) => b.timestamp - a.timestamp);
 
     const filterButtons: { label: string; value: ActivityFilter }[] = [
@@ -85,10 +87,10 @@ export function UserActivityFeed({ userId }: { userId: Id<'users'> }) {
                     <button
                         key={value}
                         onClick={() => setFilter(value)}
-                        className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+                        className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-colors ${
                             filter === value
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-muted text-muted-foreground hover:text-foreground'
+                                ? 'bg-primary text-white'
+                                : 'bg-surface-soft text-slate border border-hairline hover:bg-canvas hover:text-ink-deep'
                         }`}
                     >
                         {label}
@@ -98,40 +100,53 @@ export function UserActivityFeed({ userId }: { userId: Id<'users'> }) {
 
             {/* Activity Items */}
             {activityItems.length === 0 ? (
-                <div className="rounded-lg border bg-card p-8 text-center">
-                    <h3 className="text-lg font-semibold">No activity yet</h3>
-                    <p className="text-muted-foreground mt-2">
+                <div className="rounded-xl border border-hairline bg-surface-soft p-8 text-center">
+                    <h3 className="text-lg font-semibold text-ink-deep">No activity yet</h3>
+                    <p className="text-slate text-sm mt-1">
                         Activity will appear here when this user posts or comments.
                     </p>
                 </div>
             ) : (
                 <div className="space-y-3">
-                    {activityItems.map((item) => {
+                    {activityItems.map((item, idx) => {
                         if (item.type === 'post') {
-                            const feedItem: FeedItem = {
-                                type: 'post',
-                                _id: item.data._id,
-                                createdAt: item.data.createdAt,
-                                post: item.data as any,
+                            const post = item.data;
+                            const postId = post._id || post.id || `act-post-${idx}`;
+                            const author = post.author || {
+                                _id: post.author_id || post.authorId || userId,
+                                name: 'User',
+                                role: 'Student'
                             };
-                            return <PostCard key={`post-${item.data._id}`} item={feedItem} />;
+                            return (
+                                <PostCard
+                                    key={`post-${postId}`}
+                                    post={{
+                                        ...post,
+                                        _id: postId,
+                                        authorId: author._id || author.id,
+                                    }}
+                                    author={author}
+                                />
+                            );
                         }
 
                         if (item.type === 'comment') {
+                            const comment = item.data;
+                            const commentId = comment._id || comment.id || `act-comm-${idx}`;
                             return (
-                                <div key={`comment-${item.data._id}`} className="rounded-lg border bg-card p-4">
-                                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                                <div key={`comment-${commentId}`} className="rounded-xl border border-hairline bg-surface-soft p-4">
+                                    <div className="flex items-center gap-2 text-xs text-slate mb-2">
                                         <MessageSquare className="h-3.5 w-3.5" />
                                         <span>Commented on a post</span>
                                         <span>•</span>
-                                        <span>{formatDistanceToNow(new Date(item.data.createdAt), { addSuffix: true })}</span>
+                                        <span>{formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}</span>
                                     </div>
-                                    <p className="text-sm whitespace-pre-wrap line-clamp-3">
-                                        {item.data.content}
+                                    <p className="text-sm text-ink-deep whitespace-pre-wrap line-clamp-3">
+                                        {comment.content}
                                     </p>
                                     <Link
-                                        href={`/post/${item.data.postId}`}
-                                        className="text-xs text-primary hover:underline mt-2 inline-block"
+                                        href={`/post/${comment.postId || comment.post_id}`}
+                                        className="text-xs text-primary font-semibold hover:underline mt-2 inline-block"
                                     >
                                         View post →
                                     </Link>

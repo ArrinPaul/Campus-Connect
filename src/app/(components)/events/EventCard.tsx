@@ -36,12 +36,12 @@ export function EventCard({ event }: Props) {
     const eventTypeIcon = event.eventType === 'virtual' ? Video : event.eventType === 'in_person' ? MapPin : Globe;
 
     return (
-        <Link href={`/events/${event._id}`} className="block p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors">
+        <Link href={`/events/${event._id}`} className="block p-4 border border-hairline rounded-xl bg-surface-soft hover:bg-canvas transition-colors">
             <h3 className="font-bold text-lg text-primary line-clamp-2">{event.title}</h3>
             <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{event.description}</p>
             
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mt-3">
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 bg-primary/10 text-primary text-xs font-semibold rounded-lg px-2 py-1">
                     <Calendar className="h-3.5 w-3.5" /> {timeRange}
                 </div>
                 <div className="flex items-center gap-1">

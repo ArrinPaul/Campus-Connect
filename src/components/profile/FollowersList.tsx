@@ -1,56 +1,56 @@
 "use client"
 
-import { useUser } from "@/lib/auth/client"
-import { useQuery } from "@/lib/api"
-import { api } from "@/lib/api"
-import { Id } from "@/lib/api"
-import { UserCard } from "./UserCard"
+import { useUser } from"@/lib/auth/client"
+import { useQuery } from"@/lib/api"
+import { api } from"@/lib/api"
+import { Id } from"@/lib/api"
+import { UserCard } from"./UserCard"
 
 interface FollowersListProps {
-  userId: Id<"users">
+ userId: Id<"users">
 }
 
 export function FollowersList({ userId }: FollowersListProps) {
-  const { isLoaded, isSignedIn } = useUser()
-  const followersData = useQuery(
-    api.follows.getFollowers,
-    isLoaded && isSignedIn ? { userId } : "skip"
-  )
+ const { isLoaded, isSignedIn } = useUser()
+ const followersData = useQuery(
+ api.follows.getFollowers,
+ isLoaded && isSignedIn ? { userId } :"skip"
+ )
 
-  if (followersData === undefined) {
-    return (
-      <div className="rounded-lg bg-card p-6 shadow-elevation-1">
-        <h2 className="text-xl font-bold text-foreground mb-4">Followers</h2>
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 animate-pulse rounded-lg bg-muted" />
-          ))}
-        </div>
-      </div>
-    )
-  }
+ if (followersData === undefined) {
+ return (
+ <div className="rounded-lg bg-card p-6 shadow-elevation-1">
+ <h2 className="text-xl font-bold text-ink-deep mb-4">Followers</h2>
+ <div className="space-y-3">
+ {[1, 2, 3].map((i) => (
+ <div key={i} className="h-20 animate-pulse rounded-lg bg-muted" />
+ ))}
+ </div>
+ </div>
+ )
+ }
 
-  const followers = followersData.users ?? followersData
+ const followers = followersData.users ?? followersData
 
-  if (!Array.isArray(followers) || followers.length === 0) {
-    return (
-      <div className="rounded-lg bg-card p-6 shadow-elevation-1">
-        <h2 className="text-xl font-bold text-foreground mb-4">Followers</h2>
-        <p className="text-muted-foreground text-center py-8">No followers yet</p>
-      </div>
-    )
-  }
+ if (!Array.isArray(followers) || followers.length === 0) {
+ return (
+ <div className="rounded-lg bg-card p-6 shadow-elevation-1">
+ <h2 className="text-xl font-bold text-ink-deep mb-4">Followers</h2>
+ <p className="text-muted-foreground text-center py-8">No followers yet</p>
+ </div>
+ )
+ }
 
-  return (
-    <div className="rounded-lg bg-card p-6 shadow-elevation-1">
-      <h2 className="text-xl font-bold text-foreground mb-4">
-        Followers ({followers.length})
-      </h2>
-      <div className="space-y-3">
-        {followers.map((follower: any) => (
-          <UserCard key={follower._id} user={follower} />
-        ))}
-      </div>
-    </div>
-  )
+ return (
+ <div className="rounded-lg bg-card p-6 shadow-elevation-1">
+ <h2 className="text-xl font-bold text-ink-deep mb-4">
+ Followers ({followers.length})
+ </h2>
+ <div className="space-y-3">
+ {followers.map((follower: any) => (
+ <UserCard key={follower._id} user={follower} />
+ ))}
+ </div>
+ </div>
+ )
 }

@@ -1,13 +1,13 @@
 import React from 'react';
 
 export default function OnboardingLayout({
-  children,
+ children,
 }: {
-  children: React.ReactNode;
+ children: React.ReactNode;
 }) {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted">
-      {children}
-    </div>
-  );
+ return (
+ <div className="min-h-screen bg-canvas">
+ {children}
+ </div>
+ );
 }

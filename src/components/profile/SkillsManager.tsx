@@ -1,138 +1,138 @@
 "use client"
 
-import { useState } from "react"
-import { useMutation } from "@/lib/api"
-import { api } from "@/lib/api"
-import { validateSkill } from "@/lib/validations"
-import { ButtonLoadingSpinner } from "@/components/ui/loading-skeleton"
+import { useState } from"react"
+import { useMutation } from"@/lib/api"
+import { api } from"@/lib/api"
+import { validateSkill } from"@/lib/validations"
+import { ButtonLoadingSpinner } from"@/components/ui/loading-skeleton"
 
 interface SkillsManagerProps {
-  skills: string[]
-  onUpdate?: () => void
+ skills: string[]
+ onUpdate?: () => void
 }
 
 export function SkillsManager({ skills, onUpdate }: SkillsManagerProps) {
-  const addSkill = useMutation(api.users.addSkill)
-  const removeSkill = useMutation(api.users.removeSkill)
+ const addSkill = useMutation(api.users.addSkill)
+ const removeSkill = useMutation(api.users.removeSkill)
 
-  const [newSkill, setNewSkill] = useState("")
-  const [error, setError] = useState("")
-  const [isAdding, setIsAdding] = useState(false)
+ const [newSkill, setNewSkill] = useState("")
+ const [error, setError] = useState("")
+ const [isAdding, setIsAdding] = useState(false)
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewSkill(e.target.value)
-    // Clear error when user starts typing
-    if (error) {
-      setError("")
-    }
-  }
+ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+ setNewSkill(e.target.value)
+ // Clear error when user starts typing
+ if (error) {
+ setError("")
+ }
+ }
 
-  const handleAddSkill = async (e: React.FormEvent) => {
-    e.preventDefault()
+ const handleAddSkill = async (e: React.FormEvent) => {
+ e.preventDefault()
 
-    // Validate skill
-    const validation = validateSkill(newSkill)
-    if (!validation.valid) {
-      setError(validation.error!)
-      return
-    }
+ // Validate skill
+ const validation = validateSkill(newSkill)
+ if (!validation.valid) {
+ setError(validation.error!)
+ return
+ }
 
-    // Check for duplicate on client side
-    if (skills.includes(newSkill)) {
-      setError("Skill already exists")
-      return
-    }
+ // Check for duplicate on client side
+ if (skills.includes(newSkill)) {
+ setError("Skill already exists")
+ return
+ }
 
-    // Clear any previous errors
-    setError("")
+ // Clear any previous errors
+ setError("")
 
-    setIsAdding(true)
+ setIsAdding(true)
 
-    try {
-      await addSkill({ skill: newSkill })
-      setNewSkill("")
-      if (onUpdate) {
-        onUpdate()
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to add skill")
-    } finally {
-      setIsAdding(false)
-    }
-  }
+ try {
+ await addSkill({ skill: newSkill })
+ setNewSkill("")
+ if (onUpdate) {
+ onUpdate()
+ }
+ } catch (err) {
+ setError(err instanceof Error ? err.message :"Failed to add skill")
+ } finally {
+ setIsAdding(false)
+ }
+ }
 
-  const handleRemoveSkill = async (skill: string) => {
-    try {
-      await removeSkill({ skill })
-      if (onUpdate) {
-        onUpdate()
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to remove skill")
-    }
-  }
+ const handleRemoveSkill = async (skill: string) => {
+ try {
+ await removeSkill({ skill })
+ if (onUpdate) {
+ onUpdate()
+ }
+ } catch (err) {
+ setError(err instanceof Error ? err.message :"Failed to remove skill")
+ }
+ }
 
-  return (
-    <div className="space-y-4">
-      {/* Add Skill Form */}
-      <form onSubmit={handleAddSkill} className="flex gap-2">
-        <div className="flex-1">
-          <input
-            type="text"
-            value={newSkill}
-            onChange={handleInputChange}
-            maxLength={50}
-            placeholder="Add a skill (e.g., React, Python, Machine Learning)"
-            className="w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
-          />
-          {error && <p className="mt-1 text-sm text-destructive dark:text-red-400">{error}</p>}
-        </div>
-        <button
-          type="submit"
-          disabled={isAdding || !newSkill.trim()}
-          className="rounded-md bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 flex items-center gap-2"
-        >
-          {isAdding && <ButtonLoadingSpinner />}
-          {isAdding ? "Adding..." : "Add"}
-        </button>
-      </form>
+ return (
+ <div className="space-y-4">
+ {/* Add Skill Form */}
+ <form onSubmit={handleAddSkill} className="flex gap-2">
+ <div className="flex-1">
+ <input
+ type="text"
+ value={newSkill}
+ onChange={handleInputChange}
+ maxLength={50}
+ placeholder="Add a skill (e.g., React, Python, Machine Learning)"
+ className="w-full rounded-md border border-hairline bg-card px-3 py-2 text-ink-deep shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
+ />
+ {error && <p className="mt-1 text-sm text-critical dark:text-red-400">{error}</p>}
+ </div>
+ <button
+ type="submit"
+ disabled={isAdding || !newSkill.trim()}
+ className="rounded-md bg-primary px-4 py-2 text-on-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 flex items-center gap-2"
+ >
+ {isAdding && <ButtonLoadingSpinner />}
+ {isAdding ?"Adding..." :"Add"}
+ </button>
+ </form>
 
-      {/* Skills Display */}
-      {skills.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
-          {skills.map((skill) => (
-            <div
-              key={skill}
-              className="flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm text-primary"
-            >
-              <span>{skill}</span>
-              <button
-                onClick={() => handleRemoveSkill(skill)}
-                className="text-primary hover:text-primary dark:hover:text-blue-300 focus:outline-none"
-                aria-label={`Remove ${skill}`}
-              >
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-sm text-muted-foreground">
-          No skills added yet. Add your first skill above!
-        </p>
-      )}
-    </div>
-  )
+ {/* Skills Display */}
+ {skills.length > 0 ? (
+ <div className="flex flex-wrap gap-2">
+ {skills.map((skill) => (
+ <div
+ key={skill}
+ className="flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm text-primary"
+ >
+ <span>{skill}</span>
+ <button
+ onClick={() => handleRemoveSkill(skill)}
+ className="text-primary hover:text-primary dark:hover:text-blue-300 focus:outline-none"
+ aria-label={`Remove ${skill}`}
+ >
+ <svg
+ className="h-4 w-4"
+ fill="none"
+ stroke="currentColor"
+ viewBox="0 0 24 24"
+ >
+ <path
+ strokeLinecap="round"
+ strokeLinejoin="round"
+ strokeWidth={2}
+ d="M6 18L18 6M6 6l12 12"
+ />
+ </svg>
+ </button>
+ </div>
+ ))}
+ </div>
+ ) : (
+ <p className="text-sm text-muted-foreground">
+ No skills added yet. Add your first skill above!
+ </p>
+ )}
+ </div>
+ )
 }

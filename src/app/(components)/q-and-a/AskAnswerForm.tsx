@@ -160,7 +160,7 @@ export function AskAnswerForm({ questionId }: Props) {
                                 type="button"
                                 onClick={() => removeImage(index)}
                                 disabled={isSubmitting}
-                                className="absolute -top-1.5 -right-1.5 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="absolute -top-1.5 -right-1.5 bg-critical text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
                             >
                                 <X className="h-3 w-3" />
                             </button>
@@ -205,7 +205,7 @@ export function AskAnswerForm({ questionId }: Props) {
                 <button
                     type="submit"
                     disabled={isSubmitting || content.trim() === ''}
-                    className="h-10 py-2 px-4 btn-press bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-semibold flex items-center disabled:opacity-50"
+                    className="h-10 py-2 px-4 active:scale-[0.98] bg-primary text-on-primary hover:bg-primary/90 rounded-md text-sm font-semibold flex items-center disabled:opacity-50"
                 >
                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Post Answer

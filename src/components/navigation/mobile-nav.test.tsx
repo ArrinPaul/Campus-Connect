@@ -108,7 +108,7 @@ describe("MobileNav", () => {
     })
     
     // Click overlay
-    const overlay = container.querySelector(".fixed.inset-0.backdrop-blur-sm")
+    const overlay = container.querySelector(".fixed.inset-0")
     expect(overlay).toBeInTheDocument()
     fireEvent.click(overlay!)
     

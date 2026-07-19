@@ -46,11 +46,11 @@ const nextConfig = {
     const isDev = process.env.NODE_ENV === "development"
     const cspDirectives = [
       "default-src 'self'",
-      `script-src 'self' 'blob:' ${isDev ? "'unsafe-eval' 'unsafe-inline'" : "'unsafe-inline'"} https://challenges.cloudflare.com`,
+      `script-src 'self' blob: ${isDev ? "'unsafe-eval' 'unsafe-inline'" : "'unsafe-inline'"} https://challenges.cloudflare.com`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co",
+      "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://*.supabase.in",
       "font-src 'self' https://fonts.gstatic.com",
-      `connect-src 'self' ${isDev ? "ws://localhost:* http://localhost:*" : ""} https://*.posthog.com https://*.sentry.io https://*.supabase.co`,
+      `connect-src 'self' ${isDev ? "ws://localhost:* http://localhost:*" : ""} https://*.posthog.com https://*.sentry.io https://*.supabase.co wss://*.supabase.co https://*.supabase.in wss://*.supabase.in`,
       "frame-src 'self' https://challenges.cloudflare.com",
       "object-src 'none'",
       "base-uri 'self'",

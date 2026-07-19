@@ -1,64 +1,71 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
-// In-memory cache for soft-delete checks (resets on server restart, which is fine)
-const deletedUsersCache = new Map<string, number>()
-const CACHE_TTL_MS = 60_000 // 1 minute
+// Cache stores { isDeleted, expiresAt } so we correctly distinguish
+// deleted vs non-deleted users without hitting the DB every request.
+const userStatusCache = new Map<string, { isDeleted: boolean; expiresAt: number }>()
+
+const DELETED_TTL_MS     = 60_000   // 1 minute  — for deleted accounts
+const NOT_DELETED_TTL_MS = 300_000  // 5 minutes — for active accounts
 
 /**
- * Supabase middleware client.
- * Updates session cookies on every request and handles auth redirects.
+ * Public routes — no authentication required.
+ */
+const PUBLIC_PREFIXES = [
+  "/sign-in",
+  "/sign-up",
+  "/onboarding",
+  "/offline",
+  "/api/auth",
+  "/api/cron",
+  "/api/webhooks",
+]
+
+function isPublicRoute(pathname: string): boolean {
+  if (pathname === "/") return true
+  return PUBLIC_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(prefix + "/") || pathname.startsWith(prefix + "?")
+  )
+}
+
+function isAuthRoute(pathname: string): boolean {
+  return pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up")
+}
+
+/**
+ * Core middleware: refreshes Supabase session, enforces auth rules.
  */
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  })
+  let supabaseResponse = NextResponse.next({ request })
 
-  const authHeader = request.headers.get('Authorization')
+  const authHeader = request.headers.get("Authorization")
   const globalHeaders: Record<string, string> = authHeader ? { Authorization: authHeader } : {}
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      global: {
-        headers: globalHeaders
-      },
+      global: { headers: globalHeaders },
       cookies: {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet: any[]) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          )
-          supabaseResponse = NextResponse.next({
-            request,
-          })
+        setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, options as any)
           )
         },
       },
     }
   )
 
-  // Refresh session — important for Server Components
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
+  const { pathname } = request.nextUrl
 
-  // Protect non-public routes
-  const pathname = request.nextUrl.pathname
-  const isPublicRoute =
-    pathname === "/" ||
-    pathname.startsWith("/sign-in") ||
-    pathname.startsWith("/sign-up") ||
-    pathname.startsWith("/api/auth") ||
-    pathname.startsWith("/api/cron") ||
-    pathname.startsWith("/api/webhooks")
-
-  if (!isPublicRoute && !user) {
+  // ── 1. Unauthenticated → redirect to /sign-in (preserving intended URL) ────
+  if (!user && !isPublicRoute(pathname)) {
     if (pathname.startsWith("/api/")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
@@ -68,48 +75,57 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Block soft-deleted accounts (cached to avoid DB query on every request)
+  // ── 2. Authenticated user visiting sign-in / sign-up → send to feed ────────
+  if (user && isAuthRoute(pathname)) {
+    const url = request.nextUrl.clone()
+    url.pathname = "/feed"
+    url.search = ""
+    return NextResponse.redirect(url)
+  }
+
+  // ── 3. Authenticated user on root "/" → send to feed immediately ────────────
+  if (user && pathname === "/") {
+    const url = request.nextUrl.clone()
+    url.pathname = "/feed"
+    return NextResponse.redirect(url)
+  }
+
+  // ── 4. Soft-delete check (cached to avoid DB on every request) ──────────────
   if (user) {
     const now = Date.now()
-    const cached = deletedUsersCache.get(user.id)
-    const isDeleted = cached !== undefined && cached > now
+    const cached = userStatusCache.get(user.id)
 
-    if (cached === undefined) {
-      // Not in cache — check DB and cache the result
+    let isDeleted = false
+
+    if (cached && now < cached.expiresAt) {
+      // Cache is still valid — use it
+      isDeleted = cached.isDeleted
+    } else {
+      // Cache miss or expired — query the DB
       const { data: profile } = await supabase
         .from("users")
         .select("deleted_at")
         .eq("id", user.id)
         .single()
-      if (profile?.deleted_at) {
-        deletedUsersCache.set(user.id, now + CACHE_TTL_MS)
-        if (pathname.startsWith("/api/")) {
-          return NextResponse.json({ error: "Account has been deleted" }, { status: 403 })
-        }
-        const url = request.nextUrl.clone()
-        url.pathname = "/sign-in"
-        url.searchParams.set("error", "deleted")
-        return NextResponse.redirect(url)
-      } else {
-        // Not deleted — cache negative result for 5 minutes
-        deletedUsersCache.set(user.id, now + 300_000)
-      }
-    } else if (isDeleted) {
+
+      isDeleted = Boolean(profile?.deleted_at)
+
+      userStatusCache.set(user.id, {
+        isDeleted,
+        expiresAt: now + (isDeleted ? DELETED_TTL_MS : NOT_DELETED_TTL_MS),
+      })
+    }
+
+    if (isDeleted) {
       if (pathname.startsWith("/api/")) {
         return NextResponse.json({ error: "Account has been deleted" }, { status: 403 })
       }
       const url = request.nextUrl.clone()
       url.pathname = "/sign-in"
+      url.search = ""
       url.searchParams.set("error", "deleted")
       return NextResponse.redirect(url)
     }
-  }
-
-  // Redirect signed-in users away from auth pages
-  if (user && (pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up"))) {
-    const url = request.nextUrl.clone()
-    url.pathname = "/feed"
-    return NextResponse.redirect(url)
   }
 
   return supabaseResponse

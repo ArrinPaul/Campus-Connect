@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react"
 import { useEffect, useState, useMemo } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Mail, Lock, User, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -141,7 +141,15 @@ export function SignIn(_props: Record<string, unknown>) {
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
+
+  // Show account-deleted error if redirected here with ?error=deleted
+  useEffect(() => {
+    if (searchParams.get("error") === "deleted") {
+      setError("This account has been deleted. Please contact support.")
+    }
+  }, [searchParams])
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -160,10 +168,14 @@ export function SignIn(_props: Record<string, unknown>) {
         setError(authError.message)
         return
       }
-      router.push("/feed")
+      // Honour redirect_url param — fall back to /feed
+      const redirectTo = searchParams.get("redirect_url") || "/feed"
+      // Only allow relative paths to prevent open-redirect attacks
+      const safePath = redirectTo.startsWith("/") ? redirectTo : "/feed"
+      router.push(safePath)
       router.refresh()
     } catch {
-      setError("Unable to sign in")
+      setError("Unable to sign in. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -238,6 +250,7 @@ export function SignUp(_props: Record<string, unknown>) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -245,6 +258,7 @@ export function SignUp(_props: Record<string, unknown>) {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+    setSuccess("")
     if (!email.trim() || !password) {
       setError("Email and password are required")
       return
@@ -255,7 +269,7 @@ export function SignUp(_props: Record<string, unknown>) {
     }
     setIsSubmitting(true)
     try {
-      const { error: authError } = await supabase.auth.signUp({
+      const { data, error: authError } = await supabase.auth.signUp({
         email: email.trim(),
         password,
         options: {
@@ -266,8 +280,11 @@ export function SignUp(_props: Record<string, unknown>) {
         setError(authError.message)
         return
       }
+      if (!data.session) {
+        setSuccess("Account created successfully! Please check your email to verify your account.")
+        return
+      }
       router.push("/onboarding")
-      router.refresh()
     } catch {
       setError("Unable to sign up")
     } finally {
@@ -322,6 +339,12 @@ export function SignUp(_props: Record<string, unknown>) {
         {error && (
           <p className="text-body-sm font-semibold text-critical text-center bg-critical/5 py-2 rounded-lg border border-critical/10">
             {error}
+          </p>
+        )}
+        
+        {success && (
+          <p className="text-body-sm font-semibold text-green-600 text-center bg-green-50 py-2 rounded-lg border border-green-200">
+            {success}
           </p>
         )}
 

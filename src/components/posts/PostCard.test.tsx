@@ -88,6 +88,9 @@ jest.mock("lucide-react", () => ({
   MoreHorizontal: (props: any) => <svg {...props} />,
   Heart: (props: any) => <svg {...props} />,
   Bookmark: (props: any) => <svg {...props} />,
+  Pencil: (props: any) => <svg {...props} />,
+  Check: (props: any) => <svg {...props} />,
+  X: (props: any) => <svg {...props} />,
 }))
 
 // Mock components with complex dependencies

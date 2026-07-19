@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 export default function BillingRedirect() {
-  const router = useRouter();
-  useEffect(() => { router.replace('/settings?tab=billing'); }, [router]);
-  return null;
+ const router = useRouter();
+ useEffect(() => { router.replace('/settings?tab=billing'); }, [router]);
+ return null;
 }

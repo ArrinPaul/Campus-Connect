@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { getPostComments, createComment } from "@/server/db/comments"
+import DOMPurify from "isomorphic-dompurify"
 
 // GET /api/comments?postId=xxx&limit=20&cursor=xxx
 export async function GET(req: Request) {
@@ -31,12 +32,17 @@ export async function POST(req: Request) {
     const body = await req.json()
     if (!body.postId || !body.content) return NextResponse.json({ error: "postId and content required" }, { status: 400 })
 
+    const sanitizedContent = DOMPurify.sanitize(body.content)
+
     const comment = await createComment({
       post_id: body.postId,
       author_id: userId,
-      content: body.content,
+      content: sanitizedContent,
       parent_id: body.parentCommentId,
     })
+    if (!comment) {
+      return NextResponse.json({ error: "Failed to create comment" }, { status: 500 })
+    }
     return NextResponse.json(comment, { status: 201 })
   } catch (err) {
     return internalError(err)

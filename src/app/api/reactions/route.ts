@@ -39,7 +39,7 @@ export async function GET(req: Request) {
     const targetType = url.searchParams.get("targetType") as "post" | "comment"
 
     if (!targetId || !targetType) {
-      return NextResponse.json({ error: "targetId and targetType required" }, { status: 400 })
+      return NextResponse.json({ counts: { total: 0, topReactions: [] }, userReaction: null })
     }
 
     const [counts, userReaction] = await Promise.all([

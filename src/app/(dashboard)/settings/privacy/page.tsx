@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 export default function PrivacyRedirect() {
-  const router = useRouter();
-  useEffect(() => { router.replace('/settings?tab=privacy'); }, [router]);
-  return null;
+ const router = useRouter();
+ useEffect(() => { router.replace('/settings?tab=privacy'); }, [router]);
+ return null;
 }

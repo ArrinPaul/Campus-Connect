@@ -1,26 +1,25 @@
+import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
+import { getUserReaction } from "@/server/db/reactions"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
+// GET /api/reactions/user?targetId=...&targetType=post
+export async function GET(req: Request) {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
+    if (!userId) return NextResponse.json({ reaction: null })
 
-export async function GET() {
-  return notImplemented()
-}
+    const { searchParams } = new URL(req.url)
+    const targetId = searchParams.get("targetId")
+    const targetType = (searchParams.get("targetType") as "post" | "comment") || "post"
 
-export async function POST() {
-  return notImplemented()
-}
+    if (!targetId) return NextResponse.json({ reaction: null })
 
-export async function PATCH() {
-  return notImplemented()
-}
-
-export async function DELETE() {
-  return notImplemented()
+    const reaction = await getUserReaction(userId, targetId, targetType)
+    return NextResponse.json({ reaction })
+  } catch (err) {
+    return internalError(err)
+  }
 }

@@ -1,30 +1,30 @@
 "use client"
 
-import Image from "next/image"
-import { Plus } from "lucide-react"
-import { cn } from "@/lib/utils"
+import Image from"next/image"
+import { Plus } from"lucide-react"
+import { cn } from"@/lib/utils"
 
 export interface StoryRingUser {
-  _id: string
-  name: string
-  username?: string
-  profilePicture?: string
+ _id: string
+ name: string
+ username?: string
+ profilePicture?: string
 }
 
 export interface StoryRingStory {
-  _id: string
-  viewed: boolean
+ _id: string
+ viewed: boolean
 }
 
 interface StoryRingProps {
-  user: StoryRingUser
-  stories: StoryRingStory[]
-  /** Show "+" overlay for own stories (add to story) */
-  isOwn?: boolean
-  /** If true, show the composer variant (no ring, just + button) */
-  composerMode?: boolean
-  onClick?: () => void
-  className?: string
+ user: StoryRingUser
+ stories: StoryRingStory[]
+ /** Show"+" overlay for own stories (add to story) */
+ isOwn?: boolean
+ /** If true, show the composer variant (no ring, just + button) */
+ composerMode?: boolean
+ onClick?: () => void
+ className?: string
 }
 
 /**
@@ -34,92 +34,92 @@ interface StoryRingProps {
  * - No ring = no active stories (own profile shows + to add)
  */
 export function StoryRing({
-  user,
-  stories,
-  isOwn = false,
-  composerMode = false,
-  onClick,
-  className,
+ user,
+ stories,
+ isOwn = false,
+ composerMode = false,
+ onClick,
+ className,
 }: StoryRingProps) {
-  const hasStories = stories.length > 0
-  const hasUnseen = stories.some((s) => !s.viewed)
+ const hasStories = stories.length > 0
+ const hasUnseen = stories.some((s) => !s.viewed)
 
-  const ringClass = cn(
-    "relative flex flex-col items-center gap-1 cursor-pointer select-none btn-press",
-    className
-  )
+ const ringClass = cn(
+"relative flex flex-col items-center gap-1 cursor-pointer select-none active:scale-[0.98]",
+ className
+ )
 
-  const avatarContainerClass = cn(
-    "relative flex items-center justify-center rounded-full p-[2px]",
-    hasStories && hasUnseen
-      ? "ring-2 ring-primary"
-      : hasStories
-      ? "ring-2 ring-hairline"
-      : ""
-  )
+ const avatarContainerClass = cn(
+"relative flex items-center justify-center rounded-full p-[2px]",
+ hasStories && hasUnseen
+ ?"ring-2 ring-primary"
+ : hasStories
+ ?"ring-2 ring-hairline"
+ :""
+ )
 
-  const displayName =
-    user.username ? `@${user.username}` : user.name.split(" ")[0]
+ const displayName =
+ user.username ? `@${user.username}` : user.name.split("")[0]
 
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={ringClass}
-      aria-label={
-        isOwn
-          ? composerMode
-            ? "Add to story"
-            : `Your stories`
-          : `${user.name}'s stories`
-      }
-    >
-      <div className={avatarContainerClass} style={{ width: 66, height: 66 }}>
-        <div className="relative h-full w-full rounded-full overflow-hidden bg-canvas-parchment">
-          {user.profilePicture ? (
-            <Image
-              src={user.profilePicture}
-              alt={user.name}
-              fill
-              sizes="66px"
-              className="object-cover"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-ink text-lg font-semibold">
-              {user.name.charAt(0).toUpperCase()}
-            </div>
-          )}
-        </div>
+ return (
+ <button
+ type="button"
+ onClick={onClick}
+ className={ringClass}
+ aria-label={
+ isOwn
+ ? composerMode
+ ?"Add to story"
+ : `Your stories`
+ : `${user.name}'s stories`
+ }
+ >
+ <div className={avatarContainerClass} style={{ width: 66, height: 66 }}>
+ <div className="relative h-full w-full rounded-full overflow-hidden bg-canvas">
+ {user.profilePicture ? (
+ <Image
+ src={user.profilePicture}
+ alt={user.name}
+ fill
+ sizes="66px"
+ className="object-cover"
+ />
+ ) : (
+ <div className="flex h-full w-full items-center justify-center text-ink text-lg font-semibold">
+ {user.name.charAt(0).toUpperCase()}
+ </div>
+ )}
+ </div>
 
-        {/* "+" overlay for own ring (create story) */}
-        {isOwn && (
-          <div className="absolute bottom-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-primary ring-2 ring-canvas">
-            <Plus className="h-3 w-3 text-white" strokeWidth={3} />
-          </div>
-        )}
-      </div>
+ {/*"+" overlay for own ring (create story) */}
+ {isOwn && (
+ <div className="absolute bottom-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-primary ring-2 ring-canvas">
+ <Plus className="h-3 w-3 text-white" strokeWidth={3} />
+ </div>
+ )}
+ </div>
 
-      {/* Label */}
-      <span className="max-w-[72px] truncate text-fine-print text-ink text-center mt-1">
-        {isOwn ? "Your Story" : displayName}
-      </span>
-    </button>
-  )
+ {/* Label */}
+ <span className="max-w-[72px] truncate text-fine-print text-ink text-center mt-1">
+ {isOwn ?"Your Story" : displayName}
+ </span>
+ </button>
+ )
 }
 
 // ─── StoryRingRow ──────────────────────────────────────────────────────────────
 
 interface StoryGroup {
-  author: StoryRingUser
-  stories: StoryRingStory[]
-  isOwn: boolean
+ author: StoryRingUser
+ stories: StoryRingStory[]
+ isOwn: boolean
 }
 
 interface StoryRingRowProps {
-  storyGroups: StoryGroup[]
-  onStoryClick: (authorId: string) => void
-  onAddStory: () => void
-  className?: string
+ storyGroups: StoryGroup[]
+ onStoryClick: (authorId: string) => void
+ onAddStory: () => void
+ className?: string
 }
 
 /**
@@ -127,65 +127,65 @@ interface StoryRingRowProps {
  * The current user's ring always comes first.
  */
 export function StoryRingRow({
-  storyGroups,
-  onStoryClick,
-  onAddStory,
-  className,
+ storyGroups,
+ onStoryClick,
+ onAddStory,
+ className,
 }: StoryRingRowProps) {
-  const ownGroup = storyGroups.find((g) => g.isOwn)
-  const otherGroups = storyGroups.filter((g) => !g.isOwn)
+ const ownGroup = storyGroups.find((g) => g.isOwn)
+ const otherGroups = storyGroups.filter((g) => !g.isOwn)
 
-  return (
-    <div
-      className={cn(
-        "flex items-start gap-md overflow-x-auto py-3 px-1 scrollbar-none",
-        className
-      )}
-    >
-      {/* Own story ring (always first) */}
-      {ownGroup ? (
-        <StoryRing
-          user={ownGroup.author}
-          stories={ownGroup.stories}
-          isOwn
-          onClick={() => onStoryClick(ownGroup.author._id)}
-        />
-      ) : (
-        /* No own stories yet — show add button only */
-        <AddStoryButton onClick={onAddStory} />
-      )}
+ return (
+ <div
+ className={cn(
+"flex items-start gap-md overflow-x-auto py-3 px-1 scrollbar-none",
+ className
+ )}
+ >
+ {/* Own story ring (always first) */}
+ {ownGroup ? (
+ <StoryRing
+ user={ownGroup.author}
+ stories={ownGroup.stories}
+ isOwn
+ onClick={() => onStoryClick(ownGroup.author._id)}
+ />
+ ) : (
+ /* No own stories yet — show add button only */
+ <AddStoryButton onClick={onAddStory} />
+ )}
 
-      {otherGroups.map((group) => (
-        <StoryRing
-          key={group.author._id}
-          user={group.author}
-          stories={group.stories}
-          onClick={() => onStoryClick(group.author._id)}
-        />
-      ))}
-    </div>
-  )
+ {otherGroups.map((group) => (
+ <StoryRing
+ key={group.author._id}
+ user={group.author}
+ stories={group.stories}
+ onClick={() => onStoryClick(group.author._id)}
+ />
+ ))}
+ </div>
+ )
 }
 
 // ─── AddStoryButton ───────────────────────────────────────────────────────────
 
 function AddStoryButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex flex-col items-center gap-1 cursor-pointer select-none btn-press"
-      aria-label="Add to story"
-    >
-      <div
-        className="relative flex items-center justify-center rounded-full border border-hairline bg-canvas-parchment/50"
-        style={{ width: 66, height: 66 }}
-      >
-        <Plus className="h-6 w-6 text-primary" />
-      </div>
-      <span className="max-w-[72px] truncate text-fine-print text-ink text-center mt-1">
-        Add Story
-      </span>
-    </button>
-  )
+ return (
+ <button
+ type="button"
+ onClick={onClick}
+ className="flex flex-col items-center gap-1 cursor-pointer select-none active:scale-[0.98]"
+ aria-label="Add to story"
+ >
+ <div
+ className="relative flex items-center justify-center rounded-full border border-hairline bg-canvas/50"
+ style={{ width: 66, height: 66 }}
+ >
+ <Plus className="h-6 w-6 text-primary" />
+ </div>
+ <span className="max-w-[72px] truncate text-fine-print text-ink text-center mt-1">
+ Add Story
+ </span>
+ </button>
+ )
 }

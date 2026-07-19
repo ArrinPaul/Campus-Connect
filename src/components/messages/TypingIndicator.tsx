@@ -1,16 +1,16 @@
 "use client"
 
-import { Id } from "@/lib/api"
+import { Id } from"@/lib/api"
 
 interface TypingUser {
-  _id: Id<"users">
-  name: string
-  username?: string
-  profilePicture?: string
+ _id: Id<"users">
+ name: string
+ username?: string
+ profilePicture?: string
 }
 
 interface TypingIndicatorProps {
-  users: TypingUser[]
+ users: TypingUser[]
 }
 
 /**
@@ -18,36 +18,36 @@ interface TypingIndicatorProps {
  * Shows animated typing dots with user names
  */
 export function TypingIndicator({ users }: TypingIndicatorProps) {
-  if (users.length === 0) return null
+ if (users.length === 0) return null
 
-  const getTypingText = () => {
-    if (users.length === 1) return `${users[0].name} is typing`
-    if (users.length === 2) return `${users[0].name} and ${users[1].name} are typing`
-    return `${users[0].name} and ${users.length - 1} others are typing`
-  }
+ const getTypingText = () => {
+ if (users.length === 1) return `${users[0].name} is typing`
+ if (users.length === 2) return `${users[0].name} and ${users[1].name} are typing`
+ return `${users[0].name} and ${users.length - 1} others are typing`
+ }
 
-  return (
-    <div className="flex items-center gap-2 py-1.5 px-1">
-      {/* Animated dots */}
-      <div className="flex items-center gap-0.5 bg-muted/70 backdrop-blur-sm rounded-full px-3 py-2">
-        <span
-          className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-bounce"
-          style={{ animationDelay: "0ms", animationDuration: "1s" }}
-        />
-        <span
-          className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-bounce"
-          style={{ animationDelay: "200ms", animationDuration: "1s" }}
-        />
-        <span
-          className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-bounce"
-          style={{ animationDelay: "400ms", animationDuration: "1s" }}
-        />
-      </div>
+ return (
+ <div className="flex items-center gap-2 py-1.5 px-1">
+ {/* Animated dots */}
+ <div className="flex items-center gap-0.5 bg-canvas rounded-full px-3 py-2">
+ <span
+ className="w-1.5 h-1.5 bg-ink-deep/50 rounded-full animate-bounce"
+ style={{ animationDelay:"0ms", animationDuration:"1s" }}
+ />
+ <span
+ className="w-1.5 h-1.5 bg-ink-deep/50 rounded-full animate-bounce"
+ style={{ animationDelay:"200ms", animationDuration:"1s" }}
+ />
+ <span
+ className="w-1.5 h-1.5 bg-ink-deep/50 rounded-full animate-bounce"
+ style={{ animationDelay:"400ms", animationDuration:"1s" }}
+ />
+ </div>
 
-      {/* Typing text */}
-      <span className="text-xs text-muted-foreground italic">
-        {getTypingText()}...
-      </span>
-    </div>
-  )
+ {/* Typing text */}
+ <span className="text-xs text-slate italic">
+ {getTypingText()}...
+ </span>
+ </div>
+ )
 }

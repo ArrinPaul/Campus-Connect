@@ -26,7 +26,7 @@ function getBaseUrl(path: string): string {
 }
 
 export type Id<_T extends string = string> = string
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line
 export type Doc<_T extends string = string> = Record<string, any>
 
 export interface Endpoint {
@@ -451,7 +451,7 @@ export const api = {
 
   // ── feed_ranking ──────────────────────────────────────────────────────────
   feed_ranking: {
-    getRankedFeed: ep("/api/graph/recommendations"),
+    getRankedFeed: ep("/api/posts/explore"),
     getTrendingFeed: ep("/api/posts/explore"),
   },
 
@@ -465,7 +465,7 @@ export const api = {
 
   // ── recommendations ────────────────────────────────────────────────────────
   recommendations: {
-    getPostRecommendations: ep("/api/graph/recommendations"),
+    getPostRecommendations: ep("/api/posts/explore"),
     getSuggestedUsers: ep("/api/graph/suggestions"),
   },
 
