@@ -151,17 +151,20 @@ export async function getConversations(userId: string) {
       .order("created_at", { ascending: false })
   ])
 
-  let convs = convsRes.data || []
+  const existingConvIds = new Set((convsRes.data || []).map((c) => c.id))
+  let convs = [...(convsRes.data || [])]
 
-  // Fallback: If conversations table rows are missing, generate synthetic objects for convIds
-  if (convs.length === 0 && convIds.length > 0) {
-    convs = convIds.map((cid) => ({
-      id: cid,
-      type: "direct",
-      created_by: userId,
-      updated_at: new Date().toISOString(),
-    }))
-  }
+  // Guarantee all convIds are included, even if missing from conversations table
+  convIds.forEach((cid) => {
+    if (!existingConvIds.has(cid)) {
+      convs.push({
+        id: cid,
+        type: "direct",
+        created_by: userId,
+        updated_at: new Date().toISOString(),
+      })
+    }
+  })
 
   const rawParticipants = allPartsRes.data || []
   const messages = messagesRes.data || []
