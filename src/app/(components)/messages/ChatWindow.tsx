@@ -7,10 +7,10 @@ import { useUser } from "@/lib/auth/client"
 import { ChatMessage } from "./ChatMessage"
 import { ChatInput } from "./ChatInput"
 import { useEffect, useRef, useState } from "react"
-import { Loader2, User, MoreVertical, Phone, Video } from "lucide-react"
+import { Loader2, Phone, Video, MoreVertical, ArrowLeft } from "lucide-react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { OnlineStatusDot } from "@/components/ui/OnlineStatusDot"
-import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation"
 
 interface ChatWindowProps {
   conversationId: Id<"conversations">
@@ -18,20 +18,43 @@ interface ChatWindowProps {
 
 export function ChatWindow({ conversationId }: ChatWindowProps) {
   const { user: currentUser } = useUser()
-  const messages = useQuery(api.messages.getMessages, { conversationId })
+  const router = useRouter()
+  
+  const rawMessages = useQuery(api.messages.getMessages, { conversationId })
   const conversation = useQuery(api.conversations.getConversation, { conversationId })
   const sendMessage = useMutation(api.messages.sendMessage)
-  
+
+  const [optimisticMessages, setOptimisticMessages] = useState<any[]>([])
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  // Merge server messages & local optimistic messages
+  const messageList = Array.isArray(rawMessages)
+    ? [...rawMessages, ...optimisticMessages.filter(om => !rawMessages.some(rm => rm.content === om.content && Math.abs((rm.createdAt || 0) - om.createdAt) < 5000))]
+    : optimisticMessages
 
   // Scroll to bottom on new messages
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  }, [messages])
+  }, [messageList.length])
 
   const handleSendMessage = async (content: string) => {
+    if (!currentUser) return
+    const tempMsg = {
+      _id: `temp_${Date.now()}`,
+      senderId: currentUser.id,
+      content,
+      createdAt: Date.now(),
+      sender: {
+        _id: currentUser.id,
+        name: currentUser.name || "You",
+        profilePicture: (currentUser as any).profile_picture || currentUser.profilePicture,
+      },
+    }
+
+    setOptimisticMessages((prev) => [...prev, tempMsg])
+
     try {
       await sendMessage({ conversationId, content })
     } catch (err) {
@@ -39,96 +62,120 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
     }
   }
 
-  if (conversation === undefined || messages === undefined) {
+  const isLoading = conversation === undefined && rawMessages === undefined
+
+  if (isLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-canvas">
-        <Loader2 className="h-8 w-8 animate-spin text-ink/20" />
+      <div className="flex-1 flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary/40" />
       </div>
     )
   }
 
-  const otherUser = conversation.otherUser
+  const otherUser = conversation?.otherUser || {
+    _id: "user",
+    id: "user",
+    name: conversation?.name || "Direct Message",
+    profilePicture: undefined,
+  }
 
   return (
-    <div className="flex-1 flex flex-col bg-canvas min-w-0">
-      {/* Header - Apple Frosted Style */}
-      <div className="h-[64px] glass bg-canvas/80 border-b border-hairline px-4 md:px-8 flex items-center justify-between sticky top-0 z-20">
+    <div className="flex-1 flex flex-col bg-background min-w-0 h-full border-r border-border">
+      {/* Top Bar Header */}
+      <div className="h-16 bg-card/80 backdrop-blur-md border-b border-border px-4 md:px-6 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => router.push("/messages")}
+            className="md:hidden p-2 rounded-full text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+          >
+            <ArrowLeft size={20} />
+          </button>
+
           <div className="relative">
-            <div className="h-10 w-10 rounded-full overflow-hidden border border-hairline bg-canvas-parchment">
+            <div className="h-10 w-10 rounded-full overflow-hidden border border-border bg-muted">
               {otherUser.profilePicture ? (
                 <OptimizedImage
                   src={otherUser.profilePicture}
-                  alt={otherUser.name}
+                  alt={otherUser.name || "User"}
                   width={40}
                   height={40}
                   isAvatar
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <div className="h-full w-full flex items-center justify-center text-ink/20 font-bold text-sm">
-                  {otherUser.name.charAt(0).toUpperCase()}
+                <div className="h-full w-full flex items-center justify-center text-muted-foreground font-bold text-sm">
+                  {(otherUser.name || "U").charAt(0).toUpperCase()}
                 </div>
               )}
             </div>
-            <OnlineStatusDot userId={otherUser._id} size="sm" overlay />
+            <OnlineStatusDot userId={otherUser._id || otherUser.id} size="sm" overlay />
           </div>
+
           <div>
-            <h2 className="text-body-strong text-ink leading-tight">{otherUser.name}</h2>
-            <p className="text-[10px] text-ink-muted-48 font-bold uppercase tracking-widest">
-               Active Now
-            </p>
+            <h2 className="text-sm font-semibold text-foreground leading-snug">{otherUser.name}</h2>
+            <p className="text-[10px] text-emerald-500 font-semibold tracking-wide uppercase">Active Now</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button className="p-2 rounded-full text-primary hover:bg-primary/5 transition-colors btn-press">
-            <Phone size={20} />
+        <div className="flex items-center gap-1">
+          <button className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-accent transition-colors">
+            <Phone size={18} />
           </button>
-          <button className="p-2 rounded-full text-primary hover:bg-primary/5 transition-colors btn-press">
-            <Video size={20} />
+          <button className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-accent transition-colors">
+            <Video size={18} />
           </button>
-          <button className="p-2 rounded-full text-ink-muted-48 hover:bg-canvas-parchment hover:text-ink transition-colors btn-press">
-            <MoreVertical size={20} />
+          <button className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+            <MoreVertical size={18} />
           </button>
         </div>
       </div>
 
-      {/* Message Feed */}
-      <div 
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto py-6 space-y-2 scrollbar-none"
-      >
+      {/* Message Feed Area */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto py-6 space-y-2 scrollbar-none">
         <div className="max-w-3xl mx-auto w-full">
-           <div className="text-center mb-8 px-4">
-              <div className="h-16 w-16 rounded-full overflow-hidden border border-hairline bg-canvas-parchment mx-auto mb-3 shadow-sm">
-                {otherUser.profilePicture ? (
-                  <OptimizedImage src={otherUser.profilePicture} alt={otherUser.name} width={64} height={64} className="h-full w-full object-cover" />
-                ) : (
-                  <div className="h-full w-full flex items-center justify-center text-ink/10 font-display text-2xl">
-                    {otherUser.name.charAt(0)}
-                  </div>
-                )}
-              </div>
-              <h3 className="text-display-md text-ink">{otherUser.name}</h3>
-              <p className="text-caption text-ink-muted-48 mt-1">Academic Peer • Followed by you</p>
-              <button className="mt-4 text-caption-strong text-primary hover:underline">View Profile</button>
-           </div>
-           
-           <div className="flex flex-col">
-            {messages.map((msg: any, i: number) => (
-              <ChatMessage 
-                key={msg._id} 
-                message={msg} 
-                isOwn={msg.senderId === currentUser?.id}
-                showSenderInfo={false} 
+          {/* Direct Message Welcome Header */}
+          <div className="text-center mb-8 px-4">
+            <div className="h-16 w-16 rounded-full overflow-hidden border border-border bg-card mx-auto mb-3 shadow-md">
+              {otherUser.profilePicture ? (
+                <OptimizedImage
+                  src={otherUser.profilePicture}
+                  alt={otherUser.name || "User"}
+                  width={64}
+                  height={64}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="h-full w-full flex items-center justify-center text-muted-foreground font-bold text-xl">
+                  {(otherUser.name || "U").charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+            <h3 className="text-base font-bold text-foreground">{otherUser.name}</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">Campus Connect Student & Peer</p>
+            {otherUser._id && otherUser._id !== "user" && (
+              <button
+                onClick={() => router.push(`/profile/${otherUser._id || otherUser.id}`)}
+                className="mt-2 text-xs text-primary font-medium hover:underline"
+              >
+                View Profile
+              </button>
+            )}
+          </div>
+
+          <div className="flex flex-col">
+            {messageList.map((msg: any) => (
+              <ChatMessage
+                key={msg._id || msg.id}
+                message={msg}
+                isOwn={msg.senderId === currentUser?.id || msg.sender_id === currentUser?.id}
+                showSenderInfo={false}
               />
             ))}
-           </div>
+          </div>
         </div>
       </div>
 
-      {/* Input */}
+      {/* Input Form Bar */}
       <div className="max-w-3xl mx-auto w-full">
         <ChatInput onSendMessage={handleSendMessage} />
       </div>

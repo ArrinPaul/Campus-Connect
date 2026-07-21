@@ -15,13 +15,6 @@ import type { ReactNode } from "react"
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
 
 function getBaseUrl(path: string): string {
-  if (
-    path.startsWith("/api/auth") ||
-    path === "/api/users/me" ||
-    path === "/api/users/onboarding"
-  ) {
-    return API_BASE_URL
-  }
   return ""
 }
 
@@ -109,9 +102,12 @@ export function useMutation<A = any, T = any>(
       return res.json() as T
     },
     onSuccess: () => {
-      // Invalidate queries related to this endpoint's path prefix
       const pathPrefix = endpoint._path.split("/").slice(0, 3).join("/")
       queryClient.invalidateQueries({ queryKey: [pathPrefix] })
+      if (endpoint._path.startsWith("/api/follows")) {
+        queryClient.invalidateQueries({ queryKey: ["/api/users"] })
+        queryClient.invalidateQueries({ queryKey: ["/api/follows"] })
+      }
     },
   })
 

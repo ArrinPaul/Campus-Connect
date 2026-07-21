@@ -67,9 +67,8 @@ export async function searchUsers(
   query: string,
   limit = 10,
   viewerId?: string
-): Promise<DbUser[]> {
+): Promise<(DbUser & { isFollowing?: boolean })[]> {
   const supabase = await getSupabase()
-  // Escape ILIKE special characters to prevent pattern injection
   const escaped = query.replace(/[%_]/g, (m) => `\\${m}`)
   let q = supabase
     .from("users")
@@ -81,8 +80,24 @@ export async function searchUsers(
     q = q.neq("id", viewerId)
   }
   const { data, error } = await q
-  if (error) return []
-  return (data ?? []) as DbUser[]
+  if (error || !data) return []
+
+  if (viewerId && data.length > 0) {
+    const userIds = data.map((u) => u.id)
+    const { data: followsData } = await supabase
+      .from("follows")
+      .select("following_id")
+      .eq("follower_id", viewerId)
+      .in("following_id", userIds)
+
+    const followingSet = new Set((followsData || []).map((f) => f.following_id))
+    return data.map((u) => ({
+      ...u,
+      isFollowing: followingSet.has(u.id),
+    })) as any
+  }
+
+  return data as any
 }
 
 // ─── Update ─────────────────────────────────────────────────────────────────

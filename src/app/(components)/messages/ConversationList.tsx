@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@/lib/api';
 import { api } from '@/lib/api';
 import type { Id } from '@/lib/api';
 import { ConversationListItem } from './ConversationListItem';
 import { NewConversationModal } from './NewConversationModal';
-import { Search, PlusCircle } from 'lucide-react';
+import { Search, PlusCircle, MessageSquarePlus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 type Props = {
     selectedConversationId: Id<'conversations'> | null;
@@ -14,39 +15,67 @@ type Props = {
 
 export function ConversationList({ selectedConversationId }: Props) {
     const conversations = useQuery(api.conversations.getConversations, {});
+    const [searchQuery, setSearchQuery] = useState('');
     const [showNewModal, setShowNewModal] = useState(false);
+    const router = useRouter();
+
+    const filteredConversations = useMemo(() => {
+        if (!Array.isArray(conversations)) return [];
+        if (!searchQuery.trim()) return conversations;
+        const q = searchQuery.toLowerCase();
+        return conversations.filter((c: any) => {
+            const name = c.otherUser?.name || c.name || '';
+            const lastMsg = c.lastMessage || '';
+            return name.toLowerCase().includes(q) || lastMsg.toLowerCase().includes(q);
+        });
+    }, [conversations, searchQuery]);
 
     return (
-        <div className="flex flex-col h-full">
-            <div className="p-4 border-b flex-shrink-0">
-                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold">Messages</h2>
+        <div className="flex flex-col h-full bg-card/60 backdrop-blur-md border-r border-border">
+            <div className="p-4 border-b border-border flex-shrink-0 space-y-3">
+                 <div className="flex justify-between items-center">
+                    <h2 className="text-xl font-bold tracking-tight">Inbox</h2>
                      <button
                         onClick={() => setShowNewModal(true)}
-                        className="text-primary hover:text-primary/80"
+                        className="p-2 rounded-full text-primary hover:bg-primary/10 transition-colors"
                         title="Start new conversation"
                      >
-                        <PlusCircle className="h-6 w-6" />
+                        <MessageSquarePlus className="h-5 w-5" />
                     </button>
                  </div>
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <input type="text" placeholder="Search messages..." className="w-full pl-9 pr-3 py-2 text-sm bg-muted/50 rounded-full focus:outline-none focus:ring-1 focus:ring-primary" />
+                    <input 
+                        type="text" 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search chats..." 
+                        className="w-full pl-9 pr-3 py-2 text-sm bg-accent/40 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" 
+                    />
                 </div>
             </div>
-            <div className="flex-1 overflow-y-auto scrollbar-custom">
+
+            <div className="flex-1 overflow-y-auto divide-y divide-border/40 scrollbar-none">
                 {conversations === undefined && (
-                    <div className="p-4 text-center text-sm text-muted-foreground">Loading...</div>
+                    <div className="p-8 text-center text-sm text-muted-foreground animate-pulse">Loading conversations...</div>
                 )}
-                {conversations?.length === 0 && (
-                    <div className="p-4 text-center text-sm text-muted-foreground">No conversations yet.</div>
+                {Array.isArray(conversations) && filteredConversations.length === 0 && (
+                    <div className="p-8 text-center text-sm text-muted-foreground flex flex-col items-center gap-2">
+                        <p>No conversations found</p>
+                        <button
+                            onClick={() => setShowNewModal(true)}
+                            className="text-xs text-primary font-semibold hover:underline"
+                        >
+                            Start a new chat
+                        </button>
+                    </div>
                 )}
-                {conversations?.map((convo: any) => (
+                {filteredConversations.map((convo: any) => (
                     <ConversationListItem 
-                        key={convo._id}
+                        key={convo._id || convo.id}
                         conversation={convo}
-                        isSelected={selectedConversationId === convo._id}
-                        onClick={() => {}}
+                        isSelected={selectedConversationId === (convo._id || convo.id)}
+                        onClick={() => router.push(`/messages?c=${convo._id || convo.id}`)}
                     />
                 ))}
             </div>
