@@ -41,7 +41,7 @@ describe("NotificationsPage", () => {
 
     render(<NotificationsPage />)
 
-    expect(screen.getByText("Notifications.")).toBeInTheDocument()
+    expect(screen.getByText("Notifications")).toBeInTheDocument()
   })
 
   it("should show unread count badge when there are unread notifications", () => {
@@ -53,8 +53,8 @@ describe("NotificationsPage", () => {
 
     render(<NotificationsPage />)
 
-    // Unread count shows in "Recent Activity (2 unread)"
-    expect(screen.getByText("Recent Activity (2 unread)")).toBeInTheDocument()
+    // Unread count shows in "Mark all as read (2)" and pill badge
+    expect(screen.getByText(/Mark all as read \(2\)/i)).toBeInTheDocument()
   })
 
   it("should show Mark all as read button when there are unread notifications", () => {
@@ -84,7 +84,7 @@ describe("NotificationsPage", () => {
 
     render(<NotificationsPage />)
 
-    expect(screen.getByText("All caught up.")).toBeInTheDocument()
+    expect(screen.getByText("All caught up")).toBeInTheDocument()
   })
 
   it("should render notification items when notifications exist", () => {
