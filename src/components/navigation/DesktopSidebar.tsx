@@ -46,7 +46,7 @@ export function DesktopSidebar() {
  <span className="text-white text-sm font-bold">CC</span>
  </div>
  <span className="text-ink-deep font-bold text-lg tracking-tight hidden lg:block">
- Connect
+ College Connect
  </span>
  </Link>
 

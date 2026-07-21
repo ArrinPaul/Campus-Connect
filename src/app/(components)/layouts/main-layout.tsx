@@ -1,7 +1,6 @@
 import React from "react";
 import { DesktopSidebar } from "@/components/navigation/DesktopSidebar";
 import { MobileTopBar } from "@/components/navigation/MobileTopBar";
-import { SubNav } from "@/components/navigation/SubNav";
 import { MobileBottomNav } from "@/components/navigation/mobile-bottom-nav";
 
 type MainLayoutProps = {
@@ -25,9 +24,6 @@ export function MainLayout({ children, title = "Campus Connect" }: MainLayoutPro
         
         {/* Main Feed Column */}
         <main className="flex-1 max-w-[600px] min-w-0 min-h-screen scrollbar-custom border-x border-hairline pb-16 md:pb-0 bg-canvas relative">
-          <div className="hidden md:block sticky top-0 z-10 bg-canvas/70 backdrop-blur-md">
-            <SubNav title={title} />
-          </div>
           {children}
         </main>
         
