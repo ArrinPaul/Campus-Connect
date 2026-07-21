@@ -252,12 +252,12 @@ describe("PostCard", () => {
     expect(screen.getByTestId("reaction-picker")).toBeInTheDocument()
   })
 
-  it("should not show reaction picker when not authenticated", () => {
+  it("should render reaction picker even when not authenticated", () => {
     mockGetCurrentUser.mockReturnValue(null)
 
     render(<PostCard post={mockPost} author={mockAuthor} />)
 
-    expect(screen.queryByTestId("reaction-picker")).not.toBeInTheDocument()
+    expect(screen.getByTestId("reaction-picker")).toBeInTheDocument()
   })
 
   it("should render reaction picker button", () => {

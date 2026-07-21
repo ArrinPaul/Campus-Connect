@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Users, Briefcase, Store, Bell, LogOut, Settings, User, Sun, Moon } from 'lucide-react';
+import { Home, Users, Briefcase, Store, Bell, LogOut, Settings, User, Sun, Moon, MessageSquare, Handshake, ShieldAlert } from 'lucide-react';
 import { useUser, useAuthActions } from '@/lib/auth/client';
 import { useQuery } from '@/lib/api';
 import { api } from '@/lib/api';
@@ -28,6 +28,14 @@ export function DesktopSidebar() {
     isSignedIn ? {} : 'skip'
   );
 
+  const unreadMessagesRes = useQuery(
+    api.conversations.getUnreadCount,
+    isSignedIn ? {} : 'skip'
+  );
+  const unreadMessagesCount = typeof unreadMessagesRes === 'number'
+    ? unreadMessagesRes
+    : (unreadMessagesRes as any)?.count ?? (unreadMessagesRes as any)?.unreadCount ?? 0;
+
   const currentUser = useQuery(
     api.users.getCurrentUser,
     isSignedIn ? {} : 'skip'
@@ -39,10 +47,12 @@ export function DesktopSidebar() {
 
   const navLinks = [
     { href: '/feed', label: 'Feed', icon: Home },
+    { href: '/messages', label: 'Inbox', icon: MessageSquare, badge: unreadMessagesCount },
     { href: '/communities', label: 'Communities', icon: Users },
+    { href: '/find-partners', label: 'Find Partners', icon: Handshake },
     { href: '/jobs', label: 'Jobs', icon: Briefcase },
     { href: '/marketplace', label: 'Marketplace', icon: Store },
-    ...(isAdmin ? [{ href: '/admin/dashboard', label: 'Admin', icon: require('lucide-react').ShieldAlert }] : []),
+    ...(isAdmin ? [{ href: '/admin/dashboard', label: 'Admin', icon: ShieldAlert }] : []),
   ];
 
   return (
@@ -78,14 +88,29 @@ export function DesktopSidebar() {
                   transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 />
               )}
-              <div className="relative z-10 flex items-center gap-3 w-full">
-                <link.icon className={cn(
-                  'h-5 w-5 transition-transform duration-200 group-hover:scale-110',
-                  active ? 'stroke-[2.5px] text-primary' : 'stroke-2 text-current'
-                )} />
-                <span className={cn('hidden lg:block text-sm', active ? 'font-bold text-primary' : 'font-medium')}>
-                  {link.label}
-                </span>
+              <div className="relative z-10 flex items-center justify-between w-full">
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <link.icon className={cn(
+                      'h-5 w-5 transition-transform duration-200 group-hover:scale-110',
+                      active ? 'stroke-[2.5px] text-primary' : 'stroke-2 text-current'
+                    )} />
+                    {'badge' in link && typeof (link as any).badge === 'number' && (link as any).badge > 0 && (
+                      <span className="lg:hidden absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
+                        {(link as any).badge > 99 ? '99+' : (link as any).badge}
+                      </span>
+                    )}
+                  </div>
+                  <span className={cn('hidden lg:block text-sm', active ? 'font-bold text-primary' : 'font-medium')}>
+                    {link.label}
+                  </span>
+                </div>
+
+                {'badge' in link && typeof (link as any).badge === 'number' && (link as any).badge > 0 && (
+                  <span className="hidden lg:flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary/20 px-1.5 text-xs font-bold text-primary">
+                    {(link as any).badge > 99 ? '99+' : (link as any).badge}
+                  </span>
+                )}
               </div>
             </Link>
           );

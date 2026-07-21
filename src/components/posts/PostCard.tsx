@@ -101,7 +101,12 @@ export const PostCard = memo(function PostCard({
   const shareDropdownRef = useRef<HTMLDivElement>(null)
   const createRepost = useMutation(api.reposts.repost)
 
-  const isOwnPost = currentUser?._id === post.authorId
+  const isOwnPost = Boolean(
+    currentUser?._id &&
+      (currentUser._id === post.authorId ||
+        String(currentUser._id) === String(post.authorId) ||
+        (author?._id && String(currentUser._id) === String(author._id)))
+  )
 
   const [isDeleting, setIsDeleting] = useState(false)
   const [showComments, setShowComments] = useState(false)
@@ -380,24 +385,47 @@ export const PostCard = memo(function PostCard({
       <div className="max-w-2xl mx-auto px-4 md:px-5 flex gap-3 md:gap-4">
         {/* Left Column: Avatar */}
         <div className="shrink-0 mt-1">
-          <AvatarWithStatus userId={author._id} size="sm">
-            <div className="relative h-10 w-10 flex-shrink-0">
-              {author.profilePicture ? (
-                <OptimizedImage
-                  src={author.profilePicture}
-                  alt={author.name}
-                  fill
-                  isAvatar
-                  sizes="40px"
-                  className="rounded-full object-cover"
-                />
-              ) : (
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-canvas text-sm font-semibold text-ink-deep border border-hairline">
-                  {author.name.charAt(0).toUpperCase()}
+          {author?._id ? (
+            <Link href={`/profile/${author._id}`} className="no-nav">
+              <AvatarWithStatus userId={author._id} size="sm">
+                <div className="relative h-10 w-10 flex-shrink-0">
+                  {author.profilePicture ? (
+                    <OptimizedImage
+                      src={author.profilePicture}
+                      alt={author.name}
+                      fill
+                      isAvatar
+                      sizes="40px"
+                      className="rounded-full object-cover hover:opacity-90 transition-opacity"
+                    />
+                  ) : (
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-canvas text-sm font-semibold text-ink-deep border border-hairline hover:border-primary transition-colors">
+                      {author.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </AvatarWithStatus>
+              </AvatarWithStatus>
+            </Link>
+          ) : (
+            <AvatarWithStatus userId={author._id} size="sm">
+              <div className="relative h-10 w-10 flex-shrink-0">
+                {author.profilePicture ? (
+                  <OptimizedImage
+                    src={author.profilePicture}
+                    alt={author.name}
+                    fill
+                    isAvatar
+                    sizes="40px"
+                    className="rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-canvas text-sm font-semibold text-ink-deep border border-hairline">
+                    {author.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+            </AvatarWithStatus>
+          )}
         </div>
 
         {/* Right Column: Content */}
@@ -407,9 +435,18 @@ export const PostCard = memo(function PostCard({
           <div className="flex items-start justify-between">
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 flex-wrap text-xs text-slate">
-                <p className="font-semibold text-ink-deep text-sm truncate hover:underline cursor-pointer">
-                  {author.name}
-                </p>
+                {author?._id ? (
+                  <Link
+                    href={`/profile/${author._id}`}
+                    className="font-semibold text-ink-deep text-sm truncate hover:underline cursor-pointer no-nav"
+                  >
+                    {author.name}
+                  </Link>
+                ) : (
+                  <p className="font-semibold text-ink-deep text-sm truncate">
+                    {author.name}
+                  </p>
+                )}
                 <span>·</span>
                 <Link
                   href={`/post/${post._id}`}
@@ -593,9 +630,7 @@ export const PostCard = memo(function PostCard({
           {/* Engagement Stats and Actions */}
           <div className="mt-3 flex items-center justify-between gap-2 max-w-md">
             {/* Like Button */}
-            {currentUser && (
-              <ReactionPicker targetId={post._id} targetType="post" />
-            )}
+            <ReactionPicker targetId={post._id} targetType="post" />
 
             {/* Comment Toggle Button */}
             <motion.button
@@ -673,7 +708,7 @@ export const PostCard = memo(function PostCard({
             </div>
 
             {/* Bookmark Button */}
-            {currentUser && <BookmarkButton postId={post._id} />}
+            <BookmarkButton postId={post._id} />
           </div>
           {/* Inline Comments Section */}
           {showComments && (

@@ -14,9 +14,10 @@ type Props = {
 };
 
 export function UserCard({ user }: Props) {
+    const userId = user._id || (user as any).id || (user as any).userId;
     return (
         <Link 
-            href={`/profile/${user._id}`} 
+            href={`/profile/${userId}`} 
             className="group block p-lg bg-canvas border border-hairline rounded-lg transition-all hover:shadow-product btn-press"
         >
             <div className="flex items-center gap-4">

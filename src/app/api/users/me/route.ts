@@ -14,7 +14,7 @@ export async function GET() {
     const dbUser = await getUserById(userId)
     if (!dbUser) return NextResponse.json({ error: "User not found" }, { status: 404 })
 
-    return NextResponse.json(dbUser)
+    return NextResponse.json({ ...dbUser, _id: dbUser.id })
   } catch (err) {
     return internalError(err)
   }

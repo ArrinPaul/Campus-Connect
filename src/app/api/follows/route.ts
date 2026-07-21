@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
-import { followUser, unfollowUser, isFollowing, getFollowers, getFollowing } from "@/server/db/follows"
+import { followUser, unfollowUser, isFollowing } from "@/server/db/follows"
 
 // POST /api/follows  body: { userId }
 export async function POST(req: Request) {
@@ -11,17 +11,19 @@ export async function POST(req: Request) {
     const authId = user?.id
     if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { userId } = await req.json()
-    if (!userId) return NextResponse.json({ error: "userId required" }, { status: 400 })
+    const url = new URL(req.url)
+    const body = await req.json().catch(() => ({}))
+    const targetUserId = body.userId || body.targetUserId || body.followeeId || body.id || url.searchParams.get("userId")
+    if (!targetUserId) return NextResponse.json({ error: "userId required" }, { status: 400 })
 
-    await followUser(authId, userId)
-    return NextResponse.json({ success: true })
+    await followUser(authId, targetUserId)
+    return NextResponse.json({ success: true, isFollowing: true })
   } catch (err) {
     return internalError(err)
   }
 }
 
-// GET /api/follows?check=true&userId=xxx  OR just for compatibility
+// GET /api/follows?userId=xxx
 export async function GET(req: Request) {
   try {
     const supabase = await createClient()
@@ -39,4 +41,3 @@ export async function GET(req: Request) {
     return internalError(err)
   }
 }
-

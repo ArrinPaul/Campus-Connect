@@ -19,8 +19,9 @@ interface UserCardProps {
 }
 
 export const UserCard = memo(function UserCard({ user }: UserCardProps) {
+  const userId = user._id || (user as any).id || (user as any).userId;
  return (
- <Link href={`/profile/${user._id}`}>
+ <Link href={`/profile/${userId}`}>
  <div className="flex items-start gap-3 rounded-lg border border-hairline bg-card p-3 transition-shadow hover:shadow-md dark:hover:shadow-gray-900/50 sm:gap-4 sm:p-4">
  {/* Avatar */}
  <div className="relative h-10 w-10 flex-shrink-0 sm:h-12 sm:w-12">

@@ -14,7 +14,10 @@ export async function DELETE(req: Request) {
     const { postId } = await req.json()
     if (!postId) return NextResponse.json({ error: "postId required" }, { status: 400 })
 
-    await deletePost(postId)
+    const success = await deletePost(postId, userId)
+    if (!success) {
+      return NextResponse.json({ error: "Forbidden: You can only delete your own posts" }, { status: 403 })
+    }
     return NextResponse.json({ success: true })
   } catch (err) {
     return internalError(err)

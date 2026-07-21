@@ -205,9 +205,18 @@ export function CommentList({
  <div className="flex-1 min-w-0">
  <div className="rounded-lg bg-canvas px-3 py-2">
  <div className="flex items-center justify-between gap-2 flex-wrap">
- <p className="text-sm font-semibold text-ink-deep">
- {comment.author?.name ||"Unknown User"}
- </p>
+            {comment.author?._id ? (
+              <Link
+                href={`/profile/${comment.author._id}`}
+                className="text-sm font-semibold text-ink-deep hover:underline"
+              >
+                {comment.author.name}
+              </Link>
+            ) : (
+              <p className="text-sm font-semibold text-ink-deep">
+                {comment.author?.name || "Unknown User"}
+              </p>
+            )}
  <span className="text-xs text-slate whitespace-nowrap">
  {formatTimestamp(comment.createdAt)}
  </span>

@@ -27,23 +27,72 @@ export async function sendMessage(data: {
   type?: string
 }) {
   const supabase = await getSupabase()
-  const { data: msg, error } = await supabase
+  let convId = data.conversation_id
+
+  // 1. Ensure conversation exists in DB table
+  const { data: existingConv } = await supabase
+    .from("conversations")
+    .select("id")
+    .eq("id", convId)
+    .limit(1)
+
+  if (!existingConv || existingConv.length === 0) {
+    const { data: newConvs } = await supabase
+      .from("conversations")
+      .insert({ type: "direct", created_by: data.sender_id })
+      .select()
+    
+    if (newConvs?.[0]) {
+      convId = newConvs[0].id
+      if (data.conversation_id.startsWith("dm_")) {
+        const parts = data.conversation_id.replace("dm_", "").split("_")
+        const targetUserId = parts.find((p) => p !== data.sender_id) || parts[1] || parts[0]
+        try {
+          await supabase.from("conversation_participants").insert([
+            { conversation_id: convId, user_id: data.sender_id },
+            { conversation_id: convId, user_id: targetUserId },
+          ])
+        } catch { /* ignore */ }
+      }
+    }
+  }
+
+  // 2. Insert message
+  const { data: msgs, error } = await supabase
     .from("messages")
     .insert({
-      conversation_id: data.conversation_id,
+      conversation_id: convId,
       sender_id: data.sender_id,
       content: data.content,
       type: data.type ?? "text",
     })
     .select("*, sender:users!messages_sender_id_fkey(id, name, username, profile_picture)")
-    .single()
-  if (error) return null
-  // Update conversation timestamp
-  await supabase
+
+  const msg = msgs?.[0]
+  if (error || !msg) {
+    // Retry plain insert without relation select
+    const { data: rawMsgs } = await supabase
+      .from("messages")
+      .insert({
+        conversation_id: convId,
+        sender_id: data.sender_id,
+        content: data.content,
+        type: data.type ?? "text",
+      })
+      .select()
+    const rawMsg = rawMsgs?.[0]
+    if (rawMsg) return { ...rawMsg, _id: rawMsg.id }
+    return null
+  }
+
+  // Update conversation timestamp asynchronously
+  supabase
     .from("conversations")
     .update({ updated_at: new Date().toISOString() })
-    .eq("id", data.conversation_id)
-  return msg
+    .eq("id", convId)
+    .then(() => null, () => null)
+
+  return { ...msg, _id: msg.id }
 }
 
 export async function deleteMessage(messageId: string) {
@@ -77,38 +126,40 @@ export async function getConversations(userId: string) {
   if (pListErr || !pList?.length) return []
   const convIds = pList.map((p) => p.conversation_id)
 
-  // 2. Fetch the conversations themselves
-  const { data: convs, error: convsErr } = await supabase
-    .from("conversations")
-    .select("*")
-    .in("id", convIds)
-    .order("updated_at", { ascending: false })
+  // 2. Fetch conversations, participants, and messages concurrently
+  const [convsRes, allPartsRes, messagesRes] = await Promise.all([
+    supabase
+      .from("conversations")
+      .select("*")
+      .in("id", convIds)
+      .order("updated_at", { ascending: false }),
+    supabase
+      .from("conversation_participants")
+      .select(`
+        conversation_id,
+        user_id,
+        last_read_at,
+        muted,
+        user:users!conversation_participants_user_id_fkey(id, name, username, profile_picture)
+      `)
+      .in("conversation_id", convIds),
+    supabase
+      .from("messages")
+      .select("conversation_id, content, created_at, sender_id")
+      .in("conversation_id", convIds)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false })
+  ])
 
-  if (convsErr || !convs) return []
+  const convs = convsRes.data
+  if (!convs || convs.length === 0) return []
 
-  // 3. For all these conversation IDs, fetch participants and their user details
-  const { data: allParticipants } = await supabase
-    .from("conversation_participants")
-    .select(`
-      conversation_id,
-      user_id,
-      last_read_at,
-      muted,
-      user:users!conversation_participants_user_id_fkey(id, name, username, profile_picture)
-    `)
-    .in("conversation_id", convIds)
-
-  // 4. For all these conversation IDs, fetch messages
-  const { data: messages } = await supabase
-    .from("messages")
-    .select("conversation_id, content, created_at, sender_id")
-    .in("conversation_id", convIds)
-    .is("deleted_at", null)
-    .order("created_at", { ascending: false })
+  const allParticipants = allPartsRes.data || []
+  const messages = messagesRes.data || []
 
   // Map participants and last messages by conversation_id for fast lookup
   const participantsByConv = new Map<string, any[]>()
-  allParticipants?.forEach((p) => {
+  allParticipants.forEach((p) => {
     if (!participantsByConv.has(p.conversation_id)) {
       participantsByConv.set(p.conversation_id, [])
     }
@@ -116,76 +167,76 @@ export async function getConversations(userId: string) {
   })
 
   const lastMessageByConv = new Map<string, any>()
-  messages?.forEach((m) => {
+  messages.forEach((m) => {
     if (!lastMessageByConv.has(m.conversation_id)) {
       lastMessageByConv.set(m.conversation_id, m)
     }
   })
 
-  // 5. Calculate unreadCount for each conversation and format
-  const formatted = await Promise.all(
-    convs.map(async (conv) => {
-      const parts = participantsByConv.get(conv.id) || []
-      const mappedParts = parts.map((p: any) => {
-        const u = Array.isArray(p.user) ? p.user[0] : p.user
-        return {
-          _id: u?.id || p.user_id,
-          id: u?.id || p.user_id,
-          name: u?.name || "User",
-          username: u?.username || "",
-          profilePicture: u?.profile_picture,
-          profile_picture: u?.profile_picture,
-          last_read_at: p.last_read_at,
-          muted: p.muted,
-        }
-      })
-
-      const otherPartRaw = parts.find((p: any) => p.user_id !== userId)
-      const ou = otherPartRaw ? (Array.isArray(otherPartRaw.user) ? otherPartRaw.user[0] : otherPartRaw.user) : null
-      const otherUser = otherPartRaw
-        ? {
-            _id: ou?.id || otherPartRaw.user_id,
-            id: ou?.id || otherPartRaw.user_id,
-            name: ou?.name || "User",
-            profilePicture: ou?.profile_picture,
-            profile_picture: ou?.profile_picture,
-            username: ou?.username || "",
-          }
-        : {
-            _id: userId,
-            id: userId,
-            name: "Self",
-            profilePicture: undefined,
-            profile_picture: undefined,
-            username: "",
-          }
-
-      const lastMsg = lastMessageByConv.get(conv.id)
-      const unreadCount = await getUnreadCount(conv.id, userId)
-
+  // Synchronously compute formatted output without sequential DB roundtrips
+  const formatted = convs.map((conv) => {
+    const parts = participantsByConv.get(conv.id) || []
+    const mappedParts = parts.map((p: any) => {
+      const u = Array.isArray(p.user) ? p.user[0] : p.user
       return {
-        _id: conv.id,
-        id: conv.id,
-        type: conv.type,
-        name: conv.name,
-        created_by: conv.created_by,
-        created_at: conv.created_at,
-        updated_at: conv.updated_at,
-        updatedAt: new Date(conv.updated_at).getTime(),
-        lastMessage: lastMsg?.content || "",
-        last_message: lastMsg
-          ? {
-              content: lastMsg.content,
-              created_at: lastMsg.created_at,
-              sender_id: lastMsg.sender_id,
-            }
-          : undefined,
-        participants: mappedParts,
-        otherUser,
-        unreadCount,
+        _id: u?.id || p.user_id,
+        id: u?.id || p.user_id,
+        name: u?.name || "User",
+        username: u?.username || "",
+        profilePicture: u?.profile_picture,
+        profile_picture: u?.profile_picture,
+        last_read_at: p.last_read_at,
+        muted: p.muted,
       }
     })
-  )
+
+    const otherPartRaw = parts.find((p: any) => p.user_id !== userId) || parts[0]
+    const ou = otherPartRaw ? (Array.isArray(otherPartRaw.user) ? otherPartRaw.user[0] : otherPartRaw.user) : null
+    const otherUser = otherPartRaw
+      ? {
+          _id: ou?.id || otherPartRaw.user_id,
+          id: ou?.id || otherPartRaw.user_id,
+          name: ou?.name || "User",
+          profilePicture: ou?.profile_picture,
+          profile_picture: ou?.profile_picture,
+          username: ou?.username || "",
+        }
+      : {
+          _id: userId,
+          id: userId,
+          name: "Self",
+          profilePicture: undefined,
+          profile_picture: undefined,
+          username: "",
+        }
+
+    const lastMsg = lastMessageByConv.get(conv.id)
+    const myParticipant = parts.find((p: any) => p.user_id === userId)
+    const lastReadAt = myParticipant?.last_read_at ? new Date(myParticipant.last_read_at).getTime() : 0
+    const unreadCount = lastMsg && new Date(lastMsg.created_at).getTime() > lastReadAt && lastMsg.sender_id !== userId ? 1 : 0
+
+    return {
+      _id: conv.id,
+      id: conv.id,
+      type: conv.type,
+      name: conv.name,
+      created_by: conv.created_by,
+      created_at: conv.created_at,
+      updated_at: conv.updated_at,
+      updatedAt: new Date(conv.updated_at).getTime(),
+      lastMessage: lastMsg?.content || "",
+      last_message: lastMsg
+        ? {
+            content: lastMsg.content,
+            created_at: lastMsg.created_at,
+            sender_id: lastMsg.sender_id,
+          }
+        : undefined,
+      participants: mappedParts,
+      otherUser,
+      unreadCount,
+    }
+  })
 
   return formatted
 }
@@ -193,39 +244,25 @@ export async function getConversations(userId: string) {
 export async function getConversationById(conversationId: string) {
   const supabase = await getSupabase()
 
-  // 1. Fetch the conversation itself
-  const { data: conv, error: convsErr } = await supabase
-    .from("conversations")
-    .select("*")
-    .eq("id", conversationId)
-    .single()
-
-  if (convsErr || !conv) return null
-
-  // 2. Fetch participants and their user details
-  const { data: parts } = await supabase
-    .from("conversation_participants")
-    .select(`
+  const [convRes, partsRes, msgsRes] = await Promise.all([
+    supabase.from("conversations").select("*").eq("id", conversationId).single(),
+    supabase.from("conversation_participants").select(`
       conversation_id,
       user_id,
       last_read_at,
       muted,
       user:users!conversation_participants_user_id_fkey(id, name, username, profile_picture)
-    `)
-    .eq("conversation_id", conversationId)
+    `).eq("conversation_id", conversationId),
+    supabase.from("messages").select("content, created_at, sender_id").eq("conversation_id", conversationId).is("deleted_at", null).order("created_at", { ascending: false }).limit(1)
+  ])
 
-  // 3. Fetch the last message
-  const { data: messages } = await supabase
-    .from("messages")
-    .select("content, created_at, sender_id")
-    .eq("conversation_id", conversationId)
-    .is("deleted_at", null)
-    .order("created_at", { ascending: false })
-    .limit(1)
+  const conv = convRes.data
+  if (!conv) return null
 
-  const lastMsg = messages?.[0]
+  const parts = partsRes.data || []
+  const lastMsg = msgsRes.data?.[0]
 
-  const mappedParts = (parts ?? []).map((p: any) => {
+  const mappedParts = parts.map((p: any) => {
     const u = Array.isArray(p.user) ? p.user[0] : p.user
     return {
       _id: u?.id || p.user_id,
@@ -239,7 +276,7 @@ export async function getConversationById(conversationId: string) {
     }
   })
 
-  const otherPartRaw = (parts ?? []).find((p: any) => p.user_id !== conv.created_by) || (parts ?? [])[0]
+  const otherPartRaw = parts.find((p: any) => p.user_id !== conv.created_by) || parts[0]
   const ou = otherPartRaw ? (Array.isArray(otherPartRaw.user) ? otherPartRaw.user[0] : otherPartRaw.user) : null
   const otherUser = otherPartRaw
     ? {
@@ -269,73 +306,68 @@ export async function getConversationById(conversationId: string) {
 }
 
 export async function getOrCreateDMConversation(userId1: string, userId2: string) {
+  if (!userId1 || !userId2) return null
   const supabase = await getSupabase()
 
-  // Find existing DM by joining both users' participants in a single query
-  const { data: p1 } = await supabase
-    .from("conversation_participants")
-    .select("conversation_id")
-    .eq("user_id", userId1)
-
-  if (p1?.length) {
-    const convIds = p1.map((x) => x.conversation_id)
-    // Find conversations where both users are participants
-    const { data: shared } = await supabase
+  try {
+    // 1. Check existing DM with 1 batch query
+    const { data: p1 } = await supabase
       .from("conversation_participants")
       .select("conversation_id")
-      .in("conversation_id", convIds)
-      .eq("user_id", userId2)
+      .eq("user_id", userId1)
 
-    if (shared?.length) {
-      // Get the most recent DM (in case of duplicates from race conditions)
-      const sharedIds = shared.map((s) => s.conversation_id)
-      const { data: conv } = await supabase
-        .from("conversations")
-        .select("*")
-        .eq("type", "direct")
-        .in("id", sharedIds)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single()
-      if (conv) return conv
+    if (p1?.length) {
+      const myConvIds = p1.map((x) => x.conversation_id)
+      const [sharedRes, convsRes] = await Promise.all([
+        supabase
+          .from("conversation_participants")
+          .select("conversation_id")
+          .in("conversation_id", myConvIds)
+          .eq("user_id", userId2),
+        supabase
+          .from("conversations")
+          .select("*")
+          .in("id", myConvIds)
+      ])
+
+      const sharedConvIds = new Set((sharedRes.data || []).map((s) => s.conversation_id))
+      const directConv = (convsRes.data || []).find((c) => sharedConvIds.has(c.id) && (c.type === "direct" || !c.type))
+      if (directConv) return directConv
+    }
+
+    // 2. Fast Insert
+    const { data: convs } = await supabase
+      .from("conversations")
+      .insert({ type: "direct", created_by: userId1 })
+      .select()
+
+    const conv = convs?.[0] || {
+      id: `dm_${userId1}_${userId2}`,
+      _id: `dm_${userId1}_${userId2}`,
+      type: "direct",
+      created_by: userId1,
+    }
+
+    if (conv.id && !conv.id.startsWith("dm_")) {
+      supabase
+        .from("conversation_participants")
+        .insert([
+          { conversation_id: conv.id, user_id: userId1 },
+          { conversation_id: conv.id, user_id: userId2 },
+        ])
+        .then(() => null, () => null)
+    }
+
+    return conv
+  } catch (err) {
+    console.error("Error in getOrCreateDMConversation:", err)
+    return {
+      id: `dm_${userId1}_${userId2}`,
+      _id: `dm_${userId1}_${userId2}`,
+      type: "direct",
+      created_by: userId1,
     }
   }
-
-  // Create new DM conversation
-  const { data: conv } = await supabase
-    .from("conversations")
-    .insert({ type: "direct", created_by: userId1 })
-    .select()
-    .single()
-  if (!conv) return null
-
-  // Insert both participants — if race creates duplicate, the DB unique constraint catches it
-  const { error } = await supabase.from("conversation_participants").insert([
-    { conversation_id: conv.id, user_id: userId1 },
-    { conversation_id: conv.id, user_id: userId2 },
-  ])
-
-  // If insert failed (duplicate from race), find the existing conversation
-  if (error) {
-    const { data: existing } = await supabase
-      .from("conversation_participants")
-      .select("conversation_id")
-      .eq("user_id", userId2)
-    if (existing?.length) {
-      const { data: retryConv } = await supabase
-        .from("conversations")
-        .select("*")
-        .eq("type", "direct")
-        .in("id", existing.map((e) => e.conversation_id))
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single()
-      if (retryConv) return retryConv
-    }
-    return null
-  }
-
-  return conv
 }
 
 export async function createGroupConversation(data: {

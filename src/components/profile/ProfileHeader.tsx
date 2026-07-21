@@ -42,147 +42,164 @@ interface ProfileHeaderProps {
 }
 
 export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileHeaderProps) {
- const router = useRouter()
- const { isLoaded, isSignedIn } = useUser()
- const followUser = useMutation(api.follows.followUser)
- const unfollowUser = useMutation(api.follows.unfollowUser)
- const getOrCreateConversation = useMutation(api.conversations.getOrCreateConversation)
+  const router = useRouter()
+  const { isLoaded, isSignedIn } = useUser()
+  const followUser = useMutation(api.follows.followUser)
+  const unfollowUser = useMutation(api.follows.unfollowUser)
+  const getOrCreateConversation = useMutation(api.conversations.getOrCreateConversation)
 
- const currentUser = useQuery(
- api.users.getCurrentUser,
- isLoaded && isSignedIn ? {} :"skip"
- )
- const isOwnProfile = isOwnProfileProp ?? (currentUser?._id === user._id)
+  const targetUserId = user._id || (user as any).id || (user as any).userId
+  const profilePicture = user.profilePicture || (user as any).profile_picture || (user as any).avatar_url
+  const followerCount = user.followerCount ?? (user as any).follower_count ?? (user as any).followersCount ?? 0
+  const followingCount = user.followingCount ?? (user as any).following_count ?? 0
 
- const isFollowingQuery = useQuery(
- api.follows.isFollowing,
- isLoaded && isSignedIn && !isOwnProfile ? { userId: user._id } :"skip"
- )
- 
- const [optimisticFollowing, setOptimisticFollowing] = useState<boolean | null>(null)
- const [isLoading, setIsLoading] = useState(false)
- const [isMessageLoading, setIsMessageLoading] = useState(false)
- const [showEditModal, setShowEditModal] = useState(false)
- const [showAddCourseModal, setShowAddCourseModal] = useState(false)
- const [courseCode, setCourseCode] = useState("")
- const [isAddingCourse, setIsAddingCourse] = useState(false)
+  const currentUser = useQuery(
+    api.users.getCurrentUser,
+    isLoaded && isSignedIn ? {} : "skip"
+  )
+  const currentUserId = currentUser?._id || (currentUser as any)?.id
+  const isOwnProfile = isOwnProfileProp ?? (Boolean(currentUserId && targetUserId) && String(currentUserId) === String(targetUserId))
 
- const handleAddCourse = async () => {
-   if (!courseCode.trim()) return;
-   setIsAddingCourse(true);
-   try {
-     const res = await fetch("/api/courses/join", {
-       method: "POST",
-       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify({ courseCode: courseCode.trim() })
-     });
-     if (!res.ok) throw new Error("Failed to add course");
-     toast.success("Successfully added to course!");
-     setShowAddCourseModal(false);
-     setCourseCode("");
-     router.refresh(); // Refresh page to see new course
-   } catch (error) {
-     toast.error("Failed to add course. Please try again.");
-   } finally {
-     setIsAddingCourse(false);
-   }
- }
- 
- const rawFollowing =
-   typeof isFollowingQuery === "object" && isFollowingQuery !== null
-     ? (isFollowingQuery as any).isFollowing
-     : isFollowingQuery
- const isFollowing = optimisticFollowing !== null ? optimisticFollowing : Boolean(rawFollowing)
- 
- const handleFollowToggle = async () => {
- try {
- setIsLoading(true)
- setOptimisticFollowing(!isFollowing)
- if (isFollowing) {
- await unfollowUser({ userId: user._id })
- } else {
- await followUser({ userId: user._id })
- }
- setOptimisticFollowing(null)
- } catch (error) {
- setOptimisticFollowing(null)
- log.error("Failed to toggle follow", error)
- toast.error("Failed to update follow status")
- } finally {
- setIsLoading(false)
- }
- }
+  const isFollowingQuery = useQuery(
+    api.follows.isFollowing,
+    isLoaded && isSignedIn && !isOwnProfile && targetUserId ? { userId: targetUserId } : "skip"
+  )
+  
+  const [optimisticFollowing, setOptimisticFollowing] = useState<boolean | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isMessageLoading, setIsMessageLoading] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [showAddCourseModal, setShowAddCourseModal] = useState(false)
+  const [courseCode, setCourseCode] = useState("")
+  const [isAddingCourse, setIsAddingCourse] = useState(false)
 
- return (
- <div className="w-full bg-canvas border-b border-hairline">
- {/* Cover Image / Gradient Area */}
- <div className="relative h-48 md:h-64 w-full bg-canvas overflow-hidden">
- <div className="absolute inset-0 bg-gradient-to-b from-transparent to-canvas/20" />
- <div className="absolute inset-0 bg-tile-black opacity-5" />
- </div>
+  const handleAddCourse = async () => {
+    if (!courseCode.trim()) return;
+    setIsAddingCourse(true);
+    try {
+      const res = await fetch("/api/courses/join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseCode: courseCode.trim() })
+      });
+      if (!res.ok) throw new Error("Failed to add course");
+      toast.success("Successfully added to course!");
+      setShowAddCourseModal(false);
+      setCourseCode("");
+      router.refresh(); // Refresh page to see new course
+    } catch (error) {
+      toast.error("Failed to add course. Please try again.");
+    } finally {
+      setIsAddingCourse(false);
+    }
+  }
+  
+  const rawFollowing =
+    typeof isFollowingQuery === "object" && isFollowingQuery !== null
+      ? (isFollowingQuery as any).isFollowing
+      : isFollowingQuery
+  const isFollowing = optimisticFollowing !== null ? optimisticFollowing : Boolean(rawFollowing)
+  
+  const handleFollowToggle = async () => {
+    if (!isSignedIn) {
+      toast.error("Please sign in to follow users")
+      return
+    }
+    if (!targetUserId) {
+      toast.error("Invalid user ID")
+      return
+    }
+    try {
+      setIsLoading(true)
+      const nextFollowingState = !isFollowing
+      setOptimisticFollowing(nextFollowingState)
+      if (isFollowing) {
+        await unfollowUser({ userId: targetUserId })
+        toast.success("Unfollowed user")
+      } else {
+        await followUser({ userId: targetUserId })
+        toast.success("Followed user")
+      }
+      setOptimisticFollowing(null)
+    } catch (error) {
+      setOptimisticFollowing(null)
+      log.error("Failed to toggle follow", error)
+      toast.error("Failed to update follow status")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
- {/* Header Content */}
- <div className="max-w-4xl mx-auto px-4 md:px-0">
- <div className="relative flex flex-col items-center md:items-start -mt-20 md:-mt-24 pb-8">
- {/* Avatar */}
- <div className="relative h-40 w-40 rounded-lg border-4 border-canvas bg-canvas shadow-product overflow-hidden flex-shrink-0 z-10">
- {user.profilePicture ? (
- <Image
- src={user.profilePicture}
- alt={user.name}
- fill
- sizes="160px"
- className="object-cover"
- priority
- />
- ) : (
- <div className="h-full w-full flex items-center justify-center text-ink/20 font-display text-6xl">
- {user.name.charAt(0).toUpperCase()}
- </div>
- )}
- {!isOwnProfile && (
- <OnlineStatusDot
- userId={user._id}
- size="lg"
- overlay
- />
- )}
- </div>
+  return (
+    <div className="w-full bg-canvas border-b border-hairline">
+      {/* Cover Image / Gradient Area */}
+      <div className="relative h-48 md:h-64 w-full bg-canvas overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-canvas/20" />
+        <div className="absolute inset-0 bg-tile-black opacity-5" />
+      </div>
 
- {/* User Info Section */}
- <div className="mt-6 w-full flex flex-col md:flex-row justify-between items-center md:items-end gap-6">
- <div className="flex-1 text-center md:text-left space-y-2">
- <h1 className="text-display-lg md:text-hero-display text-ink leading-tight">
- {user.name}
- </h1>
- 
- <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-semibold text-slate uppercase tracking-wider">
- <span className="text-primary">{user.role}</span>
- <span className="border-l border-hairline pl-4">{user.university ||"Global Academic"}</span>
- <span className="border-l border-hairline pl-4">{user.experienceLevel}</span>
- </div>
+      {/* Header Content */}
+      <div className="max-w-4xl mx-auto px-4 md:px-0">
+        <div className="relative flex flex-col items-center md:items-start -mt-20 md:-mt-24 pb-8">
+          {/* Avatar */}
+          <div className="relative h-40 w-40 rounded-lg border-4 border-canvas bg-canvas shadow-product overflow-hidden flex-shrink-0 z-10">
+            {profilePicture ? (
+              <Image
+                src={profilePicture}
+                alt={user.name}
+                fill
+                sizes="160px"
+                className="object-cover"
+                priority
+              />
+            ) : (
+              <div className="h-full w-full flex items-center justify-center text-ink/20 font-display text-6xl">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+            )}
+            {!isOwnProfile && targetUserId && (
+              <OnlineStatusDot
+                userId={targetUserId}
+                size="lg"
+                overlay
+              />
+            )}
+          </div>
 
- {user.bio && (
- <p className="text-body text-slate max-w-2xl mt-4 leading-relaxed italic">
- &ldquo;{user.bio}&rdquo;
- </p>
- )}
+          {/* User Info Section */}
+          <div className="mt-6 w-full flex flex-col md:flex-row justify-between items-center md:items-end gap-6">
+            <div className="flex-1 text-center md:text-left space-y-2">
+              <h1 className="text-display-lg md:text-hero-display text-ink leading-tight">
+                {user.name}
+              </h1>
+              
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-semibold text-slate uppercase tracking-wider">
+                <span className="text-primary">{user.role}</span>
+                <span className="border-l border-hairline pl-4">{user.university || "Global Academic"}</span>
+                <span className="border-l border-hairline pl-4">{user.experienceLevel}</span>
+              </div>
 
- {/* Stats & Socials Row */}
- <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 mt-6 pt-6 border-t border-hairline w-full">
- <div className="flex gap-4">
- <div className="text-center md:text-left">
- <p className="text-tagline font-bold text-ink-deep">{user.followerCount}</p>
- <p className="text-[10px] text-slate uppercase font-semibold">Followers</p>
- </div>
- <div className="text-center md:text-left border-l border-hairline pl-4">
- <p className="text-tagline font-bold text-ink-deep">{user.followingCount}</p>
- <p className="text-[10px] text-slate uppercase font-semibold">Following</p>
- </div>
- </div>
+              {user.bio && (
+                <p className="text-body text-slate max-w-2xl mt-4 leading-relaxed italic">
+                  &ldquo;{user.bio}&rdquo;
+                </p>
+              )}
 
- <div className="flex items-center gap-3 ml-auto">
- {user.socialLinks?.website && (
+              {/* Stats & Socials Row */}
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 mt-6 pt-6 border-t border-hairline w-full">
+                <div className="flex gap-4">
+                  <div className="text-center md:text-left">
+                    <p className="text-tagline font-bold text-ink-deep">{followerCount}</p>
+                    <p className="text-[10px] text-slate uppercase font-semibold">Followers</p>
+                  </div>
+                  <div className="text-center md:text-left border-l border-hairline pl-4">
+                    <p className="text-tagline font-bold text-ink-deep">{followingCount}</p>
+                    <p className="text-[10px] text-slate uppercase font-semibold">Following</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 ml-auto">
+                  {user.socialLinks?.website && (
  <a href={user.socialLinks.website} target="_blank" className="p-2 rounded-full hover:bg-canvas text-slate transition-colors"><Globe size={18} /></a>
  )}
  {user.socialLinks?.github && (
@@ -208,12 +225,29 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
  <>
  <Button
  onClick={async () => {
- try {
- setIsMessageLoading(true)
- const conversationId = await getOrCreateConversation({ otherUserId: user._id })
- router.push(`/messages?c=${conversationId}`)
- } catch (error) { log.error("Failed to open conversation", error) }
- finally { setIsMessageLoading(false) }
+   if (!isSignedIn) {
+     toast.error("Please sign in to message users");
+     return;
+   }
+   if (!targetUserId) {
+     toast.error("Invalid user profile");
+     return;
+   }
+   try {
+     setIsMessageLoading(true)
+     const res = await getOrCreateConversation({ participantId: targetUserId, otherUserId: targetUserId })
+     const conversationId = typeof res === "string" ? res : (res?._id || res?.id)
+     if (conversationId) {
+       router.push(`/messages?c=${conversationId}`)
+     } else {
+       toast.error("Could not start conversation")
+     }
+   } catch (error) { 
+     log.error("Failed to open conversation", error)
+     toast.error("Failed to start conversation. Please try again.")
+   } finally { 
+     setIsMessageLoading(false) 
+   }
  }}
  disabled={isMessageLoading}
  variant="secondary"

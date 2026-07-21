@@ -17,9 +17,12 @@ export default function MyProfileRedirect() {
  const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : 'skip');
 
  useEffect(() => {
- if (currentUser) {
- router.replace(`/profile/${currentUser._id}`);
- }
+    if (currentUser) {
+      const myUserId = currentUser._id || currentUser.id || (currentUser as any).userId;
+      if (myUserId && myUserId !== 'undefined') {
+        router.replace(`/profile/${myUserId}`);
+      }
+    }
  }, [currentUser, router]);
 
  // Show sign-in prompt if auth resolved but user is not authenticated

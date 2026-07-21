@@ -240,13 +240,20 @@ export async function createPost(data: {
 
 export async function updatePost(
   postId: string,
-  content: string
+  content: string,
+  userId?: string
 ): Promise<DbPost | null> {
   const supabase = await getSupabase()
-  const { data, error } = await supabase
+  let query = supabase
     .from("posts")
     .update({ content, updated_at: new Date().toISOString() })
     .eq("id", postId)
+
+  if (userId) {
+    query = query.eq("author_id", userId)
+  }
+
+  const { data, error } = await query
     .select(`
       *,
       author:users!posts_author_id_fkey(id, name, username, profile_picture, role)
@@ -258,9 +265,14 @@ export async function updatePost(
 
 // ─── Delete ─────────────────────────────────────────────────────────────────
 
-export async function deletePost(postId: string): Promise<void> {
+export async function deletePost(postId: string, userId?: string): Promise<boolean> {
   const supabase = await getSupabase()
-  await supabase.from("posts").delete().eq("id", postId)
+  let query = supabase.from("posts").delete().eq("id", postId)
+  if (userId) {
+    query = query.eq("author_id", userId)
+  }
+  const { error } = await query
+  return !error
 }
 
 // ─── Counters ───────────────────────────────────────────────────────────────

@@ -39,36 +39,42 @@ export function SkillEndorsements({
  )
  }
 
- if (endorsements.skills.length === 0) {
- return (
- <p className="text-sm text-muted-foreground">
- No skills added yet
- </p>
- )
- }
+  const skillsList = Array.isArray(endorsements?.skills)
+    ? endorsements.skills
+    : Array.isArray(endorsements)
+    ? endorsements
+    : [];
 
- const handleToggleEndorse = async (skillName: string, isEndorsed: boolean) => {
- setLoadingSkill(skillName)
- setError(null)
- try {
- if (isEndorsed) {
- await removeEndorsement({ userId, skillName })
- } else {
- await endorseSkill({ userId, skillName })
- }
- } catch (e) {
- setError(e instanceof Error ? e.message :"Failed to update endorsement")
- } finally {
- setLoadingSkill(null)
- }
- }
+  if (!skillsList || skillsList.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        No skills added yet
+      </p>
+    )
+  }
 
- return (
- <div className="space-y-2">
- {error && (
- <p className="text-xs text-critical mb-2">{error}</p>
- )}
- {endorsements.skills.map((skill: any) => (
+  const handleToggleEndorse = async (skillName: string, isEndorsed: boolean) => {
+    setLoadingSkill(skillName)
+    setError(null)
+    try {
+      if (isEndorsed) {
+        await removeEndorsement({ userId, skillName })
+      } else {
+        await endorseSkill({ userId, skillName })
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to update endorsement")
+    } finally {
+      setLoadingSkill(null)
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      {error && (
+        <p className="text-xs text-critical mb-2">{error}</p>
+      )}
+      {skillsList.map((skill: any) => (
  <div
  key={skill.name}
  className="flex items-center justify-between rounded-lg border border-hairline bg-card px-3 py-2 border-hairline bg-card"

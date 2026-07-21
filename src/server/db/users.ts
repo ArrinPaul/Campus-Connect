@@ -27,6 +27,8 @@ export interface DbUser {
   updated_at?: string
 }
 
+import { cacheGet, cacheSet, cacheDel } from "@/lib/redis"
+
 async function getSupabase() {
   return await createClient()
 }
@@ -34,13 +36,19 @@ async function getSupabase() {
 // ─── Read ───────────────────────────────────────────────────────────────────
 
 export async function getUserById(id: string): Promise<DbUser | null> {
+  if (!id) return null
+  const cacheKey = `user:${id}`
+  const cached = await cacheGet<DbUser>(cacheKey)
+  if (cached) return cached
+
   const supabase = await getSupabase()
   const { data, error } = await supabase
     .from("users")
     .select("*")
     .eq("id", id)
     .single()
-  if (error) return null
+  if (error || !data) return null
+  await cacheSet(cacheKey, data, 300)
   return data as DbUser
 }
 

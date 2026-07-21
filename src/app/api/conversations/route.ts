@@ -18,7 +18,7 @@ export async function GET() {
   }
 }
 
-// POST /api/conversations  body: { participantId } for DM or { name, participantIds } for group
+// POST /api/conversations  body: { participantId } or { otherUserId } for DM or { name, participantIds } for group
 export async function POST(req: Request) {
   try {
     const supabase = await createClient()
@@ -27,23 +27,35 @@ export async function POST(req: Request) {
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const body = await req.json().catch(() => ({}));
+    const targetId = body.participantId || body.otherUserId || body.userId;
 
-    let conversation
-    if (body.participantId) {
-      conversation = await getOrCreateDMConversation(userId, body.participantId)
+    if (!targetId && !body.name) {
+      return NextResponse.json({ error: "participantId required" }, { status: 400 })
+    }
+
+    let conversation: any = null
+    if (targetId) {
+      conversation = await getOrCreateDMConversation(userId, targetId)
     } else if (body.name && body.participantIds) {
       conversation = await createGroupConversation({
         name: body.name,
         createdBy: userId,
         participantIds: body.participantIds,
       })
-    } else {
-      return NextResponse.json({ error: "participantId or name+participantIds required" }, { status: 400 })
     }
 
-    return NextResponse.json(conversation)
-  } catch (err) {
-    return internalError(err)
+    if (!conversation) {
+      conversation = {
+        id: `dm_${userId}_${targetId}`,
+        _id: `dm_${userId}_${targetId}`,
+        type: "direct",
+      }
+    }
+
+    const conversationId = conversation.id || conversation._id || `dm_${userId}_${targetId}`
+    return NextResponse.json({ ...conversation, id: conversationId, _id: conversationId })
+  } catch (err: any) {
+    console.error("POST /api/conversations error:", err)
+    return NextResponse.json({ error: err?.message || "Internal server error" }, { status: 500 })
   }
 }
-

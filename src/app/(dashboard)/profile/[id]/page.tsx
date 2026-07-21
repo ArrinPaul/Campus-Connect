@@ -37,7 +37,7 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
 
   return (
     <div className="w-full min-h-screen bg-canvas">
-      <ProfileHeader user={userProfile as any} />
+      <ProfileHeader user={{ ...userProfile, _id: userProfile.id || (userProfile as any)._id } as any} />
       
       <main className="w-full flex flex-col items-center py-lg md:py-xl">
         <div className="w-full max-w-2xl px-4 md:px-0 space-y-xl">
