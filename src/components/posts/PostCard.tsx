@@ -514,23 +514,14 @@ export const PostCard = memo(function PostCard({ post, author }: PostCardProps) 
  )}
 
  {/* Engagement Stats and Actions */}
- <div className="mt-3 flex items-center justify-between pr-4">
- {/* Reaction Picker */}
+ <div className="mt-3 flex items-center justify-between gap-2 max-w-md">
+ {/* Like Button */}
  {currentUser && (
  <ReactionPicker
  targetId={post._id}
  targetType="post"
  />
  )}
- 
- {/* Reaction Summary */}
- <ReactionSummary
- targetId={post._id}
- targetType="post"
- onClick={() => setShowReactionModal(true)}
- />
-
- <div className="flex-1" />
 
  {/* Comment Toggle Button */}
  <motion.button

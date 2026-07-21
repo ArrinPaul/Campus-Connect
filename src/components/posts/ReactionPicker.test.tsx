@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
-import { ReactionPicker, reactionEmojis } from "./ReactionPicker"
+import { LikeButton, ReactionPicker } from "./ReactionPicker"
 
 // Mock data hooks
 jest.mock("@/lib/api", () => ({
@@ -23,14 +23,12 @@ jest.mock("@/components/ui/tooltip", () => ({
   TooltipContent: ({ children }: any) => <span>{children}</span>,
 }))
 
-describe("ReactionPicker", () => {
+describe("LikeButton / ReactionPicker", () => {
   const mockAddReaction = jest.fn()
   const mockRemoveReaction = jest.fn()
 
   beforeEach(() => {
     jest.clearAllMocks()
-    // Set desktop width so hover picker shows
-    Object.defineProperty(window, 'innerWidth', { value: 1024, writable: true, configurable: true })
     const { useMutation, useQuery } = require("@/lib/api")
     
     useMutation.mockImplementation((api: any) => {
@@ -53,11 +51,6 @@ describe("ReactionPicker", () => {
           topReactions: [],
           counts: {
             like: 0,
-            love: 0,
-            laugh: 0,
-            wow: 0,
-            sad: 0,
-            scholarly: 0,
           },
         }
       }
@@ -65,59 +58,28 @@ describe("ReactionPicker", () => {
     })
   })
 
-  it("renders reaction button", () => {
+  it("renders like button", () => {
     render(
-      <ReactionPicker
+      <LikeButton
         targetId="test-post"
         targetType="post"
       />
     )
 
     expect(screen.getByRole("button")).toBeInTheDocument()
+    expect(screen.getByRole("button")).toHaveAttribute("aria-label", "Like")
   })
 
-  it("shows reaction picker on hover", async () => {
+  it("calls addReaction when clicking like button", async () => {
     render(
-      <ReactionPicker
+      <LikeButton
         targetId="test-post"
         targetType="post"
       />
     )
 
-    // Simulate hover
-    const button = screen.getByRole("button")
-    fireEvent.mouseEnter(button)
-
-    await waitFor(() => {
-      // Check if all reaction emojis are displayed in the picker
-      // Note: 👍 appears twice (main button + picker), so use getAllByText for it
-      Object.values(reactionEmojis).forEach((emoji) => {
-        const elements = screen.getAllByText(emoji)
-        expect(elements.length).toBeGreaterThanOrEqual(1)
-      })
-    })
-  })
-
-  it("calls addReaction when clicking a reaction", async () => {
-    render(
-      <ReactionPicker
-        targetId="test-post"
-        targetType="post"
-      />
-    )
-
-    // Open picker
     const button = screen.getByRole("button")
     fireEvent.click(button)
-
-    await waitFor(() => {
-      // 👍 appears in both the main button and the picker, so use getAllByText
-      expect(screen.getAllByText(reactionEmojis.like).length).toBeGreaterThanOrEqual(2)
-    })
-
-    // Click like reaction
-    const likeButton = screen.getByTitle("Like")
-    fireEvent.click(likeButton)
 
     await waitFor(() => {
       expect(mockAddReaction).toHaveBeenCalledWith({
@@ -128,41 +90,7 @@ describe("ReactionPicker", () => {
     })
   })
 
-  it("displays user's current reaction", () => {
-    const { useQuery } = require("@/lib/api")
-    useQuery.mockImplementation((api: any) => {
-      if (api.toString().includes("getUserReaction")) {
-        return "love"
-      }
-      if (api.toString().includes("getReactions")) {
-        return {
-          total: 1,
-          topReactions: [{ type: "love", count: 1 }],
-          counts: {
-            like: 0,
-            love: 1,
-            laugh: 0,
-            wow: 0,
-            sad: 0,
-            scholarly: 0,
-          },
-        }
-      }
-      return null
-    })
-
-    render(
-      <ReactionPicker
-        targetId="test-post"
-        targetType="post"
-      />
-    )
-
-    expect(screen.getByText(reactionEmojis.love)).toBeInTheDocument()
-    expect(screen.getByText("1")).toBeInTheDocument()
-  })
-
-  it("calls removeReaction when clicking same reaction again", async () => {
+  it("displays user's current like state", () => {
     const { useQuery } = require("@/lib/api")
     useQuery.mockImplementation((api: any) => {
       if (api.toString().includes("getUserReaction")) {
@@ -174,11 +102,6 @@ describe("ReactionPicker", () => {
           topReactions: [{ type: "like", count: 1 }],
           counts: {
             like: 1,
-            love: 0,
-            laugh: 0,
-            wow: 0,
-            sad: 0,
-            scholarly: 0,
           },
         }
       }
@@ -186,23 +109,44 @@ describe("ReactionPicker", () => {
     })
 
     render(
-      <ReactionPicker
+      <LikeButton
         targetId="test-post"
         targetType="post"
       />
     )
 
-    // Open picker
     const button = screen.getByRole("button")
-    fireEvent.click(button)
+    expect(button).toHaveAttribute("aria-label", "Unlike")
+    expect(screen.getByText("1")).toBeInTheDocument()
+  })
 
-    await waitFor(() => {
-      expect(screen.getByTitle("Like")).toBeInTheDocument()
+  it("calls removeReaction when clicking liked button again", async () => {
+    const { useQuery } = require("@/lib/api")
+    useQuery.mockImplementation((api: any) => {
+      if (api.toString().includes("getUserReaction")) {
+        return "like"
+      }
+      if (api.toString().includes("getReactions")) {
+        return {
+          total: 1,
+          topReactions: [{ type: "like", count: 1 }],
+          counts: {
+            like: 1,
+          },
+        }
+      }
+      return null
     })
 
-    // Click like again (should remove)
-    const likeButton = screen.getByTitle("Like")
-    fireEvent.click(likeButton)
+    render(
+      <LikeButton
+        targetId="test-post"
+        targetType="post"
+      />
+    )
+
+    const button = screen.getByRole("button")
+    fireEvent.click(button)
 
     await waitFor(() => {
       expect(mockRemoveReaction).toHaveBeenCalledWith({
@@ -212,7 +156,7 @@ describe("ReactionPicker", () => {
     })
   })
 
-  it("displays total reaction count", () => {
+  it("displays total like count", () => {
     const { useQuery } = require("@/lib/api")
     useQuery.mockImplementation((api: any) => {
       if (api.toString().includes("getUserReaction")) {
@@ -221,18 +165,9 @@ describe("ReactionPicker", () => {
       if (api.toString().includes("getReactions")) {
         return {
           total: 42,
-          topReactions: [
-            { type: "like", count: 20 },
-            { type: "love", count: 15 },
-            { type: "scholarly", count: 7 },
-          ],
+          topReactions: [{ type: "like", count: 42 }],
           counts: {
-            like: 20,
-            love: 15,
-            laugh: 0,
-            wow: 0,
-            sad: 0,
-            scholarly: 7,
+            like: 42,
           },
         }
       }
@@ -251,7 +186,7 @@ describe("ReactionPicker", () => {
 
   it("renders in compact mode", () => {
     render(
-      <ReactionPicker
+      <LikeButton
         targetId="test-post"
         targetType="post"
         compact={true}
