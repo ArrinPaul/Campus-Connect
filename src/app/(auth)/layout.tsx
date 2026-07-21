@@ -9,26 +9,26 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
  {/* Logo — matches GlobalNav/DesktopSidebar CC icon pattern */}
  <Link href="/" className="relative z-10 flex items-center gap-3">
- <div className="h-10 w-10 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
+ <div className="h-10 w-10 rounded-2xl bg-primary flex items-center justify-center shrink-0">
  <span className="text-white text-lg font-bold">CC</span>
  </div>
- <span className="text-body-md-bold text-white tracking-tight">
+ <span className="text-body-md-bold text-ink-deep tracking-tight">
  Campus Connect
  </span>
  </Link>
 
  {/* Center content */}
  <div className="relative z-10 max-w-md">
- <h2 className="text-display-lg text-white mb-lg tracking-tight font-display">
+ <h2 className="text-display-lg text-ink-deep mb-lg tracking-tight font-display">
  Your campus,<br />reimagined.
  </h2>
- <p className="text-subtitle-md text-white/80">
+ <p className="text-subtitle-md text-ink/80">
  Join thousands of students already connecting, collaborating, and thriving on the fastest growing campus platform.
  </p>
  </div>
 
  {/* Bottom footer */}
- <p className="relative z-10 text-xs text-white/50">
+ <p className="relative z-10 text-xs text-slate">
  © {new Date().getFullYear()} Campus Connect Inc.
  </p>
  </div>
@@ -38,10 +38,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
  {/* Mobile header with gradient accent */}
  <div className="lg:hidden auth-gradient-panel px-4 py-lg flex items-center gap-3">
  <Link href="/" className="flex items-center gap-2">
- <div className="h-8 w-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+ <div className="h-8 w-8 rounded-xl bg-primary flex items-center justify-center shrink-0">
  <span className="text-white text-sm font-bold">CC</span>
  </div>
- <span className="text-body-md-bold text-white tracking-tight">
+ <span className="text-body-md-bold text-ink-deep tracking-tight">
  Campus Connect
  </span>
  </Link>

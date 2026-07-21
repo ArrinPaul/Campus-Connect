@@ -306,6 +306,30 @@ export function SignUp(_props: Record<string, unknown>) {
     }
   }
 
+  if (success) {
+    return (
+      <div className="w-full max-w-md mx-auto space-y-6 text-center">
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold text-ink-deep">Verify your email</h1>
+          <p className="text-body-sm text-steel">Check your inbox to get started</p>
+        </div>
+        
+        <p className="text-body-sm font-semibold text-green-600 bg-green-50 py-4 px-4 rounded-lg border border-green-200">
+          {success}
+        </p>
+
+        <Button
+          onClick={() => router.push("/")}
+          variant="primary"
+          size="lg"
+          className="w-full h-11"
+        >
+          Continue
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full max-w-md mx-auto space-y-8">
       <div className="text-center space-y-2">
