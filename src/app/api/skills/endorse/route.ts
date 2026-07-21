@@ -11,7 +11,8 @@ export async function POST(req: Request) {
     const authId = user?.id
     if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { userId, skill } = await req.json()
+    const body = await req.json().catch(() => ({}))
+    const { userId, skill } = body
     if (!userId || !skill) return NextResponse.json({ error: "userId and skill required" }, { status: 400 })
 
     await endorseSkill(userId, authId, skill)

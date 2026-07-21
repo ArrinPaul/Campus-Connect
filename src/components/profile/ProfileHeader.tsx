@@ -9,7 +9,7 @@ import { api } from"@/lib/api"
 import { Id } from"@/lib/api"
 import { ButtonLoadingSpinner } from"@/components/ui/loading-skeleton"
 import { OnlineStatusDot } from"@/components/ui/OnlineStatusDot"
-import { MessageSquare, Pencil, X, Share2, Globe, Github, Linkedin, Twitter } from"lucide-react"
+import { MessageSquare, Pencil, X, Share2, Globe, Github, Linkedin, Twitter, BookOpen } from"lucide-react"
 import { createLogger } from"@/lib/logger"
 import { toast } from"sonner"
 import { ProfileForm } from"@/components/profile/ProfileForm"
@@ -63,6 +63,30 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
  const [isLoading, setIsLoading] = useState(false)
  const [isMessageLoading, setIsMessageLoading] = useState(false)
  const [showEditModal, setShowEditModal] = useState(false)
+ const [showAddCourseModal, setShowAddCourseModal] = useState(false)
+ const [courseCode, setCourseCode] = useState("")
+ const [isAddingCourse, setIsAddingCourse] = useState(false)
+
+ const handleAddCourse = async () => {
+   if (!courseCode.trim()) return;
+   setIsAddingCourse(true);
+   try {
+     const res = await fetch("/api/courses/join", {
+       method: "POST",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify({ courseCode: courseCode.trim() })
+     });
+     if (!res.ok) throw new Error("Failed to add course");
+     toast.success("Successfully added to course!");
+     setShowAddCourseModal(false);
+     setCourseCode("");
+     router.refresh(); // Refresh page to see new course
+   } catch (error) {
+     toast.error("Failed to add course. Please try again.");
+   } finally {
+     setIsAddingCourse(false);
+   }
+ }
  
  const isFollowing = optimisticFollowing !== null ? optimisticFollowing : (isFollowingQuery ?? false)
  
@@ -183,7 +207,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
  try {
  setIsMessageLoading(true)
  const conversationId = await getOrCreateConversation({ otherUserId: user._id })
- router.push(`/messages?conversation=${conversationId}`)
+ router.push(`/messages?c=${conversationId}`)
  } catch (error) { log.error("Failed to open conversation", error) }
  finally { setIsMessageLoading(false) }
  }}
@@ -206,14 +230,24 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
  )}
 
  {isOwnProfile && (
- <Button
- onClick={() => setShowEditModal(true)}
- variant="primary"
- size="lg"
- className="flex items-center gap-2"
- >
- <Pencil size={18} /> Edit Profile
- </Button>
+   <>
+     <Button
+       onClick={() => setShowAddCourseModal(true)}
+       variant="secondary"
+       size="lg"
+       className="flex items-center gap-2"
+     >
+       <BookOpen size={18} /> Add Course
+     </Button>
+     <Button
+       onClick={() => setShowEditModal(true)}
+       variant="primary"
+       size="lg"
+       className="flex items-center gap-2"
+     >
+       <Pencil size={18} /> Edit Profile
+     </Button>
+   </>
  )}
  </div>
  </div>
@@ -266,6 +300,43 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
  </div>
  </div>
  )}
+
+  {/* Add Course Modal */}
+  {showAddCourseModal && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowAddCourseModal(false)}>
+      <div
+        className="bg-surface-soft border border-hairline rounded-lg shadow-sm w-full max-w-sm mx-4 p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-display-md text-ink-deep">Add Course</h2>
+          <button onClick={() => setShowAddCourseModal(false)} className="p-2 rounded-full hover:bg-canvas text-slate transition-colors">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        <p className="text-body-sm text-steel mb-4">
+          Enter your course code (e.g., CS101, BIO205) to automatically join its community and connect with classmates.
+        </p>
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder="Course Code"
+            value={courseCode}
+            onChange={(e) => setCourseCode(e.target.value.toUpperCase())}
+            className="w-full px-4 h-12 bg-canvas border border-hairline rounded-lg text-ink focus:outline-none focus:border-fb-blue transition-colors"
+          />
+          <Button
+            onClick={handleAddCourse}
+            disabled={isAddingCourse || !courseCode.trim()}
+            variant="primary"
+            className="w-full h-12 flex justify-center items-center"
+          >
+            {isAddingCourse ? "Adding..." : "Add Course"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  )}
  </div>
  )
 }

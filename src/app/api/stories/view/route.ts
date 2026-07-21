@@ -11,7 +11,8 @@ export async function POST(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { storyId } = await req.json()
+    const body = await req.json().catch(() => ({}))
+    const { storyId } = body
     if (!storyId) return NextResponse.json({ error: "storyId required" }, { status: 400 })
 
     await viewStory(storyId, userId)

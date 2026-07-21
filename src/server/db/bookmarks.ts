@@ -9,12 +9,33 @@ export async function addBookmark(userId: string, postId: string, collectionName
   const supabase = await getSupabase()
   const { data, error } = await supabase.from("bookmarks").insert({ user_id: userId, post_id: postId, collection_name: collectionName }).select().single()
   if (error) return null
+
+  // Increment bookmark count
+  const { error: rpcErr } = await supabase.rpc("increment_field", {
+    table_name: "posts",
+    field_name: "bookmark_count",
+    row_id: postId,
+    increment_by: 1,
+  })
+  if (rpcErr) console.error(rpcErr)
   return data
 }
 
 export async function removeBookmark(userId: string, postId: string) {
   const supabase = await getSupabase()
-  await supabase.from("bookmarks").delete().eq("user_id", userId).eq("post_id", postId)
+  const { data: existing } = await supabase.from("bookmarks").select("id").eq("user_id", userId).eq("post_id", postId).single()
+  if (!existing) return;
+  
+  await supabase.from("bookmarks").delete().eq("id", existing.id)
+
+  // Decrement bookmark count
+  const { error: rpcErr } = await supabase.rpc("increment_field", {
+    table_name: "posts",
+    field_name: "bookmark_count",
+    row_id: postId,
+    increment_by: -1,
+  })
+  if (rpcErr) console.error(rpcErr)
 }
 
 export async function getBookmarks(userId: string, limit = 20, offset = 0) {

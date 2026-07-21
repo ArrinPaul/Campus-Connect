@@ -11,7 +11,8 @@ export async function DELETE(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { postId } = await req.json()
+    const body = await req.json().catch(() => ({}))
+    const { postId } = body
     if (!postId) return NextResponse.json({ error: "postId required" }, { status: 400 })
 
     await removeBookmark(userId, postId)

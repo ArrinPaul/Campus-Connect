@@ -86,5 +86,19 @@ export async function createComment(data: {
 
 export async function deleteComment(commentId: string): Promise<void> {
   const supabase = await getSupabase()
+  
+  // Get post id before deleting
+  const { data: comment } = await supabase.from("comments").select("post_id").eq("id", commentId).single()
+  
   await supabase.from("comments").delete().eq("id", commentId)
+  
+  if (comment?.post_id) {
+    const { error: rpcErr } = await supabase.rpc("increment_field", {
+      table_name: "posts",
+      field_name: "comment_count",
+      row_id: comment.post_id,
+      increment_by: -1,
+    })
+    if (rpcErr) console.error(rpcErr)
+  }
 }

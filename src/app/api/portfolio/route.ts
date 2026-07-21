@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     const authId = user?.id
     if (!authId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const project = await addProject(authId, body)
     return NextResponse.json(project)
   } catch (err) {

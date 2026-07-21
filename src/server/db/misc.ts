@@ -42,7 +42,16 @@ export async function repost(originalPostId: string, reposterId: string, content
 
 export async function undoRepost(originalPostId: string, reposterId: string) {
   const supabase = await getSupabase()
-  await supabase.from("reposts").delete().eq("original_post_id", originalPostId).eq("reposter_id", reposterId)
+  
+  // Check if it was actually reposted
+  const { data: existing } = await supabase.from("reposts").select("id").eq("original_post_id", originalPostId).eq("reposter_id", reposterId).single()
+  if (!existing) return;
+  
+  await supabase.from("reposts").delete().eq("id", existing.id)
+  
+  // Decrement share count
+  const { data: post } = await supabase.from("posts").select("share_count").eq("id", originalPostId).single()
+  if (post) await supabase.from("posts").update({ share_count: Math.max(0, (post.share_count ?? 0) - 1) }).eq("id", originalPostId)
 }
 
 export async function isReposted(postId: string, userId: string): Promise<boolean> {

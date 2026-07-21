@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}));
     if (!body.content?.trim()) return NextResponse.json({ error: "Content required" }, { status: 400 })
 
     const sanitizedContent = DOMPurify.sanitize(body.content)

@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}));
     const payload = {
       username: typeof body?.username === "string" ? body.username : "",
       bio: typeof body?.bio === "string" ? body.bio : "",

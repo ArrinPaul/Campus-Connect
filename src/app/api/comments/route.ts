@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { getPostComments, createComment } from "@/server/db/comments"
+import { incrementCommentCount } from "@/server/db/posts"
 import DOMPurify from "isomorphic-dompurify"
 
 // GET /api/comments?postId=xxx&limit=20&cursor=xxx
@@ -29,7 +30,7 @@ export async function POST(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}));
     if (!body.postId || !body.content) return NextResponse.json({ error: "postId and content required" }, { status: 400 })
 
     const sanitizedContent = DOMPurify.sanitize(body.content)
@@ -43,6 +44,10 @@ export async function POST(req: Request) {
     if (!comment) {
       return NextResponse.json({ error: "Failed to create comment" }, { status: 500 })
     }
+
+    // Update post count
+    incrementCommentCount(body.postId).catch(console.error)
+
     return NextResponse.json(comment, { status: 201 })
   } catch (err) {
     return internalError(err)

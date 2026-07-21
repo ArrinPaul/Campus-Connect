@@ -11,7 +11,8 @@ export async function POST(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { eventId } = await req.json()
+    const body = await req.json().catch(() => ({}));
+    const { eventId } = body;
     if (!eventId) return NextResponse.json({ error: "eventId required" }, { status: 400 })
 
     await attendEvent(eventId, userId)
@@ -29,7 +30,8 @@ export async function DELETE(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { eventId } = await req.json()
+    const body = await req.json().catch(() => ({}));
+    const { eventId } = body;
     if (!eventId) return NextResponse.json({ error: "eventId required" }, { status: 400 })
 
     await unattendEvent(eventId, userId)

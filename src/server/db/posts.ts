@@ -284,6 +284,16 @@ export async function incrementCommentCount(postId: string): Promise<void> {
   })
 }
 
+export async function decrementCommentCount(postId: string): Promise<void> {
+  const supabase = await getSupabase()
+  await supabase.rpc("increment_field", {
+    table_name: "posts",
+    field_name: "comment_count",
+    row_id: postId,
+    increment_by: -1,
+  })
+}
+
 export async function incrementShareCount(postId: string): Promise<void> {
   const supabase = await getSupabase()
   await supabase.rpc("increment_field", {

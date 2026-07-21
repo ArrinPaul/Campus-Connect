@@ -30,7 +30,8 @@ export async function POST(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { postId, collection } = await req.json()
+    const body = await req.json().catch(() => ({}))
+    const { postId, collection } = body
     if (!postId) return NextResponse.json({ error: "postId required" }, { status: 400 })
 
     await addBookmark(userId, postId, collection)

@@ -40,15 +40,25 @@ export async function createCommunity(data: { name: string; slug: string; descri
 export async function joinCommunity(communityId: string, userId: string) {
   const supabase = await getSupabase()
   await supabase.from("community_members").insert({ community_id: communityId, user_id: userId })
-  const { data } = await supabase.from("communities").select("member_count").eq("id", communityId).single()
-  if (data) await supabase.from("communities").update({ member_count: (data.member_count ?? 0) + 1 }).eq("id", communityId)
+  const { error: rpcErr } = await supabase.rpc("increment_field", {
+    table_name: "communities",
+    field_name: "member_count",
+    row_id: communityId,
+    increment_by: 1,
+  })
+  if (rpcErr) console.error(rpcErr)
 }
 
 export async function leaveCommunity(communityId: string, userId: string) {
   const supabase = await getSupabase()
   await supabase.from("community_members").delete().eq("community_id", communityId).eq("user_id", userId)
-  const { data } = await supabase.from("communities").select("member_count").eq("id", communityId).single()
-  if (data) await supabase.from("communities").update({ member_count: Math.max(0, (data.member_count ?? 0) - 1) }).eq("id", communityId)
+  const { error: rpcErr } = await supabase.rpc("increment_field", {
+    table_name: "communities",
+    field_name: "member_count",
+    row_id: communityId,
+    increment_by: -1,
+  })
+  if (rpcErr) console.error(rpcErr)
 }
 
 export async function getCommunityMembers(communityId: string) {
@@ -57,6 +67,15 @@ export async function getCommunityMembers(communityId: string) {
     .from("community_members")
     .select("user:users!community_members_user_id_fkey(id, name, username, profile_picture, role), role, joined_at")
     .eq("community_id", communityId)
+  return data ?? []
+}
+
+export async function getUserCommunities(userId: string) {
+  const supabase = await getSupabase()
+  const { data } = await supabase
+    .from("community_members")
+    .select("community:communities(*), role, joined_at")
+    .eq("user_id", userId)
   return data ?? []
 }
 

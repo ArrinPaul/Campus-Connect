@@ -166,13 +166,13 @@ export default function ListingDetailPage({ params }: PageProps) {
  onClick={() => setShowPurchaseForm(true)}
  className="h-10 px-4 active:scale-[0.98] bg-primary text-on-primary hover:bg-primary/90 rounded-md text-sm font-semibold flex items-center gap-2 w-fit"
  >
- <ShoppingCart className="h-4 w-4" /> Buy This Item
+ <ShoppingCart className="h-4 w-4" /> Buy with Secure Escrow
  </button>
  ) : (
- <div className="border rounded-lg p-4 bg-muted/30">
- <h3 className="font-semibold text-sm mb-3">Send Purchase Request</h3>
+ <div className="border rounded-lg p-4 bg-muted/30 border-primary/20">
+ <h3 className="font-semibold text-sm mb-3 text-primary flex items-center gap-2"><CheckCircle className="w-4 h-4" /> Secure Escrow Request</h3>
  <p className="text-xs text-muted-foreground mb-3">
- The seller will be notified of your interest. Include a message to coordinate pickup/delivery.
+ Funds will be held securely in escrow until you receive the item. The seller will be notified of your request. Include a message to coordinate pickup/delivery.
  </p>
  <textarea
  value={purchaseMessage}
@@ -193,7 +193,7 @@ export default function ListingDetailPage({ params }: PageProps) {
  ) : (
  <ShoppingCart className="h-4 w-4" />
  )}
- Confirm Purchase Request
+ Fund Escrow & Request
  </button>
  <button
  onClick={() => { setShowPurchaseForm(false); setPurchaseMessage(''); }}
@@ -257,7 +257,7 @@ export default function ListingDetailPage({ params }: PageProps) {
  {/* Seller: Purchase Requests */}
  {isSeller && transactions && transactions.length > 0 && (
  <div className="mt-8 border-t pt-6">
- <h3 className="font-bold text-lg mb-4">Purchase Requests ({transactions.length})</h3>
+ <h3 className="font-bold text-lg mb-4 flex items-center gap-2"><CheckCircle className="w-5 h-5 text-primary" /> Escrow Offers ({transactions.length})</h3>
  <div className="space-y-3">
  {transactions.map((tx: any) => (
  <div key={tx._id} className="flex items-start gap-3 p-4 border rounded-lg bg-canvas">

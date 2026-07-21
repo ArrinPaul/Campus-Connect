@@ -28,7 +28,7 @@ export async function PATCH(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}));
 
     // Whitelist allowed fields — never allow is_admin, follower_count, post_count, etc.
     const allowedFields = [
@@ -55,6 +55,9 @@ export async function PATCH(req: Request) {
     }
 
     const dbUser = await updateUser(userId, safeUpdate)
+    if (!dbUser) {
+      return NextResponse.json({ error: "Failed to update profile" }, { status: 500 })
+    }
     return NextResponse.json(dbUser)
   } catch (err) {
     return internalError(err)

@@ -11,7 +11,8 @@ export async function DELETE(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { commentId } = await req.json()
+    const body = await req.json().catch(() => ({}));
+    const { commentId } = body;
     if (!commentId) return NextResponse.json({ error: "commentId required" }, { status: 400 })
 
     await deleteComment(commentId)

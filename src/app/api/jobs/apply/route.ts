@@ -11,11 +11,13 @@ export async function POST(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { jobId, coverLetter } = await req.json()
+    const body = await req.json().catch(() => ({}));
+    const { jobId, coverLetter } = body;
     if (!jobId) return NextResponse.json({ error: "jobId required" }, { status: 400 })
 
-    await applyToJob(jobId, userId, coverLetter)
-    return NextResponse.json({ success: true })
+    const result = await applyToJob(jobId, userId, coverLetter)
+    if (!result) return NextResponse.json({ error: "Failed to apply to job or already applied" }, { status: 500 })
+    return NextResponse.json({ success: true, application: result })
   } catch (err) {
     return internalError(err)
   }

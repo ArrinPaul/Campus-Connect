@@ -26,7 +26,8 @@ export async function POST(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { status } = await req.json()
+    const body = await req.json().catch(() => ({}))
+    const { status } = body
     await updatePresence(userId, status ?? "online")
     return NextResponse.json({ success: true })
   } catch (err) {

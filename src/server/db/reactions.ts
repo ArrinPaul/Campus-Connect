@@ -21,13 +21,19 @@ export async function addReaction(data: {
   type: string
 }): Promise<DbReaction | null> {
   const supabase = await getSupabase()
-  // Remove existing reaction first (upsert behavior)
-  await supabase
+  
+  const { data: existing } = await supabase
     .from("reactions")
-    .delete()
+    .select("id")
     .eq("user_id", data.user_id)
     .eq("target_id", data.target_id)
     .eq("target_type", data.target_type)
+    .single()
+
+  if (existing) {
+    await supabase.from("reactions").delete().eq("id", existing.id)
+  }
+
   const { data: reaction, error } = await supabase
     .from("reactions")
     .insert({
@@ -38,7 +44,19 @@ export async function addReaction(data: {
     })
     .select()
     .single()
+    
   if (error) return null
+
+  if (!existing && data.target_type === "post") {
+    const { error: rpcErr } = await supabase.rpc("increment_field", {
+      table_name: "posts",
+      field_name: "like_count",
+      row_id: data.target_id,
+      increment_by: 1,
+    })
+    if (rpcErr) console.error(rpcErr)
+  }
+
   return reaction as DbReaction
 }
 
@@ -48,12 +66,28 @@ export async function removeReaction(
   targetType: string
 ): Promise<void> {
   const supabase = await getSupabase()
-  await supabase
+  
+  const { data: existing } = await supabase
     .from("reactions")
-    .delete()
+    .select("id")
     .eq("user_id", userId)
     .eq("target_id", targetId)
     .eq("target_type", targetType)
+    .single()
+
+  if (!existing) return;
+
+  await supabase.from("reactions").delete().eq("id", existing.id)
+
+  if (targetType === "post") {
+    const { error: rpcErr } = await supabase.rpc("increment_field", {
+      table_name: "posts",
+      field_name: "like_count",
+      row_id: targetId,
+      increment_by: -1,
+    })
+    if (rpcErr) console.error(rpcErr)
+  }
 }
 
 export async function getUserReaction(

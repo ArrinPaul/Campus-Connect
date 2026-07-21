@@ -114,3 +114,32 @@ export async function answerQuestion(questionId: string, authorId: string, conte
   })
   return answer
 }
+
+export async function acceptAnswer(answerId: string) {
+  const supabase = await getSupabase()
+  
+  // First get the answer to find the question ID
+  const { data: answer, error: ansError } = await supabase
+    .from("question_answers")
+    .select("question_id")
+    .eq("id", answerId)
+    .single()
+    
+  if (ansError || !answer) return false
+
+  // Mark answer as accepted
+  const { error: updError } = await supabase
+    .from("question_answers")
+    .update({ is_accepted: true })
+    .eq("id", answerId)
+    
+  if (updError) return false
+
+  // Mark question as resolved
+  await supabase
+    .from("questions")
+    .update({ is_resolved: true })
+    .eq("id", answer.question_id)
+    
+  return true
+}

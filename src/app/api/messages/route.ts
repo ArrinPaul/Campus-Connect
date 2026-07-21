@@ -34,7 +34,8 @@ export async function POST(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { conversationId, content } = await req.json()
+    const body = await req.json().catch(() => ({}));
+    const { conversationId, content } = body;
     if (!conversationId || !content) {
       return NextResponse.json({ error: "conversationId and content required" }, { status: 400 })
     }
