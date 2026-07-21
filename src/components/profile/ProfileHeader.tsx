@@ -88,7 +88,11 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
    }
  }
  
- const isFollowing = optimisticFollowing !== null ? optimisticFollowing : (isFollowingQuery ?? false)
+ const rawFollowing =
+   typeof isFollowingQuery === "object" && isFollowingQuery !== null
+     ? (isFollowingQuery as any).isFollowing
+     : isFollowingQuery
+ const isFollowing = optimisticFollowing !== null ? optimisticFollowing : Boolean(rawFollowing)
  
  const handleFollowToggle = async () => {
  try {

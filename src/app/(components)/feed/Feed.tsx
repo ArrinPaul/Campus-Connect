@@ -30,13 +30,13 @@ export function Feed() {
     <div className="w-full flex flex-col items-center">
       {rightSidebarNode && createPortal(<FeedRightSidebar />, rightSidebarNode)}
       {/* Top Stories/Create Area */}
-      <div className="w-full max-w-2xl px-4 md:px-0 mt-md space-y-md">
+      <div className="w-full max-w-2xl px-4 sm:px-6 md:px-6 mt-md space-y-md">
         <StoryRow />
         <CreatePost />
       </div>
 
       {/* Feed Tabs - Meta Pill Nav */}
-      <div className="w-full sticky top-[64px] z-30 bg-canvas/90 backdrop-blur-md border-b border-hairline py-md">
+      <div className="w-full sticky top-[64px] z-30 bg-canvas/90 backdrop-blur-md border-b border-hairline py-md px-4 sm:px-6 md:px-6">
         <div className="max-w-2xl mx-auto flex items-center justify-center gap-sm">
           {TABS.map((tab) => (
             <button

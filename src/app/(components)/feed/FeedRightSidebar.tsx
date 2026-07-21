@@ -1,11 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { useQuery, useMutation } from '@/lib/api';
 import { useUser } from '@/lib/auth/client';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { api } from '@/lib/api';
 import Link from 'next/link';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Check } from 'lucide-react';
 import { useGraphFollowMutation, useGraphSuggestions } from '@/hooks/useGraphSuggestions';
 
 export function FeedRightSidebar() {
@@ -112,39 +113,44 @@ export function FeedRightSidebar() {
 }
 
 function FollowButton({ profileUserId, targetAuthId }: { profileUserId?: string; targetAuthId: string }) {
-  const { isSignedIn } = useUser();
-  const isAuthenticated = isSignedIn ?? false;
-  const hasProfileUserId = !!profileUserId;
   const followUser = useMutation(api.follows.followUser);
   const unfollowUser = useMutation(api.follows.unfollowUser);
   const graphFollowMutation = useGraphFollowMutation(3);
-  const isFollowing = useQuery(
-    api.follows.isFollowing,
-    isAuthenticated && hasProfileUserId ? { userId: profileUserId as any } : 'skip'
-  );
 
-  if (hasProfileUserId && isFollowing === undefined) {
-    return <div className="h-7 w-16 bg-muted rounded-full animate-pulse" />;
-  }
+  // In "Who to follow", default action state is not following (Follow)
+  const [following, setFollowing] = useState(false);
 
-  const following = hasProfileUserId ? !!isFollowing : false;
+  const handleToggleFollow = async () => {
+    const nextState = !following;
+    setFollowing(nextState);
+    try {
+      if (profileUserId) {
+        if (following) {
+          await unfollowUser({ userId: profileUserId as any });
+        } else {
+          await followUser({ userId: profileUserId as any });
+        }
+      } else {
+        await graphFollowMutation.mutateAsync({
+          targetAuthId,
+          action: nextState ? 'follow' : 'unfollow',
+        });
+      }
+    } catch {
+      setFollowing(following);
+    }
+  };
 
   return (
     <button
-      onClick={() =>
-        hasProfileUserId
-          ? following
-            ? unfollowUser({ userId: profileUserId as any })
-            : followUser({ userId: profileUserId as any })
-          : graphFollowMutation.mutateAsync({ targetAuthId, action: 'follow' })
-      }
-      className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+      onClick={handleToggleFollow}
+      className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold border border-success transition-colors ${
         following
-          ? 'border border-border text-muted-foreground hover:border-destructive hover:text-destructive'
-          : 'bg-primary text-primary-foreground hover:bg-primary/90'
+          ? 'bg-success/10 text-success hover:bg-success hover:text-white'
+          : 'bg-transparent text-success hover:bg-success hover:text-white'
       }`}
     >
-      {!following && <UserPlus className="h-3 w-3" />}
+      {following ? <Check className="h-3 w-3" /> : <UserPlus className="h-3 w-3" />}
       {following ? 'Following' : 'Follow'}
     </button>
   );

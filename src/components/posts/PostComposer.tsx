@@ -36,180 +36,187 @@ import {
 } from"lucide-react"
 
 // Client-side file type / size constants (mirrored from backend media limits)
-import imageCompression from"browser-image-compression"
-const IMAGE_TYPES = ["image/jpeg","image/png","image/gif","image/webp"]
-const VIDEO_TYPES = ["video/mp4","video/webm"]
-const FILE_TYPES = [
-"application/pdf",
-"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-"application/vnd.openxmlformats-officedocument.presentationml.presentation",
-"application/msword",
-"text/plain",
-]
+import imageCompression from "browser-image-compression"
+
+const isImageFile = (file: File) =>
+  file.type.startsWith("image/") ||
+  /\.(jpe?g|png|gif|webp|heic|heif|bmp|svg)$/i.test(file.name)
+
+const isVideoFile = (file: File) =>
+  file.type.startsWith("video/") ||
+  /\.(mp4|webm|mov|avi|mkv)$/i.test(file.name)
+
+const isDocumentFile = (file: File) =>
+  file.type.startsWith("application/") ||
+  file.type.startsWith("text/") ||
+  /\.(pdf|docx?|pptx?|xlsx?|txt|csv)$/i.test(file.name)
+
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024
 const MAX_VIDEO_SIZE = 100 * 1024 * 1024
 const MAX_FILE_SIZE = 25 * 1024 * 1024
 const MAX_IMAGES_PER_POST = 10
 
 interface PostComposerProps {
- onPostCreated?: () => void
- communityId?: Id<"communities">
+  onPostCreated?: () => void
+  communityId?: Id<"communities">
 }
 
 export function PostComposer({ onPostCreated, communityId }: PostComposerProps) {
- const { isSignedIn, isLoaded } = useUser()
- const isAuthenticated = isSignedIn ?? false
- 
- const createPost = useMutation(api.posts.createPost)
- const generateUploadUrl = useMutation(api.media.generateUploadUrl)
- const resolveStorageUrls = useMutation(api.media.resolveStorageUrls)
- const fetchLinkPreview = useAction(api.media.fetchLinkPreview)
- const createPollMutation = useMutation(api.polls.createPoll)
- const linkPollToPost = useMutation(api.polls.linkPollToPost)
+  const { isSignedIn, isLoaded } = useUser()
+  const isAuthenticated = isSignedIn ?? false
+  
+  const createPost = useMutation(api.posts.createPost)
+  const generateUploadUrl = useMutation(api.media.generateUploadUrl)
+  const resolveStorageUrls = useMutation(api.media.resolveStorageUrls)
+  const fetchLinkPreview = useAction(api.media.fetchLinkPreview)
+  const createPollMutation = useMutation(api.polls.createPoll)
+  const linkPollToPost = useMutation(api.polls.linkPollToPost)
 
- const [content, setContent] = useState("")
- const [error, setError] = useState("")
- const [isSubmitting, setIsSubmitting] = useState(false)
- const [showHashtagAutocomplete, setShowHashtagAutocomplete] = useState(false)
- const [showMentionAutocomplete, setShowMentionAutocomplete] = useState(false)
- const [hashtagAutocompleteQuery, setHashtagAutocompleteQuery] = useState("")
- const [mentionAutocompleteQuery, setMentionAutocompleteQuery] = useState("")
- const [selectedHashtagIndex, setSelectedHashtagIndex] = useState(0)
+  const [content, setContent] = useState("")
+  const [error, setError] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showHashtagAutocomplete, setShowHashtagAutocomplete] = useState(false)
+  const [showMentionAutocomplete, setShowMentionAutocomplete] = useState(false)
+  const [hashtagAutocompleteQuery, setHashtagAutocompleteQuery] = useState("")
+  const [mentionAutocompleteQuery, setMentionAutocompleteQuery] = useState("")
+  const [selectedHashtagIndex, setSelectedHashtagIndex] = useState(0)
 
- // Media state
- const [attachedFiles, setAttachedFiles] = useState<File[]>([])
- const [attachedType, setAttachedType] = useState<"image" |"video" |"file" | null>(null)
- const [filePreviews, setFilePreviews] = useState<string[]>([])
- const [uploadProgress, setUploadProgress] = useState(0)
- const [isUploading, setIsUploading] = useState(false)
- const [detectedLink, setDetectedLink] = useState<string | null>(null)
- const [linkPreviewData, setLinkPreviewData] = useState<{
- url: string; title?: string; description?: string; image?: string; favicon?: string
- } | null>(null)
- const [isFetchingPreview, setIsFetchingPreview] = useState(false)
+  // Media state
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([])
+  const [attachedType, setAttachedType] = useState<"image" | "video" | "file" | null>(null)
+  const [filePreviews, setFilePreviews] = useState<string[]>([])
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [isUploading, setIsUploading] = useState(false)
+  const [detectedLink, setDetectedLink] = useState<string | null>(null)
+  const [linkPreviewData, setLinkPreviewData] = useState<{
+    url: string; title?: string; description?: string; image?: string; favicon?: string
+  } | null>(null)
+  const [isFetchingPreview, setIsFetchingPreview] = useState(false)
 
- // Poll state
- const [showPollUI, setShowPollUI] = useState(false)
- const [pollOptions, setPollOptions] = useState(["Option 1","Option 2"])
- const [pollDuration, setPollDuration] = useState<number | undefined>(24)
- const [pollIsAnonymous, setPollIsAnonymous] = useState(false)
+  // Poll state
+  const [showPollUI, setShowPollUI] = useState(false)
+  const [pollOptions, setPollOptions] = useState(["Option 1", "Option 2"])
+  const [pollDuration, setPollDuration] = useState<number | undefined>(24)
+  const [pollIsAnonymous, setPollIsAnonymous] = useState(false)
 
- const fileInputRef = useRef<HTMLInputElement>(null)
- const linkDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const imageInputRef = useRef<HTMLInputElement>(null)
+  const videoInputRef = useRef<HTMLInputElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const linkDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
- const maxLength = 5000
+  const maxLength = 5000
 
- // Link auto-detection
- const detectAndFetchLink = useCallback(
- (text: string) => {
- if (linkDebounceRef.current) clearTimeout(linkDebounceRef.current)
- if (attachedFiles.length > 0) return
+  // Link auto-detection
+  const detectAndFetchLink = useCallback(
+    (text: string) => {
+      if (linkDebounceRef.current) clearTimeout(linkDebounceRef.current)
+      if (attachedFiles.length > 0) return
 
- linkDebounceRef.current = setTimeout(async () => {
- const urlMatch = text.match(/https?:\/\/[^\s)>]+/)
- const url = urlMatch?.[0] ?? null
- if (url === detectedLink) return
- setDetectedLink(url)
- if (!url) {
- setLinkPreviewData(null)
- return
- }
- setIsFetchingPreview(true)
- try {
- const data = await fetchLinkPreview({ url })
- setLinkPreviewData(data ?? null)
- } catch {
- setLinkPreviewData(null)
- } finally {
- setIsFetchingPreview(false)
- }
- }, 800)
- },
- [attachedFiles.length, detectedLink, fetchLinkPreview]
- )
+      linkDebounceRef.current = setTimeout(async () => {
+        const urlMatch = text.match(/https?:\/\/[^\s)>]+/)
+        const url = urlMatch?.[0] ?? null
+        if (url === detectedLink) return
+        setDetectedLink(url)
+        if (!url) {
+          setLinkPreviewData(null)
+          return
+        }
+        setIsFetchingPreview(true)
+        try {
+          const data = await fetchLinkPreview({ url })
+          setLinkPreviewData(data ?? null)
+        } catch {
+          setLinkPreviewData(null)
+        } finally {
+          setIsFetchingPreview(false)
+        }
+      }, 800)
+    },
+    [attachedFiles.length, detectedLink, fetchLinkPreview]
+  )
 
- // File selection
- const handleFileSelect = useCallback(
- async (files: FileList | File[], type:"image" |"video" |"file") => {
- const fileArr = Array.from(files)
- if (fileArr.length === 0) return
+  // File selection
+  const handleFileSelect = useCallback(
+    async (files: FileList | File[], type: "image" | "video" | "file") => {
+      const fileArr = Array.from(files)
+      if (fileArr.length === 0) return
 
- // Validation
- for (const file of fileArr) {
- if (type ==="image") {
- if (!IMAGE_TYPES.includes(file.type)) {
- setError("Only JPEG, PNG, GIF, or WebP images are allowed")
- return
- }
- if (file.size > MAX_IMAGE_SIZE) {
- setError("Images must be under 10 MB")
- return
- }
- } else if (type ==="video") {
- if (!VIDEO_TYPES.includes(file.type)) {
- setError("Only MP4 or WebM videos are allowed")
- return
- }
- if (file.size > MAX_VIDEO_SIZE) {
- setError("Videos must be under 100 MB")
- return
- }
- } else {
- if (!FILE_TYPES.includes(file.type)) {
- setError("Only PDF, DOCX, PPTX, DOC, or TXT files are allowed")
- return
- }
- if (file.size > MAX_FILE_SIZE) {
- setError("Files must be under 25 MB")
- return
- }
- }
- }
+      // Validation
+      for (const file of fileArr) {
+        if (type === "image") {
+          if (!isImageFile(file)) {
+            setError("Please select valid image files (JPEG, PNG, GIF, WebP)")
+            return
+          }
+          if (file.size > MAX_IMAGE_SIZE) {
+            setError("Images must be under 10 MB")
+            return
+          }
+        } else if (type === "video") {
+          if (!isVideoFile(file)) {
+            setError("Please select valid video files (MP4, WebM, MOV)")
+            return
+          }
+          if (file.size > MAX_VIDEO_SIZE) {
+            setError("Videos must be under 100 MB")
+            return
+          }
+        } else {
+          if (!isDocumentFile(file)) {
+            setError("Only PDF, DOCX, PPTX, DOC, or TXT files are allowed")
+            return
+          }
+          if (file.size > MAX_FILE_SIZE) {
+            setError("Files must be under 25 MB")
+            return
+          }
+        }
+      }
 
- if (type ==="image" && fileArr.length > MAX_IMAGES_PER_POST) {
- setError(`You can attach at most ${MAX_IMAGES_PER_POST} images`)
- return
- }
- if (type ==="video" && fileArr.length > 1) {
- setError("You can only attach 1 video")
- return
- }
+      if (type === "image" && fileArr.length > MAX_IMAGES_PER_POST) {
+        setError(`You can attach at most ${MAX_IMAGES_PER_POST} images`)
+        return
+      }
+      if (type === "video" && fileArr.length > 1) {
+        setError("You can only attach 1 video")
+        return
+      }
 
- setError("")
+      setError("")
 
- let finalFiles = fileArr
- if (type ==="image") {
- const compressionOptions = {
- maxSizeMB: 1,
- maxWidthOrHeight: 1920,
- useWebWorker: true,
- fileType:"image/webp" as const,
- }
- finalFiles = await Promise.all(
- fileArr.map(async (file) => {
- if (file.type ==="image/gif") return file
- try {
- return await imageCompression(file, compressionOptions)
- } catch {
- return file
- }
- })
- )
- }
+      let finalFiles = fileArr
+      if (type === "image") {
+        const compressionOptions = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+          fileType: "image/webp" as const,
+        }
+        finalFiles = await Promise.all(
+          fileArr.map(async (file) => {
+            if (file.type === "image/gif") return file
+            try {
+              return await imageCompression(file, compressionOptions)
+            } catch {
+              return file
+            }
+          })
+        )
+      }
 
- setAttachedFiles(finalFiles)
- setAttachedType(type)
- setLinkPreviewData(null)
+      setAttachedFiles(finalFiles)
+      setAttachedType(type)
+      setLinkPreviewData(null)
 
- if (type ==="image") {
- const previews = finalFiles.map((f) => URL.createObjectURL(f))
- setFilePreviews(previews)
- } else {
- setFilePreviews([])
- }
- },
- []
- )
+      if (type === "image" || type === "video") {
+        const previews = finalFiles.map((f) => URL.createObjectURL(f))
+        setFilePreviews(previews)
+      } else {
+        setFilePreviews([])
+      }
+    },
+    []
+  )
 
  const removeFile = useCallback(
  (index: number) => {
@@ -418,22 +425,47 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
  onSubmit={handleSubmit}
  className="bg-surface-soft border border-hairline rounded-2xl p-4 space-y-md"
  >
- {/* Hidden file input */}
- <input
- ref={fileInputRef}
- type="file"
- className="hidden"
- onChange={(e) => {
- if (!e.target.files || e.target.files.length === 0) return
- const first = e.target.files[0]
- if (IMAGE_TYPES.includes(first.type)) handleFileSelect(e.target.files,"image")
- else if (VIDEO_TYPES.includes(first.type)) handleFileSelect([first],"video")
- else handleFileSelect([first],"file")
- e.target.value =""
- }}
- accept={[...IMAGE_TYPES, ...VIDEO_TYPES, ...FILE_TYPES].join(",")}
- multiple
- />
+  {/* Hidden file inputs */}
+  <input
+  ref={imageInputRef}
+  type="file"
+  className="hidden"
+  onChange={(e) => {
+  if (e.target.files && e.target.files.length > 0) {
+  handleFileSelect(e.target.files, "image")
+  e.target.value = ""
+  }
+  }}
+  accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/*"
+  multiple
+  />
+
+  <input
+  ref={videoInputRef}
+  type="file"
+  className="hidden"
+  onChange={(e) => {
+  if (e.target.files && e.target.files.length > 0) {
+  handleFileSelect(e.target.files, "video")
+  e.target.value = ""
+  }
+  }}
+  accept="video/mp4,video/webm,video/quicktime,video/*"
+  />
+
+  <input
+  ref={fileInputRef}
+  type="file"
+  className="hidden"
+  onChange={(e) => {
+  if (e.target.files && e.target.files.length > 0) {
+  handleFileSelect(e.target.files, "file")
+  e.target.value = ""
+  }
+  }}
+  accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.csv,.xlsx,application/pdf,text/plain"
+  multiple
+  />
 
  <div className="relative" onKeyDown={handleWrapperKeyDown}>
  <RichTextEditor
@@ -482,29 +514,53 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
  {error && <p className="mt-2 text-xs text-critical">{error}</p>}
  </div>
 
- {/* Media Toolbar */}
- <div className="flex items-center gap-xs border-t border-hairline pt-sm">
- <button
- type="button"
- onClick={() => fileInputRef.current?.click()}
- disabled={!!attachedType && attachedType !=="image"}
- className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-slate hover:bg-canvas hover:text-primary transition-colors disabled:opacity-30"
- >
- <ImageIcon className="h-4 w-4" />
- <span className="hidden sm:inline">Images</span>
- </button>
+  {/* Media Toolbar */}
+  <div className="flex items-center gap-xs border-t border-hairline pt-sm flex-wrap">
+  <button
+  type="button"
+  onClick={() => imageInputRef.current?.click()}
+  disabled={!!attachedType && attachedType !== "image"}
+  className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-slate hover:bg-canvas hover:text-primary transition-colors disabled:opacity-30"
+  title="Attach photos"
+  >
+  <ImageIcon className="h-4 w-4" />
+  <span className="hidden sm:inline">Photos</span>
+  </button>
 
- <button
- type="button"
- onClick={() => setShowPollUI((v) => !v)}
- className={cn(
-"active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
- showPollUI ?"bg-canvas text-primary" :"text-slate hover:bg-canvas hover:text-primary"
- )}
- >
- <BarChart2 className="h-4 w-4" />
- <span className="hidden sm:inline">Poll</span>
- </button>
+  <button
+  type="button"
+  onClick={() => videoInputRef.current?.click()}
+  disabled={!!attachedType && attachedType !== "video"}
+  className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-slate hover:bg-canvas hover:text-primary transition-colors disabled:opacity-30"
+  title="Attach video"
+  >
+  <Video className="h-4 w-4" />
+  <span className="hidden sm:inline">Video</span>
+  </button>
+
+  <button
+  type="button"
+  onClick={() => fileInputRef.current?.click()}
+  disabled={!!attachedType && attachedType !== "file"}
+  className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-slate hover:bg-canvas hover:text-primary transition-colors disabled:opacity-30"
+  title="Attach document"
+  >
+  <FileText className="h-4 w-4" />
+  <span className="hidden sm:inline">Document</span>
+  </button>
+
+  <button
+  type="button"
+  onClick={() => setShowPollUI((v) => !v)}
+  className={cn(
+  "active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
+  showPollUI ? "bg-canvas text-primary" : "text-slate hover:bg-canvas hover:text-primary"
+  )}
+  title="Create poll"
+  >
+  <BarChart2 className="h-4 w-4" />
+  <span className="hidden sm:inline">Poll</span>
+  </button>
 
  {isFetchingPreview && (
  <div className="ml-auto flex items-center gap-1.5 text-xs text-slate italic">
@@ -557,24 +613,96 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
  </div>
  )}
 
- {/* Image Previews */}
- {attachedType ==="image" && filePreviews.length > 0 && (
- <div className="flex flex-wrap gap-xs">
- {filePreviews.map((src, i) => (
- <div key={i} className="relative h-20 w-20 rounded-md overflow-hidden border border-hairline shadow-sm">
- {/* eslint-disable-next-line @next/next/no-img-element */}
- <img src={src} alt="Preview" className="h-full w-full object-cover" />
- <button
- type="button"
- onClick={() => removeFile(i)}
- className="absolute top-1 right-1 rounded-full bg-tile-black/60 p-1 text-white hover:bg-tile-black"
- >
- <X className="h-3 w-3" />
- </button>
- </div>
- ))}
- </div>
- )}
+  {/* Image Previews */}
+  {attachedType === "image" && filePreviews.length > 0 && (
+    <div className="flex flex-wrap gap-2">
+      {filePreviews.map((src, i) => (
+        <div key={i} className="relative h-20 w-20 rounded-xl overflow-hidden border border-hairline shadow-sm group">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={src} alt={`Preview ${i + 1}`} className="h-full w-full object-cover" />
+          <button
+            type="button"
+            onClick={() => removeFile(i)}
+            className="absolute top-1 right-1 rounded-full bg-black/70 p-1 text-white hover:bg-black transition-colors"
+            title="Remove image"
+          >
+            <X className="h-3 w-3" />
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+
+  {/* Video Preview */}
+  {attachedType === "video" && attachedFiles.length > 0 && (
+    <div className="relative rounded-xl overflow-hidden border border-hairline bg-canvas p-2 flex items-center justify-between">
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+          <Video className="h-5 w-5" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-xs font-semibold text-ink-deep truncate">{attachedFiles[0].name}</p>
+          <p className="text-[10px] text-slate">{(attachedFiles[0].size / (1024 * 1024)).toFixed(2)} MB</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={() => removeFile(0)}
+        className="rounded-full p-1.5 text-slate hover:bg-surface-soft hover:text-ink-deep transition-colors"
+        title="Remove video"
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </div>
+  )}
+
+  {/* Document Previews */}
+  {attachedType === "file" && attachedFiles.length > 0 && (
+    <div className="space-y-2">
+      {attachedFiles.map((file, i) => (
+        <div key={i} className="rounded-xl border border-hairline bg-canvas p-3 flex items-center justify-between">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="h-9 w-9 rounded-lg bg-surface-soft flex items-center justify-center text-slate shrink-0 border border-hairline">
+              <FileText className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-ink-deep truncate">{file.name}</p>
+              <p className="text-[10px] text-slate">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => removeFile(i)}
+            className="rounded-full p-1.5 text-slate hover:bg-surface-soft hover:text-ink-deep transition-colors"
+            title="Remove document"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+
+  {/* Link Preview Chip */}
+  {linkPreviewData && !attachedType && (
+    <div className="relative rounded-xl border border-hairline bg-canvas p-3">
+      <button
+        type="button"
+        onClick={() => {
+          setLinkPreviewData(null)
+          setDetectedLink(null)
+        }}
+        className="absolute top-2 right-2 rounded-full p-1 text-slate hover:bg-surface-soft transition-colors"
+        title="Remove link preview"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
+      <p className="text-xs font-semibold text-primary truncate pr-6">{linkPreviewData.title || linkPreviewData.url}</p>
+      {linkPreviewData.description && (
+        <p className="text-[11px] text-slate line-clamp-2 mt-0.5">{linkPreviewData.description}</p>
+      )}
+    </div>
+  )}
 
  {/* Uploading Status */}
  {isUploading && (
@@ -591,7 +719,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
 
  <Button
  type="submit"
- disabled={isSubmitting || isUploading || (content.trim().length === 0 && attachedFiles.length === 0)}
+ disabled={isSubmitting || isUploading || (content.trim().length === 0 && attachedFiles.length === 0 && !showPollUI)}
  variant="primary"
  className="w-full"
  >

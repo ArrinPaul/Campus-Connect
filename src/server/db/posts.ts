@@ -105,7 +105,18 @@ export async function getPostById(postId: string): Promise<DbPost | null> {
     `)
     .eq("id", postId)
     .single()
-  if (error) return null
+  if (error || !data) {
+    const { data: fallbackData } = await supabase
+      .from("posts")
+      .select(`
+        *,
+        author:users(id, name, username, profile_picture, role)
+      `)
+      .eq("id", postId)
+      .single()
+    if (fallbackData) return fallbackData as DbPost
+    return null
+  }
   return data as DbPost
 }
 

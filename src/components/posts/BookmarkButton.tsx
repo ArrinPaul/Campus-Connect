@@ -41,8 +41,14 @@ export function BookmarkButton({
 
  const addBookmark = useMutation(api.bookmarks.addBookmark)
  const removeBookmark = useMutation(api.bookmarks.removeBookmark)
- const isBookmarked = useQuery(api.bookmarks.isBookmarked, postId ? { postId } : "skip")
- const bookmarkDetails = useQuery(api.bookmarks.getBookmarks, postId ? { postId } : "skip")
+  const isBookmarkedQuery = useQuery(api.bookmarks.isBookmarked, postId ? { postId } : "skip")
+  const rawBookmarked =
+    typeof isBookmarkedQuery === "object" && isBookmarkedQuery !== null
+      ? (isBookmarkedQuery as any).isBookmarked
+      : isBookmarkedQuery
+  const isBookmarked = Boolean(rawBookmarked)
+
+  const bookmarkDetails = useQuery(api.bookmarks.getBookmarks, postId ? { postId } : "skip")
  const collections = useQuery(api.bookmarks.getBookmarkCollections)
 
  const handleToggleBookmark = async () => {

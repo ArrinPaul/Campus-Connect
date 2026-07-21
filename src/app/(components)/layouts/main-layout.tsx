@@ -23,7 +23,7 @@ export function MainLayout({ children, title = "Campus Connect" }: MainLayoutPro
         </aside>
         
         {/* Main Feed Column */}
-        <main className="flex-1 max-w-[600px] min-w-0 min-h-screen scrollbar-custom border-x border-hairline pb-16 md:pb-0 bg-canvas relative">
+        <main className="flex-1 max-w-[600px] min-w-0 min-h-screen scrollbar-custom border-x border-hairline px-4 sm:px-6 md:px-6 py-4 pb-16 md:pb-6 bg-canvas relative">
           {children}
         </main>
         

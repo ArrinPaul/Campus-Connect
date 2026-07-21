@@ -51,6 +51,7 @@ jest.mock("next/image", () => ({
 
 // Mock child components that have complex dependencies
 jest.mock("@/components/posts/ReactionPicker", () => ({
+  LikeButton: () => <div data-testid="reaction-picker">Like</div>,
   ReactionPicker: () => <div data-testid="reaction-picker">Reactions</div>,
   ReactionSummary: () => <div data-testid="reaction-summary">Summary</div>,
 }))
@@ -134,7 +135,7 @@ describe("PostCard", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockGetCurrentUser.mockReturnValue(null)
+    mockGetCurrentUser.mockReturnValue({ _id: "user123", name: "Current User" })
     mockHasUserLikedPost.mockReturnValue(false)
   })
 
@@ -170,10 +171,10 @@ describe("PostCard", () => {
     expect(screen.getByText("1h ago")).toBeInTheDocument()
   })
 
-  it("should display reaction summary", () => {
+  it("should display reaction picker button", () => {
     render(<PostCard post={mockPost} author={mockAuthor} />)
 
-    expect(screen.getByTestId("reaction-summary")).toBeInTheDocument()
+    expect(screen.getByTestId("reaction-picker")).toBeInTheDocument()
   })
 
   it("should display comment count", () => {
@@ -259,11 +260,11 @@ describe("PostCard", () => {
     expect(screen.queryByTestId("reaction-picker")).not.toBeInTheDocument()
   })
 
-  it("should render reaction summary with click handler", () => {
+  it("should render reaction picker button", () => {
     render(<PostCard post={mockPost} author={mockAuthor} />)
 
-    const reactionSummary = screen.getByTestId("reaction-summary")
-    expect(reactionSummary).toBeInTheDocument()
+    const reactionPicker = screen.getByTestId("reaction-picker")
+    expect(reactionPicker).toBeInTheDocument()
   })
 
   it("should format timestamp as 'just now' for recent posts", () => {

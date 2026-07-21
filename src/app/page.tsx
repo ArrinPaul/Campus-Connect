@@ -18,6 +18,8 @@ import {
   Zap,
   BookOpen,
   Globe,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
@@ -132,9 +134,10 @@ export default function RootPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="hidden md:flex h-10 w-10 items-center justify-center rounded-full bg-canvas text-ink hover:bg-surface-soft transition-colors"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-canvas text-ink hover:bg-surface-soft transition-colors"
+            aria-label={theme === 'dark' ? "Switch to light mode" : "Switch to dark mode"}
           >
-            {theme === 'dark' ? '☀️' : '🌙'}
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </button>
 
           <Link href="/sign-in" className="hidden md:flex px-6 py-2.5 rounded-full text-button-md text-ink-deep border-2 border-ink-deep hover:bg-surface-soft transition-colors">

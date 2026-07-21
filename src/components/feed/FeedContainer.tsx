@@ -113,94 +113,97 @@ export function FeedContainer({ feedType ="following" }: FeedContainerProps) {
  : feedType ==="trending"
  ? moreTrendingDataNormalized
  : moreFollowingData
+ const [isTabSwitching, setIsTabSwitching] = useState(false)
 
  // Reset when feed type changes
  useEffect(() => {
- if (prevFeedTypeRef.current !== feedType) {
- setAllItems([])
- setCursor(null)
- setIsLoadingMore(false)
- hasInitializedRef.current = false
- prevFeedTypeRef.current = feedType
- }
+   if (prevFeedTypeRef.current !== feedType) {
+     setIsTabSwitching(true)
+     setAllItems([])
+     setCursor(null)
+     setIsLoadingMore(false)
+     hasInitializedRef.current = false
+     prevFeedTypeRef.current = feedType
+   }
  }, [feedType])
 
  // Update allItems when initial data loads or updates (real-time)
  useEffect(() => {
- if (!feedData) return
- 
- if (!hasInitializedRef.current) {
- setAllItems(feedData.items as FeedQueryItem[])
- setCursor(feedData.nextCursor)
- hasInitializedRef.current = true
- } else if (!isLoadingMore) {
- // Handle real-time updates for the initial batch
- setAllItems((prev) => {
- const existingIds = new Set(prev.map((item) => item._id))
- const newItems = (feedData.items as FeedQueryItem[]).filter((item) => !existingIds.has(item._id))
- if (newItems.length > 0) {
- return [...newItems, ...prev]
- }
- return prev
- })
- setCursor(feedData.nextCursor)
- }
+   if (!feedData) return
+   setIsTabSwitching(false)
+   
+   if (!hasInitializedRef.current) {
+     setAllItems(feedData.items as FeedQueryItem[])
+     setCursor(feedData.nextCursor)
+     hasInitializedRef.current = true
+   } else if (!isLoadingMore) {
+     // Handle real-time updates for the initial batch
+     setAllItems((prev) => {
+       const existingIds = new Set(prev.map((item) => item._id))
+       const newItems = (feedData.items as FeedQueryItem[]).filter((item) => !existingIds.has(item._id))
+       if (newItems.length > 0) {
+         return [...newItems, ...prev]
+       }
+       return prev
+     })
+     setCursor(feedData.nextCursor)
+   }
  }, [feedData, isLoadingMore])
 
  // Update allItems when more data loads
  useEffect(() => {
- if (moreFeedData && isLoadingMore) {
- setAllItems((prev) => [...prev, ...(moreFeedData.items as FeedQueryItem[])])
- setCursor(moreFeedData.nextCursor)
- setIsLoadingMore(false)
- }
+   if (moreFeedData && isLoadingMore) {
+     setAllItems((prev) => [...prev, ...(moreFeedData.items as FeedQueryItem[])])
+     setCursor(moreFeedData.nextCursor)
+     setIsLoadingMore(false)
+   }
  }, [moreFeedData, isLoadingMore])
 
  // Handle loading more posts
  const handleLoadMore = useCallback(() => {
- if (!isLoadingMore && cursor) {
- setIsLoadingMore(true)
- }
+   if (!isLoadingMore && cursor) {
+     setIsLoadingMore(true)
+   }
  }, [isLoadingMore, cursor])
 
  // Loading skeleton
  const LoadingSkeleton = () => (
- <div className="space-y-3 sm:space-y-4">
- {[...Array(3)].map((_, i) => (
- <div key={i} className="animate-pulse rounded-lg bg-surface-soft p-4 shadow-elevation-1 sm:p-6">
- <div className="flex items-center gap-2 sm:gap-3">
- <div className="h-8 w-8 rounded-full bg-canvas sm:h-10 sm:w-10" />
- <div className="flex-1 space-y-2">
- <div className="h-3 w-24 rounded bg-canvas sm:h-4 sm:w-32" />
- <div className="h-2 w-16 rounded bg-canvas sm:h-3 sm:w-24" />
- </div>
- </div>
- <div className="mt-3 space-y-2 sm:mt-4">
- <div className="h-3 w-full rounded bg-canvas sm:h-4" />
- <div className="h-3 w-3/4 rounded bg-canvas sm:h-4" />
- </div>
- </div>
- ))}
- </div>
+   <div className="space-y-3 sm:space-y-4">
+     {[...Array(3)].map((_, i) => (
+       <div key={i} className="animate-pulse rounded-lg bg-surface-soft p-4 shadow-elevation-1 sm:p-6">
+         <div className="flex items-center gap-2 sm:gap-3">
+           <div className="h-8 w-8 rounded-full bg-canvas sm:h-10 sm:w-10" />
+           <div className="flex-1 space-y-2">
+             <div className="h-3 w-24 rounded bg-canvas sm:h-4 sm:w-32" />
+             <div className="h-2 w-16 rounded bg-canvas sm:h-3 sm:w-24" />
+           </div>
+         </div>
+         <div className="mt-3 space-y-2 sm:mt-4">
+           <div className="h-3 w-full rounded bg-canvas sm:h-4" />
+           <div className="h-3 w-3/4 rounded bg-canvas sm:h-4" />
+         </div>
+       </div>
+     ))}
+   </div>
  )
 
  // Show loading state while auth is being checked
  if (!isLoaded) {
- return <LoadingSkeleton />
+   return <LoadingSkeleton />
  }
 
  // Handle not authenticated
  if (!isSignedIn) {
- return (
- <div className="rounded-lg bg-surface-soft p-8 text-center shadow-elevation-1">
- <p className="text-slate">Please sign in to view the feed.</p>
- </div>
- )
+   return (
+     <div className="rounded-lg bg-surface-soft p-8 text-center shadow-elevation-1">
+       <p className="text-slate">Please sign in to view the feed.</p>
+     </div>
+   )
  }
 
- // Initial loading state
- if (feedData === undefined) {
- return <LoadingSkeleton />
+ // Initial loading state or section/tab switching state
+ if (feedData === undefined || isTabSwitching) {
+   return <LoadingSkeleton />
  }
 
  // Empty state
