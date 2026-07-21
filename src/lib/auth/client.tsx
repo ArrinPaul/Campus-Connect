@@ -4,7 +4,7 @@ import type { ReactNode } from "react"
 import { useEffect, useState, useMemo } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { Mail, Lock, User, Loader2 } from "lucide-react"
+import { Mail, Lock, User, Loader2, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 
@@ -138,6 +138,7 @@ export function UserButton(_props: Record<string, unknown>) {
 export function SignIn(_props: Record<string, unknown>) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
@@ -204,13 +205,25 @@ export function SignIn(_props: Record<string, unknown>) {
           <div className="relative group">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-steel group-focus-within:text-primary transition-colors" />
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-              className="w-full pl-11 pr-4 h-11 rounded-lg border border-hairline bg-canvas text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
+              className="w-full pl-11 pr-11 h-11 rounded-lg border border-hairline bg-canvas text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
               required
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-steel hover:text-ink-deep transition-colors focus:outline-none"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
           </div>
         </div>
 
@@ -249,6 +262,7 @@ export function SignUp(_props: Record<string, unknown>) {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -326,13 +340,25 @@ export function SignUp(_props: Record<string, unknown>) {
           <div className="relative group">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-steel group-focus-within:text-primary transition-colors" />
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password (min 8 chars)"
-              className="w-full pl-11 pr-4 h-11 rounded-lg border border-hairline bg-canvas text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
+              className="w-full pl-11 pr-11 h-11 rounded-lg border border-hairline bg-canvas text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
               required
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-steel hover:text-ink-deep transition-colors focus:outline-none"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
           </div>
         </div>
 
