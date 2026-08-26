@@ -1,203 +1,87 @@
-# Campus Connect — Plan
+# Campus Connect — Technical Architecture & Execution Plan
 
-## What Is This?
+## 1. Vision & Architecture
 
-A social media app for college students. Think WhatsApp + Facebook + Discord + LinkedIn combined.
+A unified academic and social platform for college communities merging:
+- **WhatsApp**: Direct messaging, group chats, live typing indicators, and presence status.
+- **Facebook**: Ranked feed, rich post authoring, threaded comments, emoji reactions, communities, events, marketplace.
+- **Discord**: Topic channels, community member roles, and real-time broadcasts.
+- **LinkedIn**: Academic profiles, skill endorsements, career job board, preprints/papers, and study resources.
 
-- **WhatsApp part**: Direct messages, group chats, typing indicators, online status
-- **Facebook part**: Feed, posts, comments, reactions, communities, events, marketplace
-- **Discord part**: Community channels, roles, real-time presence
-- **LinkedIn part**: Professional profiles, skills, job board, research papers, endorsements
+```
+Frontend:   Next.js 14.2.25 (App Router) + React 18.3.1 + TypeScript 5
+Styling:    Tailwind CSS 3.4.1 (Meta/Facebook Design System per meta/DESIGN.md)
+Components: Radix UI (21 primitives) + TipTap Rich Text (KaTeX LaTeX + Code blocks)
+State:      TanStack React Query 5.90.21 (@/lib/api.ts) + Zustand 5.0.11
+Data Layer: 13 Server Database Modules (src/server/db/*) using Supabase Server Client
+Database:   Supabase PostgreSQL (37 tables, 27 indexes, 119 RLS policies)
+Auth:       Supabase SSR Auth (@supabase/ssr) with Cookie Session Refresh Middleware
+Realtime:   Supabase Realtime (Postgres Changes, Presence, Broadcast)
+Testing:    Jest (426 tests, 425 passing), Testing Library, fast-check property testing
+Monitoring: Sentry 10.56.0 + PostHog 1.352.0
+```
 
 ---
 
-## Tech Stack
+## 2. Current Implementation State (August 2026 Audit)
 
-```
-Frontend:  Next.js 14 + React 18 + TypeScript + Tailwind CSS
-Design:    DESIGN.md (Meta/Facebook design system) — THE source of truth
-UI:        Radix UI (21 components) + TipTap editor
-State:     TanStack React Query + Zustand
-Backend:   Next.js API routes (100+ endpoints)
-Database:  Supabase (PostgreSQL)
-Auth:      Supabase Auth (email + social logins)
-Storage:   Supabase Storage (images, videos, files)
-Realtime:  Supabase Realtime (live chat, typing indicators)
-Monitoring: Sentry (errors) + PostHog (analytics)
-```
-
-### Design System
-
-**DESIGN.md is the single source of truth for all frontend design.** It defines:
-- Colors (cobalt primary #0064e0, ink-button black, semantic colors)
-- Typography (Optimistic VF with fallbacks to Montserrat/Helvetica)
-- Spacing (4px base unit, 12 tokens from xxs to hero)
-- Border radius (xs to full/circle — pill buttons are a brand signature)
-- Components (buttons, cards, inputs, badges, navigation patterns)
-- Responsive breakpoints and collapsing strategy
-- Do's and Don'ts for every component
-
-The `tailwind.config.ts` mirrors these tokens exactly. If you need a new token, add it to DESIGN.md first, then mirror it in tailwind.config.ts.
-
-**Deleted (old stack):** Neo4j, Express.js server, custom auth, Upstash Redis
+| Layer | Status | Key Evidence |
+| :--- | :---: | :--- |
+| **Authentication** | **100% Complete** | Sign-in, Sign-up, Sign-out, 3-step onboarding wizard, session cookies, soft-delete checks, admin RBAC. |
+| **Database Layer** | **95% Complete** | 13 server modules in `src/server/db/` complete with atomic RPC increments and Redis cache. 3 schema fixes needed. |
+| **API Endpoints** | **82% Complete** | 113 fully functional route handlers, 54 501 scaffold stubs, 4 cron/push placeholders. |
+| **Frontend UI** | **90% Complete** | 26 dashboard views, full responsive design, dark/light themes, skeletons, error boundaries. |
+| **Realtime Engine** | **85% Complete** | Live chat, typing indicators, live feed invalidation, and notification broadcasts working. |
+| **WebRTC Calls** | **Blocked** | UI components and signaling hooks complete; execution blocked by missing `calls` table in SQL migration. |
+| **Gamification** | **0% Built** | Documented as historical goal; DB table `user_reputation` exists, UI/API unbuilt. |
+| **Testing** | **80% Complete** | 425 of 426 tests passing, 0 TypeScript compilation errors. Playwright E2E tests pending. |
 
 ---
 
-## Current State
+## 3. Phased Execution Roadmap
 
-The app has **lots of UI built** but the **backend is disconnected**. Here's the situation:
+### Phase 0: Cleanup & Architecture Migration ✅ COMPLETED
+- Deleted legacy Express (`apps/api`) and Neo4j database layers.
+- Consolidated on Next.js 14 App Router and Supabase PostgreSQL.
+- Aligned Tailwind tokens with `meta/DESIGN.md`.
 
-### What WORKS (UI is built, just needs backend connection)
-- Feed with posts, comments, reactions, reposts, polls, bookmarks
-- Rich text editor with markdown, mentions, code blocks
-- Direct messages and group conversations
-- Communities (create, join, invite, member management)
-- Events (create, attend, in-person/virtual/hybrid)
-- Jobs board (post, apply)
-- Marketplace (buy/sell listings)
-- Q&A section
-- Research papers and study resources
-- Stories (text + image)
-- User profiles with skills, bio, university
-- Follow/unfollow system
-- Notifications
-- Settings (profile, account, privacy, notifications)
-- Leaderboard and gamification
-- Theme system (dark/light)
-- Accessibility (skip links, live regions)
+### Phase 1: Foundation & Data Layer ✅ COMPLETED
+- Configured Supabase PostgreSQL schema with 37 tables, 27 indexes, and 119 RLS policies.
+- Implemented `@supabase/ssr` authentication and edge middleware.
+- Built 13 server-only database access modules (`src/server/db/`).
+- Connected 113 core API route handlers.
 
-### What's BROKEN (imports reference deleted files)
-- **All 100+ API routes** — they import from `@/server/db/*` and `@/lib/auth/server` which were deleted
-- **Middleware** — imports deleted rate limiter
-- **Database layer** — deleted (was Neo4j, replacing with Supabase PostgreSQL)
+### Phase 2: Core Academic & Social Features ✅ COMPLETED
+- **Feed**: In-memory ranking algorithm combining affinity, log10 engagement, and time decay.
+- **Posts**: LaTeX equation rendering, code syntax highlighting, poll voting, link previews, reposts, bookmarks.
+- **Communities**: Category browse, custom slugs, member role governance, and invite workflows.
+- **Academic Hub**: Q&A voting/answers, Research paper repository, Course study resources.
+- **Commerce & Careers**: Campus marketplace with mark-as-sold flow; Job board with application tracking.
 
-### What's MISSING (never built)
-- Real-time messaging (currently polling-based)
-- Video stories
-- Job search/filters
-- Community settings/moderation
-- Admin dashboard (placeholder only)
-- Media upload (returns null)
-- Video/voice calls (UI stub only)
-- Find Experts page (placeholder)
-- Find Partners page (placeholder)
+### Phase 3: Real-Time Engine & Presence ✅ COMPLETED
+- Supabase Realtime integration for instant direct and group messaging (`postgres_changes`).
+- Live typing indicator synchronization via Supabase Presence API.
+- Live feed update notifications and in-app notification toasts (`useRealtimeNotifications`).
+- 60-second client presence heartbeat (`useHeartbeat`).
 
----
+### Phase 4: Integrations, Calls & Schema Patches 🔄 IN PROGRESS (CURRENT)
+- [ ] **P0**: Add `calls` table to `supabase/migrations/20240101000000_init.sql`.
+- [ ] **P0**: Add `is_resolved` column to `questions` table in schema.
+- [ ] **P0**: Fix `jobs.employment_type` column reference in `src/server/db/events-jobs.ts` to `type`.
+- [ ] **P0**: Update `main-layout.test.tsx` padding class expectation (`md:px-8`) for 100% test pass rate.
+- [ ] **P1**: Complete WebRTC video/audio peer negotiation testing via `useWebRTC` hook.
+- [ ] **P1**: Replace hardcoded database password in `setup-realtime.js` with environment variable.
 
-## The Plan
+### Phase 5: Secondary CRUD & Stubs Resolution ⬜ NEXT
+- Implement high-value 501 scaffolded route handlers:
+  - Event deletion and modification (`/api/events/delete`, `/api/events/update`).
+  - Job posting management and applicant reviews (`/api/jobs/update`, `/api/jobs/delete`, `/api/jobs/job-applications`).
+  - Q&A search, question deletion, and voting (`/api/questions/vote`, `/api/questions/search`).
+  - Research paper reviews and ratings (`/api/research/review`, `/api/research/vote`).
+- Wire `TrendingHashtags` and `SuggestedUsers` sidebar widgets to live APIs.
 
-### Phase 0: Cleanup ✅ DONE
-Deleted all unrequired files. Created this plan.
-
-### Phase 1: Foundation (NEXT — biggest phase)
-**Goal: Get the app running with Supabase**
-
-1. Create Supabase project + database tables
-2. Replace auth with Supabase Auth
-3. Rewrite database layer with Supabase queries
-4. Rewrite all 100+ API routes
-5. Integrate media upload (Supabase Storage)
-6. Fix TypeScript strictness
-7. Type the API client properly
-
-### Phase 2: Core Features
-**Goal: Make the app feel complete**
-
-1. Rebuild navigation (user avatar, notification badge, mobile nav)
-2. Rebuild landing page (real content, not placeholder boxes)
-3. Complete stories (video support, navigation)
-4. Complete jobs (search, filters)
-5. Enhance profiles (portfolio, activity)
-
-### Phase 3: Real-time
-**Goal: Make it feel alive**
-
-1. Live messaging (Supabase Realtime)
-2. Live feed updates
-3. Push notifications
-4. Video/voice calls
-
-### Phase 4: Monetization
-**Goal: Business features**
-
-1. Admin dashboard
-2. Ads system
-3. Premium subscriptions (Stripe)
-
-### Phase 5: Launch
-**Goal: Production-ready**
-
-1. Tests
-2. Performance
-3. SEO
-4. CI/CD
-
----
-
-## Database Tables (PostgreSQL)
-
-```
-users           — profiles, skills, university, role
-follows         — who follows whom
-posts           — content, media, community/poll refs
-comments        — nested replies
-reactions       — like/love/laugh/wow/sad/scholarly
-conversations   — DM or group
-messages        — chat messages
-community_members — roles (admin/moderator/member)
-communities     — name, slug, category
-events          — title, type, time, location
-jobs            — company, salary, skills, deadline
-stories         — text/image, 24hr expiry
-notifications   — type, read status
-bookmarks       — saved posts with collections
-hashtags        — trending tags
-polls           — question, options, votes
-questions       — Q&A with tags
-resources       — study materials
-research_papers — academic papers
-marketplace_listings — buy/sell items
-reposts         — shared posts
-user_reputation — gamification points/badges
-```
-
-All tables have Row Level Security (RLS) — users can only access what they're allowed to.
-
----
-
-## File Structure
-
-```
-campus-connect/
-  DESIGN.md              ← Design system (source of truth)
-  README.md              ← Project overview
-  tailwind.config.ts     ← Mirrors DESIGN.md tokens
-  supabase/
-    migration.sql        ← Database schema (36 tables, RLS, triggers)
-  docs/
-    PLAN.md              ← This file
-    FEATURES.md          ← All 240 features
-    TASKS.md             ← Task breakdown
-    TRACKER.md           ← Progress tracking
-  src/
-    app/
-      api/               → All API routes (will be rewritten)
-      (auth)/            → Sign in, sign up pages
-      (onboarding)/      → Multi-step profile setup
-      (dashboard)/       → All feature pages (21 pages)
-    components/
-      ui/                → 21 Radix components (KEEP)
-      posts/             → PostCard, PostComposer, etc. (KEEP)
-      feed/              → FeedContainer, VirtualizedFeed (KEEP)
-      messages/          → ChatArea, ConversationList (KEEP)
-      communities/       → CommunityCard, etc. (KEEP)
-      profile/           → ProfileHeader, SkillsManager (KEEP)
-      navigation/        → GlobalNav, MobileNav (REBUILD)
-      ...etc
-    lib/
-      supabase/          → NEW: Supabase client setup
-      api.ts             → API client (REWRITE types)
-      auth/              → Auth hooks (REWRITE for Supabase)
-      validations.ts     → Zod schemas (KEEP)
-      utils.ts           → Helpers (KEEP)
-```
+### Phase 6: Production Hardening & Launch ⬜ PENDING
+- Build Playwright E2E automated test suite for critical user journeys (Registration, Feed, Chat, Purchase).
+- Connect Web Push notification persistence for background device notifications.
+- Execute Lighthouse performance audits, database query plan optimization, and staging verification.
+- Production deployment on Vercel with custom domain and SSL.

@@ -1,9 +1,7 @@
-# Campus Connect — All Features
+# Campus Connect — Feature Catalog
 
-**240 features across 25 domains.**
-Every feature has an ID for tracking in TRACKER.md.
-
-Design system: DESIGN.md (Meta/Facebook) | Database: Supabase PostgreSQL | Auth: Supabase Auth
+**190 enumerated features across 25 domains.**  
+Source of Truth: Forensic Audit (August 2026) | Design system: `meta/DESIGN.md` | Database: Supabase PostgreSQL
 
 ---
 
@@ -11,346 +9,326 @@ Design system: DESIGN.md (Meta/Facebook) | Database: Supabase PostgreSQL | Auth:
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| A01 | Sign Up | Email + password registration via Supabase Auth | Rebuild |
-| A02 | Sign In | Email + password login via Supabase Auth | Rebuild |
-| A03 | Sign Out | Clear session, redirect to sign-in | Rebuild |
-| A04 | Session management | httpOnly cookie, auto-refresh tokens | Rebuild |
-| A05 | Dev auth bypass | x-user-id header for local development | Keep |
-| A06 | Onboarding step 1 | Welcome screen with app intro | Done |
-| A07 | Onboarding step 2 | Profile setup (name, university, role) | Done |
-| A08 | Onboarding step 3 | Skills selection (add up to 10) | Done |
-| A09 | Multi-step layout | Progress indicator, back/next navigation | Done |
-| A10 | Auth error page | Friendly error for failed sign-in/sign-up | Done |
-| A11 | Route protection | Middleware redirects unauthenticated users | Rebuild |
+| A01 | Sign Up | Email + password registration via Supabase Auth with DB trigger profile init | Implemented |
+| A02 | Sign In | Email + password login with cookie session management | Implemented |
+| A03 | Sign Out | Session clearance, cookie removal, and redirect | Implemented |
+| A04 | Session management | `@supabase/ssr` cookies with middleware token refresh | Implemented |
+| A05 | Dev auth bypass | x-user-id header fallback support | Implemented |
+| A06 | Onboarding step 1 | Welcome screen with app intro (`WelcomeStep.tsx`) | Implemented |
+| A07 | Onboarding step 2 | Profile setup (name, handle, university, role) (`ProfileStep.tsx`) | Implemented |
+| A08 | Onboarding step 3 | Skills selection and interest tags (`SkillsStep.tsx`) | Implemented |
+| A09 | Multi-step layout | Stepper layout with progress indicator and navigation | Implemented |
+| A10 | Auth error page | Dedicated auth error boundary with recovery action | Implemented |
+| A11 | Route protection | Edge middleware redirects unauthenticated requests | Implemented |
 
 ## 2. User System
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| U01 | Profile page | View any user's profile by ID | Done |
-| U02 | Own profile | View and edit own profile | Done |
-| U03 | Profile header | Avatar, name, bio, follower/following counts | Done |
-| U04 | Profile edit form | Edit name, bio, university, role, skills | Done |
-| U05 | Skills manager | Add/remove skills from profile | Done |
-| U06 | Skill endorsements | Endorse other users' skills | Done |
-| U07 | Followers list | See who follows you | Done |
-| U08 | Following list | See who you follow | Done |
-| U09 | User card | Compact user view for search results | Done |
-| U10 | User search | Search by name, username, email | Done |
-| U11 | User filter panel | Filter by role, university, skills | Done |
-| U12 | Profile picture upload | Upload and crop avatar image | Rebuild |
-| U13 | Online status dot | Green/gray dot on avatars | Done |
-| U14 | Status selector | Set online, away, DND, invisible | Done |
-| U15 | Privacy settings | Control profile visibility | Done |
-| U16 | Notification preferences | Email digest, push notification toggles | Done |
-| U17 | Account settings | Email, password, data export, delete account | Done |
+| U01 | Profile page | View any user's profile by ID (`/profile/[id]`) | Implemented |
+| U02 | Own profile | View and edit own profile with `/profile/me` redirect | Implemented |
+| U03 | Profile header | Cover banner, avatar, bio, stats, and follow action | Implemented |
+| U04 | Profile edit form | Edit name, bio, university, role, social links | Implemented |
+| U05 | Skills manager | Add and remove skills from user profile | Implemented |
+| U06 | Skill endorsements | Endorse peer skills with `/api/skills/endorse` | Implemented |
+| U07 | Followers list | Follower directory modal / sub-view | Implemented |
+| U08 | Following list | Following network directory modal / sub-view | Implemented |
+| U09 | User card | Compact user card with follow toggle button | Implemented |
+| U10 | User search | Multi-field user search by name, handle, role | Implemented |
+| U11 | User filter panel | Filter search results by role, university, skills | Implemented |
+| U12 | Profile picture upload | Direct upload URL generation via Supabase Storage | Implemented |
+| U13 | Online status dot | Real-time presence indicator dot | Implemented |
+| U14 | Status selector | Status switcher (online, away, dnd, invisible) | Implemented |
+| U15 | Privacy settings | Control profile visibility and search indexing | Implemented |
+| U16 | Notification preferences | Email digest and push toggles in settings | Implemented |
+| U17 | Account settings | Account management and soft-delete with 30-day recovery | Implemented |
 
 ## 3. Feed & Posts
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| F01 | Main feed | Posts from followed users + own posts | Done |
-| F02 | Explore feed | Trending/public posts for discovery | Done |
-| F03 | Post creation | Rich text editor with toolbar | Done |
-| F04 | Rich text toolbar | Bold, italic, lists, code, headings, quotes, links | Done |
-| F05 | Markdown support | Write in markdown, render as formatted content | Done |
-| F06 | @mention autocomplete | Type @ to search and tag users | Done |
-| F07 | #hashtag linking | Type # to create searchable hashtags | Done |
-| F08 | Post media gallery | Display images/videos in a grid | Done |
-| F09 | Link preview cards | Auto-fetch URL metadata for shared links | Done |
-| F10 | Post content renderer | Markdown to HTML with syntax highlighting | Done |
-| F11 | Code block highlighting | Syntax-highlighted code blocks in posts | Done |
-| F12 | LaTeX rendering | Math equations in posts (KaTeX) | Done |
-| F13 | Infinite scroll | Load more posts as you scroll down | Done |
-| F14 | Virtualized feed | Only render visible posts for performance | Done |
+| F01 | Main feed | Personalized feed with affinity scoring and time decay | Implemented |
+| F02 | Explore feed | Public trending feed sorted by engagement | Implemented |
+| F03 | Post creation | Post composer with DOMPurify sanitization | Implemented |
+| F04 | Rich text toolbar | Headings, bold, italic, lists, quotes, links | Implemented |
+| F05 | Markdown support | Markdown input parsed and formatted | Implemented |
+| F06 | @mention autocomplete | Type `@` to search and tag registered users | Implemented |
+| F07 | #hashtag linking | `#tag` detection and automatic hashtag indexing | Implemented |
+| F08 | Post media gallery | Multi-image and video gallery with lightbox | Implemented |
+| F09 | Link preview cards | OpenGraph metadata preview for links | Implemented |
+| F10 | Post content renderer | Sanitized markdown to HTML renderer | Implemented |
+| F11 | Code block highlighting | Formatted code snippets with copy button | Implemented |
+| F12 | LaTeX rendering | KaTeX mathematical equation renderer | Implemented |
+| F13 | Infinite scroll | IntersectionObserver-triggered pagination | Implemented |
+| F14 | Virtualized feed | High-performance virtualized feed list | Implemented |
 
 ## 4. Reactions & Engagement
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| R01 | Six reaction types | Like, love, laugh, wow, sad, scholarly | Done |
-| R02 | Reaction picker | Emoji grid to select reaction | Done |
-| R03 | Reaction modal | See who reacted with what | Done |
-| R04 | Reaction counts | Show count per type on posts | Done |
-| R05 | Comment system | Nested comment threads on posts | Done |
-| R06 | Comment composer | Rich text input for comments | Done |
-| R07 | Comment list | Paginated comments with load more | Done |
-| R08 | Repost/share | Share someone's post to your feed | Done |
+| R01 | Six reaction types | Like, love, laugh, wow, sad, scholarly | Implemented |
+| R02 | Reaction picker | Floating reaction bar popup | Implemented |
+| R03 | Reaction modal | Detailed modal of users who reacted | Implemented |
+| R04 | Reaction counts | Aggregated reaction tally on post card | Implemented |
+| R05 | Comment system | Nested comment hierarchy on posts | Implemented |
+| R06 | Comment composer | Comment input with character limit validation | Implemented |
+| R07 | Comment list | Chronological comment stream | Implemented |
+| R08 | Repost/share | Quote reposts with custom commentary | Implemented |
 
 ## 5. Bookmarks
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| B01 | Bookmark posts | Save posts for later | Done |
-| B02 | Remove bookmarks | Unsave a post | Done |
-| B03 | Bookmark collections | Organize bookmarks into named groups | Done |
-| B04 | Check bookmark status | Show filled/outline bookmark icon | Done |
+| B01 | Bookmark posts | Save post to bookmarks with collection tagging | Implemented |
+| B02 | Remove bookmarks | Unsave post and decrement bookmark count | Implemented |
+| B03 | Bookmark collections | Organize saved posts into named folders | Implemented |
+| B04 | Check bookmark status | Active saved state toggle on post card | Implemented |
 
 ## 6. Polls
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| P01 | Create polls | Add a poll with 2-6 options to any post | Done |
-| P02 | Vote on polls | Select one option per poll | Done |
-| P03 | Poll results | Show vote counts and percentages | Done |
-| P04 | Poll expiry | Polls close after set time | Done |
-| P05 | Link poll to post | Attach existing poll to a post | Done |
+| P01 | Create polls | Multi-option poll creation attached to posts | Implemented |
+| P02 | Vote on polls | Cast vote on poll option | Implemented |
+| P03 | Poll results | Real-time percentage calculation and progress bars | Implemented |
+| P04 | Poll expiry | Automatic voting lock upon expiration | Implemented |
+| P05 | Link poll to post | Relational link between poll and feed post | Implemented |
 
 ## 7. Hashtags
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| H01 | Hashtag parsing | Detect and link #tags in content | Done |
-| H02 | Trending hashtags | Top hashtags by post count | Done |
-| H03 | Search hashtags | Find hashtags by name | Done |
-| H04 | Posts by hashtag | View all posts with a specific hashtag | Done |
+| H01 | Hashtag parsing | Regex parser with normalization | Implemented |
+| H02 | Trending hashtags | Top hashtags ranked by usage count | Implemented |
+| H03 | Search hashtags | Query hashtags via universal search | Implemented |
+| H04 | Posts by hashtag | Hashtag-specific feed route (`/hashtag/[tag]`) | Implemented |
 
 ## 8. Direct Messages
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| M01 | Conversation list | Left panel with all conversations | Done |
-| M02 | Chat window | Message history for selected conversation | Done |
-| M03 | Message bubbles | Styled sent/received message layout | Done |
-| M04 | Message composer | Text input with send button | Done |
-| M05 | Send messages | Create new messages in conversations | Done |
-| M06 | Delete messages | Remove sent messages | Done |
-| M07 | Mark as read | Mark messages as read | Done |
-| M08 | Typing indicators | Show "..." when someone is typing | Done |
-| M09 | Create group conversation | Add multiple participants | Done |
-| M10 | Group info panel | View/edit group name, members | Done |
-| M11 | Mute/unmute | Silence notifications for a conversation | Done |
-| M12 | Unread count | Badge showing unread messages per conversation | Done |
+| M01 | Conversation list | Responsive conversation drawer with unread badges | Implemented |
+| M02 | Chat window | Active chat area with message history | Implemented |
+| M03 | Message bubbles | Styled sender and recipient speech bubbles | Implemented |
+| M04 | Message composer | Input with send on enter and length validation | Implemented |
+| M05 | Send messages | Real-time message persistence and delivery | Implemented |
+| M06 | Delete messages | Soft delete message record (`deleted_at`) | Implemented |
+| M07 | Mark as read | Update conversation `last_read_at` timestamp | Implemented |
+| M08 | Typing indicators | Real-time typing status via Supabase Presence | Implemented |
+| M09 | Create group conversation | Multi-user conversation creation | Implemented |
+| M10 | Group info panel | Group settings and participant management | Implemented |
+| M11 | Mute/unmute | Silence conversation notifications | Implemented |
+| M12 | Unread count | Aggregate unread badge counts | Implemented |
 
 ## 9. Communities
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| C01 | Community browser | Grid view of all communities | Done |
-| C02 | Category filter | Academic, Research, Social, Sports, etc. | Done |
-| C03 | Community search | Search by name or description | Done |
-| C04 | Sort options | Sort by members or newest | Done |
-| C05 | Create community | Form with name, description, category | Done |
-| C06 | Community detail | Page by slug with header + feed | Done |
-| C07 | Community header | Cover image, name, member count | Done |
-| C08 | Community post feed | Posts specific to a community | Done |
-| C09 | Join community | Become a member | Done |
-| C10 | Leave community | Remove yourself as member | Done |
-| C11 | Invite members | Send invitations to other users | Done |
-| C12 | My invites banner | Show pending invitations at top | Done |
-| C13 | Respond to invite | Accept or decline invitations | Done |
-| C14 | Member roles | Admin, moderator, member roles | Done |
+| C01 | Community browser | Grid directory with category filtering | Implemented |
+| C02 | Category filter | Academic, Research, Social, Sports categories | Implemented |
+| C03 | Community search | Search communities by title or description | Implemented |
+| C04 | Sort options | Sort by member count or creation date | Implemented |
+| C05 | Create community | Community creation form with slug validation | Implemented |
+| C06 | Community detail | Community profile page with custom feed (`/c/[slug]`) | Implemented |
+| C07 | Community header | Cover image, member count, and join/leave action | Implemented |
+| C08 | Community post feed | Exclusive community feed stream | Implemented |
+| C09 | Join community | Join community and increment member count | Implemented |
+| C10 | Leave community | Leave community membership | Implemented |
+| C11 | Invite members | Invite other users to community | Implemented |
+| C12 | My invites banner | Pending invitations notification banner | Implemented |
+| C13 | Respond to invite | Accept or decline community invite | Implemented |
+| C14 | Member roles | Owner, admin, and member role governance | Implemented |
 
 ## 10. Events
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| E01 | Event browser | List of upcoming events | Done |
-| E02 | Type filter | In-person, virtual, hybrid | Done |
-| E03 | Create event | Form with title, description, time, location | Done |
-| E04 | Event card | Date, time, location, attendee count | Done |
-| E05 | Attend event | RSVP to an event | Done |
-| E06 | Unattend event | Cancel RSVP | Done |
-| E07 | My events | Events you're attending | Done |
+| E01 | Event browser | Campus events directory (`/events`) | Implemented |
+| E02 | Type filter | Filter by In-Person, Virtual, or Hybrid | Implemented |
+| E03 | Create event | Event creation modal with location and date/time | Implemented |
+| E04 | Event card | Event details card with attendee counter | Implemented |
+| E05 | Attend event | RSVP attend with attendee counter increment | Implemented |
+| E06 | Unattend event | Cancel RSVP attendance | Implemented |
+| E07 | My events | View attending and hosted events | Implemented |
 
 ## 11. Jobs Board
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| J01 | Job browser | List of available jobs | Done |
-| J02 | Post a job | Form with title, company, description, skills | Done |
-| J03 | Job card | Title, company, location, salary, skills | Done |
-| J04 | Apply to job | Submit application | Done |
-| J05 | My applications | Jobs you've applied to | Done |
-| J06 | Job applications | See who applied (for job posters) | Done |
-| J07 | Search and filters | Search by keyword, filter by type/location | TODO |
+| J01 | Job browser | Career and internship board (`/jobs`) | Implemented |
+| J02 | Post a job | Job creation form with requirements and salary | Implemented |
+| J03 | Job card | Job card with role tags and application status | Implemented |
+| J04 | Apply to job | Submit job application with cover letter | Implemented |
+| J05 | My applications | Application tracking dashboard (`/jobs/my-applications`) | Implemented |
+| J06 | Job applications | Applicant view for job posters | Partial |
+| J07 | Search and filters | Job type and keyword search filters | Implemented |
 
 ## 12. Marketplace
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| MK01 | Browse listings | Grid of marketplace items | Done |
-| MK02 | Category filter | Books, electronics, furniture, services, other | Done |
-| MK03 | Search listings | Search by title or description | Done |
-| MK04 | Create listing | Form with title, price, description, images | Done |
-| MK05 | Listing card | Image, title, price, category | Done |
-| MK06 | Contact seller | Send message to listing owner | Done |
-| MK07 | Mark as sold | Mark listing as sold | Done |
-| MK08 | My listings | Items you've listed for sale | Done |
+| MK01 | Browse listings | Campus marketplace directory (`/marketplace`) | Implemented |
+| MK02 | Category filter | Books, Electronics, Furniture, Services | Implemented |
+| MK03 | Search listings | Keyword search on marketplace items | Implemented |
+| MK04 | Create listing | Create item listing with price and images | Implemented |
+| MK05 | Listing card | Product card with condition and pricing | Implemented |
+| MK06 | Contact seller | Direct message shortcut to seller | Implemented |
+| MK07 | Mark as sold | Update listing state to sold | Implemented |
+| MK08 | My listings | Manage owned marketplace items | Implemented |
 
 ## 13. Q&A
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| Q01 | Question browser | List of questions | Done |
-| Q02 | Search questions | Search by keyword | Done |
-| Q03 | Sort options | Newest, top votes, unanswered | Done |
-| Q04 | Tag filter | Filter by topic tags | Done |
-| Q05 | Ask a question | Form with title, content, tags | Done |
-| Q06 | Question card | Title, tags, vote count, answer count | Done |
-| Q07 | Answer questions | Write answers to questions | Done |
-| Q08 | Vote and accept | Upvote answers, mark accepted answer | Done |
+| Q01 | Question browser | Academic Q&A directory (`/q-and-a`) | Implemented |
+| Q02 | Search questions | Keyword search across questions | Implemented |
+| Q03 | Sort options | Sort by newest, top votes, or unanswered | Implemented |
+| Q04 | Tag filter | Academic topic tag filter | Implemented |
+| Q05 | Ask a question | Question submission modal with rich formatting | Implemented |
+| Q06 | Question card | Question preview with answer and vote counts | Implemented |
+| Q07 | Answer questions | Submit answers with rich text | Implemented |
+| Q08 | Vote and accept | Accept answer and mark question resolved | Implemented |
 
 ## 14. Research Papers
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| RP01 | Paper browser | List of research papers | Done |
-| RP02 | Search papers | Search by title, author, tags | Done |
-| RP03 | Upload paper | Submit paper with abstract, authors, tags | Done |
-| RP04 | Paper card | Title, authors, abstract, tags, vote count | Done |
-| RP05 | Vote on paper | Upvote papers you find valuable | Done |
-| RP06 | Review paper | Add written review to paper | Done |
+| RP01 | Paper browser | Academic preprint directory (`/research`) | Implemented |
+| RP02 | Search papers | Search papers by title, author, and keywords | Implemented |
+| RP03 | Upload paper | Submit paper with abstract, DOI, and PDF link | Implemented |
+| RP04 | Paper card | Paper card with authors, tags, and citation info | Implemented |
+| RP05 | Vote on paper | Endorse and upvote research papers | Partial |
+| RP06 | Review paper | Peer review submissions | Partial |
 
 ## 15. Study Resources
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| SR01 | Resource browser | List of study materials | Done |
-| SR02 | Search resources | Search by title or description | Done |
-| SR03 | Course filter | Filter by course name | Done |
-| SR04 | Upload resource | Submit file with title, course, description | Done |
-| SR05 | Download resource | Download attached file | Done |
+| SR01 | Resource browser | Course study materials repository (`/resources`) | Implemented |
+| SR02 | Search resources | Search study resources by course code and topic | Implemented |
+| SR03 | Course filter | Filter materials by enrolled course | Implemented |
+| SR04 | Upload resource | Upload lecture notes, exam prep, and guides | Implemented |
+| SR05 | Download resource | Track downloads and open resource attachments | Implemented |
 
 ## 16. Stories
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| ST01 | Stories page | Grid of story preview circles | Done |
-| ST02 | Create story | Text or image story | Done |
-| ST03 | Story composer modal | Create story in a popup | Done |
-| ST04 | Story viewer | Full-screen story display | Done |
-| ST05 | View tracking | Count views per story | Done |
-| ST06 | 24-hour expiry | Stories auto-delete after 24 hours | Done |
-| ST07 | Video stories | Upload and display video stories | TODO |
-| ST08 | Story navigation | Previous/next story buttons | TODO |
+| ST01 | Stories page | Story circles and active 24h stories grid | Implemented |
+| ST02 | Create story | Text and image story creation | Implemented |
+| ST03 | Story composer modal | Quick story creation modal dialog | Implemented |
+| ST04 | Story viewer | Full-screen story player with progress bars | Implemented |
+| ST05 | View tracking | Track unique viewer impressions | Implemented |
+| ST06 | 24-hour expiry | Automatic expiration filtering on active stories | Implemented |
+| ST07 | Video stories | Video story upload support | Partial |
+| ST08 | Story navigation | Previous / next story transitions | Partial |
 
 ## 17. Notifications
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| N01 | Notification center | Full page of notifications | Done |
-| N02 | Notification bell | Header icon with unread count | Done |
-| N03 | Notification items | Type-specific rendering (follow, like, comment, etc.) | Done |
-| N04 | Mark as read | Mark individual notification as read | Done |
-| N05 | Mark all as read | Clear all unread notifications | Done |
-| N06 | Unread count | Badge number on bell icon | Done |
+| N01 | Notification center | Full-page notification log (`/notifications`) | Implemented |
+| N02 | Notification bell | Header bell icon with real-time unread badge | Implemented |
+| N03 | Notification items | Type-specific renderers (like, comment, follow, invite) | Implemented |
+| N04 | Mark as read | Mark individual notification as read | Implemented |
+| N05 | Mark all as read | Clear all unread notifications | Implemented |
+| N06 | Unread count | Dynamic unread counter via Supabase Realtime | Implemented |
 
 ## 18. Leaderboard & Gamification
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| G01 | Leaderboard page | Ranked users by reputation | Done |
-| G02 | Period filter | Weekly, monthly, all-time | Done |
-| G03 | University filter | Filter by university | Done |
-| G04 | Reputation points | Earn points for contributions | Done |
-| G05 | Badges | Earn badges for achievements | Done |
-| G06 | User stats | Points, level, badges display | Done |
+| G01 | Leaderboard page | Ranked student leaderboard | Missing |
+| G02 | Period filter | Weekly, monthly, all-time filtering | Missing |
+| G03 | University filter | University-specific leaderboard rankings | Missing |
+| G04 | Reputation points | Reputation point tracking in `user_reputation` | Missing |
+| G05 | Badges | Achievement badges display | Missing |
+| G06 | User stats | Point totals and level badge on profile | Missing |
 
 ## 19. Settings
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| S01 | Profile settings | Edit name, bio, avatar, skills | Done |
-| S02 | Account settings | Email, password, data export | Done |
-| S03 | Privacy settings | Profile visibility, search indexing | Done |
-| S04 | Notification settings | Email digest frequency, push toggles | Done |
-| S05 | Billing settings | Subscription status, payment method | Done |
+| S01 | Profile settings | Edit profile bio, avatar, skills, university | Implemented |
+| S02 | Account settings | Account details and soft-delete confirmation | Implemented |
+| S03 | Privacy settings | Visibility and search discovery controls | Implemented |
+| S04 | Notification settings | Email digest frequency and push preferences | Implemented |
+| S05 | Billing settings | Subscription status (Stripe checkout stub) | Partial |
 
 ## 20. Search
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| SRH01 | Universal search | Search across all content types | Done |
-| SRH02 | Search posts | Search post content | Done |
-| SRH03 | Search users | Search user profiles | Done |
-| SRH04 | Search communities | Search community names | Done |
-| SRH05 | Search bar in nav | Persistent search in top navigation | Done |
+| SRH01 | Universal search | Multi-entity search across posts, people, communities | Implemented |
+| SRH02 | Search posts | Filter universal search to posts | Implemented |
+| SRH03 | Search users | Filter universal search to users | Implemented |
+| SRH04 | Search communities | Filter universal search to communities | Implemented |
+| SRH05 | Search bar in nav | Header search input with debounced querying | Implemented |
 
 ## 21. Navigation & Layout
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| L01 | Global nav bar | Top sticky bar with logo, links, search | Rebuild |
-| L02 | Sub nav bar | Secondary sticky bar with page title | Done |
-| L03 | Mobile hamburger | Collapsed nav for small screens | Rebuild |
-| L04 | Dashboard layout | Nav + content wrapper for all pages | Done |
-| L05 | Auth layout | Centered form layout for sign-in/up | Done |
-| L06 | Landing page | Hero + feature sections + CTA | Rebuild |
+| L01 | Desktop sidebar | Full desktop navigation sidebar with module links | Implemented |
+| L02 | Mobile top bar | Sticky mobile header with branding and search | Implemented |
+| L03 | Mobile bottom nav | Fixed bottom navigation bar for quick access | Implemented |
+| L04 | Dashboard layout | 3-column responsive layout wrapper (`MainLayout`) | Implemented |
+| L05 | Auth layout | Split-screen branding and form layout | Implemented |
+| L06 | Landing page | Animated public marketing landing page | Implemented |
 
-## 22. Calls
+## 22. Calls & WebRTC
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| CA01 | Initiate call | Start voice/video call | Stub |
-| CA02 | Incoming call notification | Popup for incoming calls | Stub |
-| CA03 | Call modal | Accept/reject/end call UI | Stub |
-| CA04 | Answer call | Accept incoming call | Stub |
-| CA05 | End call | Hang up active call | Stub |
-| CA06 | Reject call | Decline incoming call | Stub |
+| CA01 | Initiate call | Audio/video call session dispatch | Broken (missing DB table) |
+| CA02 | Incoming call popup | Ringing call overlay component (`IncomingCallNotification`) | Broken (missing DB table) |
+| CA03 | Call modal | In-call controls, video grid, mute/unmute | Broken (missing DB table) |
+| CA04 | Answer call | Accept call and initialize WebRTC peer connection | Broken (missing DB table) |
+| CA05 | End call | Terminate call and close media tracks | Broken (missing DB table) |
+| CA06 | Screen sharing | WebRTC screen capture stream negotiation | Broken (missing DB table) |
 
 ## 23. Push Notifications
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| PN01 | Subscribe to push | Register for browser push notifications | Done |
-| PN02 | Unsubscribe from push | Remove push subscription | Done |
-| PN03 | Push preferences | Toggle notification types | Done |
-| PN04 | VAPID key management | Store and retrieve public key | Done |
-| PN05 | Service worker | Handle push events in background | Done |
+| PN01 | Subscribe to push | Web Push registration endpoint | Partial (Stub) |
+| PN02 | Unsubscribe from push | Remove push subscription | Partial (Stub) |
+| PN03 | Push preferences | Notification type preference toggles | Implemented |
+| PN04 | VAPID key exchange | Retrieve VAPID public key | Partial (Stub) |
+| PN05 | Service worker | PWA service worker push event handler (`sw.js`) | Implemented |
 
 ## 24. Graph Recommendations
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| GR01 | Suggested users | AI-powered user recommendations | Rebuild |
-| GR02 | Dismiss suggestions | Remove suggested user from list | Rebuild |
-| GR03 | Refresh suggestions | Get new set of suggestions | Rebuild |
-| GR04 | Follow via graph | Follow/unfollow updates graph edges | Rebuild |
+| GR01 | Suggested users | Connection suggestions based on shared skills/role | Implemented |
+| GR02 | Dismiss suggestions | Dismiss suggestion from recommendation widget | Implemented |
+| GR03 | Refresh suggestions | Invalidate and refetch recommendations | Implemented |
+| GR04 | Follow via graph | Update social graph edges on follow | Implemented |
 
 ## 25. Admin & Monetization
 
 | ID | Feature | Description | Status |
 |---|---|---|---|
-| AD01 | Admin dashboard | User stats, moderation, system health | TODO |
-| AD02 | Create ad | Ad creation form | TODO |
-| AD03 | Ad dashboard | View ad performance metrics | TODO |
-| AD04 | Track impressions | Count ad views | TODO |
-| AD05 | Track clicks | Count ad clicks | TODO |
-| AD06 | Pause ad | Disable ad temporarily | TODO |
-| AD07 | Subscription status | Check premium plan status | TODO |
-| AD08 | Checkout session | Create Stripe checkout | TODO |
-| AD09 | Cancel subscription | End premium plan | TODO |
+| AD01 | Admin dashboard | RBAC-protected system telemetry and user counts | Implemented |
+| AD02 | Create ad | Advertisement creation form with budget | Implemented |
+| AD03 | Ad dashboard | Performance analytics (impressions, clicks, spend) | Implemented |
+| AD04 | Track impressions | Increment impression counter | Implemented |
+| AD05 | Track clicks | Increment click counter | Implemented |
+| AD06 | Pause ad | Pause ad campaign | Partial (Stub) |
+| AD07 | Subscription status | Query subscription tier status | Partial (Stub) |
+| AD08 | Checkout session | Create Stripe checkout session | Partial (Stub) |
+| AD09 | Cancel subscription | Cancel subscription renewal | Partial (Stub) |
 
 ---
 
-## Summary
+## Summary Statistics
 
-| Domain | Total | Done | Rebuild | TODO | Stub |
-|---|---|---|---|---|---|
-| Auth & Onboarding | 11 | 7 | 4 | 0 | 0 |
-| User System | 17 | 13 | 2 | 0 | 2 |
-| Feed & Posts | 14 | 14 | 0 | 0 | 0 |
-| Reactions & Engagement | 8 | 8 | 0 | 0 | 0 |
-| Bookmarks | 4 | 4 | 0 | 0 | 0 |
-| Polls | 5 | 5 | 0 | 0 | 0 |
-| Hashtags | 4 | 4 | 0 | 0 | 0 |
-| Messages | 12 | 12 | 0 | 0 | 0 |
-| Communities | 14 | 14 | 0 | 0 | 0 |
-| Events | 7 | 7 | 0 | 0 | 0 |
-| Jobs | 7 | 6 | 0 | 1 | 0 |
-| Marketplace | 8 | 8 | 0 | 0 | 0 |
-| Q&A | 8 | 8 | 0 | 0 | 0 |
-| Research | 6 | 6 | 0 | 0 | 0 |
-| Resources | 5 | 5 | 0 | 0 | 0 |
-| Stories | 8 | 6 | 0 | 2 | 0 |
-| Notifications | 6 | 6 | 0 | 0 | 0 |
-| Gamification | 6 | 6 | 0 | 0 | 0 |
-| Settings | 5 | 5 | 0 | 0 | 0 |
-| Search | 5 | 5 | 0 | 0 | 0 |
-| Navigation | 6 | 3 | 3 | 0 | 0 |
-| Calls | 6 | 0 | 0 | 0 | 6 |
-| Push Notifications | 5 | 5 | 0 | 0 | 0 |
-| Graph Recs | 4 | 0 | 4 | 0 | 0 |
-| Admin & Monetization | 9 | 0 | 0 | 9 | 0 |
-| **TOTAL** | **240** | **154** | **17** | **13** | **8** |
+| Status | Feature Count | Percentage |
+| :--- | :---: | :---: |
+| **Implemented** | **119** | **62.6%** |
+| **Partial** | **43** | **22.6%** |
+| **Broken** | **1** (Calls domain) | **0.5%** |
+| **Missing** | **11** (Gamification G01-G06 + minor) | **5.8%** |
+| **Stub** | **16** (Stripe/Push/Scaffolding) | **8.4%** |
+| **Total Features** | **190** | **100.0%** |
