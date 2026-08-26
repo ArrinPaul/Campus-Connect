@@ -92,15 +92,72 @@ export async function createListing(data: any) {
   return listing
 }
 
-export async function updateListing(listingId: string, data: any) {
+export async function getListingById(listingId: string) {
   const supabase = await getSupabase()
-  const { data: listing } = await supabase.from("marketplace_listings").update(data).eq("id", listingId).select().single()
+  const { data: listing, error } = await supabase
+    .from("marketplace_listings")
+    .select("*, seller:users!marketplace_listings_posted_by_fkey(id, name, username, profile_picture, university)")
+    .eq("id", listingId)
+    .single()
+  if (error || !listing) return null
   return listing
 }
 
-export async function deleteListing(listingId: string) {
+export async function updateListing(listingId: string, userId: string, data: any) {
   const supabase = await getSupabase()
-  await supabase.from("marketplace_listings").delete().eq("id", listingId)
+
+  // Verify listing exists
+  const { data: listing } = await supabase
+    .from("marketplace_listings")
+    .select("posted_by")
+    .eq("id", listingId)
+    .single()
+
+  if (!listing) return { error: "Listing not found", status: 404 }
+
+  // Check ownership / admin authorization
+  const { data: user } = await supabase.from("users").select("is_admin").eq("id", userId).single()
+  const isAdmin = user?.is_admin ?? false
+  if (listing.posted_by !== userId && !isAdmin) {
+    return { error: "Forbidden: Only listing owner or admin can update listing", status: 403 }
+  }
+
+  const { data: updated, error } = await supabase
+    .from("marketplace_listings")
+    .update({
+      ...data,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", listingId)
+    .select()
+    .single()
+
+  if (error) return { error: error.message, status: 500 }
+  return { data: updated }
+}
+
+export async function deleteListing(listingId: string, userId: string) {
+  const supabase = await getSupabase()
+
+  // Verify listing exists
+  const { data: listing } = await supabase
+    .from("marketplace_listings")
+    .select("posted_by")
+    .eq("id", listingId)
+    .single()
+
+  if (!listing) return { error: "Listing not found", status: 404 }
+
+  // Check ownership / admin authorization
+  const { data: user } = await supabase.from("users").select("is_admin").eq("id", userId).single()
+  const isAdmin = user?.is_admin ?? false
+  if (listing.posted_by !== userId && !isAdmin) {
+    return { error: "Forbidden: Only listing owner or admin can delete listing", status: 403 }
+  }
+
+  const { error } = await supabase.from("marketplace_listings").delete().eq("id", listingId)
+  if (error) return { error: error.message, status: 500 }
+  return { success: true }
 }
 
 // ─── Calls ──────────────────────────────────────────────────────────────────

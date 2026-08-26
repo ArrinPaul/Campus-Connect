@@ -11,11 +11,16 @@ export async function POST(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { listingId } = await req.json()
+    const body = await req.json().catch(() => ({}))
+    const listingId = body.listingId || body.id
     if (!listingId) return NextResponse.json({ error: "listingId required" }, { status: 400 })
 
-    await updateListing(listingId, { status: "sold" })
-    return NextResponse.json({ success: true })
+    const result = await updateListing(listingId, userId, { status: "sold" })
+    if ("error" in result) {
+      return NextResponse.json({ error: result.error }, { status: result.status })
+    }
+
+    return NextResponse.json({ success: true, listing: result.data })
   } catch (err) {
     return internalError(err)
   }

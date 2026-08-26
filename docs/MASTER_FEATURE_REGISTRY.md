@@ -235,8 +235,8 @@
 | RP02 | Research | Search Papers | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | Title and author search query | None | `research_papers` | P1 |
 | RP03 | Research | Upload Paper | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `UploadPaperModal.tsx`, `POST /api/research` | None | `research_papers` | P1 |
 | RP04 | Research | Paper Card | Done | IMPLEMENTED | ✓ | - | - | - | - | `ResearchPaperCard.tsx` with DOI & authors | None | None | P1 |
-| RP05 | Research | Single Paper View | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `research/[id]/page.tsx` PDF viewer link | None | `research_papers` | P1 |
-| RP06 | Research | Vote & Review | Done | PARTIAL | ✓ | - | - | - | - | Endpoints `/api/research/vote` and `/review` are 501 stubs | Implement route logic | `research_papers` | P2 |
+| RP05 | Research | Single Paper View | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `research/[id]/page.tsx`, `/api/research/single` | None | `research_papers` | P1 |
+| RP06 | Research | Vote & Review | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `/api/research/vote`, `/api/research/review`, peer review & voting UI in `research/[id]/page.tsx` | None | `research_papers` | P1 |
 
 ---
 

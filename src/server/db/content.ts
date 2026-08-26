@@ -200,3 +200,155 @@ export async function voteQuestion(questionId: string, userId: string, voteType:
   }
 }
 
+// ─── Research Paper Extended Features ───────────────────────────────────────
+
+export async function getPaperById(paperId: string) {
+  const supabase = await getSupabase()
+  const { data: paper, error } = await supabase
+    .from("research_papers")
+    .select("*, uploader:users!research_papers_uploaded_by_fkey(id, name, username, profile_picture, university, role)")
+    .eq("id", paperId)
+    .single()
+  if (error || !paper) return null
+  return paper
+}
+
+export async function updatePaper(paperId: string, userId: string, updates: Partial<{ title: string; abstract: string; tags: string[]; file_url: string; authors: string[] }>) {
+  const supabase = await getSupabase()
+  const { data: paper } = await supabase.from("research_papers").select("uploaded_by").eq("id", paperId).single()
+  if (!paper) return { error: "Paper not found", status: 404 }
+
+  const { data: user } = await supabase.from("users").select("is_admin").eq("id", userId).single()
+  const isAdmin = user?.is_admin ?? false
+  if (paper.uploaded_by !== userId && !isAdmin) {
+    return { error: "Forbidden: Only paper uploader or admin can update paper", status: 403 }
+  }
+
+  const { data: updated, error } = await supabase
+    .from("research_papers")
+    .update(updates)
+    .eq("id", paperId)
+    .select()
+    .single()
+
+  if (error) return { error: error.message, status: 500 }
+  return { data: updated }
+}
+
+export async function deletePaper(paperId: string, userId: string) {
+  const supabase = await getSupabase()
+  const { data: paper } = await supabase.from("research_papers").select("uploaded_by").eq("id", paperId).single()
+  if (!paper) return { error: "Paper not found", status: 404 }
+
+  const { data: user } = await supabase.from("users").select("is_admin").eq("id", userId).single()
+  const isAdmin = user?.is_admin ?? false
+  if (paper.uploaded_by !== userId && !isAdmin) {
+    return { error: "Forbidden: Only paper uploader or admin can delete paper", status: 403 }
+  }
+
+  const { error } = await supabase.from("research_papers").delete().eq("id", paperId)
+  if (error) return { error: error.message, status: 500 }
+  return { success: true }
+}
+
+export async function votePaper(paperId: string, userId: string, voteType: "up" | "down" = "up") {
+  const supabase = await getSupabase()
+
+  // Verify paper exists
+  const { data: paper } = await supabase.from("research_papers").select("id").eq("id", paperId).single()
+  if (!paper) return { error: "Paper not found", status: 404 }
+
+  const { data: existing } = await supabase
+    .from("reactions")
+    .select("id, type")
+    .eq("user_id", userId)
+    .eq("target_id", paperId)
+    .eq("target_type", "research")
+    .single()
+
+  let userVote: "up" | "down" | null = voteType
+  let diff = voteType === "up" ? 1 : -1
+
+  if (existing) {
+    if (existing.type === voteType) {
+      // Toggle off
+      await supabase.from("reactions").delete().eq("id", existing.id)
+      diff = voteType === "up" ? -1 : 1
+      userVote = null
+    } else {
+      // Switch vote from opposite
+      await supabase.from("reactions").update({ type: voteType }).eq("id", existing.id)
+      diff = voteType === "up" ? 2 : -2
+      userVote = voteType
+    }
+  } else {
+    // New vote
+    await supabase.from("reactions").insert({
+      user_id: userId,
+      target_id: paperId,
+      target_type: "research",
+      type: voteType,
+    })
+  }
+
+  // Atomically update paper vote_count
+  await supabase.rpc("increment_field", {
+    table_name: "research_papers",
+    field_name: "vote_count",
+    row_id: paperId,
+    increment_by: diff,
+  })
+
+  const { data: updatedPaper } = await supabase
+    .from("research_papers")
+    .select("vote_count")
+    .eq("id", paperId)
+    .single()
+
+  return {
+    voteCount: updatedPaper?.vote_count ?? 0,
+    userVote,
+  }
+}
+
+export async function submitPaperReview(paperId: string, reviewerId: string, review: {
+  rating: number
+  comments: string
+  recommendation?: "accept" | "minor_revision" | "major_revision" | "reject"
+}) {
+  const supabase = await getSupabase()
+
+  // Verify paper exists
+  const { data: paper } = await supabase
+    .from("research_papers")
+    .select("id, uploaded_by")
+    .eq("id", paperId)
+    .single()
+
+  if (!paper) return { error: "Paper not found", status: 404 }
+
+  // Authors cannot review their own paper
+  if (paper.uploaded_by === reviewerId) {
+    return { error: "Authors cannot submit peer reviews on their own papers", status: 403 }
+  }
+
+  // Increment review_count on research_papers
+  await supabase.rpc("increment_field", {
+    table_name: "research_papers",
+    field_name: "review_count",
+    row_id: paperId,
+    increment_by: 1,
+  })
+
+  return {
+    success: true,
+    paperId,
+    reviewerId,
+    rating: review.rating,
+    comments: review.comments,
+    recommendation: review.recommendation || "accept",
+    createdAt: new Date().toISOString(),
+  }
+}
+
+

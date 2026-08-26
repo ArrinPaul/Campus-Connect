@@ -1,22 +1,22 @@
-import { NextResponse } from "next/server"
 import { internalError } from "@/lib/api-error"
-import { createClient } from "@/lib/supabase/server"
+import { NextResponse } from "next/server"
+import { getListingById } from "@/server/db/misc"
 
 // GET /api/marketplace/single?id=...
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url)
-    const id = searchParams.get("id")
-    if (!id) return NextResponse.json({ error: "id required" }, { status: 400 })
+    const id = searchParams.get("id") || searchParams.get("listingId")
+    if (!id) {
+      return NextResponse.json({ error: "Listing ID required" }, { status: 400 })
+    }
 
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from("marketplace_listings")
-      .select("*, seller:users!marketplace_listings_posted_by_fkey(id, name, profile_picture)")
-      .eq("id", id)
-      .single()
-    if (error || !data) return NextResponse.json({ error: "Not found" }, { status: 404 })
-    return NextResponse.json(data)
+    const listing = await getListingById(id)
+    if (!listing) {
+      return NextResponse.json({ error: "Listing not found" }, { status: 404 })
+    }
+
+    return NextResponse.json(listing)
   } catch (err) {
     return internalError(err)
   }

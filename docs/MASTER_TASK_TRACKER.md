@@ -30,8 +30,8 @@
 | **P1-03** | Event Management | Event deletion and editing were 501 scaffold stubs. | **✅ RESOLVED** | Implemented `updateEvent` & `deleteEvent` in `events-jobs.ts` and routes `/api/events/delete`, `/api/events/update` with host auth. Verified in `phase3-integration.test.ts`. |
 | **P1-04** | Job Management | Job deletion and applicant management were 501 stubs. | **✅ RESOLVED** | Implemented `updateJob`, `deleteJob`, and `getJobApplications` in `events-jobs.ts` and routes `/api/jobs/delete`, `/api/jobs/update`, `/api/jobs/job-applications` with poster auth. Verified in `phase3-integration.test.ts`. |
 | **P1-05** | Q&A Voting | Question voting was a 501 stub (`/api/questions/vote`). | **✅ RESOLVED** | Implemented atomic `voteQuestion` in `content.ts` with toggle-off/switch logic and `/api/questions/vote`. Verified in `phase3-integration.test.ts`. |
-| **P1-06** | Realtime Calls | WebRTC video/audio peer negotiation unverified end-to-end. | Backlog (Phase 4) | Signaling implementation verified; media devices unverified in headless CLI. |
-| **P1-07** | Media Storage | PostComposer direct binary upload to Supabase storage. | Backlog (Phase 4) | In progress for Phase 4. |
+| **P1-06** | Realtime Calls | WebRTC video/audio peer negotiation & media tracks. | **✅ RESOLVED** | Verified in browser environment via `tests/webrtc-browser-media.test.ts` (6 tests). |
+| **P1-07** | Media Storage | PostComposer direct binary upload to Supabase storage. | **✅ RESOLVED** | Implemented direct binary upload via `/api/media/upload-url` in `PostComposer.tsx`, verified in `PostComposer.test.tsx`. |
 
 ---
 
@@ -42,8 +42,9 @@
 | **P2-01** | Gamification | G01-G06 features have DB table `user_reputation` but 0 UI pages or hooks. | Student engagement and reputation tracking is inactive. | `src/app/(dashboard)/leaderboard/page.tsx` (new), `src/server/db/users.ts` | Leaderboard view showing top students ranked by reputation points. | Component test |
 | **P2-02** | Push Notifications | Web Push subscription endpoint `/api/push/subscribe` is a stub. | Background browser notifications cannot be sent to offline students. | `src/app/api/push/subscribe/route.ts`, `src/hooks/usePushNotifications.ts` | Browser push subscription JSON is saved to `push_subscriptions` table. | Web Push test |
 | **P2-03** | E2E Testing | Zero Playwright / Cypress automated browser tests exist. | Critical user journeys (Signup -> Feed -> DM -> Checkout) lack regression safety. | `e2e/` (new directory), `playwright.config.ts` | Automated end-to-end tests for Auth, Feed post creation, and Direct messaging. | `npm run test:e2e` |
-| **P2-04** | Research Reviews | Research paper peer review and voting routes are 501 stubs. | Scholarly feedback on preprints is limited to reading. | `src/app/api/research/review/route.ts`, `src/app/api/research/vote/route.ts` | Students/faculty can submit structured peer reviews and votes. | API test |
-| **P2-05** | Story Navigation | Story player lacks tap-left / tap-right transitions between user stories. | Story viewing UX requires manual close. | `src/app/(dashboard)/stories/[id]/page.tsx` | Keyboard arrow and click zone navigation auto-advances to next unviewed story. | Component test |
+| **P2-04** | Research Reviews | Research paper peer review and voting routes were 501 stubs. | **✅ RESOLVED** | Implemented in `content.ts`, `/api/research/review`, `/api/research/vote`, verified in `tests/research-review-vote.test.ts`. |
+| **P2-05** | Marketplace Mutations | Marketplace update/delete mutations were 501 stubs. | **✅ RESOLVED** | Implemented in `misc.ts`, `/api/marketplace/update`, `/api/marketplace/delete`, verified in `tests/marketplace-mutations.test.ts`. |
+| **P2-06** | Story Navigation | Story player lacks tap-left / tap-right transitions between user stories. | Story viewing UX requires manual close. | `src/app/(dashboard)/stories/[id]/page.tsx` | Keyboard arrow and click zone navigation auto-advances to next unviewed story. | Component test |
 
 ---
 

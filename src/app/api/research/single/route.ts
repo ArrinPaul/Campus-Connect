@@ -1,26 +1,23 @@
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
+import { getPaperById } from "@/server/db/content"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
+// GET /api/research/single?id=...
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get("id") || searchParams.get("paperId")
+    if (!id) {
+      return NextResponse.json({ error: "Paper ID required" }, { status: 400 })
+    }
 
-export async function GET() {
-  return notImplemented()
-}
+    const paper = await getPaperById(id)
+    if (!paper) {
+      return NextResponse.json({ error: "Paper not found" }, { status: 404 })
+    }
 
-export async function POST() {
-  return notImplemented()
-}
-
-export async function PATCH() {
-  return notImplemented()
-}
-
-export async function DELETE() {
-  return notImplemented()
+    return NextResponse.json(paper)
+  } catch (err) {
+    return internalError(err)
+  }
 }

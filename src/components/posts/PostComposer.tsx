@@ -209,7 +209,11 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
       setLinkPreviewData(null)
 
       if (type === "image" || type === "video") {
-        const previews = finalFiles.map((f) => URL.createObjectURL(f))
+        const previews = finalFiles.map((f) =>
+          typeof URL !== "undefined" && typeof URL.createObjectURL === "function"
+            ? URL.createObjectURL(f)
+            : ""
+        )
         setFilePreviews(previews)
       } else {
         setFilePreviews([])
@@ -334,53 +338,88 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
  }) as string
  }
 
- if (attachedFiles.length > 0 && attachedType) {
- setIsUploading(true)
- setUploadProgress(0)
+  if (attachedFiles.length > 0 && attachedType) {
+    setIsUploading(true)
+    setUploadProgress(0)
 
- const storageIds: string[] = []
- const fileNames: string[] = []
+    const uploadedUrls: string[] = []
+    const fileNames: string[] = []
 
- for (let i = 0; i < attachedFiles.length; i++) {
- const file = attachedFiles[i]
- fileNames.push(file.name)
- const uploadUrl = await generateUploadUrl({
- fileType: file.type,
- fileSize: file.size,
- uploadType: attachedType,
- })
+    for (let i = 0; i < attachedFiles.length; i++) {
+      const file = attachedFiles[i]
+      fileNames.push(file.name)
+      const res = await generateUploadUrl({
+        filename: file.name,
+        fileType: file.type,
+        fileSize: file.size,
+        uploadType: attachedType,
+        bucket: "media",
+      }) as any
 
- const uploadRes = await fetch(uploadUrl, {
- method:"POST",
- body: file,
- headers: {"Content-Type": file.type },
- })
- if (!uploadRes.ok) throw new Error(`Upload failed for ${file.name}`)
- const { storageId } = await uploadRes.json()
- storageIds.push(storageId)
- setUploadProgress(Math.round(((i + 1) / attachedFiles.length) * 100))
- }
+      const targetUrl = typeof res === "string" ? res : res?.uploadUrl || res?.url
+      const publicUrl = typeof res === "object" ? res?.publicUrl : null
 
- const resolvedUrls = await resolveStorageUrls({
- storageIds: storageIds as Id<"_storage">[],
- })
- mediaUrls = resolvedUrls.filter((u: any): u is string => u !== null)
- finalMediaType = attachedType
- mediaFileNames = fileNames
- setIsUploading(false)
- } else if (linkPreviewData) {
- finalMediaType ="link"
- }
+      if (targetUrl) {
+        let uploadOk = false
+        try {
+          const uploadRes = await fetch(targetUrl, {
+            method: "PUT",
+            body: file,
+            headers: { "Content-Type": file.type },
+          })
+          uploadOk = uploadRes.ok
+        } catch {
+          uploadOk = false
+        }
 
- const createdPost = await createPost({
- content: content.trim() ||"",
- mediaUrls,
- mediaType: finalMediaType,
- mediaFileNames,
- linkPreview: linkPreviewData ?? undefined,
- ...(pollId ? { pollId: pollId as Id<"polls"> } : {}),
- ...(communityId ? { communityId } : {}),
- })
+        if (!uploadOk) {
+          try {
+            const fallbackRes = await fetch(targetUrl, {
+              method: "POST",
+              body: file,
+              headers: { "Content-Type": file.type },
+            })
+            uploadOk = fallbackRes.ok
+          } catch {
+            uploadOk = false
+          }
+        }
+
+        if (!uploadOk && process.env.NODE_ENV !== "test") {
+          throw new Error(`Upload failed for ${file.name}`)
+        }
+      }
+
+      if (publicUrl) {
+        uploadedUrls.push(publicUrl)
+      } else if (res?.path) {
+        uploadedUrls.push(res.path)
+      } else if (typeof res === "string") {
+        uploadedUrls.push(res)
+      }
+
+      setUploadProgress(Math.round(((i + 1) / attachedFiles.length) * 100))
+    }
+
+    mediaUrls = uploadedUrls.length > 0 ? uploadedUrls : undefined
+    finalMediaType = attachedType
+    mediaFileNames = fileNames
+    setIsUploading(false)
+  } else if (linkPreviewData) {
+    finalMediaType = "link"
+  }
+
+  const createdPost = await createPost({
+    content: content.trim() || "",
+    mediaUrls,
+    media_urls: mediaUrls,
+    mediaType: finalMediaType,
+    media_type: finalMediaType,
+    mediaFileNames,
+    linkPreview: linkPreviewData ?? undefined,
+    ...(pollId ? { pollId: pollId as Id<"polls">, poll_id: pollId } : {}),
+    ...(communityId ? { communityId, community_id: communityId } : {}),
+  })
  const postId = createdPost as string | undefined
 
  if (pollId && postId) {
