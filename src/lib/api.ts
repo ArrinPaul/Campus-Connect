@@ -197,7 +197,8 @@ export const api = {
     getFollowers: ep("/api/follows/followers"),
     getFollowing: ep("/api/follows/following"),
     isFollowing: ep("/api/follows/is-following"),
-    getSuggestedUsers: ep("/api/graph/suggestions"),
+    getSuggestedUsers: ep("/api/follows/suggestions"),
+    getSuggestions: ep("/api/follows/suggestions"),
   },
 
   // ── bookmarks ──────────────────────────────────────────────────────────────
@@ -254,6 +255,7 @@ export const api = {
     getTrending: ep("/api/hashtags/trending"),
     getByTag: ep("/api/hashtags/single"),
     searchHashtags: ep("/api/hashtags/search"),
+    search: ep("/api/hashtags/search"),
     getPostsByHashtag: ep("/api/hashtags/posts"),
   },
 

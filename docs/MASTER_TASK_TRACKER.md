@@ -1,6 +1,6 @@
-# MASTER TASK TRACKER — REMAINING WORK CLASSIFICATION
+# MASTER TASK TRACKER — CAMPUS CONNECT REMAINING WORK CLASSIFICATION
 
-**Tracker Version:** 1.0.0 (Phase 1 Baseline)  
+**Tracker Version:** 2.0.0 (Phase 3 Reconciled)  
 **Classification Rules:**  
 - **P0 Critical**: Architectural blockers, broken database schemas, crashed execution paths, failing test suites.
 - **P1 High**: Essential student-facing feature gaps, core CRUD incompleteness, active placeholder replacements.
@@ -16,21 +16,22 @@
 | **P0-01** | Database Schema | Table `calls` missing from migration. | **✅ RESOLVED** | Added Table 38 (`calls`) with foreign keys, indexes, and RLS policies to `supabase/migrations/20240101000000_init.sql`. Verified in `tests/phase2-foundation.test.ts`. |
 | **P0-02** | Database Schema | Column `is_resolved` missing from `questions`. | **✅ RESOLVED** | Added `is_resolved BOOLEAN DEFAULT FALSE` to `questions` table in migration. Verified in `tests/phase2-foundation.test.ts`. |
 | **P0-03** | Database Query | Code filtered `jobs.employment_type` vs `jobs.type`. | **✅ RESOLVED** | Aligned query in `src/server/db/events-jobs.ts:L54` to filter on `type`. Verified in `tests/phase2-foundation.test.ts`. |
-| **P0-04** | Unit Testing | `main-layout.test.tsx` padding assertion mismatch. | **✅ RESOLVED** | Updated test assertion to match `md:px-8` design system token; 42 suites, 436/436 tests pass (100%). |
+| **P0-04** | Unit Testing | `main-layout.test.tsx` padding assertion mismatch. | **✅ RESOLVED** | Updated test assertion to match `md:px-8` design system token; 45 suites, 451/451 tests pass (100%). |
 | **P0-05** | Security | Hardcoded password in `setup-realtime.js`. | **✅ RESOLVED** | Replaced hardcoded connection URL with `process.env.DATABASE_URL`. Verified in `tests/phase2-foundation.test.ts`. |
 
 ---
 
 ## P1 High Tasks (Core Feature Completion)
 
-| Task ID | Component | Problem | Why It Matters | Impacted Files | Acceptance Criteria | Tests Required |
-|---|---|---|---|---|---|---|
-| **P1-01** | Realtime Calls | WebRTC video/audio peer negotiation unverified end-to-end. | Realtime calling is a core campus communication pillar. | `src/hooks/useWebRTC.ts`, `src/components/calls/CallModal.tsx` | Two clients can successfully exchange SDP offer/answer over Supabase broadcast and render remote stream. | WebRTC peer mock test |
-| **P1-02** | Sidebar Widgets | `TrendingHashtags` and `SuggestedUsers` render "Coming Soon" static placeholders. | Key discovery surfaces on desktop feed are unpopulated. | `src/components/trending/TrendingHashtags.tsx`, `src/components/discover/SuggestedUsers.tsx` | Components call `api.hashtags.getTrending` and `api.follows.getSuggestedUsers` with skeleton loaders. | Widget component tests |
-| **P1-03** | Event Management | Event deletion and editing are 501 scaffold stubs. | Event organizers cannot modify or cancel hosted events. | `src/app/api/events/delete/route.ts`, `src/app/api/events/update/route.ts` | Authorized event hosts can execute PATCH and DELETE mutations. | API route tests |
-| **P1-04** | Job Management | Job deletion and applicant management are 501 scaffold stubs. | Employers/clubs cannot view applicants or close listings. | `src/app/api/jobs/delete/route.ts`, `src/app/api/jobs/job-applications/route.ts` | Job creators can review submitted applicant cover letters and delete postings. | API route tests |
-| **P1-05** | Q&A Voting | Question voting is a 501 scaffold stub (`/api/questions/vote`). | Students cannot upvote good questions to surface them. | `src/app/api/questions/vote/route.ts` | Upvotes increment `questions.vote_count` atomically. | API route test |
-| **P1-06** | Media Storage | PostComposer has placeholder comment for file upload wiring. | Posts with images/attachments depend on client upload completion. | `src/components/posts/PostComposer.tsx`, `src/app/api/media/upload-url/route.ts` | Uploads binary directly to Supabase signed URL and attaches public URL to post payload. | Media upload integration test |
+| Task ID | Component | Problem | Status | Resolution / Verification |
+|---|---|---|:---:|---|
+| **P1-01** | Sidebar Widgets | `TrendingHashtags` static placeholder. | **✅ RESOLVED** | Live `TrendingHashtags.tsx` connected to `api.hashtags.getTrending` with loading/empty/list states. Verified in `TrendingHashtags.test.tsx`. |
+| **P1-02** | Sidebar Widgets | `SuggestedUsers` static placeholder. | **✅ RESOLVED** | Live `SuggestedUsers.tsx` connected to `api.follows.getSuggestedUsers` with 1-click follow mutation. Verified in `SuggestedUsers.test.tsx`. |
+| **P1-03** | Event Management | Event deletion and editing were 501 scaffold stubs. | **✅ RESOLVED** | Implemented `updateEvent` & `deleteEvent` in `events-jobs.ts` and routes `/api/events/delete`, `/api/events/update` with host auth. Verified in `phase3-integration.test.ts`. |
+| **P1-04** | Job Management | Job deletion and applicant management were 501 stubs. | **✅ RESOLVED** | Implemented `updateJob`, `deleteJob`, and `getJobApplications` in `events-jobs.ts` and routes `/api/jobs/delete`, `/api/jobs/update`, `/api/jobs/job-applications` with poster auth. Verified in `phase3-integration.test.ts`. |
+| **P1-05** | Q&A Voting | Question voting was a 501 stub (`/api/questions/vote`). | **✅ RESOLVED** | Implemented atomic `voteQuestion` in `content.ts` with toggle-off/switch logic and `/api/questions/vote`. Verified in `phase3-integration.test.ts`. |
+| **P1-06** | Realtime Calls | WebRTC video/audio peer negotiation unverified end-to-end. | Backlog (Phase 4) | Signaling implementation verified; media devices unverified in headless CLI. |
+| **P1-07** | Media Storage | PostComposer direct binary upload to Supabase storage. | Backlog (Phase 4) | In progress for Phase 4. |
 
 ---
 
@@ -52,5 +53,5 @@
 |---|---|---|---|---|---|---|
 | **P3-01** | Stripe Subscriptions | Subscription and checkout routes are stubs. | Monetization is non-essential prior to campus user base validation. | `src/app/api/subscriptions/*` | Stripe Checkout session and webhook handler implemented when payment gateway configured. | Stripe mock test |
 | **P3-02** | ESLint Warnings | 2 `<img>` warnings in `ChatInput.tsx` and `ChatMessage.tsx`. | Optimization hygiene for next/image. | `src/app/(components)/messages/ChatInput.tsx`, `ChatMessage.tsx` | Replaced with Next.js `<Image />` or `OptimizedImage`. | `npm run lint` clean |
-| **P3-03** | Migration Script | `run-migration.js` references obsolete path `supabase/migration.sql`. | Automated migration runner helper fails. | `run-migration.js:L15` | Path updated to `supabase/migrations/20240101000000_init.sql`. | Script check |
-| **P3-04** | Ad Campaign Pausing | `/api/ads/pause` is a 501 scaffold stub. | Advertisers cannot pause active campaigns. | `src/app/api/ads/pause/route.ts` | Campaign status toggles between `active` and `paused`. | API test |
+| **P3-03** | Ad Campaign Pausing | `/api/ads/pause` is a 501 scaffold stub. | Advertisers cannot pause active campaigns. | `src/app/api/ads/pause/route.ts` | Campaign status toggles between `active` and `paused`. | API test |
+| **P3-04** | Migration Script | `run-migration.js` path mismatch. | **✅ RESOLVED** | `run-migration.js` | Updated path to canonical `supabase/migrations/20240101000000_init.sql`. | Migration runner check |

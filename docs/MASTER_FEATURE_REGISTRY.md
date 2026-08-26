@@ -123,7 +123,7 @@
 | ID | Domain | Feature | Documented Status | Actual Status | Frontend | API | Database | Realtime | Tests | Evidence | Remaining Work | Dependencies | Priority |
 |---|---|---|---|---|:---:|:---:|:---:|:---:|:---:|---|---|---|:---:|
 | H01 | Hashtags | Hashtag Parsing | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `hashtag-utils.ts` regex parsing and normalization | None | None | P1 |
-| H02 | Hashtags | Trending Hashtags | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `/api/hashtags/trending`, usage counter aggregation | Connect to sidebar | `hashtags` table | P1 |
+| H02 | Hashtags | Trending Hashtags | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `TrendingHashtags.tsx`, `/api/hashtags/trending`, `TrendingHashtags.test.tsx` | None | `hashtags` table | P1 |
 | H03 | Hashtags | Search Hashtags | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `/api/search` universal search query | None | `hashtags` table | P2 |
 | H04 | Hashtags | Posts by Hashtag | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `/hashtag/[tag]` route, `getPostsByHashtag` | None | `post_hashtags` | P1 |
 
@@ -193,7 +193,7 @@
 | J04 | Jobs | Apply to Job | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `POST /api/jobs/apply` with cover letter | None | `job_applications` | P1 |
 | J05 | Jobs | My Applications | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `jobs/my-applications/page.tsx` status tracker | None | `job_applications` | P1 |
 | J06 | Jobs | Single Job View | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `jobs/[id]/page.tsx`, `/api/jobs/single` | None | `jobs` table | P1 |
-| J07 | Jobs | Job Search & Filter | TODO | PARTIAL | ✓ | ✓ | ✓ | - | - | Keyword query works; filter key uses `employment_type` vs `type` in DB | Fix column reference | `jobs` table | P0 |
+| J07 | Jobs | Job Search & Filter | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | Query filters on column `type` in `events-jobs.ts`, verified in tests | None | `jobs` table | P1 |
 
 ---
 
@@ -223,7 +223,7 @@
 | Q05 | Q&A | Ask Question | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `AskQuestionModal.tsx`, `POST /api/questions` | None | `questions` table | P1 |
 | Q06 | Q&A | Question Detail | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `q-and-a/[id]/page.tsx`, `/api/questions/single` | None | `questions` table | P0 |
 | Q07 | Q&A | Answer Question | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `AskAnswerForm.tsx`, `POST /api/questions/answer` | None | `question_answers` | P0 |
-| Q08 | Q&A | Accept Answer | Done | BROKEN | ✓ | ✓ | ✓ | - | - | `POST /api/questions/accept` updates missing `is_resolved` column | Add `is_resolved` to schema | `questions` table | P0 |
+| Q08 | Q&A | Accept Answer | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `POST /api/questions/accept`, `is_resolved` schema column, verified in tests | None | `questions` table | P0 |
 
 ---
 
@@ -334,12 +334,12 @@
 
 | ID | Domain | Feature | Documented Status | Actual Status | Frontend | API | Database | Realtime | Tests | Evidence | Remaining Work | Dependencies | Priority |
 |---|---|---|---|---|:---:|:---:|:---:|:---:|:---:|---|---|---|:---:|
-| CA01 | Calls | Initiate Call | Stub | BROKEN | ✓ | ✓ | ✗ | ✓ | - | `POST /api/calls` executes DB insert into missing `calls` table | Add `calls` table to SQL migration | Supabase DB | P0 |
-| CA02 | Calls | Incoming Notification | Stub | BROKEN | ✓ | ✓ | ✗ | ✓ | - | `IncomingCallNotification.tsx` polls `/api/calls/incoming` | Add `calls` table to SQL migration | Supabase DB | P0 |
-| CA03 | Calls | Call Modal UI | Stub | BROKEN | ✓ | - | ✗ | ✓ | - | `CallModal.tsx` in-call controls & video layout | Add `calls` table to SQL migration | WebRTC | P0 |
-| CA04 | Calls | Answer Call | Stub | BROKEN | ✓ | ✓ | ✗ | ✓ | - | `POST /api/calls/accept`, `useWebRTC.ts` SDP answer | Add `calls` table to SQL migration | Supabase DB | P0 |
-| CA05 | Calls | End Call | Stub | BROKEN | ✓ | ✓ | ✗ | ✓ | - | `POST /api/calls/end`, closes media streams | Add `calls` table to SQL migration | Supabase DB | P0 |
-| CA06 | Calls | Screen Sharing | Stub | BROKEN | ✓ | - | ✗ | ✓ | - | `getDisplayMedia()` stream switching in `useWebRTC.ts` | Add `calls` table to SQL migration | WebRTC | P1 |
+| CA01 | Calls | Initiate Call | Done | IMPLEMENTED | ✓ | ✓ | ✓ | ✓ | ✓ | `POST /api/calls` inserts into table 38 `calls`, verified in tests | None | `calls` table | P0 |
+| CA02 | Calls | Incoming Notification | Done | IMPLEMENTED | ✓ | ✓ | ✓ | ✓ | - | `IncomingCallNotification.tsx` polls `/api/calls/incoming` | None | `calls` table | P0 |
+| CA03 | Calls | Call Modal UI | Done | IMPLEMENTED | ✓ | - | ✓ | ✓ | - | `CallModal.tsx` in-call controls & video layout | None | WebRTC | P0 |
+| CA04 | Calls | Answer Call | Done | IMPLEMENTED | ✓ | ✓ | ✓ | ✓ | - | `POST /api/calls/accept`, `useWebRTC.ts` SDP answer | None | `calls` table | P0 |
+| CA05 | Calls | End Call | Done | IMPLEMENTED | ✓ | ✓ | ✓ | ✓ | ✓ | `POST /api/calls/end`, updates `status = ended`, verified in tests | None | `calls` table | P0 |
+| CA06 | Calls | Screen Sharing | Done | IMPLEMENTED | ✓ | - | ✓ | ✓ | - | `getDisplayMedia()` stream switching in `useWebRTC.ts` | None | WebRTC | P1 |
 
 ---
 
@@ -359,10 +359,10 @@
 
 | ID | Domain | Feature | Documented Status | Actual Status | Frontend | API | Database | Realtime | Tests | Evidence | Remaining Work | Dependencies | Priority |
 |---|---|---|---|---|:---:|:---:|:---:|:---:|:---:|---|---|---|:---:|
-| GR01 | Graph | Suggested Connections | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `useGraphSuggestions.ts`, `/api/graph/suggestions` | Connect to sidebar | Users, Follows | P1 |
+| GR01 | Graph | Suggested Connections | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `SuggestedUsers.tsx`, `useGraphSuggestions.ts`, `/api/follows/suggestions`, tested | None | Users, Follows | P1 |
 | GR02 | Graph | Dismiss Suggestion | Done | IMPLEMENTED | ✓ | - | - | - | - | Client-side dismissal state in `useGraphSuggestions` | None | None | P2 |
 | GR03 | Graph | Refresh Suggestions | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | React Query query invalidation trigger | None | None | P2 |
-| GR04 | Graph | Follow via Graph | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `useGraphFollowMutation` invalidating suggestions | None | Follows API | P1 |
+| GR04 | Graph | Follow via Graph | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `SuggestedUsers.tsx` follow button mutation, tested | None | Follows API | P1 |
 
 ---
 

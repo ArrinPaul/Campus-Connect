@@ -143,3 +143,60 @@ export async function acceptAnswer(answerId: string) {
     
   return true
 }
+
+export async function voteQuestion(questionId: string, userId: string, voteType: "up" | "down" = "up") {
+  const supabase = await getSupabase()
+
+  const { data: existing } = await supabase
+    .from("reactions")
+    .select("id, type")
+    .eq("user_id", userId)
+    .eq("target_id", questionId)
+    .eq("target_type", "question")
+    .single()
+
+  let userVote: "up" | "down" | null = voteType
+  let diff = voteType === "up" ? 1 : -1
+
+  if (existing) {
+    if (existing.type === voteType) {
+      // Toggle off
+      await supabase.from("reactions").delete().eq("id", existing.id)
+      diff = voteType === "up" ? -1 : 1
+      userVote = null
+    } else {
+      // Switch vote from opposite
+      await supabase.from("reactions").update({ type: voteType }).eq("id", existing.id)
+      diff = voteType === "up" ? 2 : -2
+      userVote = voteType
+    }
+  } else {
+    // New vote
+    await supabase.from("reactions").insert({
+      user_id: userId,
+      target_id: questionId,
+      target_type: "question",
+      type: voteType,
+    })
+  }
+
+  // Atomically update question vote_count
+  await supabase.rpc("increment_field", {
+    table_name: "questions",
+    field_name: "vote_count",
+    row_id: questionId,
+    increment_by: diff,
+  })
+
+  const { data: updatedQuestion } = await supabase
+    .from("questions")
+    .select("vote_count")
+    .eq("id", questionId)
+    .single()
+
+  return {
+    voteCount: updatedQuestion?.vote_count ?? 0,
+    userVote,
+  }
+}
+

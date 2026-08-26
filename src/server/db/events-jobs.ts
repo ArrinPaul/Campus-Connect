@@ -44,6 +44,40 @@ export async function unattendEvent(eventId: string, userId: string) {
   if (data) await supabase.from("events").update({ attendee_count: Math.max(0, (data.attendee_count ?? 0) - 1) }).eq("id", eventId)
 }
 
+export async function updateEvent(
+  eventId: string,
+  userId: string,
+  data: {
+    title?: string
+    description?: string
+    location?: string
+    start_time?: string
+    end_time?: string
+    event_type?: string
+    max_attendees?: number
+  },
+  isAdmin = false
+) {
+  const supabase = await getSupabase()
+  const { data: event, error: fetchErr } = await supabase.from("events").select("id, created_by").eq("id", eventId).single()
+  if (fetchErr || !event) return null
+  if (event.created_by !== userId && !isAdmin) return { error: "Forbidden" }
+
+  const { data: updated, error } = await supabase.from("events").update(data).eq("id", eventId).select().single()
+  if (error) return null
+  return updated
+}
+
+export async function deleteEvent(eventId: string, userId: string, isAdmin = false) {
+  const supabase = await getSupabase()
+  const { data: event, error: fetchErr } = await supabase.from("events").select("id, created_by").eq("id", eventId).single()
+  if (fetchErr || !event) return false
+  if (event.created_by !== userId && !isAdmin) return false
+
+  const { error } = await supabase.from("events").delete().eq("id", eventId)
+  return !error
+}
+
 // ─── Jobs ───────────────────────────────────────────────────────────────────
 
 export async function getJobs(limit = 20, offset = 0, filters?: { query?: string; type?: string }) {
@@ -78,6 +112,40 @@ export async function createJob(data: any) {
   return job
 }
 
+export async function updateJob(
+  jobId: string,
+  userId: string,
+  data: {
+    title?: string
+    company?: string
+    description?: string
+    location?: string
+    type?: string
+    salary?: string
+    requirements?: string[]
+  },
+  isAdmin = false
+) {
+  const supabase = await getSupabase()
+  const { data: job, error: fetchErr } = await supabase.from("jobs").select("id, posted_by").eq("id", jobId).single()
+  if (fetchErr || !job) return null
+  if (job.posted_by !== userId && !isAdmin) return { error: "Forbidden" }
+
+  const { data: updated, error } = await supabase.from("jobs").update(data).eq("id", jobId).select().single()
+  if (error) return null
+  return updated
+}
+
+export async function deleteJob(jobId: string, userId: string, isAdmin = false) {
+  const supabase = await getSupabase()
+  const { data: job, error: fetchErr } = await supabase.from("jobs").select("id, posted_by").eq("id", jobId).single()
+  if (fetchErr || !job) return false
+  if (job.posted_by !== userId && !isAdmin) return false
+
+  const { error } = await supabase.from("jobs").delete().eq("id", jobId)
+  return !error
+}
+
 export async function applyToJob(jobId: string, userId: string, coverLetter?: string) {
   const supabase = await getSupabase()
   const { data, error } = await supabase.from("job_applications").insert({ job_id: jobId, user_id: userId, cover_letter: coverLetter }).select().single()
@@ -85,6 +153,21 @@ export async function applyToJob(jobId: string, userId: string, coverLetter?: st
   const { data: job } = await supabase.from("jobs").select("application_count").eq("id", jobId).single()
   if (job) await supabase.from("jobs").update({ application_count: (job.application_count ?? 0) + 1 }).eq("id", jobId)
   return data
+}
+
+export async function getJobApplications(jobId: string, userId: string, isAdmin = false) {
+  const supabase = await getSupabase()
+  const { data: job } = await supabase.from("jobs").select("id, posted_by").eq("id", jobId).single()
+  if (!job || (job.posted_by !== userId && !isAdmin)) return []
+
+  const { data, error } = await supabase
+    .from("job_applications")
+    .select("*, applicant:users!job_applications_user_id_fkey(id, name, username, profile_picture, university, role)")
+    .eq("job_id", jobId)
+    .order("created_at", { ascending: false })
+
+  if (error) return []
+  return data ?? []
 }
 
 export async function getMyApplications(userId: string) {

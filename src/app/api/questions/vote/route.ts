@@ -1,26 +1,26 @@
+import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
+import { voteQuestion } from "@/server/db/content"
 import { NextResponse } from "next/server"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
+// POST /api/questions/vote
+export async function POST(req: Request) {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-export async function GET() {
-  return notImplemented()
-}
+    const body = await req.json()
+    const questionId = body.questionId || body.id
+    const voteType = body.voteType === "down" ? "down" : "up"
 
-export async function POST() {
-  return notImplemented()
-}
+    if (!questionId) {
+      return NextResponse.json({ error: "Missing questionId parameter" }, { status: 400 })
+    }
 
-export async function PATCH() {
-  return notImplemented()
-}
-
-export async function DELETE() {
-  return notImplemented()
+    const result = await voteQuestion(questionId, user.id, voteType)
+    return NextResponse.json({ success: true, ...result })
+  } catch (err) {
+    return internalError(err)
+  }
 }

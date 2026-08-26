@@ -1,26 +1,28 @@
+import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
+import { getJobApplications } from "@/server/db/events-jobs"
 import { NextResponse } from "next/server"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
+// GET /api/jobs/job-applications?jobId=...
+export async function GET(req: Request) {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-export async function GET() {
-  return notImplemented()
-}
+    const { searchParams } = new URL(req.url)
+    const jobId = searchParams.get("jobId") || searchParams.get("id")
 
-export async function POST() {
-  return notImplemented()
-}
+    if (!jobId) {
+      return NextResponse.json({ error: "Missing jobId parameter" }, { status: 400 })
+    }
 
-export async function PATCH() {
-  return notImplemented()
-}
+    const { data: profile } = await supabase.from("users").select("is_admin").eq("id", user.id).single()
+    const isAdmin = Boolean(profile?.is_admin)
 
-export async function DELETE() {
-  return notImplemented()
+    const applications = await getJobApplications(jobId, user.id, isAdmin)
+    return NextResponse.json(applications)
+  } catch (err) {
+    return internalError(err)
+  }
 }
