@@ -51,7 +51,7 @@ export async function getJobs(limit = 20, offset = 0, filters?: { query?: string
   let q = supabase.from("jobs").select("*, poster:users!jobs_posted_by_fkey(id, name, profile_picture)").order("created_at", { ascending: false })
   
   if (filters?.type && filters.type !== "All") {
-    q = q.eq("employment_type", filters.type)
+    q = q.eq("type", filters.type)
   }
   
   if (filters?.query) {

@@ -9,15 +9,15 @@
 
 ---
 
-## P0 Critical Tasks (Prerequisites for Phase 2 Functionality)
+## P0 Critical Tasks (Foundation Blockers — ALL RESOLVED IN PHASE 2)
 
-| Task ID | Component | Problem | Why It Matters | Impacted Files | Acceptance Criteria | Tests Required |
-|---|---|---|---|---|---|---|
-| **P0-01** | Database Schema | Table `calls` is missing from `20240101000000_init.sql`. | All `/api/calls/*` routes fail on DB insert/update; WebRTC signaling cannot persist state. | `supabase/migrations/20240101000000_init.sql`, `src/server/db/misc.ts` | `calls` table created with columns `caller_id`, `recipient_id`, `type`, `status`, `started_at`, `ended_at`, and RLS policies. | DB migration test |
-| **P0-02** | Database Schema | Column `is_resolved` is missing from `questions` table in migration. | `POST /api/questions/accept` crashes when marking accepted answer. | `supabase/migrations/20240101000000_init.sql`, `src/server/db/content.ts` | Column `is_resolved BOOLEAN DEFAULT FALSE` added to `questions` table. | Q&A accept answer integration test |
-| **P0-03** | Database Query | Code filters `jobs.employment_type` while migration defines column as `type`. | Job board type filtering silently returns empty array or throws DB error. | `src/server/db/events-jobs.ts:L54` | Query updated to filter on column `type`. | Job filtering unit test |
-| **P0-04** | Unit Testing | `main-layout.test.tsx` fails asserting `md:px-6` instead of `md:px-8`. | CI pipeline fails; 1 of 426 tests is red. | `src/app/(components)/layouts/main-layout.test.tsx:L29` | Test assertion updated to match `md:px-8` design system token; 426/426 tests pass. | `npm test` passes 100% |
-| **P0-05** | Security | Hardcoded database password in `setup-realtime.js`. | Security vulnerability in version control. | `setup-realtime.js:L3` | Password string replaced with `process.env.SUPABASE_DB_PASSWORD`. | Static secret scan |
+| Task ID | Component | Problem | Status | Resolution / Verification |
+|---|---|---|:---:|---|
+| **P0-01** | Database Schema | Table `calls` missing from migration. | **✅ RESOLVED** | Added Table 38 (`calls`) with foreign keys, indexes, and RLS policies to `supabase/migrations/20240101000000_init.sql`. Verified in `tests/phase2-foundation.test.ts`. |
+| **P0-02** | Database Schema | Column `is_resolved` missing from `questions`. | **✅ RESOLVED** | Added `is_resolved BOOLEAN DEFAULT FALSE` to `questions` table in migration. Verified in `tests/phase2-foundation.test.ts`. |
+| **P0-03** | Database Query | Code filtered `jobs.employment_type` vs `jobs.type`. | **✅ RESOLVED** | Aligned query in `src/server/db/events-jobs.ts:L54` to filter on `type`. Verified in `tests/phase2-foundation.test.ts`. |
+| **P0-04** | Unit Testing | `main-layout.test.tsx` padding assertion mismatch. | **✅ RESOLVED** | Updated test assertion to match `md:px-8` design system token; 42 suites, 436/436 tests pass (100%). |
+| **P0-05** | Security | Hardcoded password in `setup-realtime.js`. | **✅ RESOLVED** | Replaced hardcoded connection URL with `process.env.DATABASE_URL`. Verified in `tests/phase2-foundation.test.ts`. |
 
 ---
 

@@ -26,6 +26,7 @@ describe("MainLayout", () => {
     expect(mainElement).toBeInTheDocument();
     expect(mainElement).toHaveClass("border-x");
     expect(mainElement).toHaveClass("px-4");
-    expect(mainElement).toHaveClass("md:px-6");
+    expect(mainElement).toHaveClass("sm:px-6");
+    expect(mainElement).toHaveClass("md:px-8");
   });
 });

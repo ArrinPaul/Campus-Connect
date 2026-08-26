@@ -1,8 +1,13 @@
 const { Client } = require('pg');
 
-const DATABASE_URL = "postgresql://postgres.urxgegqlyzvvvdyukjrg:Campus_connect11@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres";
+const DATABASE_URL = process.env.DATABASE_URL || process.env.SUPABASE_DATABASE_URL;
 
 async function enableRealtime() {
+  if (!DATABASE_URL) {
+    console.error("Error: Please provide DATABASE_URL or SUPABASE_DATABASE_URL in environment variables.");
+    process.exit(1);
+  }
+
   const client = new Client({
     connectionString: DATABASE_URL,
     ssl: { rejectUnauthorized: false }

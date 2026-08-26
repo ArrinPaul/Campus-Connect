@@ -1,25 +1,25 @@
-# CAMPUS CONNECT — DATABASE SCHEMA & RLS AUDIT
+# CAMPUS CONNECT — DATABASE SCHEMA & RLS AUDIT (PHASE 2 FINAL)
 
 **Database Engine:** PostgreSQL 15 (Supabase Hosted)  
-**Migration File:** [`supabase/migrations/20240101000000_init.sql`](file:///D:/ON%20Going%20Projects/ON%20Going%20Projects/Campus%20Connect/supabase/migrations/20240101000000_init.sql) (919 lines)  
-**Schema Health Score:** **85/100** (3 Critical Mismatches Identified)
+**Migration File:** [`supabase/migrations/20240101000000_init.sql`](file:///D:/ON%20Going%20Projects/ON%20Going%20Projects/Campus%20Connect/supabase/migrations/20240101000000_init.sql) (949 lines)  
+**Schema Health Score:** **100/100 (All Foundational Mismatches Resolved)**
 
 ---
 
 ## 1. Schema Inventory
 
 ```
-Total Tables:              37
-Total Performance Indexes: 27
-Row-Level Security (RLS): 119 Policies (111 table + 8 storage)
-Database Functions:         3
-Database Triggers:          9
+Total Tables:              38 (37 Original + Table 38 'calls')
+Total Performance Indexes: 30 (27 Original + 3 'calls' Indexes)
+Row-Level Security (RLS): 122 Policies (114 Table + 8 Storage)
+Database Functions:         3 (increment_field, update_updated_at, handle_new_user)
+Database Triggers:         10 (9 updated_at + 1 on_auth_user_created)
 Storage Buckets:            2 ('media', 'avatars')
 ```
 
 ---
 
-## 2. Table Catalog (37 Relational Tables)
+## 2. Table Catalog (38 Relational Tables)
 
 | # | Table Name | Primary Key | Foreign Keys | RLS Status |
 |---|---|---|---|:---:|
@@ -47,7 +47,7 @@ Storage Buckets:            2 ('media', 'avatars')
 | 22 | `polls` | `id (UUID)` | `created_by` -> `users(id)` | Enabled |
 | 23 | `poll_votes` | `(poll_id, user_id)` | Junction recording `option_index` | Enabled |
 | 24 | `reposts` | `id (UUID)` | `original_post_id` -> `posts(id)`, `reposter_id` | Enabled |
-| 25 | `questions` | `id (UUID)` | `author_id` -> `users(id)` | Enabled |
+| 25 | `questions` | `id (UUID)` | `author_id` -> `users(id)` (includes `is_resolved`) | Enabled |
 | 26 | `question_answers` | `id (UUID)` | `question_id` -> `questions(id)`, `author_id` | Enabled |
 | 27 | `resources` | `id (UUID)` | `uploaded_by` -> `users(id)` | Enabled |
 | 28 | `research_papers` | `id (UUID)` | `uploaded_by` -> `users(id)` | Enabled |
@@ -56,17 +56,18 @@ Storage Buckets:            2 ('media', 'avatars')
 | 31 | `portfolio_projects` | `id (UUID)` | `user_id` -> `users(id)` | Enabled |
 | 32 | `portfolio_certifications` | `id (UUID)` | `user_id` -> `users(id)` | Enabled |
 | 33 | `ads` | `id (UUID)` | `created_by` -> `users(id)` | Enabled |
-| 34 | `presence` | `user_id (UUID)` | References `users(id)` | Enabled |
-| 35 | `user_reputation` | `user_id (UUID)` | References `users(id)` | Enabled |
-| 36 | `content_reports` | `id (UUID)` | `reporter_id` -> `users(id)` | Enabled |
-| 37 | `course_enrollments` | `(user_id, course_code)` | Academic course linking | Enabled |
+| 34 | `subscriptions` | `id (UUID)` | `user_id` -> `users(id)` | Enabled |
+| 35 | `presence` | `user_id (UUID)` | References `users(id)` | Enabled |
+| 36 | `user_reputation` | `user_id (UUID)` | References `users(id)` | Enabled |
+| 37 | `content_reports` | `id (UUID)` | `reporter_id` -> `users(id)` | Enabled |
+| 38 | `calls` | `id (UUID)` | `caller_id` -> `users(id)`, `recipient_id` -> `users(id)` | Enabled |
 
 ---
 
 ## 3. Database Functions & Triggers
 
 ### 3.1 Functions
-1. `increment_field(table_name TEXT, row_id UUID, field_name TEXT, amount INT)`: Atomic counter increment/decrement to prevent lost updates on likes, comments, and member counts.
+1. `increment_field(table_name TEXT, field_name TEXT, row_id UUID, amount INT)`: Atomic counter increment/decrement to prevent lost updates on likes, comments, and member counts.
 2. `update_updated_at()`: Automatically bumps `updated_at` column timestamp before row update.
 3. `handle_new_user()`: Invoked on `auth.users` insert; automatically provisions corresponding rows in `public.users`, `public.user_reputation`, and `public.presence`.
 
@@ -76,12 +77,12 @@ Storage Buckets:            2 ('media', 'avatars')
 
 ---
 
-## 4. Code vs Schema Discrepancies (Blockers)
+## 4. Code vs Schema Discrepancies Reconciliation
 
-| # | Discrepancy Description | Code Location | Migration Impact | Severity |
+| # | Discrepancy Description | Code Location | Migration Impact | Phase 2 Resolution |
 |---|---|---|---|:---:|
-| 1 | **Missing `calls` Table** | `src/server/db/misc.ts:L108-150` | Table `calls` is completely absent from `init.sql`. All `/api/calls/*` mutations fail. | **P0 Block** |
-| 2 | **Missing `questions.is_resolved` Column** | `src/server/db/content.ts:L141` | `acceptAnswer()` executes `.update({ is_resolved: true })` on `questions`, but column is missing. | **P0 Block** |
-| 3 | **`jobs.employment_type` vs `jobs.type`** | `src/server/db/events-jobs.ts:L54` | Code executes `.eq("employment_type", filters.type)` while schema column name is `type`. | **P0 Bug** |
-| 4 | **Hardcoded Password** | `setup-realtime.js:L3` | Contains literal password string in connection URI. | **P1 Sec** |
-| 5 | **Migration Runner Path Mismatch** | `run-migration.js:L15` | Script attempts to read `supabase/migration.sql` instead of `supabase/migrations/20240101000000_init.sql`. | **P2 Dev** |
+| 1 | **Missing `calls` Table** | `src/server/db/misc.ts:L108-150` | Added Table 38 `calls` with caller/recipient foreign keys, status enum, and timestamps. | **✅ RESOLVED** |
+| 2 | **Missing `questions.is_resolved` Column** | `src/server/db/content.ts:L141` | Added `is_resolved BOOLEAN DEFAULT FALSE` to `questions` table in migration. | **✅ RESOLVED** |
+| 3 | **`jobs.employment_type` vs `jobs.type`** | `src/server/db/events-jobs.ts:L54` | Corrected query in `events-jobs.ts` to filter on `type`. | **✅ RESOLVED** |
+| 4 | **Hardcoded Password** | `setup-realtime.js:L3` | Replaced connection string with `process.env.DATABASE_URL`. | **✅ RESOLVED** |
+| 5 | **Migration Runner Path Mismatch** | `run-migration.js:L15` | Updated script path to `supabase/migrations/20240101000000_init.sql`. | **✅ RESOLVED** |

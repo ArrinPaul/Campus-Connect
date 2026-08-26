@@ -345,6 +345,7 @@ CREATE TABLE IF NOT EXISTS questions (
   tags TEXT[] DEFAULT '{}',
   answer_count INT DEFAULT 0,
   vote_count INT DEFAULT 0,
+  is_resolved BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -517,6 +518,21 @@ CREATE TABLE IF NOT EXISTS content_reports (
 );
 
 -- ============================================================================
+-- 38. CALLS (WebRTC Audio/Video Signaling Sessions)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS calls (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  caller_id UUID NOT NULL CONSTRAINT calls_caller_id_fkey REFERENCES users(id) ON DELETE CASCADE,
+  recipient_id UUID NOT NULL CONSTRAINT calls_recipient_id_fkey REFERENCES users(id) ON DELETE CASCADE,
+  type TEXT NOT NULL DEFAULT 'video' CHECK (type IN ('video', 'audio')),
+  status TEXT NOT NULL DEFAULT 'ringing' CHECK (status IN ('ringing', 'active', 'ended', 'rejected', 'missed')),
+  started_at TIMESTAMPTZ DEFAULT NOW(),
+  ended_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================================================
 -- INDEXES
 -- ============================================================================
 CREATE INDEX IF NOT EXISTS idx_posts_author ON posts(author_id);
@@ -546,6 +562,9 @@ CREATE INDEX IF NOT EXISTS idx_research_papers_author ON research_papers(uploade
 CREATE INDEX IF NOT EXISTS idx_posts_feed ON posts(created_at DESC, author_id);
 CREATE INDEX IF NOT EXISTS idx_content_reports_status ON content_reports(status);
 CREATE INDEX IF NOT EXISTS idx_content_reports_target ON content_reports(target_id, target_type);
+CREATE INDEX IF NOT EXISTS idx_calls_caller ON calls(caller_id);
+CREATE INDEX IF NOT EXISTS idx_calls_recipient ON calls(recipient_id);
+CREATE INDEX IF NOT EXISTS idx_calls_status ON calls(status);
 
 -- ============================================================================
 -- ROW LEVEL SECURITY (RLS)
@@ -589,6 +608,7 @@ ALTER TABLE portfolio_certifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE content_reports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE calls ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================================
 -- RLS POLICIES
@@ -815,6 +835,14 @@ CREATE POLICY "Create reports" ON content_reports FOR INSERT WITH CHECK (auth.ui
 CREATE POLICY "Admin update reports" ON content_reports FOR UPDATE
   USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND is_admin = true));
 
+-- CALLS: callers and recipients can view/manage their call sessions
+CREATE POLICY "View own calls" ON calls FOR SELECT
+  USING (auth.uid() = caller_id OR auth.uid() = recipient_id);
+CREATE POLICY "Create calls" ON calls FOR INSERT
+  WITH CHECK (auth.uid() = caller_id);
+CREATE POLICY "Update own calls" ON calls FOR UPDATE
+  USING (auth.uid() = caller_id OR auth.uid() = recipient_id);
+
 -- ============================================================================
 -- FUNCTIONS
 -- ============================================================================
@@ -853,6 +881,7 @@ CREATE TRIGGER set_jobs_updated_at BEFORE UPDATE ON jobs FOR EACH ROW EXECUTE FU
 CREATE TRIGGER set_questions_updated_at BEFORE UPDATE ON questions FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 CREATE TRIGGER set_marketplace_updated_at BEFORE UPDATE ON marketplace_listings FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 CREATE TRIGGER set_conversations_updated_at BEFORE UPDATE ON conversations FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER set_calls_updated_at BEFORE UPDATE ON calls FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 -- Auto-create user profile on signup
 CREATE OR REPLACE FUNCTION handle_new_user()

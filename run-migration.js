@@ -17,8 +17,11 @@ async function runMigration() {
     console.log('Connecting to database...');
     await client.connect();
 
-    console.log('Reading migration.sql...');
-    const sql = fs.readFileSync('supabase/migration.sql', 'utf8');
+    const migrationPath = fs.existsSync('supabase/migrations/20240101000000_init.sql')
+      ? 'supabase/migrations/20240101000000_init.sql'
+      : 'supabase/migration.sql';
+    console.log(`Reading ${migrationPath}...`);
+    const sql = fs.readFileSync(migrationPath, 'utf8');
 
     console.log('Executing migration...');
     await client.query(sql);
