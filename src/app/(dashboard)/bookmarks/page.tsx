@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { BookmarkedPostList } from '../../(components)/bookmarks/BookmarkedPostList';
 
@@ -10,3 +10,5 @@ export default function BookmarksPage() {
  </div>
  );
 }
+
+

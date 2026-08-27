@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import Image from"next/image"
 import { useState } from"react"
@@ -136,18 +136,18 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
   }
 
   return (
-    <div className="w-full bg-canvas border-b border-hairline">
+    <div className="w-full bg-surface-soft border-b border-hairline shadow-sm">
       {/* Cover Image / Gradient Area */}
-      <div className="relative h-48 md:h-64 w-full bg-canvas overflow-hidden">
+      <div className="relative h-48 md:h-80 w-full max-w-[1096px] mx-auto bg-muted overflow-hidden md:rounded-b-lg">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-canvas/20" />
         <div className="absolute inset-0 bg-tile-black opacity-5" />
       </div>
 
       {/* Header Content */}
-      <div className="max-w-4xl mx-auto px-4 md:px-0">
-        <div className="relative flex flex-col items-center md:items-start -mt-20 md:-mt-24 pb-8">
+      <div className="max-w-[1024px] mx-auto px-4 md:px-8 pb-4">
+        <div className="relative flex flex-col md:flex-row items-center md:items-end -mt-16 md:-mt-8 md:mb-4">
           {/* Avatar */}
-          <div className="relative h-40 w-40 rounded-lg border-4 border-canvas bg-canvas shadow-product overflow-hidden flex-shrink-0 z-10">
+          <div className="relative h-32 w-32 md:h-40 md:w-40 rounded-full border-4 border-surface-soft bg-surface-soft shadow-sm overflow-hidden flex-shrink-0 z-10 md:mr-6">
             {profilePicture ? (
               <Image
                 src={profilePicture}
@@ -172,9 +172,9 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
           </div>
 
           {/* User Info Section */}
-          <div className="mt-6 w-full flex flex-col md:flex-row justify-between items-center md:items-end gap-6">
+          <div className="mt-4 md:mt-0 w-full flex flex-col md:flex-row justify-between items-center md:items-end gap-4 md:pb-4">
             <div className="flex-1 text-center md:text-left space-y-2">
-              <h1 className="text-display-lg md:text-hero-display text-ink leading-tight">
+              <h1 className="text-heading-lg font-bold text-ink-deep leading-tight">
                 {user.name}
               </h1>
               
@@ -191,7 +191,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
               )}
 
               {/* Stats & Socials Row */}
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 mt-6 pt-6 border-t border-hairline w-full">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 mt-4 pt-4 w-full">
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="text-center md:text-left">
                     <p className="text-tagline font-bold text-ink-deep">{followerCount}</p>
@@ -211,7 +211,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
                   <div className="text-center md:text-left border-l border-hairline pl-4">
                     <p className="text-tagline font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
                       <Trophy className="w-3.5 h-3.5" />
-                      <span>{reputation?.rank ? `#${reputation.rank}` : "—"}</span>
+                      <span>{reputation?.rank ? `#${reputation.rank}` : "â€”"}</span>
                     </p>
                     <p className="text-[10px] text-slate uppercase font-semibold">Campus Rank</p>
                   </div>
@@ -416,3 +416,5 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
  </div>
  )
 }
+
+

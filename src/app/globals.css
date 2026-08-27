@@ -1,364 +1,66 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* ── Brand — Apple Minimal System ─────────────────────────────────────── */
-    --primary: 0 122 255;        /* #007AFF Apple System Blue */
-    --primary-deep: 0 102 204;   /* #0066CC */
-    --primary-soft: 90 200 250;  /* #5AC8FA */
+    /* Brand - Modern Social System */
+    --primary: 8 102 255;        /* #0866FF Modern Social Blue */
+    --primary-deep: 0 84 209;    /* #0054D1 */
+    --primary-soft: 231 243 255; /* #E7F3FF Active state bg */
     --on-primary: 255 255 255;
 
-    --ink-button: 29 29 31;      /* #1D1D1F */
-    --on-ink-button: 255 255 255;
-
-    --fb-blue: 0 122 255;
-    --meta-link: 0 102 204;
-    --oculus-purple: 175 82 222;
-
-    /* ── Semantic ──────────────────────────────────────────────────────────── */
-    --success: 52 199 89;        /* #34C759 */
+    /* Semantic */
+    --success: 49 162 76;        /* #31A24C */
     --success-bg: 234 250 238;
-    --attention: 255 149 0;      /* #FF9500 */
-    --warning: 255 204 0;        /* #FFCC00 */
+    --attention: 245 159 0;      /* #F59F00 */
+    --warning: 245 159 0;        
     --warning-bg: 255 250 230;
-    --critical: 255 59 48;       /* #FF3B30 */
-    --critical-strong: 215 0 21;
+    --critical: 240 40 73;       /* #F02849 */
+    --critical-strong: 200 30 60;
 
-    /* ── Surfaces ──────────────────────────────────────────────────────────── */
-    --canvas: 245 245 247;       /* #F5F5F7 Apple Page Background */
-    --surface-soft: 255 255 255; /* #FFFFFF Card/Sheet Surface */
+    /* Surfaces */
+    --canvas: 240 242 245;       /* #F0F2F5 Classic Social Background */
+    --surface-soft: 255 255 255; /* #FFFFFF Cards */
+    --surface-hover: 242 242 242;/* Hover states on cards */
 
-    /* ── Text ──────────────────────────────────────────────────────────────── */
-    --ink-deep: 29 29 31;        /* #1D1D1F Primary Label */
-    --ink: 60 60 67;             /* #3C3C43 Secondary Label */
-    --charcoal: 99 99 102;       /* #636366 */
-    --slate: 142 142 147;        /* #8E8E93 Tertiary Label */
-    --steel: 174 174 178;        /* #AEAEB2 Quaternary */
-    --stone: 197 197 202;        /* #C5C5CA Placeholder */
+    /* Text */
+    --ink-deep: 5 5 5;           /* #050505 Primary Text */
+    --ink: 101 103 107;          /* #65676B Secondary Text */
+    --charcoal: 101 103 107;     
+    --slate: 140 147 157;        
+    --steel: 176 179 184;        
+    --stone: 190 195 200;        
 
-    /* ── Borders ───────────────────────────────────────────────────────────── */
-    --hairline: 229 229 234;     /* #E5E5EA */
-    --hairline-soft: 242 242 247;/* #F2F2F7 */
-    --disabled-text: 199 199 204;
+    /* Borders */
+    --hairline: 206 208 212;     /* #CED0D4 Strong borders */
+    --hairline-soft: 228 230 235;/* #E4E6EB Soft dividers */
+    --disabled-text: 190 195 200;
 
-    /* ── Legacy Compat Aliases ─────────────────────────────────────────────── */
-    --muted: 245 245 247;
-    --muted-foreground: 142 142 147;
+    /* Legacy Compat Aliases (shadcn) */
+    --muted: 240 242 245;
+    --muted-foreground: 101 103 107;
     --card: 255 255 255;
-    --card-foreground: 29 29 31;
-    --border: 229 229 234;
-    --input: 229 229 234;
-    --ring: 0 122 255;
-    --background: 245 245 247;
-    --foreground: 29 29 31;
-    --destructive: 255 59 48;
+    --card-foreground: 5 5 5;
+    --border: 228 230 235;
+    --input: 206 208 212;
+    --ring: 8 102 255;
+    --background: 240 242 245;
+    --foreground: 5 5 5;
+    --destructive: 240 40 73;
     --destructive-foreground: 255 255 255;
-    --accent: 245 245 247;
-    --accent-foreground: 29 29 31;
+    --accent: 240 242 245;
+    --accent-foreground: 5 5 5;
     --popover: 255 255 255;
-    --popover-foreground: 29 29 31;
-    --secondary: 242 242 247;
-    --secondary-foreground: 29 29 31;
-  }
-
-  .dark {
-    /* ── Brand — Apple Dark Mode ───────────────────────────────────────────── */
-    --primary: 10 132 255;       /* #0A84FF */
-    --primary-deep: 0 113 227;
-    --primary-soft: 100 210 255;
-    --on-primary: 255 255 255;
-
-    --ink-button: 255 255 255;
-    --on-ink-button: 0 0 0;
-
-    --fb-blue: 10 132 255;
-    --meta-link: 100 210 255;
-    --oculus-purple: 191 90 242;
-
-    /* ── Semantic ──────────────────────────────────────────────────────────── */
-    --success: 48 209 88;
-    --success-bg: 25 45 30;
-    --attention: 255 159 10;
-    --warning: 255 214 10;
-    --warning-bg: 45 40 20;
-    --critical: 255 69 58;
-    --critical-strong: 255 100 90;
-
-    /* ── Surfaces ──────────────────────────────────────────────────────────── */
-    --canvas: 0 0 0;             /* #000000 True Black */
-    --surface-soft: 28 28 30;   /* #1C1C1E Elevated Dark Surface */
-
-    /* ── Text ──────────────────────────────────────────────────────────────── */
-    --ink-deep: 245 245 247;
-    --ink: 235 235 245;
-    --charcoal: 174 174 178;
-    --slate: 142 142 147;
-    --steel: 99 99 102;
-    --stone: 78 78 80;
-
-    /* ── Borders ───────────────────────────────────────────────────────────── */
-    --hairline: 44 44 46;        /* #2C2C2E */
-    --hairline-soft: 58 58 60;   /* #3A3A3C */
-    --disabled-text: 99 99 102;
-
-    /* ── Legacy Compat Aliases ─────────────────────────────────────────────── */
-    --muted: 28 28 30;
-    --muted-foreground: 142 142 147;
-    --card: 28 28 30;
-    --card-foreground: 245 245 247;
-    --border: 44 44 46;
-    --input: 44 44 46;
-    --ring: 10 132 255;
-    --background: 0 0 0;
-    --foreground: 245 245 247;
-    --destructive: 255 69 58;
-    --destructive-foreground: 255 255 255;
-    --accent: 28 28 30;
-    --accent-foreground: 245 245 247;
-    --popover: 28 28 30;
-    --popover-foreground: 245 245 247;
-    --secondary: 44 44 46;
-    --secondary-foreground: 245 245 247;
+    --popover-foreground: 5 5 5;
   }
 }
 
 @layer base {
   * {
-    @apply border-hairline;
-    box-sizing: border-box;
+    @apply border-border;
   }
-
-  html {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    scroll-behavior: smooth;
-    text-rendering: optimizeLegibility;
-  }
-
   body {
-    @apply bg-canvas text-ink;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-display text-ink-deep tracking-tight;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
-  }
-
-  :focus-visible {
-    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-canvas;
-  }
-}
-
-@layer components {
-  /* ── Buttons ─────────────────────────────────────────────────────────────── */
-  .button-primary {
-    @apply bg-ink-button text-on-ink-button text-button-md rounded-full px-6 py-3
-           hover:opacity-90 active:scale-[0.98] disabled:opacity-40
-           transition-all inline-flex items-center justify-center font-semibold;
-  }
-
-  .button-buy-cta {
-    @apply bg-primary text-on-primary text-button-md rounded-full px-6 py-3
-           hover:bg-primary-deep active:scale-[0.98]
-           transition-all inline-flex items-center justify-center font-semibold;
-  }
-
-  .button-secondary {
-    @apply bg-surface-soft text-ink-deep text-button-md rounded-full px-6 py-3
-           border border-hairline hover:bg-canvas active:scale-[0.98]
-           transition-all inline-flex items-center justify-center font-semibold;
-  }
-
-  .button-ghost {
-    @apply bg-transparent text-ink-deep text-button-md rounded-full px-5 py-2.5
-           hover:bg-surface-soft active:scale-[0.98]
-           transition-all inline-flex items-center justify-center font-medium;
-  }
-
-  .button-pill-tab {
-    @apply bg-surface-soft text-ink text-body-sm-bold rounded-full px-4 py-2
-           border border-hairline hover:border-primary/50 hover:bg-canvas hover:text-primary active:scale-[0.96]
-           transition-all duration-200 inline-flex items-center justify-center cursor-pointer shadow-sm;
-  }
-
-  .button-pill-tab-active {
-    @apply bg-primary text-white text-body-sm-bold rounded-full px-4 py-2
-           border border-transparent shadow-md hover:bg-primary/90 active:scale-[0.96]
-           transition-all duration-200 inline-flex items-center justify-center cursor-pointer;
-  }
-
-  /* ── Cards ───────────────────────────────────────────────────────────────── */
-  .card-product-feature {
-    @apply bg-surface-soft rounded-2xl p-6 border border-hairline
-           shadow-[0_1px_4px_rgba(0,0,0,0.05)] overflow-hidden transition-all;
-  }
-
-  .card-feature-photo {
-    @apply bg-surface-soft rounded-2xl border border-hairline overflow-hidden relative;
-  }
-
-  .card-promo-strip {
-    @apply bg-ink-deep text-canvas rounded-2xl p-8 overflow-hidden;
-  }
-
-  .card-icon-feature {
-    @apply bg-surface-soft rounded-xl p-6 border border-hairline
-           shadow-[0_1px_2px_rgba(0,0,0,0.04)];
-  }
-
-  .why-buy-tile {
-    @apply bg-surface-soft rounded-xl py-6 px-6 border border-hairline
-           flex flex-col gap-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)];
-  }
-
-  /* ── Inputs ──────────────────────────────────────────────────────────────── */
-  .text-input {
-    @apply bg-surface-soft text-ink-deep text-body-md rounded-xl px-4 py-3
-           border border-hairline
-           focus:border-primary focus:ring-2 focus:ring-primary/20
-           outline-none transition-all;
-  }
-
-  .search-pill {
-    @apply bg-surface-soft text-ink text-body-sm rounded-full px-4 py-2
-           border border-hairline
-           focus:border-primary focus:ring-2 focus:ring-primary/20
-           outline-none transition-all flex items-center gap-2;
-  }
-
-  /* ── Badges ──────────────────────────────────────────────────────────────── */
-  .badge-promo-yellow {
-    @apply bg-warning/15 text-ink-deep text-caption-bold rounded-full px-3 py-1
-           inline-flex items-center font-semibold border border-warning/25;
-  }
-
-  .promo-banner {
-    @apply bg-ink-deep text-canvas text-body-sm-bold px-6 py-3 w-full
-           flex justify-center items-center gap-4 text-center;
-  }
-
-  /* ── Feed / Post Cards ───────────────────────────────────────────────────── */
-  .post-card {
-    @apply bg-surface-soft border-b border-hairline py-4 px-4
-           hover:bg-canvas transition-colors cursor-pointer;
-  }
-
-  /* ── Sidebar / Nav ───────────────────────────────────────────────────────── */
-  .nav-link {
-    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-body-sm font-medium
-           text-ink transition-colors hover:bg-surface-soft;
-  }
-
-  .nav-link-active {
-    @apply bg-surface-soft text-ink-deep font-semibold;
-  }
-
-  /* ── Modals / Sheets ─────────────────────────────────────────────────────── */
-  .modal-overlay {
-    @apply fixed inset-0 bg-ink-deep/40 backdrop-blur-[2px] z-50
-           flex items-center justify-center p-4;
-  }
-
-  .modal-panel {
-    @apply bg-surface-soft border border-hairline rounded-2xl shadow-lg w-full max-w-lg;
-  }
-}
-
-/* ── Keyframes ────────────────────────────────────────────────────────────── */
-@keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
-}
-
-::selection {
-  background: rgb(var(--primary) / 0.15);
-  color: rgb(var(--ink-deep));
-}
-
-/* ── Gradient / Glass Overrides (disabled) ───────────────────────────────── */
-@layer components {
-  .gradient-mesh     { background: rgb(var(--canvas)); }
-  .floating-orb      { display: none; }
-  .glass-card        {
-    background: rgb(var(--surface-soft));
-    border: 1px solid rgb(var(--hairline));
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-  }
-  .dark .glass-card  { box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
-  .auth-gradient-panel {
-    background: rgb(var(--surface-soft));
-    border-right: 1px solid rgb(var(--hairline));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* ── Custom Sleek Minimalistic Scrollbar ─────────────────────────────────── */
-@layer utilities {
-  /* Global smooth sleek scrollbar styling for Webkit */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: rgb(var(--slate) / 0.3);
-    border-radius: 9999px;
-    border: 1px solid transparent;
-    background-clip: padding-box;
-    transition: background-color 0.2s ease;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgb(var(--slate) / 0.6);
-  }
-
-  ::-webkit-scrollbar-thumb:active {
-    background: rgb(var(--primary) / 0.85);
-  }
-
-  /* Specific styling for scrollbar-custom containers */
-  .scrollbar-custom::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  .scrollbar-custom::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .scrollbar-custom::-webkit-scrollbar-thumb {
-    background: rgb(var(--slate) / 0.35);
-    border-radius: 9999px;
-    transition: background-color 0.2s ease;
-  }
-
-  .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-    background: rgb(var(--slate) / 0.7);
-  }
-
-  .scrollbar-custom::-webkit-scrollbar-thumb:active {
-    background: rgb(var(--primary) / 0.9);
-  }
-
-  /* Firefox scrollbar support */
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: rgb(var(--slate) / 0.35) transparent;
+    @apply bg-background text-foreground;
   }
 }

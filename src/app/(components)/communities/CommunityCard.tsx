@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -19,7 +19,7 @@ export function CommunityCard({ community }: Props) {
     return (
         <Link 
             href={`/c/${community.slug}`} 
-            className="group block bg-canvas border border-hairline rounded-lg overflow-hidden transition-all hover:shadow-product btn-press"
+            className="group block bg-surface-soft border border-hairline rounded-xl overflow-hidden transition-all shadow-sm hover:shadow-md"
         >
             {/* Banner Area */}
             <div className="h-24 bg-canvas-parchment overflow-hidden relative">
@@ -36,7 +36,7 @@ export function CommunityCard({ community }: Props) {
             <div className="p-lg pt-0 relative">
                 {/* Avatar Overlay */}
                 <div className="-mt-8 mb-md relative z-10">
-                     <div className="h-16 w-16 rounded-md border-2 border-canvas bg-canvas-parchment shadow-sm overflow-hidden mx-auto">
+                     <div className="h-16 w-16 rounded-2xl border-4 border-surface-soft bg-muted shadow-sm overflow-hidden mx-auto">
                         {community.avatar ? (
                             <Image src={community.avatar} alt={community.name} width={64} height={64} className="h-full w-full object-cover" />
                         ) : (
@@ -49,16 +49,16 @@ export function CommunityCard({ community }: Props) {
 
                 {/* Content */}
                 <div className="text-center space-y-xs">
-                    <h3 className="text-body-strong text-ink truncate px-1">
+                    <h3 className="text-[17px] font-bold text-ink-deep truncate px-1 leading-tight">
                         {community.name}
                     </h3>
-                    <p className="text-caption text-ink-muted-48 line-clamp-2 min-h-[40px]">
+                    <p className="text-xs text-slate line-clamp-2 min-h-[32px] mt-1">
                         {community.description}
                     </p>
                 </div>
 
                 {/* Stats */}
-                <div className="flex items-center justify-center gap-2 mt-md text-fine-print text-ink-muted-48 font-semibold uppercase tracking-wider">
+                <div className="flex items-center justify-center gap-2 mt-4 text-[11px] text-slate font-semibold uppercase tracking-wider">
                     <Users className="h-3 w-3" />
                     <span>{community.memberCount} {community.memberCount === 1 ? 'member' : 'members'}</span>
                 </div>
@@ -78,3 +78,4 @@ export function CommunityCard({ community }: Props) {
         </Link>
     );
 }
+

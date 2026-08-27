@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -13,9 +13,9 @@ function MessagesPageContent() {
   const selectedConversationId = searchParams.get('c');
 
   return (
-    <div className="flex h-[calc(100vh-61px)] md:h-screen w-full min-w-0 bg-background overflow-hidden">
+    <div className="flex h-[calc(100vh-61px)] md:h-[calc(100vh-56px)] w-full min-w-0 bg-canvas overflow-hidden">
       {/* Desktop: Two-column expanded layout */}
-      <div className="hidden md:flex flex-col w-72 xl:w-80 border-r border-border bg-card/60 flex-shrink-0 h-full">
+      <div className="hidden md:flex flex-col w-72 xl:w-80 border-r border-hairline bg-surface-soft flex-shrink-0 h-full shadow-sm z-10">
         <ConversationList selectedConversationId={selectedConversationId as Id<'conversations'> | null} />
       </div>
 
@@ -23,7 +23,7 @@ function MessagesPageContent() {
         {selectedConversationId ? (
           <ChatWindow key={selectedConversationId} conversationId={selectedConversationId as Id<'conversations'>} />
         ) : (
-          <div className="flex flex-col h-full w-full items-center justify-center text-center p-8 bg-background">
+          <div className="flex flex-col h-full w-full items-center justify-center text-center p-8 bg-canvas">
             <div className="rounded-full bg-primary/10 p-6 mb-4 animate-bounce duration-1000">
               <MessageSquare className="text-primary h-12 w-12" />
             </div>
@@ -54,3 +54,4 @@ export default function MessagesPage() {
     </Suspense>
   );
 }
+

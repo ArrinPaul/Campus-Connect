@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { Suspense } from 'react';
 import { useQuery } from '@/lib/api';
@@ -6,7 +6,8 @@ import { api } from '@/lib/api';
 import { notFound } from 'next/navigation';
 import { CommunityHeader } from '../../../(components)/communities/CommunityHeader';
 import { CommunityPostFeed } from '../../../(components)/communities/CommunityPostFeed';
-import { CreatePost } from '../../../(components)/feed/CreatePost';
+import { PostComposer } from '@/components/posts/PostComposer';
+import { Globe } from 'lucide-react';
 import { Section } from '@/components/ui/Section';
 
 type PageProps = {
@@ -42,35 +43,51 @@ function CommunityPageContent({ slug }: { slug: string }) {
  <div className="w-full min-h-screen bg-canvas">
  <CommunityHeader community={community as any} />
  
- <main className="w-full flex flex-col items-center py-lg md:py-xl">
- <div className="w-full max-w-2xl px-4 md:px-0 space-y-lg">
- {/* Post Creation Area */}
- {canPost ? (
- <CreatePost communityId={community._id} />
- ) : (
- <div className="rounded-lg border border-hairline bg-canvas/30 p-xl text-center">
- <h3 className="font-semibold text-ink">
- {viewerRole === 'pending'
- ? 'Membership Pending'
- : 'Connect with this Community'}
- </h3>
- <p className="text-caption text-slate mt-2 max-w-xs mx-auto">
- {viewerRole === 'pending'
- ? 'Your request is being reviewed by the moderators.'
- : 'Join this community to share your thoughts and participate in discussions.'}
- </p>
- </div>
- )}
+   <main className="w-full flex justify-center py-6">
+   <div className="w-full max-w-[1024px] px-4 md:px-8 grid grid-cols-1 lg:grid-cols-3 gap-4">
+    
+    {/* Left Column: About */}
+    <div className="col-span-1 space-y-4">
+      <div className="bg-surface-soft border border-hairline rounded-xl p-4 shadow-sm">
+        <h2 className="text-[17px] font-bold text-ink-deep mb-3">About</h2>
+        <p className="text-sm text-slate mb-4 leading-relaxed">{community.description}</p>
+        <div className="flex items-center gap-2 text-sm text-ink-deep mb-2">
+          <Globe className="h-4 w-4 text-slate" />
+          <span className="font-semibold">{community.type === 'public' ? 'Public' : 'Private'} Group</span>
+        </div>
+        <div className="text-xs text-slate ml-6">
+          {community.type === 'public' ? 'Anyone can see who is in the group and what they post.' : 'Only members can see who is in the group and what they post.'}
+        </div>
+      </div>
+    </div>
 
- {/* Community Feed */}
- <div className="w-full">
- <div className="text-fine-print text-slate font-bold uppercase tracking-widest mb-md border-b border-hairline pb-2">
- Recent Activity
- </div>
- <CommunityPostFeed communityId={community._id} />
- </div>
- </div>
- </main>
+    {/* Right Column: Feed */}
+    <div className="col-span-1 lg:col-span-2 space-y-4">
+      {/* Post Creation Area */}
+      {canPost ? (
+        <PostComposer communityId={community._id} />
+      ) : (
+        <div className="rounded-xl border border-hairline bg-surface-soft p-8 text-center shadow-sm mb-4">
+          <h3 className="font-bold text-ink-deep">
+            {viewerRole === 'pending'
+            ? 'Membership Pending'
+            : 'Connect with this Community'}
+          </h3>
+          <p className="text-sm text-slate mt-2 max-w-xs mx-auto">
+            {viewerRole === 'pending'
+            ? 'Your request is being reviewed by the moderators.'
+            : 'Join this community to participate in discussions and share posts.'}
+          </p>
+        </div>
+      )}
+
+      {/* Feed Section */}
+      <div className="w-full">
+        <CommunityPostFeed communityId={community._id} />
+      </div>
+    </div>
+   </div>
+  </main>
  </div>
  );
 }
@@ -86,3 +103,5 @@ export default function CommunityPage({ params }: PageProps) {
  </Suspense>
  );
 }
+
+

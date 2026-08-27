@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Suspense } from 'react';
 import { ExplorePostGrid } from '../../(components)/explore/ExplorePostGrid';
@@ -16,14 +16,14 @@ export default function ExplorePage() {
  return (
  <div className="w-full bg-canvas min-h-screen">
  {/* Header Section */}
- <section className="bg-canvas py-section-sm px-base md:px-xl border-b border-hairline-soft">
+ <section className="bg-surface-soft py-6 px-4 md:px-8 border-b border-hairline shadow-sm">
  <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-xl">
  <div className="max-w-2xl flex items-center gap-md">
  <div className="w-14 h-14 bg-surface-soft rounded-circle flex items-center justify-center shrink-0 border border-hairline">
  <Compass className="w-7 h-7 text-ink-deep" />
  </div>
  <div>
- <h1 className="text-display-lg text-ink-deep mb-xs">Explore.</h1>
+ <h1 className="text-heading-lg font-bold text-ink-deep mb-1">Explore</h1>
  <p className="text-subtitle-md text-ink">Discover trending posts across campus</p>
  </div>
  </div>
@@ -41,3 +41,4 @@ export default function ExplorePage() {
  </div>
  );
 }
+

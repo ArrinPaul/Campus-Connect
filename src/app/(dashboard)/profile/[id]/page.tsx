@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+﻿import React, { Suspense } from 'react';
 import type { Id } from '@/lib/api';
 import { getUserById } from '@/server/db/users';
 import { getUserCommunities } from '@/server/db/communities';
@@ -105,3 +105,4 @@ export default function ProfilePage({ params }: ProfilePageProps) {
  </Suspense>
  );
 }
+

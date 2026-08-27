@@ -1,4 +1,4 @@
-import React from"react";
+﻿import React from"react";
 import { cn } from"@/lib/utils";
 
 interface SectionProps {
@@ -46,3 +46,4 @@ export function SectionHeader({ title, tagline, children }: { title: string; tag
  </div>
  );
 }
+

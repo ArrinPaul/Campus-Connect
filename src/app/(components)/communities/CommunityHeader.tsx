@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import Image from 'next/image';
@@ -53,9 +53,9 @@ export function CommunityHeader({ community }: Props) {
     }
 
     return (
-        <div className="w-full bg-canvas border-b border-hairline">
+        <div className="w-full bg-surface-soft border-b border-hairline shadow-sm">
             {/* Banner Section */}
-            <div className="relative h-64 md:h-80 w-full bg-canvas-parchment overflow-hidden">
+            <div className="relative h-48 md:h-80 w-full max-w-[1096px] mx-auto bg-muted overflow-hidden md:rounded-b-lg">
                 {community.banner ? (
                     <Image 
                         src={community.banner} 
@@ -70,10 +70,10 @@ export function CommunityHeader({ community }: Props) {
             </div>
 
             {/* Header Content */}
-            <div className="max-w-4xl mx-auto px-4 md:px-0">
-                <div className="relative flex flex-col items-center md:items-start -mt-20 md:-mt-24 pb-8">
+            <div className="max-w-[1024px] mx-auto px-4 md:px-8 pb-0">
+                <div className="relative flex flex-col md:flex-row items-center md:items-end -mt-16 md:-mt-8 md:mb-4">
                     {/* Avatar */}
-                    <div className="relative h-40 w-40 rounded-lg border-4 border-canvas bg-canvas-parchment shadow-product overflow-hidden flex-shrink-0 z-10">
+                    <div className="relative h-32 w-32 md:h-40 md:w-40 rounded-2xl border-4 border-surface-soft bg-surface-soft shadow-sm overflow-hidden flex-shrink-0 z-10 md:mr-6">
                         {community.avatar ? (
                             <Image src={community.avatar} alt={community.name} width={160} height={160} className="h-full w-full object-cover" />
                         ) : (
@@ -84,12 +84,12 @@ export function CommunityHeader({ community }: Props) {
                     </div>
 
                     {/* Text & Actions */}
-                    <div className="mt-6 w-full flex flex-col md:flex-row justify-between items-center md:items-end gap-6">
+                    <div className="mt-4 md:mt-0 w-full flex flex-col md:flex-row justify-between items-center md:items-end gap-4 md:pb-4">
                         <div className="flex-1 text-center md:text-left space-y-2">
-                            <h1 className="text-display-lg md:text-hero-display text-ink leading-tight">
+                            <h1 className="text-heading-lg font-bold text-ink-deep leading-tight">
                                 {community.name}
                             </h1>
-                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-caption-strong text-ink-muted-48 uppercase tracking-wider">
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-semibold text-slate uppercase tracking-wider mt-2">
                                 <div className="flex items-center gap-1.5">
                                     <Users size={16} className="text-primary" />
                                     <span>{community.memberCount} members</span>
@@ -99,7 +99,7 @@ export function CommunityHeader({ community }: Props) {
                                     <span>{typeInfo[community.type as keyof typeof typeInfo]?.text || typeInfo.public.text}</span>
                                 </div>
                             </div>
-                            <p className="text-body text-ink-muted-48 max-w-2xl mt-4 leading-relaxed">
+                            <p className="text-body-md text-slate max-w-2xl mt-4 leading-relaxed">
                                 {community.description}
                             </p>
                         </div>
@@ -151,3 +151,4 @@ export function CommunityHeader({ community }: Props) {
         </div>
     );
 }
+

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 // A temporary v2 button.
 const TempButton = ({ children, onClick }: { children: React.ReactNode, onClick: () => void }) => {
@@ -15,11 +15,11 @@ export function WelcomeStep({ nextStep }: Props) {
         <div className="text-center flex flex-col items-center h-full justify-center">
             <div className="rounded-full bg-primary/10 p-4 mb-6">
                 <div className="rounded-full bg-primary/20 p-4">
-                    <span className="text-5xl">👋</span>
+                    <span className="text-5xl">ðŸ‘‹</span>
                 </div>
             </div>
-            <h1 className="text-3xl font-bold mb-2">Welcome to Campus Connect!</h1>
-            <p className="text-muted-foreground max-w-sm mb-8">
+            <h1 className="text-[28px] font-bold text-ink-deep mb-2">Welcome to Campus Connect</h1>
+            <p className="text-[15px] text-slate max-w-sm mb-8 leading-relaxed">
                 Let&apos;s get your profile set up so you can start connecting with peers and discovering opportunities.
             </p>
             <TempButton onClick={nextStep}>
@@ -28,3 +28,4 @@ export function WelcomeStep({ nextStep }: Props) {
         </div>
     );
 }
+

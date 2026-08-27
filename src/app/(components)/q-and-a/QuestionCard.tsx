@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -23,9 +23,9 @@ export function QuestionCard({ question }: Props) {
     const askerAvatar = question.asker?.profilePicture;
 
     return (
-        <Link href={`/q-and-a/${question._id}`} className="block p-4 border border-hairline rounded-xl bg-surface-soft hover:bg-canvas transition-colors">
-            <h3 className="font-bold text-lg text-primary line-clamp-2">{question.title}</h3>
-            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{question.content}</p>
+        <Link href={`/q-and-a/${question._id}`} className="block p-4 border border-hairline rounded-xl bg-surface-soft hover:bg-surface-hover transition-colors shadow-sm">
+            <h3 className="font-bold text-[17px] text-primary hover:underline line-clamp-2">{question.title}</h3>
+            <p className="text-[13px] text-slate mt-1.5 line-clamp-2 leading-relaxed">{question.content}</p>
 
             <div className="flex flex-wrap items-center justify-between mt-3 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
@@ -35,7 +35,7 @@ export function QuestionCard({ question }: Props) {
                         <UserIcon className="h-3.5 w-3.5" />
                     )}
                     <p>{askerName}</p>
-                    <span className="mx-1">•</span>
+                    <span className="mx-1">â€¢</span>
                     <p>{formatDistanceToNow(new Date(question.createdAt), { addSuffix: true })}</p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -65,3 +65,4 @@ export function QuestionCard({ question }: Props) {
         </Link>
     );
 }
+

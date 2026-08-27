@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useQuery, useMutation } from "@/lib/api"
 import { api } from "@/lib/api"
@@ -80,9 +80,9 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-background min-w-0 h-full border-r border-border">
+    <div className="flex-1 flex flex-col bg-surface-soft min-w-0 h-full">
       {/* Top Bar Header */}
-      <div className="h-16 bg-card/80 backdrop-blur-md border-b border-border px-4 md:px-6 flex items-center justify-between sticky top-0 z-20">
+      <div className="h-16 bg-surface-soft border-b border-hairline px-4 md:px-6 flex items-center justify-between sticky top-0 z-20 shadow-sm">
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/messages")}
@@ -131,7 +131,7 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
       </div>
 
       {/* Message Feed Area */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto py-6 space-y-2 scrollbar-none">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto py-6 space-y-2 scrollbar-custom">
         <div className="max-w-3xl mx-auto w-full">
           {/* Direct Message Welcome Header */}
           <div className="text-center mb-8 px-4">
@@ -182,3 +182,4 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
     </div>
   )
 }
+

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import type { Doc } from '@/lib/api';
 import Link from 'next/link';
@@ -18,11 +18,11 @@ export function UserCard({ user }: Props) {
     return (
         <Link 
             href={`/profile/${userId}`} 
-            className="group block p-lg bg-canvas border border-hairline rounded-lg transition-all hover:shadow-product btn-press"
+            className="group block p-4 bg-surface-soft border border-hairline rounded-xl transition-all shadow-sm hover:shadow-md cursor-pointer"
         >
             <div className="flex items-center gap-4">
                 {/* Avatar */}
-                <div className="h-14 w-14 rounded-full overflow-hidden border border-hairline bg-canvas-parchment shadow-sm flex-shrink-0">
+                <div className="h-14 w-14 rounded-full overflow-hidden border border-hairline bg-muted shadow-sm flex-shrink-0">
                     {user.profilePicture ? (
                         <Image 
                             src={user.profilePicture} 
@@ -41,7 +41,7 @@ export function UserCard({ user }: Props) {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2">
-                        <h3 className="text-body-strong text-ink truncate group-hover:text-primary transition-colors">
+                        <h3 className="text-[17px] font-bold text-ink-deep truncate group-hover:underline transition-colors">
                             {user.name}
                         </h3>
                         {user.username && (
@@ -51,7 +51,7 @@ export function UserCard({ user }: Props) {
                         )}
                     </div>
                     {user.bio && (
-                        <p className="text-caption text-ink-muted-48 mt-0.5 line-clamp-1 italic">
+                        <p className="text-xs text-slate mt-1 line-clamp-1">
                             {user.bio}
                         </p>
                     )}
@@ -70,3 +70,4 @@ export function UserCard({ user }: Props) {
         </Link>
     );
 }
+

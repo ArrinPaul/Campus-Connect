@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { Id } from "@/lib/api"
@@ -29,15 +29,15 @@ export function ChatMessage({ message, isOwn, showSenderInfo }: ChatMessageProps
   const imageMatch = content.match(/!\[Image\]\((.*?)\)/)
   const imageUrl = imageMatch ? imageMatch[1] : null
 
-  // Extract file attachment markdown: [📎 filename](url)
-  const fileMatch = content.match(/\[📎 (.*?)\]\((.*?)\)/)
+  // Extract file attachment markdown: [ðŸ“Ž filename](url)
+  const fileMatch = content.match(/\[ðŸ“Ž (.*?)\]\((.*?)\)/)
   const fileName = fileMatch ? fileMatch[1] : null
   const fileUrl = fileMatch ? fileMatch[2] : null
 
   // Remove markdown tags from plain text portion
   const textContent = content
     .replace(/!\[Image\]\(.*?\)/g, "")
-    .replace(/\[📎 .*?\]\(.*?\)/g, "")
+    .replace(/\[ðŸ“Ž .*?\]\(.*?\)/g, "")
     .trim()
 
   const formattedTime = message.createdAt ? format(message.createdAt, "h:mm a") : ""
@@ -154,3 +154,4 @@ export function ChatMessage({ message, isOwn, showSenderInfo }: ChatMessageProps
     </div>
   )
 }
+

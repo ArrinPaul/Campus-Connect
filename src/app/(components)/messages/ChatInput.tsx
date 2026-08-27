@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useRef } from "react"
 import Image from "next/image"
@@ -13,9 +13,9 @@ interface ChatInputProps {
 }
 
 const EMOJI_LIST = [
-  "😊", "😂", "❤️", "👍", "🔥", "🚀", "🎉", "💡", 
-  "👏", "🙌", "😎", "🤔", "🥳", "✨", "💯", "💻", 
-  "📚", "🎓", "🤝", "💪", "⚡", "🎯", "💬", "👀"
+  "ðŸ˜Š", "ðŸ˜‚", "â¤ï¸", "ðŸ‘", "ðŸ”¥", "ðŸš€", "ðŸŽ‰", "ðŸ’¡", 
+  "ðŸ‘", "ðŸ™Œ", "ðŸ˜Ž", "ðŸ¤”", "ðŸ¥³", "âœ¨", "ðŸ’¯", "ðŸ’»", 
+  "ðŸ“š", "ðŸŽ“", "ðŸ¤", "ðŸ’ª", "âš¡", "ðŸŽ¯", "ðŸ’¬", "ðŸ‘€"
 ]
 
 export function ChatInput({ onSendMessage, disabled, placeholder = "Type a message..." }: ChatInputProps) {
@@ -36,7 +36,7 @@ export function ChatInput({ onSendMessage, disabled, placeholder = "Type a messa
       if (selectedFile.isImage) {
         finalContent = finalContent ? `${finalContent}\n![Image](${selectedFile.url})` : `![Image](${selectedFile.url})`
       } else {
-        finalContent = finalContent ? `${finalContent}\n[📎 ${selectedFile.name}](${selectedFile.url})` : `[📎 ${selectedFile.name}](${selectedFile.url})`
+        finalContent = finalContent ? `${finalContent}\n[ðŸ“Ž ${selectedFile.name}](${selectedFile.url})` : `[ðŸ“Ž ${selectedFile.name}](${selectedFile.url})`
       }
     }
 
@@ -99,7 +99,7 @@ export function ChatInput({ onSendMessage, disabled, placeholder = "Type a messa
   }
 
   return (
-    <div className="relative p-4 bg-background/90 backdrop-blur-md border-t border-border flex flex-col gap-2">
+    <div className="relative p-4 bg-surface-soft border-t border-hairline flex flex-col gap-2">
       {/* Hidden File Inputs */}
       <input
         type="file"
@@ -200,7 +200,7 @@ export function ChatInput({ onSendMessage, disabled, placeholder = "Type a messa
             placeholder={placeholder}
             disabled={disabled}
             className={cn(
-              "w-full resize-none bg-accent/30 border border-border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all max-h-32 scrollbar-none pr-10",
+              "w-full resize-none bg-canvas border-none rounded-2xl px-4 py-2.5 text-[15px] text-ink-deep placeholder:text-slate focus:outline-none focus:ring-0 transition-all max-h-32 scrollbar-custom pr-10",
               disabled && "opacity-50 cursor-not-allowed"
             )}
             style={{ height: "44px" }}
@@ -229,3 +229,5 @@ export function ChatInput({ onSendMessage, disabled, placeholder = "Type a messa
     </div>
   )
 }
+
+

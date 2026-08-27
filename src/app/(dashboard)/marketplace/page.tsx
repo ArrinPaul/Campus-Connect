@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useQuery } from '@/lib/api';
 import { api } from '@/lib/api';
@@ -43,10 +43,10 @@ export default function MarketplacePage() {
   return (
     <div className="w-full bg-canvas min-h-screen pb-16">
       {/* Header Section */}
-      <section className="bg-canvas pt-8 pb-6 px-4 md:px-8 border-b border-hairline">
+      <section className="bg-surface-soft py-6 px-4 md:px-8 border-b border-hairline shadow-sm">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-ink-deep tracking-tight">Marketplace</h1>
+            <h1 className="text-heading-lg font-bold text-ink-deep mb-1">Marketplace</h1>
             <p className="text-sm text-slate mt-1 max-w-xl">
               Buy, sell, and exchange books, electronics, and services safely within campus.
             </p>
@@ -73,7 +73,7 @@ export default function MarketplacePage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search items, textbooks, gadgets..."
-                className="w-full pl-11 pr-10 h-11 rounded-full border border-hairline bg-surface-soft text-xs text-ink-deep placeholder:text-slate focus:outline-none focus:border-primary focus:bg-canvas transition-all"
+                className="w-full pl-11 pr-10 h-11 rounded-full border border-hairline bg-surface-soft text-[15px] text-ink-deep placeholder:text-slate focus:outline-none focus:border-primary focus:bg-canvas transition-all shadow-sm"
               />
               {searchQuery && (
                 <button
@@ -177,3 +177,4 @@ export default function MarketplacePage() {
     </div>
   );
 }
+

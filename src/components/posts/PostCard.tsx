@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, memo, useRef, useEffect } from "react"
 import { motion } from "framer-motion"
@@ -123,7 +123,7 @@ export const PostCard = memo(function PostCard({
   const [allComments, setAllComments] = useState<any[]>([])
   const [isLoadingMoreComments, setIsLoadingMoreComments] = useState(false)
 
-  // Only fetch comments when expanded — paginated
+  // Only fetch comments when expanded â€” paginated
   const commentsData = useQuery(
     api.comments.getPostComments,
     showComments ? { postId: post._id, sortBy: commentSort, limit: 20 } : "skip"
@@ -380,9 +380,9 @@ export const PostCard = memo(function PostCard({
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.4, ease: "easeOut" }}
       onClick={handlePostClick}
-      className="group/post w-full bg-surface-soft border-b border-hairline py-lg md:py-xl transition-all hover:bg-canvas cursor-pointer"
+      className="group/post w-full bg-surface-soft border border-hairline rounded-xl mb-4 pt-4 transition-all hover:bg-surface-hover cursor-pointer shadow-sm"
     >
-      <div className="max-w-2xl mx-auto px-4 md:px-5 flex gap-3 md:gap-4">
+      <div className="w-full px-4 flex gap-3 pb-2">
         {/* Left Column: Avatar */}
         <div className="shrink-0 mt-1">
           {author?._id ? (
@@ -447,7 +447,7 @@ export const PostCard = memo(function PostCard({
                     {author.name}
                   </p>
                 )}
-                <span>·</span>
+                <span>Â·</span>
                 <Link
                   href={`/post/${post._id}`}
                   className="hover:underline text-slate"
@@ -481,7 +481,7 @@ export const PostCard = memo(function PostCard({
                   )
                 })() && (
                   <span className="text-[11px] text-slate/70 italic cursor-default select-none">
-                    · edited {formatTimestamp(updatedAtTimestamp)}
+                    Â· edited {formatTimestamp(updatedAtTimestamp)}
                   </span>
                 )}
               </div>
@@ -758,3 +758,5 @@ export const PostCard = memo(function PostCard({
     </motion.article>
   )
 })
+
+

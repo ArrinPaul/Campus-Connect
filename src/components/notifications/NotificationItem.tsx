@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useRouter } from"next/navigation"
 import { OptimizedImage } from"@/components/ui/OptimizedImage"
@@ -134,3 +134,4 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
  </button>
  )
 }
+

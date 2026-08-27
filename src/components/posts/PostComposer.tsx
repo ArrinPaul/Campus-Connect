@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useRef, useEffect, useCallback } from"react"
 import { useMutation, useQuery, useAction } from"@/lib/api"
@@ -62,7 +62,7 @@ interface PostComposerProps {
 }
 
 export function PostComposer({ onPostCreated, communityId }: PostComposerProps) {
-  const { isSignedIn, isLoaded } = useUser()
+  const { user, isSignedIn, isLoaded } = useUser()
   const isAuthenticated = isSignedIn ?? false
   
   const createPost = useMutation(api.posts.createPost)
@@ -462,7 +462,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
  return (
  <form
  onSubmit={handleSubmit}
- className="bg-surface-soft border border-hairline rounded-2xl p-4 space-y-md"
+ className="bg-surface-soft border border-hairline rounded-xl mb-4 p-4 space-y-4 shadow-sm"
  >
   {/* Hidden file inputs */}
   <input
@@ -506,11 +506,23 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
   multiple
   />
 
- <div className="relative" onKeyDown={handleWrapperKeyDown}>
+ <div className="flex gap-3">
+  {user && (
+    <div className="h-10 w-10 shrink-0 rounded-full bg-muted overflow-hidden border border-hairline mt-1">
+      {user.profilePicture ? (
+        <img src={user.profilePicture} alt={user.name} className="h-full w-full object-cover" />
+      ) : (
+        <div className="h-full w-full flex items-center justify-center bg-primary text-primary-foreground font-bold text-sm">
+          {user.name.substring(0,2).toUpperCase()}
+        </div>
+      )}
+    </div>
+  )}
+  <div className="relative flex-1" onKeyDown={handleWrapperKeyDown}>
  <RichTextEditor
  value={content}
  onChange={handleContentChange}
- placeholder="Share your thoughts..."
+ placeholder={user ? `What's on your mind, ${user.name.split(" ")[0]}?` : "Share your thoughts..."}
  maxLength={maxLength}
  minHeight="100px"
  disabled={isSubmitting}
@@ -551,6 +563,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
  )}
 
  {error && <p className="mt-2 text-xs text-critical">{error}</p>}
+   </div>
  </div>
 
   {/* Media Toolbar */}
@@ -767,3 +780,6 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
  </form>
  )
 }
+
+
+

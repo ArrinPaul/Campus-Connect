@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useQuery } from '@/lib/api';
 import { api } from '@/lib/api';
@@ -19,14 +19,14 @@ export default function ResearchPage() {
  return (
  <div className="w-full bg-canvas min-h-screen">
  {/* Header Section */}
- <section className="bg-canvas py-section-sm px-base md:px-xl border-b border-hairline-soft">
+ <section className="bg-surface-soft py-6 px-4 md:px-8 border-b border-hairline shadow-sm">
  <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-xl">
  <div className="max-w-2xl flex items-center gap-md">
  <div className="w-14 h-14 bg-surface-soft rounded-circle flex items-center justify-center shrink-0 border border-hairline">
  <Microscope className="w-7 h-7 text-ink-deep" />
  </div>
  <div>
- <h1 className="text-display-lg text-ink-deep mb-xs">Research.</h1>
+ <h1 className="text-heading-lg font-bold text-ink-deep mb-1">Research Hub</h1>
  <p className="text-subtitle-md text-ink">Discover and share academic research</p>
  </div>
  </div>
@@ -45,7 +45,7 @@ export default function ResearchPage() {
  <section className="py-section-sm px-base md:px-xl">
  <div className="w-full max-w-6xl mx-auto space-y-xl">
  {/* Search Controls */}
- <div className="flex items-center justify-between pb-md border-b border-hairline">
+ <div className="flex items-center justify-between pb-4 border-b border-hairline">
  <div className="relative w-full md:max-w-md group">
  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-steel group-focus-within:text-primary transition-colors" />
  <input
@@ -53,7 +53,7 @@ export default function ResearchPage() {
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  placeholder="Search papers by title, author, or tags..."
- className="w-full pl-12 pr-4 h-[48px] bg-surface-soft border border-hairline rounded-full text-body-md focus:outline-none focus:border-2 focus:border-fb-blue focus:bg-canvas transition-all text-ink placeholder:text-steel"
+ className="w-full pl-12 pr-4 h-11 bg-surface-soft border border-hairline rounded-full text-[15px] focus:outline-none focus:border-primary focus:bg-canvas transition-all text-ink-deep placeholder:text-slate shadow-sm"
  />
  </div>
  </div>
@@ -96,3 +96,4 @@ export default function ResearchPage() {
  </div>
  );
 }
+

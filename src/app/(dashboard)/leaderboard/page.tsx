@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { useQuery } from "@/lib/api"
@@ -48,7 +48,7 @@ export default function LeaderboardPage() {
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6 pb-12">
       {/* Header */}
-      <div className="bg-card border border-hairline rounded-2xl p-6 shadow-sm relative overflow-hidden">
+      <div className="bg-surface-soft border border-hairline rounded-2xl p-6 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-0" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
@@ -56,10 +56,10 @@ export default function LeaderboardPage() {
               <Trophy className="w-4 h-4 text-amber-500" />
               <span>Campus Leaderboard</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-ink tracking-tight">
+            <h1 className="text-[28px] md:text-3xl font-extrabold text-ink-deep tracking-tight">
               Academic & Peer Recognition
             </h1>
-            <p className="text-sm text-muted-foreground max-w-lg">
+            <p className="text-sm text-slate mt-1 max-w-lg leading-relaxed">
               Rankings driven by validated contributions: accepted answers (+15), research preprints (+10), helpful peer reviews (+10), and community upvotes (+5).
             </p>
           </div>
@@ -204,7 +204,7 @@ export default function LeaderboardPage() {
               <p className="text-[11px] text-muted-foreground truncate max-w-[160px]">{topThree[1].university || "Campus Scholar"}</p>
               <div className="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 text-xs font-bold">
                 <span>{topThree[1].points} pts</span>
-                <span className="text-[10px] text-muted-foreground">· Lvl {topThree[1].level}</span>
+                <span className="text-[10px] text-muted-foreground">Â· Lvl {topThree[1].level}</span>
               </div>
             </div>
           )}
@@ -231,7 +231,7 @@ export default function LeaderboardPage() {
               <div className="mt-3 flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-400 text-sm font-extrabold">
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>{topThree[0].points} pts</span>
-                <span className="text-[11px] font-semibold opacity-80">· Lvl {topThree[0].level}</span>
+                <span className="text-[11px] font-semibold opacity-80">Â· Lvl {topThree[0].level}</span>
               </div>
             </div>
           )}
@@ -257,7 +257,7 @@ export default function LeaderboardPage() {
               <p className="text-[11px] text-muted-foreground truncate max-w-[160px]">{topThree[2].university || "Campus Scholar"}</p>
               <div className="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-700/10 text-amber-800 dark:text-amber-400 text-xs font-bold">
                 <span>{topThree[2].points} pts</span>
-                <span className="text-[10px] text-muted-foreground">· Lvl {topThree[2].level}</span>
+                <span className="text-[10px] text-muted-foreground">Â· Lvl {topThree[2].level}</span>
               </div>
             </div>
           )}
@@ -351,3 +351,5 @@ export default function LeaderboardPage() {
     </div>
   )
 }
+
+

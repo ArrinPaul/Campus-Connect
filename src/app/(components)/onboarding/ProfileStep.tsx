@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { OnboardingData } from '../../(onboarding)/onboarding/page';
 
@@ -41,8 +41,8 @@ export function ProfileStep({ data, updateFormData, nextStep, prevStep }: Props)
 
     return (
         <div>
-            <h1 className="text-2xl font-bold mb-2">Tell us about yourself</h1>
-            <p className="text-muted-foreground mb-6">This information will be displayed on your public profile.</p>
+            <h1 className="text-[28px] font-bold text-ink-deep mb-2">Tell us about yourself</h1>
+            <p className="text-[15px] text-slate mb-6">This information will be displayed on your public profile.</p>
 
             <div className="space-y-4">
                  <Input label="Full Name" name="name" value={data.name} onChange={handleChange} placeholder="e.g. Jane Doe" />
@@ -83,3 +83,4 @@ export function ProfileStep({ data, updateFormData, nextStep, prevStep }: Props)
         </div>
     );
 }
+

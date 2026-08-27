@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useQuery, useMutation } from '@/lib/api';
@@ -59,10 +59,10 @@ export default function NotificationsPage() {
   return (
     <div className="w-full bg-canvas min-h-screen pb-16">
       {/* Header Section */}
-      <section className="bg-canvas pt-8 pb-6 px-4 md:px-8 border-b border-hairline">
+      <section className="bg-surface-soft py-6 px-4 md:px-8 border-b border-hairline shadow-sm">
         <div className="max-w-2xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-ink-deep tracking-tight">Notifications</h1>
+            <h1 className="text-heading-lg font-bold text-ink-deep mb-1">Notifications</h1>
             <p className="text-xs text-slate mt-1">
               Keep track of likes, comments, and community updates.
             </p>
@@ -144,3 +144,5 @@ export default function NotificationsPage() {
     </div>
   );
 }
+
+

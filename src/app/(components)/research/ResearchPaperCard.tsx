@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import type { Doc } from '@/lib/api';
@@ -18,11 +18,11 @@ type Props = {
 
 export function ResearchPaperCard({ paper }: Props) {
     return (
-        <Link href={`/research/${paper._id}`} className="block p-4 border border-hairline rounded-xl bg-surface-soft hover:bg-canvas transition-colors">
-            <h3 className="font-bold text-lg text-primary line-clamp-2">{paper.title}</h3>
-            <p className="text-sm text-muted-foreground mt-1 line-clamp-3">{paper.abstract}</p>
+        <Link href={`/research/${paper._id}`} className="block p-4 border border-hairline rounded-xl bg-surface-soft hover:bg-surface-hover transition-colors shadow-sm">
+            <h3 className="font-bold text-[17px] text-primary hover:underline line-clamp-2">{paper.title}</h3>
+            <p className="text-[13px] text-slate mt-1.5 line-clamp-3 leading-relaxed">{paper.abstract}</p>
             
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mt-3">
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate mt-3 font-semibold">
                 <div className="flex items-center gap-1">
                     <BookOpen className="h-3.5 w-3.5" /> {paper.authors.join(', ')}
                 </div>
@@ -54,3 +54,4 @@ export function ResearchPaperCard({ paper }: Props) {
         </Link>
     );
 }
+

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useQuery } from '@/lib/api';
 import { api } from '@/lib/api';
@@ -40,10 +40,10 @@ export default function JobsPage() {
   return (
     <div className="w-full bg-canvas min-h-screen pb-16">
       {/* Header Section */}
-      <section className="bg-canvas pt-8 pb-6 px-4 md:px-8 border-b border-hairline">
+      <section className="bg-surface-soft py-6 px-4 md:px-8 border-b border-hairline shadow-sm">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-ink-deep tracking-tight">Job Board</h1>
+            <h1 className="text-heading-lg font-bold text-ink-deep mb-1">Job Board</h1>
             <p className="text-sm text-slate mt-1 max-w-xl">
               Explore internships, full-time positions, and project opportunities on campus.
             </p>
@@ -77,7 +77,7 @@ export default function JobsPage() {
                 placeholder="Search roles, companies, keywords..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-11 pr-10 h-11 rounded-full border border-hairline bg-surface-soft text-xs text-ink-deep placeholder:text-slate focus:outline-none focus:border-primary focus:bg-canvas transition-all"
+                className="w-full pl-11 pr-10 h-11 rounded-full border border-hairline bg-surface-soft text-[15px] text-ink-deep placeholder:text-slate focus:outline-none focus:border-primary focus:bg-canvas transition-all shadow-sm"
               />
               {searchTerm && (
                 <button
@@ -181,3 +181,4 @@ export default function JobsPage() {
     </div>
   );
 }
+

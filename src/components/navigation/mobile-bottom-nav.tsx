@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -35,11 +35,11 @@ export function MobileBottomNav() {
  href={item.href}
  className={cn(
 "flex flex-col items-center justify-center w-full h-full gap-1 transition-all duration-200 relative active:scale-[0.92] group",
- isActive ? "text-primary font-bold" : "text-steel hover:text-primary"
+ isActive ? "text-primary font-bold" : "text-slate hover:text-primary"
  )}
  >
  <item.icon className={cn("w-6 h-6 transition-transform duration-200 group-hover:scale-110", isActive ? "stroke-[2.5px] text-primary" : "stroke-2")} />
- <span className={cn("text-[10px] font-bold transition-colors", isActive ? "text-primary" : "text-steel group-hover:text-primary")}>
+ <span className={cn("text-[10px] font-bold transition-colors", isActive ? "text-primary" : "text-slate group-hover:text-primary")}>
  {item.label}
  </span>
  {item.href === '/notifications' && typeof unreadCount === 'number' && unreadCount > 0 && (
@@ -53,3 +53,4 @@ export function MobileBottomNav() {
  </nav>
  );
 }
+

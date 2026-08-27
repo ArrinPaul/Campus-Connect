@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useMemo } from 'react';
 import { useQuery } from '@/lib/api';
@@ -31,8 +31,8 @@ export function ConversationList({ selectedConversationId }: Props) {
     }, [conversations, searchQuery]);
 
     return (
-        <div className="flex flex-col h-full bg-card/60 backdrop-blur-md border-r border-border">
-            <div className="p-4 border-b border-border flex-shrink-0 space-y-3">
+        <div className="flex flex-col h-full bg-transparent border-r border-hairline">
+            <div className="p-4 border-b border-hairline flex-shrink-0 space-y-3 bg-surface-soft">
                  <div className="flex justify-between items-center">
                     <h2 className="text-xl font-bold tracking-tight">Inbox</h2>
                      <button
@@ -50,12 +50,12 @@ export function ConversationList({ selectedConversationId }: Props) {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search chats..." 
-                        className="w-full pl-9 pr-3 py-2 text-sm bg-accent/40 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" 
+                        className="w-full pl-9 pr-3 py-2 text-[15px] bg-canvas border-none rounded-full focus:outline-none focus:ring-0 text-ink-deep placeholder:text-slate transition-all" 
                     />
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto divide-y divide-border/40 scrollbar-none">
+            <div className="flex-1 overflow-y-auto bg-surface-soft scrollbar-custom">
                 {conversations === undefined && (
                     <div className="p-8 text-center text-sm text-muted-foreground animate-pulse">Loading conversations...</div>
                 )}
@@ -86,3 +86,4 @@ export function ConversationList({ selectedConversationId }: Props) {
         </div>
     );
 }
+

@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 
 import React from "react";
+import { TopNav } from "@/components/navigation/TopNav";
 import { DesktopSidebar } from "@/components/navigation/DesktopSidebar";
 import { MobileTopBar } from "@/components/navigation/MobileTopBar";
 import { MobileBottomNav } from "@/components/navigation/mobile-bottom-nav";
@@ -17,26 +18,38 @@ export function MainLayout({ children, title = "Campus Connect", fullWidth }: Ma
   const isFullWidthPage = fullWidth || pathname?.startsWith("/messages");
 
   return (
-    <div className="min-h-screen bg-canvas overflow-x-hidden">
+    <div className="min-h-screen bg-canvas overflow-x-hidden flex flex-col">
+      {/* Global Desktop Header */}
+      <div className="hidden md:block">
+        <TopNav />
+      </div>
+
       {/* Mobile Top Bar */}
       <div className="md:hidden sticky top-0 z-50">
         <MobileTopBar />
       </div>
 
-      <div className={`mx-auto flex w-full justify-center ${isFullWidthPage ? 'max-w-none px-0' : 'max-w-7xl px-0 sm:px-2'}`}>
+      {/* 
+        Main Application Grid 
+        Adds pt-14 on desktop to clear the fixed TopNav 
+      */}
+      <div className={`flex flex-1 w-full mx-auto md:pt-14 ${isFullWidthPage ? 'max-w-none px-0' : 'max-w-[1920px] px-0'}`}>
+        
         {/* Left Sidebar - Desktop */}
-        <aside className="hidden md:flex w-[240px] lg:w-[260px] shrink-0 sticky top-0 h-screen overflow-y-auto border-r border-border">
+        <aside className="hidden md:block w-[280px] shrink-0 sticky top-14 h-[calc(100vh-56px)] overflow-y-auto overflow-x-hidden hover:scrollbar-custom scrollbar-hide bg-transparent">
           <DesktopSidebar />
         </aside>
 
-        {/* Main Content Area */}
-        <main className={`flex-1 min-w-0 min-h-screen scrollbar-custom bg-canvas relative ${isFullWidthPage ? 'w-full max-w-full px-0 py-0 pb-0 md:pb-0' : 'w-full max-w-3xl xl:max-w-4xl px-4 sm:px-6 md:px-8 py-4 pb-16 md:pb-6 border-x border-hairline'}`}>
-          {children}
+        {/* Center Main Content Area */}
+        <main className={`flex-1 min-w-0 bg-transparent flex justify-center pb-16 md:pb-8 ${isFullWidthPage ? 'w-full' : ''}`}>
+          <div className={`w-full ${isFullWidthPage ? 'max-w-none' : 'max-w-[680px] px-0 sm:px-4 md:px-8 py-6'}`}>
+            {children}
+          </div>
         </main>
 
-        {/* Right Sidebar - Hidden on full width pages like Messages */}
+        {/* Right Sidebar - Desktop Trending/Contacts */}
         {!isFullWidthPage && (
-          <aside className="hidden xl:block w-[300px] shrink-0 sticky top-0 h-screen overflow-y-auto pl-6 py-4">
+          <aside className="hidden xl:block w-[360px] shrink-0 sticky top-14 h-[calc(100vh-56px)] overflow-y-auto pl-4 pr-8 py-6">
             <div id="right-sidebar-portal"></div>
           </aside>
         )}
