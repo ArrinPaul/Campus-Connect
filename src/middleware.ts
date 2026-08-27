@@ -1,43 +1,69 @@
-import { NextResponse, type NextRequest } from "next/server"
+﻿import { NextResponse, type NextRequest } from "next/server"
 import { updateSession } from "@/lib/supabase/middleware"
+import { Ratelimit } from "@upstash/ratelimit"
+import { Redis } from "@upstash/redis"
 
-// In-memory rate limiting tracker (resets per runtime instance scale-out)
-const ipRequestCounts = new Map<string, { count: number; resetTime: number }>()
-const RATE_LIMIT_WINDOW_MS = 60_000 // 1 minute
-const MAX_REQUESTS_PER_WINDOW = 120 // 120 requests/min
+// Initialize Redis and Upstash Rate Limiter (only if environment variables exist)
+let ratelimit: Ratelimit | null = null
+
+try {
+  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    const redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    })
+    
+    // Global rate limit: 120 requests per minute per IP
+    ratelimit = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(120, "1 m"),
+      analytics: true,
+      prefix: "campus_connect_ratelimit",
+    })
+  } else {
+    console.warn("Upstash Redis credentials missing. Falling back to unprotected middleware.")
+  }
+} catch (error) {
+  console.error("Failed to initialize Upstash Rate Limiter:", error)
+}
 
 /**
  * Middleware: refreshes Supabase session and protects non-public routes.
- * Also performs lightweight IP-based rate limiting on API endpoints to prevent spammers/DDoS.
+ * Also performs Vercel Edge distributed rate limiting on API endpoints to prevent spammers/DDoS.
  */
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
-  // Apply rate limiting to API routes only
-  if (pathname.startsWith("/api/")) {
+  // 1. Apply Edge Rate Limiting to API routes
+  if (pathname.startsWith("/api/") && ratelimit) {
+    // Extract IP from Vercel headers, or fallback to localhost
     const ip = request.ip || request.headers.get("x-real-ip") || request.headers.get("x-forwarded-for") || "127.0.0.1"
-    const now = Date.now()
-
-    const limitData = ipRequestCounts.get(ip)
-    if (!limitData || now > limitData.resetTime) {
-      ipRequestCounts.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS })
-    } else {
-      limitData.count++
-      if (limitData.count > MAX_REQUESTS_PER_WINDOW) {
+    
+    try {
+      const { success, limit, reset, remaining } = await ratelimit.limit(ip)
+      
+      if (!success) {
         return NextResponse.json(
           { error: "Too many requests. Please try again later." },
           { 
             status: 429,
             headers: {
+              "X-RateLimit-Limit": limit.toString(),
+              "X-RateLimit-Remaining": remaining.toString(),
+              "X-RateLimit-Reset": reset.toString(),
               "Retry-After": "60",
               "Access-Control-Allow-Origin": "*"
             }
           }
         )
       }
+    } catch (error) {
+      console.error("Rate limiter error:", error)
+      // Fail open if Redis is down so we don't break the app
     }
   }
 
+  // 2. Auth & Session Management
   return await updateSession(request)
 }
 
