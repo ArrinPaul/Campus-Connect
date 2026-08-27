@@ -91,7 +91,7 @@ const nextConfig = {
           {
             key: "Permissions-Policy",
             value:
-              "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+              "camera=(self), microphone=(self), geolocation=(), interest-cohort=()",
           },
           {
             key: "X-Permitted-Cross-Domain-Policies",
