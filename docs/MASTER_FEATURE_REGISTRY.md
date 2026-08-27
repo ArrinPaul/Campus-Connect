@@ -379,3 +379,16 @@
 | AD07 | Monetization | Subscription Status | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `GET /api/subscriptions`, `subscriptions` table, verified in `phase6-subscriptions.test.ts` | None | `subscriptions` | P1 |
 | AD08 | Monetization | Stripe Checkout Session | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `POST /api/subscriptions/checkout`, provider adapter, verified in `phase6-subscriptions.test.ts` | None | Payment Provider | P1 |
 | AD09 | Monetization | Cancel Subscription | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `DELETE /api/subscriptions`, `POST /api/subscriptions/cancel`, verified in `phase6-subscriptions.test.ts` | None | Payment Provider | P1 |
+
+---
+
+## 26. Vector Search, Recommendations & Observability (5 Features)
+
+| ID | Domain | Feature | Documented Status | Actual Status | Frontend | API | Database | Realtime | Tests | Evidence | Remaining Work | Dependencies | Priority |
+|---|---|---|---|---|:---:|:---:|:---:|:---:|:---:|---|---|---|:---:|
+| REC01 | Recommendations | Partner & Study Buddy Matching | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `GET /api/matching`, multi-factor scoring (skills, university, department, bio), verified in `phase7-recommendations.test.ts` | None | `users` table | P1 |
+| REC02 | Recommendations | Pairwise Compatibility Score | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `GET /api/matching/score`, Jaccard + cosine composite index, verified in `phase7-recommendations.test.ts` | None | `users` table | P1 |
+| VEC01 | Vector Search | Semantic Research Discovery | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `GET /api/research/search`, cosine vector similarity + keyword fallback, verified in `phase7-vector-search.test.ts` | None | `research_embeddings` | P1 |
+| OBS01 | Observability | Structured Logging & Error Monitoring | Done | IMPLEMENTED | ✓ | ✓ | - | - | ✓ | `logger.ts`, sensitive data scrubber, Sentry scope tagging, verified in `phase7-observability.test.ts` | None | Sentry SDK | P1 |
+| OBS02 | Observability | Health & Readiness Probes | Done | IMPLEMENTED | - | ✓ | ✓ | - | ✓ | `GET /api/health`, `GET /api/health/ready` (DB probe), verified in `phase7-health.test.ts` | None | Supabase | P0 |
+

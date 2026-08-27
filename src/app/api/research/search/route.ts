@@ -1,26 +1,18 @@
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
+import { searchResearchSemantic } from "@/server/recommendations/matching-engine"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
+// GET /api/research/search — Semantic + keyword research search
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const query = searchParams.get("q") || searchParams.get("query") || ""
+    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)))
+    const offset = Math.max(0, parseInt(searchParams.get("offset") || "0", 10))
 
-export async function GET() {
-  return notImplemented()
-}
-
-export async function POST() {
-  return notImplemented()
-}
-
-export async function PATCH() {
-  return notImplemented()
-}
-
-export async function DELETE() {
-  return notImplemented()
+    const papers = await searchResearchSemantic({ query, limit, offset })
+    return NextResponse.json(papers, { status: 200 })
+  } catch (err) {
+    return internalError(err)
+  }
 }

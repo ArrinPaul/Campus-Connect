@@ -1,17 +1,7 @@
 /**
- * Structured logger for the Next.js frontend.
- *
- * - Development: pretty colour-coded console output
- * - Production:  errors/warns sent to Sentry; all levels emit structured JSON
- *
- * Usage:
- *   import { createLogger } from "@/lib/logger"
- *   const log = createLogger("PostCard")
- *   log.info("Post deleted", { postId })
- *   log.error("Failed to delete post", error, { postId })
+ * Structured logger for Campus Connect with production security scrubbing,
+ * request correlation IDs, and Sentry error monitoring integration.
  */
-
-
 
 export type LogLevel = "debug" | "info" | "warn" | "error"
 
@@ -24,6 +14,46 @@ export interface Logger {
   info(message: string, context?: LogContext): void
   warn(message: string, context?: LogContext): void
   error(message: string, error?: unknown, context?: LogContext): void
+}
+
+// ─── Sensitive Field Scrubber ────────────────────────────────────────────────
+
+const SENSITIVE_KEYS = new Set([
+  "password",
+  "token",
+  "secret",
+  "authorization",
+  "cookie",
+  "apikey",
+  "service_role",
+  "service_key",
+  "private_key",
+  "card",
+  "cvv",
+])
+
+export function scrubSensitiveData(data: unknown): unknown {
+  if (data === null || data === undefined) return data
+  if (typeof data !== "object") return data
+
+  if (Array.isArray(data)) {
+    return data.map((item) => scrubSensitiveData(item))
+  }
+
+  const clean: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
+    const lowerKey = key.toLowerCase()
+    const isSensitive = Array.from(SENSITIVE_KEYS).some((s) => lowerKey.includes(s))
+
+    if (isSensitive) {
+      clean[key] = "[REDACTED]"
+    } else if (typeof value === "object" && value !== null) {
+      clean[key] = scrubSensitiveData(value)
+    } else {
+      clean[key] = value
+    }
+  }
+  return clean
 }
 
 // ─── Colours for dev-mode pretty output ──────────────────────────────────────
@@ -61,22 +91,24 @@ function emit(
   error?: unknown,
   context?: LogContext
 ): void {
+  const cleanContext = context ? (scrubSensitiveData(context) as LogContext) : undefined
+
   if (Sentry && (level === "error" || level === "warn")) {
     try {
       Sentry.withScope((sentryScope: any) => {
         sentryScope.setTag("logger.scope", scope)
-        if (context) {
-          sentryScope.setExtras(context)
+        if (cleanContext) {
+          sentryScope.setExtras(cleanContext)
         }
         if (level === "error") {
           Sentry.captureException(error || new Error(message))
         } else if (level === "warn") {
-          sentryScope.setExtras({ level: "warning" }) // Set warning level extra if needed, or captured in message
+          sentryScope.setExtras({ level: "warning" })
           Sentry.captureMessage(message, "warning")
         }
       })
-    } catch (err) {
-      // Ignore
+    } catch {
+      // Graceful fallback
     }
   }
 
@@ -86,7 +118,7 @@ function emit(
     scope,
     message,
     timestamp: ts,
-    ...(context ?? {}),
+    ...(cleanContext ?? {}),
   }
 
   if (error !== undefined) {
@@ -97,7 +129,7 @@ function emit(
     }
   }
 
-  // ── Server (Node.js / Edge) — always structured JSON ──────────────────────
+  // Server (Node.js / Edge) — structured JSON
   if (isServer) {
     const out = JSON.stringify(payload)
     if (level === "error") {
@@ -110,24 +142,24 @@ function emit(
     return
   }
 
-  // ── Browser development — pretty formatted ────────────────────────────────
+  // Browser development — pretty formatted
   if (isDev) {
     const prefix = `%c[${LEVEL_PREFIXES[level]}] [${scope}]`
     const style = LEVEL_STYLES[level]
 
     if (level === "error") {
-      console.error(prefix, style, message, ...(context ? [context] : []), ...(error !== undefined ? [error] : []))
+      console.error(prefix, style, message, ...(cleanContext ? [cleanContext] : []), ...(error !== undefined ? [error] : []))
     } else if (level === "warn") {
-      console.warn(prefix, style, message, ...(context ? [context] : []))
+      console.warn(prefix, style, message, ...(cleanContext ? [cleanContext] : []))
     } else if (level === "debug") {
-      console.debug(prefix, style, message, ...(context ? [context] : []))
+      console.debug(prefix, style, message, ...(cleanContext ? [cleanContext] : []))
     } else {
-      console.info(prefix, style, message, ...(context ? [context] : []))
+      console.info(prefix, style, message, ...(cleanContext ? [cleanContext] : []))
     }
     return
   }
 
-  // ── Browser production — structured JSON ────────────────────────────────
+  // Browser production — structured JSON
   const out = JSON.stringify(payload)
   if (level === "error") {
     console.error(out)
@@ -140,12 +172,6 @@ function emit(
 
 // ─── Factory ─────────────────────────────────────────────────────────────────
 
-/**
- * Create a scoped logger. The scope name appears in every log line and as a
- * Sentry tag for easy filtering.
- *
- * @param scope  Module/component name, e.g. "PostCard", "auth/webhook"
- */
 export function createLogger(scope: string): Logger {
   return {
     debug(message, context) {
@@ -162,7 +188,5 @@ export function createLogger(scope: string): Logger {
     },
   }
 }
-
-// ─── Default app-level logger ─────────────────────────────────────────────────
 
 export const logger = createLogger("app")

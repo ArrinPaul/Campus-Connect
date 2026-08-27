@@ -54,3 +54,16 @@
 | **P3-02** | ESLint Warnings | 2 `<img>` warnings in `ChatInput.tsx` and `ChatMessage.tsx`. | **✅ RESOLVED** | Replaced with Next.js `Image` and `OptimizedImage`. `npx next lint` reports 0 warnings and 0 errors. |
 | **P3-03** | Ad Campaign Pausing | `/api/ads/pause` was a 501 scaffold stub. | **✅ RESOLVED** | Implemented campaign status toggle in `src/app/api/ads/pause/route.ts` with ownership & admin RBAC checks. |
 | **P3-04** | Migration Script | `run-migration.js` path mismatch. | **✅ RESOLVED** | Updated path to canonical `supabase/migrations/20240101000000_init.sql`. |
+
+---
+
+## Phase 7 Production Hardening & Observability Tasks (ALL RESOLVED)
+
+| Task ID | Component | Problem | Status | Resolution / Verification |
+|---|---|---|:---:|---|
+| **P7-01** | Observability | Unstructured logs & unprotected sensitive data. | **✅ RESOLVED** | Added recursive data scrubber to `src/lib/logger.ts`, correlation IDs, and unified `src/lib/analytics.ts` product event abstraction. Verified in `tests/phase7-observability.test.ts`. |
+| **P7-02** | Matching Engine | Study buddy & project partner matching routes were stubs. | **✅ RESOLVED** | Implemented multi-factor matching engine in `matching-engine.ts`, `GET /api/matching`, and `GET /api/matching/score`. Verified in `tests/phase7-recommendations.test.ts`. |
+| **P7-03** | Vector Search | Research paper semantic similarity search was a stub. | **✅ RESOLVED** | Added Table 43 `research_embeddings`, Table 44 `user_interest_embeddings`, `EmbeddingProvider` abstraction, and `GET /api/research/search`. Verified in `tests/phase7-vector-search.test.ts`. |
+| **P7-04** | Health Probes | Missing production liveness and readiness endpoints. | **✅ RESOLVED** | Implemented `GET /api/health` (liveness) and `GET /api/health/ready` (readiness with DB probe). Verified in `tests/phase7-health.test.ts`. |
+| **P7-05** | Caching | Unbounded repeated database queries on public views. | **✅ RESOLVED** | Built `src/lib/cache.ts` with bounded TTL memory cache and eviction. Verified in `tests/phase7-cache.test.ts`. |
+

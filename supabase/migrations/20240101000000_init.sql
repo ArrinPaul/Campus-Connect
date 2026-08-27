@@ -595,6 +595,34 @@ CREATE TABLE IF NOT EXISTS subscription_events (
 );
 
 -- ============================================================================
+-- 43. RESEARCH EMBEDDINGS
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS research_embeddings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  paper_id UUID NOT NULL REFERENCES research_papers(id) ON DELETE CASCADE,
+  embedding JSONB DEFAULT '[]',
+  dimensions INT DEFAULT 128,
+  model TEXT DEFAULT 'text-embedding-3-small',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(paper_id)
+);
+
+-- ============================================================================
+-- 44. USER INTEREST EMBEDDINGS
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS user_interest_embeddings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  embedding JSONB DEFAULT '[]',
+  tags TEXT[] DEFAULT '{}',
+  dimensions INT DEFAULT 128,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id)
+);
+
+-- ============================================================================
 -- INDEXES
 -- ============================================================================
 CREATE INDEX IF NOT EXISTS idx_posts_author ON posts(author_id);
