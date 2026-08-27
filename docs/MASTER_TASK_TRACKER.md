@@ -37,13 +37,11 @@
 
 ## P2 Medium Tasks (Secondary Features & Polish)
 
-| Task ID | Component | Problem | Why It Matters | Impacted Files | Acceptance Criteria | Tests Required |
-|---|---|---|---|---|---|---|
-| **P2-01** | Gamification | G01-G06 features have DB table `user_reputation` but 0 UI pages or hooks. | Student engagement and reputation tracking is inactive. | `src/app/(dashboard)/leaderboard/page.tsx` (new), `src/server/db/users.ts` | Leaderboard view showing top students ranked by reputation points. | Component test |
+| **P2-01** | Gamification | G01-G06 features had DB table but lacked end-to-end integration. | **✅ RESOLVED** | Implemented `src/server/db/gamification.ts`, `/leaderboard` page, period/university filters, reputation triggers (+15, +10, +5), skill endorsements, achievement badges, and `tests/phase5-*.test.ts` (18 tests). | | |
 | **P2-02** | Push Notifications | Web Push subscription endpoint `/api/push/subscribe` is a stub. | Background browser notifications cannot be sent to offline students. | `src/app/api/push/subscribe/route.ts`, `src/hooks/usePushNotifications.ts` | Browser push subscription JSON is saved to `push_subscriptions` table. | Web Push test |
 | **P2-03** | E2E Testing | Zero Playwright / Cypress automated browser tests exist. | Critical user journeys (Signup -> Feed -> DM -> Checkout) lack regression safety. | `e2e/` (new directory), `playwright.config.ts` | Automated end-to-end tests for Auth, Feed post creation, and Direct messaging. | `npm run test:e2e` |
-| **P2-04** | Research Reviews | Research paper peer review and voting routes were 501 stubs. | **✅ RESOLVED** | Implemented in `content.ts`, `/api/research/review`, `/api/research/vote`, verified in `tests/research-review-vote.test.ts`. |
-| **P2-05** | Marketplace Mutations | Marketplace update/delete mutations were 501 stubs. | **✅ RESOLVED** | Implemented in `misc.ts`, `/api/marketplace/update`, `/api/marketplace/delete`, verified in `tests/marketplace-mutations.test.ts`. |
+| **P2-04** | Research Reviews | Research paper peer review and voting routes were 501 stubs. | **✅ RESOLVED** | Implemented in `content.ts`, `/api/research/review`, `/api/research/vote`, verified in `tests/research-review-vote.test.ts`. | | |
+| **P2-05** | Marketplace Mutations | Marketplace update/delete mutations were 501 stubs. | **✅ RESOLVED** | Implemented in `misc.ts`, `/api/marketplace/update`, `/api/marketplace/delete`, verified in `tests/marketplace-mutations.test.ts`. | | |
 | **P2-06** | Story Navigation | Story player lacks tap-left / tap-right transitions between user stories. | Story viewing UX requires manual close. | `src/app/(dashboard)/stories/[id]/page.tsx` | Keyboard arrow and click zone navigation auto-advances to next unviewed story. | Component test |
 
 ---

@@ -516,4 +516,13 @@ export const api = {
     createReport: ep("/api/reports", "POST"),
     getReports: ep("/api/reports"),
   },
+
+  // ── gamification & leaderboard ─────────────────────────────────────────────
+  gamification: {
+    getLeaderboard: ep("/api/leaderboard"),
+    getUserReputation: ep("/api/reputation"),
+  },
+  leaderboard: {
+    getLeaderboard: ep("/api/leaderboard"),
+  },
 } as const

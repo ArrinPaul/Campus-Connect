@@ -118,10 +118,10 @@ export async function answerQuestion(questionId: string, authorId: string, conte
 export async function acceptAnswer(answerId: string) {
   const supabase = await getSupabase()
   
-  // First get the answer to find the question ID
+  // First get the answer to find the question ID and author ID
   const { data: answer, error: ansError } = await supabase
     .from("question_answers")
-    .select("question_id")
+    .select("question_id, author_id")
     .eq("id", answerId)
     .single()
     
@@ -140,12 +140,29 @@ export async function acceptAnswer(answerId: string) {
     .from("questions")
     .update({ is_resolved: true })
     .eq("id", answer.question_id)
+
+  // Award +15 reputation points to the answer author (Gamification Engine)
+  if (answer.author_id) {
+    const { awardReputation } = await import("@/server/db/gamification")
+    await awardReputation({
+      recipientId: answer.author_id,
+      actorId: null,
+      eventType: "accepted_answer",
+      sourceType: "question_answer",
+      sourceId: answerId,
+      points: 15,
+    })
+  }
     
   return true
 }
 
 export async function voteQuestion(questionId: string, userId: string, voteType: "up" | "down" = "up") {
   const supabase = await getSupabase()
+
+  // Fetch question author
+  const { data: question } = await supabase.from("questions").select("author_id").eq("id", questionId).single()
+  const authorId = question?.author_id
 
   const { data: existing } = await supabase
     .from("reactions")
@@ -158,17 +175,44 @@ export async function voteQuestion(questionId: string, userId: string, voteType:
   let userVote: "up" | "down" | null = voteType
   let diff = voteType === "up" ? 1 : -1
 
+  const { awardReputation, revokeReputation } = await import("@/server/db/gamification")
+
   if (existing) {
     if (existing.type === voteType) {
       // Toggle off
       await supabase.from("reactions").delete().eq("id", existing.id)
       diff = voteType === "up" ? -1 : 1
       userVote = null
+
+      if (voteType === "up" && authorId) {
+        await revokeReputation({
+          recipientId: authorId,
+          eventType: "question_upvote",
+          sourceId: questionId,
+        })
+      }
     } else {
       // Switch vote from opposite
       await supabase.from("reactions").update({ type: voteType }).eq("id", existing.id)
       diff = voteType === "up" ? 2 : -2
       userVote = voteType
+
+      if (voteType === "up" && authorId) {
+        await awardReputation({
+          recipientId: authorId,
+          actorId: userId,
+          eventType: "question_upvote",
+          sourceType: "question",
+          sourceId: questionId,
+          points: 5,
+        })
+      } else if (voteType === "down" && authorId) {
+        await revokeReputation({
+          recipientId: authorId,
+          eventType: "question_upvote",
+          sourceId: questionId,
+        })
+      }
     }
   } else {
     // New vote
@@ -178,6 +222,17 @@ export async function voteQuestion(questionId: string, userId: string, voteType:
       target_type: "question",
       type: voteType,
     })
+
+    if (voteType === "up" && authorId) {
+      await awardReputation({
+        recipientId: authorId,
+        actorId: userId,
+        eventType: "question_upvote",
+        sourceType: "question",
+        sourceId: questionId,
+        points: 5,
+      })
+    }
   }
 
   // Atomically update question vote_count
@@ -255,8 +310,9 @@ export async function votePaper(paperId: string, userId: string, voteType: "up" 
   const supabase = await getSupabase()
 
   // Verify paper exists
-  const { data: paper } = await supabase.from("research_papers").select("id").eq("id", paperId).single()
+  const { data: paper } = await supabase.from("research_papers").select("id, uploaded_by").eq("id", paperId).single()
   if (!paper) return { error: "Paper not found", status: 404 }
+  const uploaderId = paper.uploaded_by
 
   const { data: existing } = await supabase
     .from("reactions")
@@ -269,17 +325,44 @@ export async function votePaper(paperId: string, userId: string, voteType: "up" 
   let userVote: "up" | "down" | null = voteType
   let diff = voteType === "up" ? 1 : -1
 
+  const { awardReputation, revokeReputation } = await import("@/server/db/gamification")
+
   if (existing) {
     if (existing.type === voteType) {
       // Toggle off
       await supabase.from("reactions").delete().eq("id", existing.id)
       diff = voteType === "up" ? -1 : 1
       userVote = null
+
+      if (voteType === "up" && uploaderId) {
+        await revokeReputation({
+          recipientId: uploaderId,
+          eventType: "research_vote",
+          sourceId: paperId,
+        })
+      }
     } else {
       // Switch vote from opposite
       await supabase.from("reactions").update({ type: voteType }).eq("id", existing.id)
       diff = voteType === "up" ? 2 : -2
       userVote = voteType
+
+      if (voteType === "up" && uploaderId) {
+        await awardReputation({
+          recipientId: uploaderId,
+          actorId: userId,
+          eventType: "research_vote",
+          sourceType: "research_paper",
+          sourceId: paperId,
+          points: 10,
+        })
+      } else if (voteType === "down" && uploaderId) {
+        await revokeReputation({
+          recipientId: uploaderId,
+          eventType: "research_vote",
+          sourceId: paperId,
+        })
+      }
     }
   } else {
     // New vote
@@ -289,6 +372,17 @@ export async function votePaper(paperId: string, userId: string, voteType: "up" 
       target_type: "research",
       type: voteType,
     })
+
+    if (voteType === "up" && uploaderId) {
+      await awardReputation({
+        recipientId: uploaderId,
+        actorId: userId,
+        eventType: "research_vote",
+        sourceType: "research_paper",
+        sourceId: paperId,
+        points: 10,
+      })
+    }
   }
 
   // Atomically update paper vote_count
@@ -338,6 +432,17 @@ export async function submitPaperReview(paperId: string, reviewerId: string, rev
     field_name: "review_count",
     row_id: paperId,
     increment_by: 1,
+  })
+
+  // Award +10 reputation points for submitting a helpful peer review
+  const { awardReputation } = await import("@/server/db/gamification")
+  await awardReputation({
+    recipientId: reviewerId,
+    actorId: reviewerId, // Note: reviewer is doing the helpful work
+    eventType: "helpful_review",
+    sourceType: "research_review",
+    sourceId: paperId,
+    points: 10,
   })
 
   return {

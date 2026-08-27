@@ -44,7 +44,7 @@
 | U03 | Users | Profile Header | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `ProfileHeader.tsx`, follower counters | None | Users table | P1 |
 | U04 | Users | Profile Edit Form | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `ProfileForm.tsx`, `PATCH /api/users/me`, Zod validation | None | Users table | P1 |
 | U05 | Users | Skills Manager | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `SkillsManager.tsx`, `/api/users/skills` | None | Users table | P1 |
-| U06 | Users | Skill Endorsements | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `SkillEndorsements.tsx`, `/api/skills/endorse` | None | `skill_endorsements` | P2 |
+| U06 | Users | Skill Endorsements | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `SkillEndorsements.tsx`, `POST/DELETE /api/skills/endorse`, `GET /api/skills/endorsements`, verified in `phase5-skill-endorsements.test.ts` | None | `skill_endorsements` | P1 |
 | U07 | Users | Followers List | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `FollowersList.tsx`, `/api/follows/followers` | None | `follows` table | P1 |
 | U08 | Users | Following List | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `FollowingList.tsx`, `/api/follows/following` | None | `follows` table | P1 |
 | U09 | Users | User Card | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `UserCard.tsx` with follow button state | None | Users table | P1 |
@@ -284,12 +284,12 @@
 
 | ID | Domain | Feature | Documented Status | Actual Status | Frontend | API | Database | Realtime | Tests | Evidence | Remaining Work | Dependencies | Priority |
 |---|---|---|---|---|:---:|:---:|:---:|:---:|:---:|---|---|---|:---:|
-| G01 | Gamification | Leaderboard Page | Done | MISSING | - | - | ✓ | - | - | `user_reputation` table exists; no frontend page | Build page UI | None | P2 |
-| G02 | Gamification | Period Filter | Done | MISSING | - | - | - | - | - | Documented in FEATURES.md; 0 code | Build query filter | None | P2 |
-| G03 | Gamification | University Filter | Done | MISSING | - | - | - | - | - | Documented in FEATURES.md; 0 code | Build university query | None | P2 |
-| G04 | Gamification | Reputation Points | Done | MISSING | - | - | ✓ | - | - | Column `points` exists in `user_reputation`; no increment triggers | Build point handlers | `user_reputation` | P2 |
-| G05 | Gamification | Achievement Badges | Done | MISSING | - | - | ✓ | - | - | Column `badges` array exists in `user_reputation`; no badges awarded | Build badge rules | `user_reputation` | P2 |
-| G06 | Gamification | Profile User Stats | Done | MISSING | - | - | - | - | - | Documented in FEATURES.md; 0 code | Render on profile | None | P2 |
+| G01 | Gamification | Leaderboard Page | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `src/app/(dashboard)/leaderboard/page.tsx`, `GET /api/leaderboard`, Top 3 podium, verified in `phase5-leaderboard.test.ts` | None | `user_reputation` | P1 |
+| G02 | Gamification | Period Filter | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | Weekly, Monthly, All-Time period tabs aggregating `reputation_events`, verified in `phase5-leaderboard.test.ts` | None | `reputation_events` | P1 |
+| G03 | Gamification | University Filter | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | University dropdown and real-time query filter, verified in `phase5-leaderboard.test.ts` | None | `users` | P1 |
+| G04 | Gamification | Reputation Points | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | Atomic triggers (+15 accepted answer, +10 research vote/review, +5 Q&A vote) in `gamification.ts` & `content.ts`, verified in `phase5-reputation-engine.test.ts` | None | `reputation_events` | P1 |
+| G05 | Gamification | Achievement Badges | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | Deterministic criteria for Top Researcher, Helpful Peer, Campus Leader in `evaluateBadges`, verified in `phase5-badges.test.ts` | None | `user_reputation` | P1 |
+| G06 | Gamification | Profile User Stats | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | Points, Level, Campus Rank, and Badge icons rendered in `ProfileHeader.tsx`, verified in `ProfileHeader.test.tsx` | None | `user_reputation` | P1 |
 
 ---
 

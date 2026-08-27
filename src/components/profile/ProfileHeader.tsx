@@ -9,7 +9,7 @@ import { api } from"@/lib/api"
 import { Id } from"@/lib/api"
 import { ButtonLoadingSpinner } from"@/components/ui/loading-skeleton"
 import { OnlineStatusDot } from"@/components/ui/OnlineStatusDot"
-import { MessageSquare, Pencil, X, Share2, Globe, Github, Linkedin, Twitter, BookOpen } from"lucide-react"
+import { MessageSquare, Pencil, X, Share2, Globe, Github, Linkedin, Twitter, BookOpen, Trophy, Award, CheckCircle, Sparkles } from"lucide-react"
 import { createLogger } from"@/lib/logger"
 import { toast } from"sonner"
 import { ProfileForm } from"@/components/profile/ProfileForm"
@@ -63,6 +63,11 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
   const isFollowingQuery = useQuery(
     api.follows.isFollowing,
     isLoaded && isSignedIn && !isOwnProfile && targetUserId ? { userId: targetUserId } : "skip"
+  )
+
+  const reputation = useQuery(
+    api.gamification?.getUserReputation,
+    targetUserId ? { userId: targetUserId } : "skip"
   )
   
   const [optimisticFollowing, setOptimisticFollowing] = useState<boolean | null>(null)
@@ -187,7 +192,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
 
               {/* Stats & Socials Row */}
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 mt-6 pt-6 border-t border-hairline w-full">
-                <div className="flex gap-4">
+                <div className="flex flex-wrap items-center gap-4">
                   <div className="text-center md:text-left">
                     <p className="text-tagline font-bold text-ink-deep">{followerCount}</p>
                     <p className="text-[10px] text-slate uppercase font-semibold">Followers</p>
@@ -196,30 +201,63 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
                     <p className="text-tagline font-bold text-ink-deep">{followingCount}</p>
                     <p className="text-[10px] text-slate uppercase font-semibold">Following</p>
                   </div>
+                  <div className="text-center md:text-left border-l border-hairline pl-4">
+                    <p className="text-tagline font-bold text-primary flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>{reputation?.points ?? (user as any).reputation ?? 0}</span>
+                    </p>
+                    <p className="text-[10px] text-slate uppercase font-semibold">Reputation (Lvl {reputation?.level ?? 1})</p>
+                  </div>
+                  <div className="text-center md:text-left border-l border-hairline pl-4">
+                    <p className="text-tagline font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                      <Trophy className="w-3.5 h-3.5" />
+                      <span>{reputation?.rank ? `#${reputation.rank}` : "—"}</span>
+                    </p>
+                    <p className="text-[10px] text-slate uppercase font-semibold">Campus Rank</p>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-3 ml-auto">
                   {user.socialLinks?.website && (
- <a href={user.socialLinks.website} target="_blank" className="p-2 rounded-full hover:bg-canvas text-slate transition-colors"><Globe size={18} /></a>
- )}
- {user.socialLinks?.github && (
- <a href={user.socialLinks.github} target="_blank" className="p-2 rounded-full hover:bg-canvas text-slate transition-colors"><Github size={18} /></a>
- )}
- {user.socialLinks?.linkedin && (
- <a href={user.socialLinks.linkedin} target="_blank" className="p-2 rounded-full hover:bg-canvas text-slate transition-colors"><Linkedin size={18} /></a>
- )}
- {user.socialLinks?.twitter && (
- <a href={user.socialLinks.twitter} target="_blank" className="p-2 rounded-full hover:bg-canvas text-slate transition-colors"><Twitter size={18} /></a>
- )}
- </div>
- </div>
- </div>
+                    <a href={user.socialLinks.website} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-canvas text-slate transition-colors"><Globe size={18} /></a>
+                  )}
+                  {user.socialLinks?.github && (
+                    <a href={user.socialLinks.github} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-canvas text-slate transition-colors"><Github size={18} /></a>
+                  )}
+                  {user.socialLinks?.linkedin && (
+                    <a href={user.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-canvas text-slate transition-colors"><Linkedin size={18} /></a>
+                  )}
+                  {user.socialLinks?.twitter && (
+                    <a href={user.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-canvas text-slate transition-colors"><Twitter size={18} /></a>
+                  )}
+                </div>
+              </div>
 
- {/* Actions */}
- <div className="flex items-center gap-3">
- <Button variant="pearl" size="icon" className="shadow-sm">
- <Share2 size={20} />
- </Button>
+              {/* Achievement Badges Row */}
+              {reputation?.badges && reputation.badges.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2 pt-4 w-full">
+                  <span className="text-[10px] font-bold text-slate uppercase tracking-wider mr-1">Badges:</span>
+                  {reputation.badges.map((b: any) => (
+                    <div
+                      key={b.id}
+                      title={`${b.name}: ${b.description}`}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-semibold"
+                    >
+                      {b.id === "top_researcher" && <BookOpen className="w-3.5 h-3.5" />}
+                      {b.id === "helpful_peer" && <CheckCircle className="w-3.5 h-3.5" />}
+                      {b.id === "campus_leader" && <Trophy className="w-3.5 h-3.5" />}
+                      <span>{b.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3">
+              <Button variant="pearl" size="icon" className="shadow-sm">
+                <Share2 size={20} />
+              </Button>
  
  {!isOwnProfile && (
  <>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Users, Briefcase, Store, Bell, LogOut, Settings, User, Sun, Moon, MessageSquare, Handshake, ShieldAlert } from 'lucide-react';
+import { Home, Users, Briefcase, Store, Bell, LogOut, Settings, User, Sun, Moon, MessageSquare, Handshake, ShieldAlert, Award } from 'lucide-react';
 import { useUser, useAuthActions } from '@/lib/auth/client';
 import { useQuery } from '@/lib/api';
 import { api } from '@/lib/api';
@@ -49,6 +49,7 @@ export function DesktopSidebar() {
     { href: '/feed', label: 'Feed', icon: Home },
     { href: '/messages', label: 'Inbox', icon: MessageSquare, badge: unreadMessagesCount },
     { href: '/communities', label: 'Communities', icon: Users },
+    { href: '/leaderboard', label: 'Leaderboard', icon: Award },
     { href: '/find-partners', label: 'Find Partners', icon: Handshake },
     { href: '/jobs', label: 'Jobs', icon: Briefcase },
     { href: '/marketplace', label: 'Marketplace', icon: Store },

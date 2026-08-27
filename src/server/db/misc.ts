@@ -227,23 +227,110 @@ export async function universalSearch(query: string) {
 // ─── Skill Endorsements ─────────────────────────────────────────────────────
 
 export async function endorseSkill(userId: string, endorserId: string, skill: string) {
+  if (!userId || !endorserId || !skill) {
+    return { error: "Missing required parameters", status: 400 }
+  }
+
+  // Rule: Do not allow self-endorsement
+  if (userId === endorserId) {
+    return { error: "You cannot endorse your own skills", status: 400 }
+  }
+
   const supabase = await getSupabase()
+
+  // Verify target user exists
+  const { data: user, error: userError } = await supabase
+    .from("users")
+    .select("id, skills")
+    .eq("id", userId)
+    .single()
+
+  if (userError || !user) {
+    return { error: "Target user not found", status: 404 }
+  }
+
+  // Verify target user has the skill
+  const currentSkills: string[] = Array.isArray(user.skills) ? user.skills : []
+  const hasSkill = currentSkills.some((s) => s.toLowerCase() === skill.toLowerCase())
+  if (!hasSkill) {
+    return { error: `User does not list "${skill}" as a skill`, status: 400 }
+  }
+
   const { data, error } = await supabase
     .from("skill_endorsements")
     .upsert({ user_id: userId, endorser_id: endorserId, skill })
     .select()
     .single()
-  if (error) return null
-  return data
+
+  if (error) return { error: error.message, status: 500 }
+
+  // Evaluate badges in background
+  import("@/server/db/gamification").then(({ evaluateBadges }) => {
+    evaluateBadges(userId).catch(() => {})
+  })
+
+  return { success: true, endorsement: data }
 }
 
-export async function getEndorsements(userId: string) {
+export async function removeEndorsement(userId: string, endorserId: string, skill: string) {
+  if (!userId || !endorserId || !skill) {
+    return { error: "Missing required parameters", status: 400 }
+  }
+
   const supabase = await getSupabase()
-  const { data } = await supabase
+  const { error } = await supabase
     .from("skill_endorsements")
-    .select("*, endorser:users!skill_endorsements_endorser_id_fkey(id, name, username, profile_picture)")
+    .delete()
     .eq("user_id", userId)
-  return data ?? []
+    .eq("endorser_id", endorserId)
+    .eq("skill", skill)
+
+  if (error) return { error: error.message, status: 500 }
+
+  // Evaluate badges in background
+  import("@/server/db/gamification").then(({ evaluateBadges }) => {
+    evaluateBadges(userId).catch(() => {})
+  })
+
+  return { success: true }
+}
+
+export async function getEndorsements(userId: string, viewerId?: string) {
+  const supabase = await getSupabase()
+
+  // Fetch user skills and all endorsements for this user
+  const [userRes, endorsementsRes] = await Promise.all([
+    supabase.from("users").select("skills").eq("id", userId).single(),
+    supabase
+      .from("skill_endorsements")
+      .select("*, endorser:users!skill_endorsements_endorser_id_fkey(id, name, username, profile_picture)")
+      .eq("user_id", userId),
+  ])
+
+  const skills: string[] = Array.isArray(userRes.data?.skills) ? userRes.data.skills : []
+  const endorsements = endorsementsRes.data ?? []
+
+  const skillsList = skills.map((skillName) => {
+    const matching = endorsements.filter(
+      (e: any) => e.skill.toLowerCase() === skillName.toLowerCase()
+    )
+    const count = matching.length
+    const topEndorsers = matching
+      .map((e: any) => e.endorser?.name || "A Peer")
+      .slice(0, 3)
+    const endorsedByViewer = viewerId
+      ? matching.some((e: any) => e.endorser_id === viewerId)
+      : false
+
+    return {
+      name: skillName,
+      count,
+      topEndorsers,
+      endorsedByViewer,
+    }
+  })
+
+  return { skills: skillsList }
 }
 
 // ─── Portfolio ──────────────────────────────────────────────────────────────

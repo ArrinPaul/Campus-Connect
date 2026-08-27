@@ -48,6 +48,9 @@ jest.mock("@/lib/api", () => ({
     presence: {
       getUserPresence: "presence:getUserPresence",
     },
+    gamification: {
+      getUserReputation: "gamification:getUserReputation",
+    },
   },
 }))
 

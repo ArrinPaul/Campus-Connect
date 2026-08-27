@@ -533,6 +533,22 @@ CREATE TABLE IF NOT EXISTS calls (
 );
 
 -- ============================================================================
+-- 39. REPUTATION EVENTS (Auditable Gamification History)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS reputation_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  recipient_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  actor_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  event_type TEXT NOT NULL CHECK (event_type IN ('accepted_answer', 'question_upvote', 'research_vote', 'helpful_review')),
+  source_type TEXT NOT NULL CHECK (source_type IN ('question_answer', 'question', 'research_paper', 'research_review')),
+  source_id UUID NOT NULL,
+  points INT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(recipient_user_id, event_type, source_id)
+);
+
+
+-- ============================================================================
 -- INDEXES
 -- ============================================================================
 CREATE INDEX IF NOT EXISTS idx_posts_author ON posts(author_id);
