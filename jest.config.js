@@ -17,7 +17,7 @@ const customJestConfig = {
     '**/__tests__/**/*.[jt]s?(x)',
     '**/?(*.)+(spec|test).[jt]s?(x)'
   ],
-  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/e2e/'],
+  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/src/e2e/'],
   // Transform ESM-only packages that react-markdown and its remark/rehype ecosystem require
   transformIgnorePatterns: [
     '/node_modules/(?!(' + [

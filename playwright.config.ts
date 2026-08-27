@@ -4,7 +4,7 @@ import { defineConfig, devices } from "@playwright/test"
  * Playwright Configuration for Campus Connect E2E Regression Suite
  */
 export default defineConfig({
-  testDir: "./e2e",
+  testDir: "./src/e2e",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,

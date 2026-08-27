@@ -19,7 +19,7 @@ describe("Phase 2 Foundation Verification Suite", () => {
 
   describe("1. Database Migration File Integrity", () => {
     const migrationSql = fs.readFileSync(
-      path.join(__dirname, "../supabase/migrations/20240101000000_init.sql"),
+      path.join(__dirname, "../../supabase/migrations/20240101000000_init.sql"),
       "utf-8"
     );
 
@@ -49,13 +49,13 @@ describe("Phase 2 Foundation Verification Suite", () => {
 
   describe("2. Security - Credential Scan", () => {
     it("setup-realtime.js uses process.env without hardcoded DB passwords", () => {
-      const scriptContent = fs.readFileSync(path.join(__dirname, "../setup-realtime.js"), "utf-8");
+      const scriptContent = fs.readFileSync(path.join(__dirname, "../../scripts/setup-realtime.js"), "utf-8");
       expect(scriptContent).not.toContain("Campus_connect11");
       expect(scriptContent).toContain("process.env.DATABASE_URL");
     });
 
     it("run-migration.js points to the canonical migration directory", () => {
-      const scriptContent = fs.readFileSync(path.join(__dirname, "../run-migration.js"), "utf-8");
+      const scriptContent = fs.readFileSync(path.join(__dirname, "../../scripts/run-migration.js"), "utf-8");
       expect(scriptContent).toContain("supabase/migrations/20240101000000_init.sql");
     });
   });
