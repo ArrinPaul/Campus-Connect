@@ -82,10 +82,8 @@ src/
 
 ## Documentation
 
-- [`AUDIT.md`](./AUDIT.md) — Comprehensive forensic audit report (~78% completion status)
-- [`PROJECT_PROFILE.md`](./PROJECT_PROFILE.md) — Architectural overview and stack profile
-- [`meta/DESIGN.md`](./meta/DESIGN.md) — Design system specification and token dictionary
-- [`docs/FEATURES.md`](./docs/FEATURES.md) — Feature catalog with verified statuses
-- [`docs/PLAN.md`](./docs/PLAN.md) — Technical plan and phase roadmap
-- [`docs/TASKS.md`](./docs/TASKS.md) — Granular implementation task checklist
-- [`docs/TRACKER.md`](./docs/TRACKER.md) — Progress tracking and feature breakdown
+- [`docs/SYSTEM_ARCHITECTURE.md`](./docs/SYSTEM_ARCHITECTURE.md) — Single source of truth for technical architecture, database design, and system overview.
+- [`docs/DEVELOPMENT.md`](./docs/DEVELOPMENT.md) — Developer onboarding, setup instructions, testing workflow, and code quality standards.
+- [`docs/OPERATIONS.md`](./docs/OPERATIONS.md) — Production operations, deployment, incident response, and monitoring guides.
+- [`docs/PHASE_8_FINAL_REPORT.md`](./docs/PHASE_8_FINAL_REPORT.md) — Final production certification baseline report.
+- [`meta/DESIGN.md`](./meta/DESIGN.md) — Design system specification and token dictionary.
