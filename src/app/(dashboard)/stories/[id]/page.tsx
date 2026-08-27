@@ -94,13 +94,35 @@ function StoryViewerContent({ storyId }: { storyId: Id<'stories'> }) {
  };
  }, [storyId, isAuthenticated, isVideo, story, startProgressBar, viewStory]);
  
- useEffect(() => {
- // Sync video play/pause
- if (videoRef.current) {
- if (isPaused) videoRef.current.pause();
- else videoRef.current.play().catch(console.error);
- }
- }, [isPaused]);
+  useEffect(() => {
+    // Keyboard navigation: ArrowLeft (prev), ArrowRight (next), Space (pause/play), Escape (exit)
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        navigateTo("prev");
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        navigateTo("next");
+      } else if (e.key === " " || e.code === "Space") {
+        e.preventDefault();
+        setIsPaused((prev) => !prev);
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        router.push("/stories");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [navigateTo, router]);
+
+  useEffect(() => {
+    // Sync video play/pause
+    if (videoRef.current) {
+      if (isPaused) videoRef.current.pause();
+      else videoRef.current.play().catch(console.error);
+    }
+  }, [isPaused]);
 
  const handleVideoTimeUpdate = () => {
  if (!videoRef.current || isPaused) return;
@@ -210,11 +232,27 @@ function StoryViewerContent({ storyId }: { storyId: Id<'stories'> }) {
  onPointerUp={() => setIsPaused(false)}
  onPointerLeave={() => setIsPaused(false)}
  >
- {/* Left Tap Zone */}
- <div className="absolute left-0 top-0 bottom-0 w-1/3 z-10" onClick={(e) => { e.stopPropagation(); navigateTo('prev'); }} />
- 
- {/* Right Tap Zone */}
- <div className="absolute right-0 top-0 bottom-0 w-2/3 z-10" onClick={(e) => { e.stopPropagation(); navigateTo('next'); }} />
+  {/* Left Tap Zone & Navigation Button */}
+  <div className="absolute left-0 top-0 bottom-0 w-1/3 z-10 flex items-center justify-start pl-4" onClick={(e) => { e.stopPropagation(); navigateTo('prev'); }}>
+    <button
+      onClick={(e) => { e.stopPropagation(); navigateTo('prev'); }}
+      className="hidden md:flex h-10 w-10 rounded-full bg-black/40 text-white items-center justify-center hover:bg-black/70 transition-colors pointer-events-auto"
+      aria-label="Previous story"
+    >
+      <ArrowLeft className="h-5 w-5" />
+    </button>
+  </div>
+  
+  {/* Right Tap Zone & Navigation Button */}
+  <div className="absolute right-0 top-0 bottom-0 w-2/3 z-10 flex items-center justify-end pr-4" onClick={(e) => { e.stopPropagation(); navigateTo('next'); }}>
+    <button
+      onClick={(e) => { e.stopPropagation(); navigateTo('next'); }}
+      className="hidden md:flex h-10 w-10 rounded-full bg-black/40 text-white items-center justify-center hover:bg-black/70 transition-colors pointer-events-auto"
+      aria-label="Next story"
+    >
+      <ArrowRight className="h-5 w-5" />
+    </button>
+  </div>
 
  {story.mediaUrl ? (
  isVideo ? (

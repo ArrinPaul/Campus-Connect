@@ -97,9 +97,11 @@ export function ChatMessage({ message, isOwn, showSenderInfo }: ChatMessageProps
           {imageUrl && (
             <div className="rounded-xl overflow-hidden border border-border/40 max-w-xs max-h-64 shadow-inner">
               <a href={imageUrl} target="_blank" rel="noopener noreferrer">
-                <img
+                <OptimizedImage
                   src={imageUrl}
                   alt="Attachment"
+                  width={320}
+                  height={240}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
                 />
               </a>

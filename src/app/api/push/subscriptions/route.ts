@@ -3,7 +3,7 @@ import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
 import { getUserPushSubscriptions } from "@/server/push/web-push"
 
-// GET /api/push/endpoint — Get current active push endpoints for user
+// GET /api/push/subscriptions
 export async function GET() {
   try {
     const supabase = await createClient()
@@ -12,11 +12,8 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const subs = await getUserPushSubscriptions(user.id)
-    return NextResponse.json({
-      count: subs.length,
-      endpoints: subs.map((s) => s.endpoint),
-    })
+    const subscriptions = await getUserPushSubscriptions(user.id)
+    return NextResponse.json(subscriptions)
   } catch (err) {
     return internalError(err)
   }

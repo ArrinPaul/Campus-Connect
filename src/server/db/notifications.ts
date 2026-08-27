@@ -55,5 +55,23 @@ export async function createNotification(data: {
     // we don't necessarily need to removeChannel immediately on server side, 
     // but good practice to clean up if we had a persistent connection.
     adminSupabase.removeChannel(channel)
+
+    // Dispatch Web Push notification asynchronously (Authoritative Server Trigger)
+    import("@/server/push/web-push").then(({ sendPushNotification }) => {
+      let targetUrl = "/notifications"
+      if (data.reference_type === "post" && data.reference_id) targetUrl = `/post/${data.reference_id}`
+      else if (data.reference_type === "question" && data.reference_id) targetUrl = `/q-and-a/${data.reference_id}`
+      else if (data.reference_type === "research_paper" && data.reference_id) targetUrl = `/research/${data.reference_id}`
+      else if (data.reference_type === "conversation" || data.type === "message") targetUrl = `/messages`
+      else if (data.reference_type === "marketplace" && data.reference_id) targetUrl = `/marketplace/${data.reference_id}`
+      else if (data.reference_type === "event" && data.reference_id) targetUrl = `/events/${data.reference_id}`
+
+      sendPushNotification({
+        userId: data.user_id,
+        title: "Campus Connect",
+        body: data.message,
+        url: targetUrl,
+      }).catch(() => {})
+    }).catch(() => {})
   }
 }

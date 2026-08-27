@@ -1,26 +1,28 @@
+import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
+import { cancelUserSubscription } from "@/server/subscriptions/service"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
-
-export async function GET() {
-  return notImplemented()
-}
-
+// POST or DELETE /api/subscriptions/cancel — Cancel active subscription
 export async function POST() {
-  return notImplemented()
-}
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
 
-export async function PATCH() {
-  return notImplemented()
+    const result = await cancelUserSubscription(user.id)
+    if (!result.success) {
+      return NextResponse.json({ error: result.error || "Failed to cancel subscription" }, { status: 400 })
+    }
+
+    return NextResponse.json({ success: true }, { status: 200 })
+  } catch (err) {
+    return internalError(err)
+  }
 }
 
 export async function DELETE() {
-  return notImplemented()
+  return POST()
 }

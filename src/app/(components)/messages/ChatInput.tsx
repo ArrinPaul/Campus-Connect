@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
+import Image from "next/image"
 import { Send, Image as ImageIcon, Smile, Paperclip, X, FileText, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -146,7 +147,7 @@ export function ChatInput({ onSendMessage, disabled, placeholder = "Type a messa
       {selectedFile && (
         <div className="flex items-center gap-3 p-2 bg-accent/40 border border-border rounded-lg w-fit max-w-sm animate-in fade-in">
           {selectedFile.isImage ? (
-            <img src={selectedFile.url} alt="Upload preview" className="h-12 w-12 object-cover rounded-md border border-border" />
+            <Image src={selectedFile.url} alt="Upload preview" width={48} height={48} unoptimized className="h-12 w-12 object-cover rounded-md border border-border" />
           ) : (
             <div className="h-10 w-10 rounded-md bg-primary/10 text-primary flex items-center justify-center">
               <FileText size={20} />

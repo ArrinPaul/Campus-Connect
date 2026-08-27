@@ -358,6 +358,37 @@ export async function addProject(userId: string, data: { title: string; descript
   return project
 }
 
+export async function deleteProject(projectId: string, userId: string) {
+  const supabase = await getSupabase()
+  const { error } = await supabase
+    .from("portfolio_projects")
+    .delete()
+    .eq("id", projectId)
+    .eq("user_id", userId)
+  return !error
+}
+
+export async function addCertification(userId: string, data: { title: string; issuer: string; date_obtained?: string; credential_url?: string }) {
+  const supabase = await getSupabase()
+  const { data: cert, error } = await supabase
+    .from("portfolio_certifications")
+    .insert({ user_id: userId, ...data })
+    .select()
+    .single()
+  if (error) return null
+  return cert
+}
+
+export async function deleteCertification(certId: string, userId: string) {
+  const supabase = await getSupabase()
+  const { error } = await supabase
+    .from("portfolio_certifications")
+    .delete()
+    .eq("id", certId)
+    .eq("user_id", userId)
+  return !error
+}
+
 // ─── Ads Tracking ───────────────────────────────────────────────────────────
 
 export async function trackAdImpression(adId: string) {

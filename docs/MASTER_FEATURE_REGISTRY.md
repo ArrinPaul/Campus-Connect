@@ -262,8 +262,8 @@
 | ST04 | Stories | Full-Screen Story Viewer | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `stories/[id]/page.tsx` progress timer player | None | `stories` table | P1 |
 | ST05 | Stories | View Tracking | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `POST /api/stories/view`, `story_views` table | None | `story_views` | P1 |
 | ST06 | Stories | 24-Hour Expiration | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | SQL filter `created_at > now() - interval '24 hours'` | None | `stories` table | P1 |
-| ST07 | Stories | Video Stories | TODO | PARTIAL | ✓ | - | - | - | - | Media type enum supports video; upload flow needs test | Verify video playback | Storage bucket | P2 |
-| ST08 | Stories | Story Navigation | TODO | PARTIAL | ✓ | - | - | - | - | Next/prev tap navigation in story player | Verify transitions | None | P2 |
+| ST07 | Stories | Video Stories | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | Media type enum supports video; auto-play & duration sync in `stories/[id]/page.tsx` | None | Storage bucket | P2 |
+| ST08 | Stories | Story Navigation | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | Tap left/right zones, keyboard ArrowLeft/ArrowRight/Space navigation, desktop buttons | None | None | P1 |
 
 ---
 
@@ -301,7 +301,7 @@
 | S02 | Settings | Account Settings | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `settings/page.tsx` tab, soft-delete modal | None | Users table | P1 |
 | S03 | Settings | Privacy Settings | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `settings/page.tsx` tab, `/api/users/privacy` | None | Users table | P1 |
 | S04 | Settings | Notification Settings | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `settings/page.tsx` tab, `/api/users/notification-preferences` | None | Users table | P1 |
-| S05 | Settings | Billing Settings | Done | STUB | ✓ | ✓ | - | - | ✓ | `/api/subscriptions` returns `{ status: "free" }` | Stripe gateway | Stripe API | P3 |
+| S05 | Settings | Billing Settings | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `settings/billing/page.tsx`, `GET/DELETE /api/subscriptions`, `POST /api/subscriptions/checkout`, verified in `phase6-subscriptions.test.ts` | None | `subscriptions` table | P1 |
 
 ---
 
@@ -324,7 +324,7 @@
 | L01 | Navigation | Desktop Sidebar | Done | IMPLEMENTED | ✓ | - | - | - | ✓ | `DesktopSidebar.tsx` with module links & active states | None | None | P0 |
 | L02 | Navigation | Mobile Top Bar | Done | IMPLEMENTED | ✓ | - | - | - | - | `MobileTopBar.tsx` sticky header | None | None | P1 |
 | L03 | Navigation | Mobile Bottom Nav | Done | IMPLEMENTED | ✓ | - | - | - | ✓ | `mobile-bottom-nav.tsx` touch navigation bar | None | None | P1 |
-| L04 | Navigation | 3-Column Dashboard Layout | Done | IMPLEMENTED | ✓ | - | - | - | ✓ | `main-layout.tsx` wrapper with portal sidebar | Fix padding test | None | P0 |
+| L04 | Navigation | 3-Column Dashboard Layout | Done | IMPLEMENTED | ✓ | - | - | - | ✓ | `main-layout.tsx` wrapper with portal sidebar | None | None | P0 |
 | L05 | Navigation | Auth Layout | Done | IMPLEMENTED | ✓ | - | - | - | - | `src/app/(auth)/layout.tsx` split-screen container | None | None | P1 |
 | L06 | Navigation | Marketing Landing Page | Done | IMPLEMENTED | ✓ | - | - | - | - | `src/app/page.tsx` animated public showcase | None | None | P2 |
 
@@ -347,11 +347,11 @@
 
 | ID | Domain | Feature | Documented Status | Actual Status | Frontend | API | Database | Realtime | Tests | Evidence | Remaining Work | Dependencies | Priority |
 |---|---|---|---|---|:---:|:---:|:---:|:---:|:---:|---|---|---|:---:|
-| PN01 | Push | Subscribe to Push | Done | STUB | ✓ | ✓ | - | - | - | `usePushNotifications.ts`, `/api/push/subscribe` returns static true | Save push subscription in DB | Web Push | P2 |
-| PN02 | Push | Unsubscribe | Done | STUB | ✓ | ✓ | - | - | - | `/api/push/unsubscribe` is a 501 scaffold stub | Implement unsubscribe | Web Push | P2 |
-| PN03 | Push | Notification Preferences | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | User settings push notification toggles | None | Users table | P2 |
-| PN04 | Push | VAPID Key Management | Done | STUB | ✓ | ✓ | - | - | - | `/api/push/vapid-key` is a 501 scaffold stub | Serve public VAPID key | VAPID env | P2 |
-| PN05 | Push | Service Worker Handler | Done | IMPLEMENTED | ✓ | - | - | - | - | `public/sw.js` push & notification click listeners | None | Browser SW | P2 |
+| PN01 | Push | Subscribe to Push | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `usePushNotifications.ts`, `POST /api/push/subscribe`, `push_subscriptions` table, verified in `phase6-push-notifications.test.ts` | None | `push_subscriptions` | P1 |
+| PN02 | Push | Unsubscribe | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `DELETE /api/push/subscribe`, `POST/DELETE /api/push/unsubscribe`, verified in `phase6-push-notifications.test.ts` | None | `push_subscriptions` | P1 |
+| PN03 | Push | Notification Preferences | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `GET/PATCH /api/push/preferences`, user settings toggles | None | Users table | P1 |
+| PN04 | Push | VAPID Key Management | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `GET /api/push/vapid-key` serves public key safely, verified in tests | None | VAPID env | P1 |
+| PN05 | Push | Service Worker Handler | Done | IMPLEMENTED | ✓ | - | - | - | - | `public/sw.js` push & deep-link notificationclick listeners | None | Browser SW | P1 |
 
 ---
 
@@ -375,7 +375,7 @@
 | AD03 | Ads | Ad Performance Dashboard | TODO | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `ads/dashboard/page.tsx`, `GET /api/ads/dashboard` | None | `ads` table | P2 |
 | AD04 | Ads | Track Impressions | TODO | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `POST /api/ads/impression`, atomic count increment | None | `ads` table | P2 |
 | AD05 | Ads | Track Clicks | TODO | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `POST /api/ads/click`, atomic count increment | None | `ads` table | P2 |
-| AD06 | Ads | Pause Ad Campaign | TODO | STUB | ✓ | ✓ | - | - | - | `POST /api/ads/pause` is a 501 scaffold stub | Implement pause flag | `ads` table | P3 |
-| AD07 | Monetization | Subscription Status | TODO | STUB | ✓ | ✓ | - | - | - | `/api/subscriptions` returns `{ status: "free" }` | Stripe integration | Stripe API | P3 |
-| AD08 | Monetization | Stripe Checkout Session | TODO | STUB | ✓ | ✓ | - | - | - | `/api/subscriptions/checkout` is a 501 scaffold stub | Implement Stripe session | Stripe API | P3 |
-| AD09 | Monetization | Cancel Subscription | TODO | STUB | ✓ | ✓ | - | - | - | `/api/subscriptions/cancel` is a 501 scaffold stub | Implement Stripe cancel | Stripe API | P3 |
+| AD06 | Ads | Pause Ad Campaign | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | - | `POST /api/ads/pause` campaign toggle with RBAC checks | None | `ads` table | P2 |
+| AD07 | Monetization | Subscription Status | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `GET /api/subscriptions`, `subscriptions` table, verified in `phase6-subscriptions.test.ts` | None | `subscriptions` | P1 |
+| AD08 | Monetization | Stripe Checkout Session | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `POST /api/subscriptions/checkout`, provider adapter, verified in `phase6-subscriptions.test.ts` | None | Payment Provider | P1 |
+| AD09 | Monetization | Cancel Subscription | Done | IMPLEMENTED | ✓ | ✓ | ✓ | - | ✓ | `DELETE /api/subscriptions`, `POST /api/subscriptions/cancel`, verified in `phase6-subscriptions.test.ts` | None | Payment Provider | P1 |

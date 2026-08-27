@@ -1,26 +1,11 @@
 import { NextResponse } from "next/server"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
-
+// GET /api/push/vapid-key — Public VAPID key for service worker registration
 export async function GET() {
-  return notImplemented()
-}
+  const publicKey =
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ||
+    process.env.VAPID_PUBLIC_KEY ||
+    ""
 
-export async function POST() {
-  return notImplemented()
-}
-
-export async function PATCH() {
-  return notImplemented()
-}
-
-export async function DELETE() {
-  return notImplemented()
+  return NextResponse.json({ publicKey }, { status: 200 })
 }

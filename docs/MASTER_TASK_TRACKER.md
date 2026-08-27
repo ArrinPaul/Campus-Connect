@@ -37,20 +37,20 @@
 
 ## P2 Medium Tasks (Secondary Features & Polish)
 
-| **P2-01** | Gamification | G01-G06 features had DB table but lacked end-to-end integration. | **✅ RESOLVED** | Implemented `src/server/db/gamification.ts`, `/leaderboard` page, period/university filters, reputation triggers (+15, +10, +5), skill endorsements, achievement badges, and `tests/phase5-*.test.ts` (18 tests). | | |
-| **P2-02** | Push Notifications | Web Push subscription endpoint `/api/push/subscribe` is a stub. | Background browser notifications cannot be sent to offline students. | `src/app/api/push/subscribe/route.ts`, `src/hooks/usePushNotifications.ts` | Browser push subscription JSON is saved to `push_subscriptions` table. | Web Push test |
-| **P2-03** | E2E Testing | Zero Playwright / Cypress automated browser tests exist. | Critical user journeys (Signup -> Feed -> DM -> Checkout) lack regression safety. | `e2e/` (new directory), `playwright.config.ts` | Automated end-to-end tests for Auth, Feed post creation, and Direct messaging. | `npm run test:e2e` |
-| **P2-04** | Research Reviews | Research paper peer review and voting routes were 501 stubs. | **✅ RESOLVED** | Implemented in `content.ts`, `/api/research/review`, `/api/research/vote`, verified in `tests/research-review-vote.test.ts`. | | |
-| **P2-05** | Marketplace Mutations | Marketplace update/delete mutations were 501 stubs. | **✅ RESOLVED** | Implemented in `misc.ts`, `/api/marketplace/update`, `/api/marketplace/delete`, verified in `tests/marketplace-mutations.test.ts`. | | |
-| **P2-06** | Story Navigation | Story player lacks tap-left / tap-right transitions between user stories. | Story viewing UX requires manual close. | `src/app/(dashboard)/stories/[id]/page.tsx` | Keyboard arrow and click zone navigation auto-advances to next unviewed story. | Component test |
+| **P2-01** | Gamification | G01-G06 features had DB table but lacked end-to-end integration. | **✅ RESOLVED** | Implemented `src/server/db/gamification.ts`, `/leaderboard` page, period/university filters, reputation triggers (+15, +10, +5), skill endorsements, achievement badges, and `tests/phase5-*.test.ts` (18 tests). |
+| **P2-02** | Push Notifications | Web Push subscription endpoint `/api/push/subscribe` is a stub. | **✅ RESOLVED** | Implemented `web-push.ts`, `POST/DELETE /api/push/subscribe`, `POST/DELETE /api/push/unsubscribe`, `GET /api/push/vapid-key`, and automatic server notification dispatch in `notifications.ts`. Verified in `tests/phase6-push-notifications.test.ts` (6 tests). |
+| **P2-03** | E2E Testing | Zero Playwright automated browser tests exist. | **✅ RESOLVED** | Built Playwright test suite in `e2e/` (`auth`, `feed`, `leaderboard`, `research`, `marketplace`, `notifications`, `messaging`, `profile`), `playwright.config.ts`, and `npm run test:e2e`. |
+| **P2-04** | Research Reviews | Research paper peer review and voting routes were 501 stubs. | **✅ RESOLVED** | Implemented in `content.ts`, `/api/research/review`, `/api/research/vote`, verified in `tests/research-review-vote.test.ts`. |
+| **P2-05** | Marketplace Mutations | Marketplace update/delete mutations were 501 stubs. | **✅ RESOLVED** | Implemented in `misc.ts`, `/api/marketplace/update`, `/api/marketplace/delete`, verified in `tests/marketplace-mutations.test.ts`. |
+| **P2-06** | Story Navigation | Story player lacked tap-left/right & keyboard navigation. | **✅ RESOLVED** | Added ArrowLeft/ArrowRight/Space/Escape keyboard listeners and visible desktop next/prev buttons to `src/app/(dashboard)/stories/[id]/page.tsx`. |
 
 ---
 
 ## P3 Low Tasks (Monetization & Housekeeping)
 
-| Task ID | Component | Problem | Why It Matters | Impacted Files | Acceptance Criteria | Tests Required |
-|---|---|---|---|---|---|---|
-| **P3-01** | Stripe Subscriptions | Subscription and checkout routes are stubs. | Monetization is non-essential prior to campus user base validation. | `src/app/api/subscriptions/*` | Stripe Checkout session and webhook handler implemented when payment gateway configured. | Stripe mock test |
-| **P3-02** | ESLint Warnings | 2 `<img>` warnings in `ChatInput.tsx` and `ChatMessage.tsx`. | Optimization hygiene for next/image. | `src/app/(components)/messages/ChatInput.tsx`, `ChatMessage.tsx` | Replaced with Next.js `<Image />` or `OptimizedImage`. | `npm run lint` clean |
-| **P3-03** | Ad Campaign Pausing | `/api/ads/pause` is a 501 scaffold stub. | Advertisers cannot pause active campaigns. | `src/app/api/ads/pause/route.ts` | Campaign status toggles between `active` and `paused`. | API test |
-| **P3-04** | Migration Script | `run-migration.js` path mismatch. | **✅ RESOLVED** | `run-migration.js` | Updated path to canonical `supabase/migrations/20240101000000_init.sql`. | Migration runner check |
+| Task ID | Component | Problem | Status | Resolution / Verification |
+|---|---|---|:---:|---|
+| **P3-01** | Stripe Subscriptions | Subscription and checkout routes were stubs. | **✅ RESOLVED** | Implemented `SubscriptionService`, `StripePaymentAdapter`, `MockPaymentAdapter`, `POST /api/subscriptions/checkout`, `POST /api/subscriptions/webhook` (idempotent reconciliation), and `GET/DELETE /api/subscriptions`. Verified in `tests/phase6-subscriptions.test.ts` (8 tests). |
+| **P3-02** | ESLint Warnings | 2 `<img>` warnings in `ChatInput.tsx` and `ChatMessage.tsx`. | **✅ RESOLVED** | Replaced with Next.js `Image` and `OptimizedImage`. `npx next lint` reports 0 warnings and 0 errors. |
+| **P3-03** | Ad Campaign Pausing | `/api/ads/pause` was a 501 scaffold stub. | **✅ RESOLVED** | Implemented campaign status toggle in `src/app/api/ads/pause/route.ts` with ownership & admin RBAC checks. |
+| **P3-04** | Migration Script | `run-migration.js` path mismatch. | **✅ RESOLVED** | Updated path to canonical `supabase/migrations/20240101000000_init.sql`. |
