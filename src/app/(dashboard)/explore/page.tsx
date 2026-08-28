@@ -1,8 +1,8 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense } from 'react';
 import { ExplorePostGrid } from '@/app/(components)/explore/ExplorePostGrid';
-import { Search, Compass, Sparkles, TrendingUp } from 'lucide-react';
+import { Search, Compass, Sparkles, Store, Briefcase, BookOpen, Calendar, Users } from 'lucide-react';
 import Link from 'next/link';
 
 const ExplorePostGridSkeleton = () => (
@@ -13,13 +13,19 @@ const ExplorePostGridSkeleton = () => (
   </div>
 );
 
-export default function ExplorePage() {
-  const [searchQuery, setSearchQuery] = useState('');
+const CATEGORIES = [
+  { label: 'Marketplace', href: '/marketplace', icon: Store },
+  { label: 'Jobs & Careers', href: '/jobs', icon: Briefcase },
+  { label: 'Research Papers', href: '/research', icon: BookOpen },
+  { label: 'Events & Meetups', href: '/events', icon: Calendar },
+  { label: 'Communities', href: '/communities', icon: Users },
+];
 
+export default function ExplorePage() {
   return (
     <div className="w-full bg-canvas min-h-screen space-y-4">
       {/* Search & Header Bar */}
-      <section className="bg-card/80 backdrop-blur-xl border border-border/80 rounded-2xl p-4 sm:p-5 shadow-sm">
+      <section className="bg-card/80 backdrop-blur-xl border border-border/80 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
@@ -31,7 +37,7 @@ export default function ExplorePage() {
                 <Sparkles className="h-4 w-4 text-amber-500" />
               </h1>
               <p className="text-xs text-muted-foreground">
-                Trending discussions, research, and discoveries
+                Trending discussions, research, jobs, and discoveries
               </p>
             </div>
           </div>
@@ -45,6 +51,20 @@ export default function ExplorePage() {
               <span>Search posts, people, tags...</span>
             </Link>
           </div>
+        </div>
+
+        {/* Quick Category Chips */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1 border-t border-border/50">
+          {CATEGORIES.map((cat) => (
+            <Link
+              key={cat.label}
+              href={cat.href}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-muted hover:bg-primary/10 hover:text-primary transition-all text-xs font-semibold text-foreground/80 shrink-0 active:scale-95"
+            >
+              <cat.icon className="h-3.5 w-3.5" />
+              <span>{cat.label}</span>
+            </Link>
+          ))}
         </div>
       </section>
 

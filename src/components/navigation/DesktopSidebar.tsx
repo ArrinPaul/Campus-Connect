@@ -22,6 +22,10 @@ import {
   Heart,
   PlusSquare,
   Users,
+  Store,
+  Briefcase,
+  BookOpen,
+  Calendar,
   Bookmark,
   Menu,
   Moon,
@@ -135,11 +139,39 @@ export function DesktopSidebar({
       isActive: false,
     },
     {
+      id: "marketplace",
+      label: "Marketplace",
+      href: "/marketplace",
+      icon: Store,
+      isActive: pathname?.startsWith("/marketplace"),
+    },
+    {
+      id: "jobs",
+      label: "Jobs",
+      href: "/jobs",
+      icon: Briefcase,
+      isActive: pathname?.startsWith("/jobs"),
+    },
+    {
+      id: "research",
+      label: "Research",
+      href: "/research",
+      icon: BookOpen,
+      isActive: pathname?.startsWith("/research"),
+    },
+    {
       id: "communities",
       label: "Communities",
       href: "/communities",
       icon: Users,
       isActive: pathname?.startsWith("/communities"),
+    },
+    {
+      id: "events",
+      label: "Events",
+      href: "/events",
+      icon: Calendar,
+      isActive: pathname?.startsWith("/events"),
     },
     {
       id: "bookmarks",
@@ -161,14 +193,14 @@ export function DesktopSidebar({
     <TooltipProvider delayDuration={150}>
       <aside
         className={cn(
-          "flex flex-col h-full bg-background dark:bg-black border-r border-border transition-all duration-200 select-none z-30 px-3 py-5 justify-between relative",
+          "flex flex-col h-full bg-background dark:bg-black border-r border-border transition-all duration-200 select-none z-30 px-3 py-4 justify-between relative",
           isCollapsed ? "w-[72px]" : "w-[245px] xl:w-[260px]"
         )}
         aria-label="Instagram Style Desktop Sidebar"
       >
         {/* Top Header / Brand Logo */}
-        <div className="flex flex-col gap-6">
-          <div className="px-3 pt-2">
+        <div className="flex flex-col gap-4 overflow-hidden">
+          <div className="px-3 pt-1">
             <Link
               href="/feed"
               className="flex items-center gap-3 active:scale-95 transition-transform focus:outline-none"
@@ -185,8 +217,8 @@ export function DesktopSidebar({
             </Link>
           </div>
 
-          {/* Navigation Item Stack */}
-          <nav className="flex flex-col gap-1.5">
+          {/* Navigation Item Stack (Scrollable if height constrained) */}
+          <nav className="flex flex-col gap-1 overflow-y-auto no-scrollbar max-h-[calc(100vh-140px)] pr-1">
             {navItems.map((item) => {
               const active = item.isActive;
 
@@ -195,9 +227,9 @@ export function DesktopSidebar({
                   key={item.id}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-4 px-3 py-3 rounded-xl transition-all font-medium text-foreground relative group",
+                    "flex items-center gap-4 px-3 py-2.5 rounded-xl transition-all font-medium text-foreground relative group",
                     active ? "font-bold" : "hover:bg-muted/60 text-foreground/80 hover:text-foreground",
-                    isCollapsed && "justify-center px-0 w-12 h-12 mx-auto"
+                    isCollapsed && "justify-center px-0 w-12 h-11 mx-auto"
                   )}
                   aria-current={active ? "page" : undefined}
                 >
@@ -222,7 +254,7 @@ export function DesktopSidebar({
                       {item.icon && (
                         <item.icon
                           className={cn(
-                            "h-[22px] w-[22px] transition-transform group-hover:scale-105",
+                            "h-[21px] w-[21px] transition-transform group-hover:scale-105",
                             active ? "stroke-[2.5px] text-foreground" : "stroke-[1.8] text-foreground",
                             item.iconClass
                           )}
@@ -237,7 +269,7 @@ export function DesktopSidebar({
                   )}
 
                   {!isCollapsed && (
-                    <span className={cn("text-[15px] tracking-tight", active ? "font-bold text-foreground" : "text-foreground")}>
+                    <span className={cn("text-[14.5px] tracking-tight", active ? "font-bold text-foreground" : "text-foreground")}>
                       {item.label}
                     </span>
                   )}
@@ -350,9 +382,9 @@ export function DesktopSidebar({
             type="button"
             onClick={() => setShowMoreMenu((prev) => !prev)}
             className={cn(
-              "flex items-center gap-4 px-3 py-3 rounded-xl transition-all font-medium text-foreground hover:bg-muted/60 w-full group focus:outline-none cursor-pointer",
+              "flex items-center gap-4 px-3 py-2.5 rounded-xl transition-all font-medium text-foreground hover:bg-muted/60 w-full group focus:outline-none cursor-pointer",
               showMoreMenu && "bg-muted/70 font-bold",
-              isCollapsed && "justify-center px-0 w-12 h-12 mx-auto"
+              isCollapsed && "justify-center px-0 w-12 h-11 mx-auto"
             )}
             aria-label="More options"
             aria-expanded={showMoreMenu}
