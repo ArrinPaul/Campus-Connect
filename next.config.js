@@ -1,10 +1,28 @@
-
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 })
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    serverComponentsExternalPackages: [
+      "@opentelemetry/instrumentation",
+      "require-in-the-middle",
+      "@sentry/node",
+      "import-in-the-middle",
+    ],
+  },
+
+  webpack: (config, { isServer }) => {
+    config.ignoreWarnings = [
+      ...(config.ignoreWarnings || []),
+      { module: /node_modules\/require-in-the-middle/ },
+      { module: /node_modules\/@opentelemetry/ },
+      { message: /Critical dependency: require function is used in a way in which dependencies cannot be statically extracted/ },
+    ]
+    return config
+  },
+
   images: {
     // Enable modern image formats
     formats: ["image/avif", "image/webp"],

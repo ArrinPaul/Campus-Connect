@@ -23,59 +23,59 @@
     --attention: 245 159 0;      /* #F59F00 */
     --warning: 245 159 0;        
     --warning-bg: 255 250 230;
-    --critical: 240 40 73;       /* #F02849 */
+    --critical: 237 73 86;       /* #ED4956 Instagram Like Red */
     --critical-strong: 200 30 60;
 
     /* Surfaces */
-    --canvas: 240 242 245;       /* #F0F2F5 Classic Social Background */
+    --canvas: 248 249 250;       /* #F8F9FA Clean Background */
     --surface-soft: 255 255 255; /* #FFFFFF Cards */
     --surface-hover: 242 242 242;/* Hover states on cards */
     --surface-active: 230 232 236;
 
     /* Text */
-    --ink-deep: 5 5 5;           /* #050505 Primary Text */
-    --ink: 101 103 107;          /* #65676B Secondary Text */
+    --ink-deep: 38 38 38;        /* #262626 Primary Text */
+    --ink: 142 142 142;          /* #8E8E8E Secondary Text */
     --charcoal: 101 103 107;     
     --slate: 140 147 157;        
     --steel: 176 179 184;        
     --stone: 190 195 200;        
 
     /* Borders */
-    --hairline: 206 208 212;     /* #CED0D4 Strong borders */
-    --hairline-soft: 228 230 235;/* #E4E6EB Soft dividers */
+    --hairline: 219 219 219;     /* #DBDBDB Hairlines */
+    --hairline-soft: 239 239 239;/* #EFEFEF Soft dividers */
     --disabled-text: 190 195 200;
 
     /* Legacy & Radix UI Compat Aliases (shadcn) */
-    --muted: 240 242 245;
-    --muted-foreground: 101 103 107;
+    --muted: 245 245 247;
+    --muted-foreground: 142 142 142;
     --card: 255 255 255;
-    --card-foreground: 5 5 5;
+    --card-foreground: 38 38 38;
     --border: 228 230 235;
-    --input: 206 208 212;
+    --input: 219 219 219;
     --ring: 8 102 255;
-    --background: 240 242 245;
-    --foreground: 5 5 5;
-    --destructive: 240 40 73;
+    --background: 248 249 250;
+    --foreground: 38 38 38;
+    --destructive: 237 73 86;
     --destructive-foreground: 255 255 255;
-    --accent: 240 242 245;
-    --accent-foreground: 5 5 5;
+    --accent: 245 245 247;
+    --accent-foreground: 38 38 38;
     --popover: 255 255 255;
-    --popover-foreground: 5 5 5;
-    --secondary: 240 242 245;
-    --secondary-foreground: 5 5 5;
+    --popover-foreground: 38 38 38;
+    --secondary: 245 245 247;
+    --secondary-foreground: 38 38 38;
   }
 
   .dark {
     /* Dark Mode Brand */
-    --primary: 45 136 255;       /* Vibrant Social Blue for dark theme */
+    --primary: 76 181 249;       /* #4CB5F9 Vibrant Blue */
     --primary-deep: 8 102 255;
     --primary-soft: 24 39 64;    /* Subtle dark blue background */
     --on-primary: 255 255 255;
 
     --ink-button: 255 255 255;
-    --on-ink-button: 10 10 10;
-    --fb-blue: 45 136 255;
-    --meta-link: 69 153 255;
+    --on-ink-button: 0 0 0;
+    --fb-blue: 76 181 249;
+    --meta-link: 76 181 249;
     --oculus-purple: 168 85 247;
 
     /* Dark Semantic */
@@ -84,65 +84,73 @@
     --attention: 251 191 36;
     --warning: 251 191 36;
     --warning-bg: 45 35 15;
-    --critical: 248 113 113;
+    --critical: 237 73 86;       /* #ED4956 */
     --critical-strong: 239 68 68;
 
     /* Dark Surfaces */
-    --canvas: 18 18 18;          /* #121212 Dark Canvas */
-    --surface-soft: 28 28 30;    /* #1C1C1E Elevated Cards */
-    --surface-hover: 38 38 42;
-    --surface-active: 48 48 54;
+    --canvas: 0 0 0;             /* #000000 Pitch Black OLED */
+    --surface-soft: 18 18 18;    /* #121212 Elevated Surface */
+    --surface-hover: 28 28 30;
+    --surface-active: 38 38 42;
 
     /* Dark Text */
-    --ink-deep: 245 245 247;     /* High-contrast off-white */
-    --ink: 161 161 170;          /* Secondary gray */
-    --charcoal: 161 161 170;
+    --ink-deep: 245 245 245;     /* #F5F5F5 High-contrast */
+    --ink: 168 168 168;          /* #A8A8A8 Secondary */
+    --charcoal: 168 168 168;
     --slate: 140 147 157;
     --steel: 113 113 122;
     --stone: 82 82 91;
 
     /* Dark Borders */
-    --hairline: 45 45 49;
-    --hairline-soft: 35 35 39;
+    --hairline: 38 38 38;        /* #262626 */
+    --hairline-soft: 28 28 30;
     --disabled-text: 82 82 91;
 
     /* Dark Compat Aliases */
-    --muted: 28 28 30;
-    --muted-foreground: 161 161 170;
-    --card: 28 28 30;
-    --card-foreground: 245 245 247;
-    --border: 45 45 49;
-    --input: 45 45 49;
-    --ring: 45 136 255;
-    --background: 18 18 18;
-    --foreground: 245 245 247;
-    --destructive: 248 113 113;
+    --muted: 18 18 18;
+    --muted-foreground: 168 168 168;
+    --card: 18 18 18;
+    --card-foreground: 245 245 245;
+    --border: 38 38 38;
+    --input: 38 38 38;
+    --ring: 76 181 249;
+    --background: 0 0 0;
+    --foreground: 245 245 245;
+    --destructive: 237 73 86;
     --destructive-foreground: 255 255 255;
-    --accent: 38 38 42;
-    --accent-foreground: 245 245 247;
-    --popover: 28 28 30;
-    --popover-foreground: 245 245 247;
-    --secondary: 38 38 42;
-    --secondary-foreground: 245 245 247;
+    --accent: 28 28 30;
+    --accent-foreground: 245 245 245;
+    --popover: 18 18 18;
+    --popover-foreground: 245 245 245;
+    --secondary: 28 28 30;
+    --secondary-foreground: 245 245 245;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
+    -webkit-tap-highlight-color: transparent;
   }
   body {
     @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
   }
 }
 
-/* Custom scrollbars and transitions */
+/* Custom scrollbars, safe area, and tactile feedback utilities */
 @layer utilities {
   .pb-safe {
     padding-bottom: max(1rem, env(safe-area-inset-bottom, 16px));
   }
   .bottom-safe {
     bottom: max(1rem, env(safe-area-inset-bottom, 16px));
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
   .scrollbar-none {
     -ms-overflow-style: none;
@@ -151,5 +159,11 @@
   .scrollbar-none::-webkit-scrollbar {
     display: none;
   }
+  .tap-feedback {
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+  .tap-feedback:active {
+    opacity: 0.65;
+    transform: scale(0.96);
+  }
 }
-

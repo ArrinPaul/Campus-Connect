@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Bell, MessageSquare, Search } from 'lucide-react';
+import { Heart, Send, Search } from 'lucide-react';
 import { useUser } from '@/lib/auth/client';
 import { useQuery } from '@/lib/api';
 import { api } from '@/lib/api';
@@ -21,60 +21,55 @@ export function MobileTopBar() {
   );
 
   return (
-    <header className="relative flex items-center justify-between h-14 px-4 bg-card/90 dark:bg-card/95 backdrop-blur-md border-b border-border/80 sticky top-0 z-40">
-      {/* Left Action / Search */}
+    <header className="relative flex items-center justify-between h-[48px] px-3.5 bg-background/95 dark:bg-black/95 backdrop-blur-xl border-b border-border sticky top-0 z-40">
+      {/* Left Action: Search */}
       <div className="flex items-center gap-2 z-10">
         <Link
           href="/search"
-          className="h-9 w-9 flex items-center justify-center rounded-full text-foreground/80 hover:text-foreground hover:bg-muted transition-colors active:scale-95"
+          className="h-9 w-9 flex items-center justify-center rounded-full text-foreground hover:bg-muted transition-colors active:scale-90"
           aria-label="Search"
         >
-          <Search className="h-5 w-5 stroke-[2.2]" />
+          <Search className="h-[22px] w-[22px] stroke-[1.8]" />
         </Link>
       </div>
 
-      {/* Middle Brand: Campus Connect centered like Instagram */}
+      {/* Middle Brand: Pure typography Campus Connect centered in Instagram style */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <Link
           href="/feed"
-          className="pointer-events-auto flex items-center gap-2 active:scale-95 transition-transform"
+          className="pointer-events-auto flex items-center active:scale-95 transition-transform"
         >
-          <div className="h-7 w-7 rounded-lg bg-gradient-to-tr from-primary to-blue-500 flex items-center justify-center text-on-primary font-black text-xs shadow-sm shadow-primary/20">
-            CC
-          </div>
-          <span className="font-bold text-[17px] tracking-tight text-foreground bg-gradient-to-r from-foreground via-foreground to-foreground/80 bg-clip-text">
+          <span className="font-bold text-[20px] tracking-tight text-foreground font-sans">
             Campus Connect
           </span>
         </Link>
       </div>
 
-      {/* Right Actions: Notifications & Messages (Instagram style) */}
-      <div className="flex items-center gap-1.5 z-10">
+      {/* Right Actions: Activity Heart & Direct Messages */}
+      <div className="flex items-center gap-1 z-10">
         {isSignedIn ? (
           <>
-            {/* Notifications Bell */}
+            {/* Activity / Notifications Heart */}
             <Link
               href="/notifications"
-              className="relative h-9 w-9 flex items-center justify-center rounded-full text-foreground/80 hover:text-foreground hover:bg-muted transition-colors active:scale-95"
+              className="relative h-9 w-9 flex items-center justify-center rounded-full text-foreground hover:bg-muted transition-colors active:scale-90"
               aria-label="Notifications"
             >
-              <Bell className="h-5 w-5 stroke-[2.2]" />
+              <Heart className="h-[22px] w-[22px] stroke-[1.8]" />
               {typeof unreadNotifications === 'number' && unreadNotifications > 0 && (
-                <span className="absolute top-1 right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-critical px-1 text-[9px] font-black text-white shadow-sm ring-2 ring-card">
-                  {unreadNotifications > 99 ? '99+' : unreadNotifications}
-                </span>
+                <span className="absolute top-1.5 right-1.5 flex h-2 w-2 rounded-full bg-[#ED4956] ring-1.5 ring-background" />
               )}
             </Link>
 
-            {/* Direct Messages */}
+            {/* Direct Messages Paper-plane */}
             <Link
               href="/messages"
-              className="relative h-9 w-9 flex items-center justify-center rounded-full text-foreground/80 hover:text-foreground hover:bg-muted transition-colors active:scale-95"
+              className="relative h-9 w-9 flex items-center justify-center rounded-full text-foreground hover:bg-muted transition-colors active:scale-90"
               aria-label="Messages"
             >
-              <MessageSquare className="h-5 w-5 stroke-[2.2]" />
+              <Send className="h-[20px] w-[20px] stroke-[1.8] -rotate-12 translate-y-[-1px]" />
               {typeof totalUnreadMessages === 'number' && totalUnreadMessages > 0 && (
-                <span className="absolute top-1 right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-critical px-1 text-[9px] font-black text-white shadow-sm ring-2 ring-card">
+                <span className="absolute top-1 right-1 flex h-4 min-w-[15px] items-center justify-center rounded-full bg-[#ED4956] px-1 text-[9px] font-bold text-white shadow-xs ring-1.5 ring-background">
                   {totalUnreadMessages > 99 ? '99+' : totalUnreadMessages}
                 </span>
               )}
@@ -83,7 +78,7 @@ export function MobileTopBar() {
         ) : (
           <Link
             href="/sign-in"
-            className="text-xs font-semibold px-3.5 py-1.5 rounded-full bg-primary text-on-primary hover:bg-primary-deep transition-colors"
+            className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-primary text-on-primary hover:bg-primary-deep transition-colors"
           >
             Log In
           </Link>

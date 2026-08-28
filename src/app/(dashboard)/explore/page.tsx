@@ -1,44 +1,59 @@
-﻿'use client';
+'use client';
 
-import { Suspense } from 'react';
-import { ExplorePostGrid } from '../../(components)/explore/ExplorePostGrid';
-import { Compass } from 'lucide-react';
+import { Suspense, useState } from 'react';
+import { ExplorePostGrid } from '@/app/(components)/explore/ExplorePostGrid';
+import { Search, Compass, Sparkles, TrendingUp } from 'lucide-react';
+import Link from 'next/link';
 
 const ExplorePostGridSkeleton = () => (
- <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
- {[...Array(9)].map((_, i) => (
- <div key={i} className="border border-border/50 rounded-lg bg-card p-4 h-[320px] animate-pulse" />
- ))}
- </div>
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {[...Array(9)].map((_, i) => (
+      <div key={i} className="border border-border/60 rounded-2xl bg-card p-4 h-[320px] animate-pulse" />
+    ))}
+  </div>
 );
 
 export default function ExplorePage() {
- return (
- <div className="w-full bg-canvas min-h-screen">
- {/* Header Section */}
- <section className="bg-card py-6 px-4 md:px-8 border-b border-border shadow-sm">
- <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-xl">
- <div className="max-w-2xl flex items-center gap-md">
- <div className="w-14 h-14 bg-card rounded-circle flex items-center justify-center shrink-0 border border-border">
- <Compass className="w-7 h-7 text-foreground" />
- </div>
- <div>
- <h1 className="text-heading-lg font-bold text-foreground mb-1">Explore</h1>
- <p className="text-subtitle-md text-foreground">Discover trending posts across campus</p>
- </div>
- </div>
- </div>
- </section>
+  const [searchQuery, setSearchQuery] = useState('');
 
- {/* Content Section */}
- <section className="py-section-sm px-base md:px-xl">
- <div className="w-full max-w-6xl mx-auto space-y-xl">
- <Suspense fallback={<ExplorePostGridSkeleton />}>
- <ExplorePostGrid />
- </Suspense>
- </div>
- </section>
- </div>
- );
+  return (
+    <div className="w-full bg-canvas min-h-screen space-y-4">
+      {/* Search & Header Bar */}
+      <section className="bg-card/80 backdrop-blur-xl border border-border/80 rounded-2xl p-4 sm:p-5 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+              <Compass className="h-6 w-6 stroke-[2.2]" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-foreground tracking-tight flex items-center gap-2">
+                <span>Explore Campus</span>
+                <Sparkles className="h-4 w-4 text-amber-500" />
+              </h1>
+              <p className="text-xs text-muted-foreground">
+                Trending discussions, research, and discoveries
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Link
+              href="/search"
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors w-full sm:w-64"
+            >
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <span>Search posts, people, tags...</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Discovery Feed Grid */}
+      <section className="w-full">
+        <Suspense fallback={<ExplorePostGridSkeleton />}>
+          <ExplorePostGrid />
+        </Suspense>
+      </section>
+    </div>
+  );
 }
-
