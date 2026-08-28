@@ -15,7 +15,7 @@ const navItems = [
 
 export function SettingsNav() {
   const searchParams = useSearchParams()
-  const currentTab = searchParams.get("tab") || "profile"
+  const currentTab = searchParams?.get("tab") || "profile"
 
   return (
     <nav className="flex flex-row md:flex-col gap-1 md:w-56 flex-shrink-0 md:pr-8 md:border-r border-border h-fit sticky top-24">

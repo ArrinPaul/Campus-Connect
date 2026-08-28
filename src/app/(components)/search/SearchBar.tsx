@@ -16,7 +16,7 @@ export function SearchBar({ initialQuery = '', className }: Props) {
     const [query, setQuery] = useState(initialQuery);
 
     useEffect(() => {
-        setQuery(searchParams.get('q') || '');
+        setQuery(searchParams?.get('q') || '');
     }, [searchParams]);
 
     const handleSearch = (e: React.FormEvent) => {
