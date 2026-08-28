@@ -1,33 +1,23 @@
-﻿"use client"
+"use client"
 
-import { useState, useRef, useEffect, useCallback } from"react"
-import { useMutation, useQuery, useAction } from"@/lib/api"
-import { useUser } from"@/lib/auth/client"
-import { api } from"@/lib/api"
-import { Id } from"@/lib/api"
-import dynamic from"next/dynamic"
-import { ButtonLoadingSpinner } from"@/components/ui/loading-skeleton"
-import { MentionAutocomplete } from"./MentionAutocomplete"
-import { toast } from"sonner"
-import { Button } from"@/components/ui/button"
-import { cn } from"@/lib/utils"
-
-
-import Image from"next/image"
-import {
- Image as ImageIcon,
- Video,
- FileText,
- X,
- Link as LinkIcon,
- Loader2,
- BarChart2,
- Plus,
- Trash2,
-} from"lucide-react"
-
-// Client-side file type / size constants (mirrored from backend media limits)
+import { useState, useRef, useEffect, useCallback } from "react"
+import { useMutation, useQuery, useAction } from "@/lib/api"
+import { useUser } from "@/lib/auth/client"
+import { api } from "@/lib/api"
+import { Id } from "@/lib/api"
+import { MentionAutocomplete } from "./MentionAutocomplete"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import imageCompression from "browser-image-compression"
+import {
+  Image as ImageIcon,
+  Video,
+  FileText,
+  X,
+  Loader2,
+  BarChart2,
+} from "lucide-react"
 
 const isImageFile = (file: File) =>
   file.type.startsWith("image/") ||
@@ -53,12 +43,11 @@ interface PostComposerProps {
 }
 
 export function PostComposer({ onPostCreated, communityId }: PostComposerProps) {
-  const { user, isSignedIn, isLoaded } = useUser()
+  const { user, isSignedIn } = useUser()
   const isAuthenticated = isSignedIn ?? false
-  
+
   const createPost = useMutation(api.posts.createPost)
   const generateUploadUrl = useMutation(api.media.generateUploadUrl)
-  const resolveStorageUrls = useMutation(api.media.resolveStorageUrls)
   const fetchLinkPreview = useAction(api.media.fetchLinkPreview)
   const createPollMutation = useMutation(api.polls.createPoll)
   const linkPollToPost = useMutation(api.polls.linkPollToPost)
@@ -80,7 +69,11 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
   const [isUploading, setIsUploading] = useState(false)
   const [detectedLink, setDetectedLink] = useState<string | null>(null)
   const [linkPreviewData, setLinkPreviewData] = useState<{
-    url: string; title?: string; description?: string; image?: string; favicon?: string
+    url: string
+    title?: string
+    description?: string
+    image?: string
+    favicon?: string
   } | null>(null)
   const [isFetchingPreview, setIsFetchingPreview] = useState(false)
 
@@ -132,7 +125,6 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
       const fileArr = Array.from(files)
       if (fileArr.length === 0) return
 
-      // Validation
       for (const file of fileArr) {
         if (type === "image") {
           if (!isImageFile(file)) {
@@ -213,564 +205,608 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
     []
   )
 
- const removeFile = useCallback(
- (index: number) => {
- setAttachedFiles((prev) => {
- const next = prev.filter((_, i) => i !== index)
- if (next.length === 0) setAttachedType(null)
- return next
- })
- setFilePreviews((prev) => {
- const toRevoke = prev[index]
- if (toRevoke) URL.revokeObjectURL(toRevoke)
- return prev.filter((_, i) => i !== index)
- })
- },
- []
- )
+  const removeFile = useCallback((index: number) => {
+    setAttachedFiles((prev) => {
+      const next = prev.filter((_, i) => i !== index)
+      if (next.length === 0) setAttachedType(null)
+      return next
+    })
+    setFilePreviews((prev) => {
+      const toRevoke = prev[index]
+      if (toRevoke) URL.revokeObjectURL(toRevoke)
+      return prev.filter((_, i) => i !== index)
+    })
+  }, [])
 
- const hashtagSuggestions = useQuery(
- api.hashtags.searchHashtags,
- showHashtagAutocomplete && hashtagAutocompleteQuery.length > 0
- ? { query: hashtagAutocompleteQuery, limit: 5 }
- :"skip"
- )
+  const hashtagSuggestions = useQuery(
+    api.hashtags.searchHashtags,
+    showHashtagAutocomplete && hashtagAutocompleteQuery.length > 0
+      ? { query: hashtagAutocompleteQuery, limit: 5 }
+      : "skip"
+  )
 
- useEffect(() => {
- const lastAtMatch = content.match(/(?:^|\s)@([^\s@]*)$/);
- if (lastAtMatch) {
- setMentionAutocompleteQuery(lastAtMatch[1])
- setShowMentionAutocomplete(true)
- setShowHashtagAutocomplete(false)
- return
- }
-
- const lastHashMatch = content.match(/(?:^|\s)#([^\s#]*)$/)
- if (lastHashMatch) {
- setHashtagAutocompleteQuery(lastHashMatch[1])
- setShowHashtagAutocomplete(true)
- setShowMentionAutocomplete(false)
- setSelectedHashtagIndex(0)
- return
- }
-
- setShowHashtagAutocomplete(false)
- setShowMentionAutocomplete(false)
- }, [content])
-
- const handleWrapperKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
- if (!showHashtagAutocomplete || !hashtagSuggestions || hashtagSuggestions.length === 0) return
- if (e.key ==="ArrowDown") {
- e.preventDefault()
- setSelectedHashtagIndex((prev) => (prev < hashtagSuggestions.length - 1 ? prev + 1 : prev))
- } else if (e.key ==="ArrowUp") {
- e.preventDefault()
- setSelectedHashtagIndex((prev) => (prev > 0 ? prev - 1 : 0))
- } else if (e.key ==="Enter" && showHashtagAutocomplete) {
- e.preventDefault()
- insertHashtag(hashtagSuggestions[selectedHashtagIndex].tag)
- } else if (e.key ==="Escape") {
- setShowHashtagAutocomplete(false)
- }
- }
-
- const insertHashtag = (tag: string) => {
- const newContent = content.replace(/(?:^|(?<=\s))#[^\s#]*$/, `#${tag} `)
- setContent(newContent !== content ? newContent : content + `#${tag} `)
- setShowHashtagAutocomplete(false)
- }
-
- const insertMention = (username: string) => {
- const newContent = content.replace(/(?:^|(?<=\s))@[^\s@]*$/, `@${username} `)
- setContent(newContent !== content ? newContent : content + `@${username} `)
- setShowMentionAutocomplete(false)
- }
-
- const handleContentChange = (val: string) => {
- setContent(val)
- detectAndFetchLink(val)
- }
-
- const handleSubmit = async (e: React.FormEvent) => {
- e.preventDefault()
- setError("")
-
- if (!isAuthenticated) {
- setError("You must be signed in to create a post")
- return
- }
-
- if (!content || content.trim().length === 0) {
- if (attachedFiles.length === 0) {
- setError("Post content cannot be empty")
- return
- }
- }
-
- setIsSubmitting(true)
-
- try {
- let pollId: string | undefined
- let mediaUrls: string[] | undefined
- let finalMediaType:"image" |"video" |"file" |"link" | undefined
- let mediaFileNames: string[] | undefined
-
- if (showPollUI) {
- const validOptions = pollOptions.map((o) => o.trim()).filter(Boolean)
- if (validOptions.length < 2) {
- setError("A poll needs at least 2 options")
- setIsSubmitting(false)
- return
- }
- pollId = await createPollMutation({
- options: validOptions,
- durationHours: pollDuration,
- isAnonymous: pollIsAnonymous,
- }) as string
- }
-
-  if (attachedFiles.length > 0 && attachedType) {
-    setIsUploading(true)
-    setUploadProgress(0)
-
-    const uploadedUrls: string[] = []
-    const fileNames: string[] = []
-
-    for (let i = 0; i < attachedFiles.length; i++) {
-      const file = attachedFiles[i]
-      fileNames.push(file.name)
-      const res = await generateUploadUrl({
-        filename: file.name,
-        fileType: file.type,
-        fileSize: file.size,
-        uploadType: attachedType,
-        bucket: "media",
-      }) as any
-
-      const targetUrl = typeof res === "string" ? res : res?.uploadUrl || res?.url
-      const publicUrl = typeof res === "object" ? res?.publicUrl : null
-
-      if (targetUrl) {
-        let uploadOk = false
-        try {
-          const uploadRes = await fetch(targetUrl, {
-            method: "PUT",
-            body: file,
-            headers: { "Content-Type": file.type },
-          })
-          uploadOk = uploadRes.ok
-        } catch {
-          uploadOk = false
-        }
-
-        if (!uploadOk) {
-          try {
-            const fallbackRes = await fetch(targetUrl, {
-              method: "POST",
-              body: file,
-              headers: { "Content-Type": file.type },
-            })
-            uploadOk = fallbackRes.ok
-          } catch {
-            uploadOk = false
-          }
-        }
-
-        if (!uploadOk && process.env.NODE_ENV !== "test") {
-          throw new Error(`Upload failed for ${file.name}`)
-        }
-      }
-
-      if (publicUrl) {
-        uploadedUrls.push(publicUrl)
-      } else if (res?.path) {
-        uploadedUrls.push(res.path)
-      } else if (typeof res === "string") {
-        uploadedUrls.push(res)
-      }
-
-      setUploadProgress(Math.round(((i + 1) / attachedFiles.length) * 100))
+  useEffect(() => {
+    const lastAtMatch = content.match(/(?:^|\s)@([^\s@]*)$/)
+    if (lastAtMatch) {
+      setMentionAutocompleteQuery(lastAtMatch[1])
+      setShowMentionAutocomplete(true)
+      setShowHashtagAutocomplete(false)
+      return
     }
 
-    mediaUrls = uploadedUrls.length > 0 ? uploadedUrls : undefined
-    finalMediaType = attachedType
-    mediaFileNames = fileNames
-    setIsUploading(false)
-  } else if (linkPreviewData) {
-    finalMediaType = "link"
+    const lastHashMatch = content.match(/(?:^|\s)#([^\s#]*)$/)
+    if (lastHashMatch) {
+      setHashtagAutocompleteQuery(lastHashMatch[1])
+      setShowHashtagAutocomplete(true)
+      setShowMentionAutocomplete(false)
+      setSelectedHashtagIndex(0)
+      return
+    }
+
+    setShowHashtagAutocomplete(false)
+    setShowMentionAutocomplete(false)
+  }, [content])
+
+  const handleWrapperKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!showHashtagAutocomplete || !hashtagSuggestions || hashtagSuggestions.length === 0) return
+    if (e.key === "ArrowDown") {
+      e.preventDefault()
+      setSelectedHashtagIndex((prev) => (prev < hashtagSuggestions.length - 1 ? prev + 1 : prev))
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault()
+      setSelectedHashtagIndex((prev) => (prev > 0 ? prev - 1 : 0))
+    } else if (e.key === "Enter" && showHashtagAutocomplete) {
+      e.preventDefault()
+      insertHashtag(hashtagSuggestions[selectedHashtagIndex].tag)
+    } else if (e.key === "Escape") {
+      setShowHashtagAutocomplete(false)
+    }
   }
 
-  const createdPost = await createPost({
-    content: content.trim() || "",
-    mediaUrls,
-    media_urls: mediaUrls,
-    mediaType: finalMediaType,
-    media_type: finalMediaType,
-    mediaFileNames,
-    linkPreview: linkPreviewData ?? undefined,
-    ...(pollId ? { pollId: pollId as Id<"polls">, poll_id: pollId } : {}),
-    ...(communityId ? { communityId, community_id: communityId } : {}),
-  })
- const postId = createdPost as string | undefined
-
- if (pollId && postId) {
- await linkPollToPost({ pollId: pollId as Id<"polls">, postId: postId as Id<"posts"> })
- }
-
- // Broadcast the new post to trigger realtime feed updates
- import("@/lib/supabase/client").then(({ createClient }) => {
- const supabase = createClient()
- supabase.channel('public:posts').send({
- type:"broadcast",
- event:"new_post",
- payload: { id: postId },
- })
- })
-
- setContent("")
- setAttachedFiles([])
- setAttachedType(null)
- filePreviews.forEach((u) => URL.revokeObjectURL(u))
- setFilePreviews([])
- setLinkPreviewData(null)
- setDetectedLink(null)
- setUploadProgress(0)
- setShowPollUI(false)
- setPollOptions(["Option 1","Option 2"])
- setPollDuration(24)
- setPollIsAnonymous(false)
-
- if (onPostCreated) onPostCreated()
- toast.success("Post published!")
- } catch (err) {
- setError(err instanceof Error ? err.message :"Failed to create post")
- setIsUploading(false)
- } finally {
- setIsSubmitting(false)
- }
- }
-
- return (
- <form
- onSubmit={handleSubmit}
- className="bg-card border border-border rounded-lg mb-4 p-4 space-y-4 shadow-sm"
- >
-  {/* Hidden file inputs */}
-  <input
-  ref={imageInputRef}
-  type="file"
-  className="hidden"
-  onChange={(e) => {
-  if (e.target.files && e.target.files.length > 0) {
-  handleFileSelect(e.target.files, "image")
-  e.target.value = ""
+  const insertHashtag = (tag: string) => {
+    const newContent = content.replace(/(?:^|(?<=\s))#[^\s#]*$/, `#${tag} `)
+    setContent(newContent !== content ? newContent : content + `#${tag} `)
+    setShowHashtagAutocomplete(false)
   }
-  }}
-  accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/*"
-  multiple
-  />
 
-  <input
-  ref={videoInputRef}
-  type="file"
-  className="hidden"
-  onChange={(e) => {
-  if (e.target.files && e.target.files.length > 0) {
-  handleFileSelect(e.target.files, "video")
-  e.target.value = ""
+  const insertMention = (username: string) => {
+    const newContent = content.replace(/(?:^|(?<=\s))@[^\s@]*$/, `@${username} `)
+    setContent(newContent !== content ? newContent : content + `@${username} `)
+    setShowMentionAutocomplete(false)
   }
-  }}
-  accept="video/mp4,video/webm,video/quicktime,video/*"
-  />
 
-  <input
-  ref={fileInputRef}
-  type="file"
-  className="hidden"
-  onChange={(e) => {
-  if (e.target.files && e.target.files.length > 0) {
-  handleFileSelect(e.target.files, "file")
-  e.target.value = ""
+  const handleContentChange = (val: string) => {
+    setContent(val)
+    detectAndFetchLink(val)
   }
-  }}
-  accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.csv,.xlsx,application/pdf,text/plain"
-  multiple
-  />
 
- <div className="flex gap-3">
-  {user && (
-    <div className="h-10 w-10 shrink-0 rounded-full bg-muted overflow-hidden border border-border mt-1">
-      {user.profilePicture ? (
-        <img src={user.profilePicture} alt={user.name} className="h-full w-full object-cover" />
-      ) : (
-        <div className="h-full w-full flex items-center justify-center bg-primary text-primary-foreground font-bold text-sm">
-          {user.name.substring(0,2).toUpperCase()}
-        </div>
-      )}
-    </div>
-  )}
-  <div className="relative flex-1" onKeyDown={handleWrapperKeyDown}>
- <textarea
- value={content}
- onChange={(e) => handleContentChange(e.target.value)}
- placeholder="What's on your mind?"
- maxLength={maxLength}
- disabled={isSubmitting}
- className="w-full min-h-[80px] bg-transparent border-none focus:outline-none focus:ring-0 resize-none text-[17px] text-foreground placeholder:text-muted-foreground py-2"
-/>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
 
- {/* Hashtag autocomplete */}
- {showHashtagAutocomplete && hashtagSuggestions && hashtagSuggestions.length > 0 && (
- <div className="absolute z-50 mt-1 w-64 bg-card border border-border rounded-lg shadow-product overflow-hidden">
- <ul className="py-1">
- {hashtagSuggestions.map((hashtag: any, index: any) => (
- <li
- key={hashtag._id}
- className={cn(
-"px-4 py-2 cursor-pointer text-xs text-muted-foreground transition-colors",
- index === selectedHashtagIndex ?"bg-card text-primary" :"text-foreground hover:bg-card"
- )}
- onClick={() => insertHashtag(hashtag.tag)}
- onMouseEnter={() => setSelectedHashtagIndex(index)}
- >
- <div className="flex items-center justify-between font-semibold">
- <span>#{hashtag.tag}</span>
- <span className="text-[10px] text-muted-foreground">{hashtag.postCount}</span>
- </div>
- </li>
- ))}
- </ul>
- </div>
- )}
+    if (!isAuthenticated) {
+      setError("You must be signed in to create a post")
+      return
+    }
 
- {/* Mention autocomplete */}
- {showMentionAutocomplete && (
- <MentionAutocomplete
- query={mentionAutocompleteQuery}
- onSelect={insertMention}
- onClose={() => setShowMentionAutocomplete(false)}
- position={{ top: 100, left: 0 }}
- />
- )}
+    if (!content || content.trim().length === 0) {
+      if (attachedFiles.length === 0 && !showPollUI) {
+        setError("Post content cannot be empty")
+        return
+      }
+    }
 
- {error && <p className="mt-2 text-xs text-critical">{error}</p>}
-   </div>
- </div>
+    setIsSubmitting(true)
 
-  {/* Media Toolbar */}
-  <div className="flex items-center gap-xs border-t border-border pt-sm flex-wrap">
-  <button
-  type="button"
-  onClick={() => imageInputRef.current?.click()}
-  disabled={!!attachedType && attachedType !== "image"}
-  className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-card hover:text-primary transition-colors disabled:opacity-30"
-  title="Attach photos"
-  >
-  <ImageIcon className="h-4 w-4" />
-  <span className="hidden sm:inline">Photos</span>
-  </button>
+    try {
+      let pollId: string | undefined
+      let mediaUrls: string[] | undefined
+      let finalMediaType: "image" | "video" | "file" | "link" | undefined
+      let mediaFileNames: string[] | undefined
 
-  <button
-  type="button"
-  onClick={() => videoInputRef.current?.click()}
-  disabled={!!attachedType && attachedType !== "video"}
-  className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-card hover:text-primary transition-colors disabled:opacity-30"
-  title="Attach video"
-  >
-  <Video className="h-4 w-4" />
-  <span className="hidden sm:inline">Video</span>
-  </button>
+      if (showPollUI) {
+        const validOptions = pollOptions.map((o) => o.trim()).filter(Boolean)
+        if (validOptions.length < 2) {
+          setError("A poll needs at least 2 options")
+          setIsSubmitting(false)
+          return
+        }
+        pollId = (await createPollMutation({
+          options: validOptions,
+          durationHours: pollDuration,
+          isAnonymous: pollIsAnonymous,
+        })) as string
+      }
 
-  <button
-  type="button"
-  onClick={() => fileInputRef.current?.click()}
-  disabled={!!attachedType && attachedType !== "file"}
-  className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-card hover:text-primary transition-colors disabled:opacity-30"
-  title="Attach document"
-  >
-  <FileText className="h-4 w-4" />
-  <span className="hidden sm:inline">Document</span>
-  </button>
+      if (attachedFiles.length > 0 && attachedType) {
+        setIsUploading(true)
+        setUploadProgress(0)
 
-  <button
-  type="button"
-  onClick={() => setShowPollUI((v) => !v)}
-  className={cn(
-  "active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
-  showPollUI ? "bg-card text-primary" : "text-muted-foreground hover:bg-card hover:text-primary"
-  )}
-  title="Create poll"
-  >
-  <BarChart2 className="h-4 w-4" />
-  <span className="hidden sm:inline">Poll</span>
-  </button>
+        const uploadedUrls: string[] = []
+        const fileNames: string[] = []
 
- {isFetchingPreview && (
- <div className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground italic">
- <Loader2 className="h-3.5 w-3.5 animate-spin" />
- <span>Fetching preview...</span>
- </div>
- )}
- </div>
+        for (let i = 0; i < attachedFiles.length; i++) {
+          const file = attachedFiles[i]
+          fileNames.push(file.name)
+          const res = (await generateUploadUrl({
+            filename: file.name,
+            fileType: file.type,
+            fileSize: file.size,
+            uploadType: attachedType,
+            bucket: "media",
+          })) as any
 
- {/* Poll Creator */}
- {showPollUI && (
- <div className="rounded-lg border border-border bg-card p-md space-y-md animate-in">
- <div className="flex items-center justify-between">
- <span className="font-semibold text-xs text-foreground flex items-center gap-1.5">
- <BarChart2 className="h-4 w-4" /> Create Poll
- </span>
- <button
- type="button"
- onClick={() => setShowPollUI(false)}
- className="text-muted-foreground hover:text-foreground transition-colors"
- >
- <X className="h-4 w-4" />
- </button>
- </div>
- <div className="space-y-2">
- {pollOptions.map((opt, i) => (
- <input
- key={i}
- type="text"
- value={opt}
- onChange={(e) => {
- const next = [...pollOptions];
- next[i] = e.target.value;
- setPollOptions(next);
- }}
- placeholder={`Option ${i + 1}`}
- className="w-full rounded-sm border border-border bg-card px-3 py-2 text-xs text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
- />
- ))}
- {pollOptions.length < 5 && (
- <button
- type="button"
- onClick={() => setPollOptions([...pollOptions,""])}
- className="text-xs text-primary font-semibold hover:opacity-80 transition-opacity"
- >
- + Add Option
- </button>
- )}
- </div>
- </div>
- )}
+          const targetUrl = typeof res === "string" ? res : res?.uploadUrl || res?.url
+          const publicUrl = typeof res === "object" ? res?.publicUrl : null
 
-  {/* Image Previews */}
-  {attachedType === "image" && filePreviews.length > 0 && (
-    <div className="flex flex-wrap gap-2">
-      {filePreviews.map((src, i) => (
-        <div key={i} className="relative h-20 w-20 rounded-lg overflow-hidden border border-border shadow-sm group">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={src} alt={`Preview ${i + 1}`} className="h-full w-full object-cover" />
-          <button
-            type="button"
-            onClick={() => removeFile(i)}
-            className="absolute top-1 right-1 rounded-full bg-black/70 p-1 text-white hover:bg-black transition-colors"
-            title="Remove image"
-          >
-            <X className="h-3 w-3" />
-          </button>
-        </div>
-      ))}
-    </div>
-  )}
+          if (targetUrl) {
+            let uploadOk = false
+            try {
+              const uploadRes = await fetch(targetUrl, {
+                method: "PUT",
+                body: file,
+                headers: { "Content-Type": file.type },
+              })
+              uploadOk = uploadRes.ok
+            } catch {
+              uploadOk = false
+            }
 
-  {/* Video Preview */}
-  {attachedType === "video" && attachedFiles.length > 0 && (
-    <div className="relative rounded-lg overflow-hidden border border-border bg-card p-2 flex items-center justify-between">
-      <div className="flex items-center gap-3 min-w-0">
-        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-          <Video className="h-5 w-5" />
-        </div>
-        <div className="min-w-0">
-          <p className="text-xs font-semibold text-foreground truncate">{attachedFiles[0].name}</p>
-          <p className="text-[10px] text-muted-foreground">{(attachedFiles[0].size / (1024 * 1024)).toFixed(2)} MB</p>
+            if (!uploadOk) {
+              try {
+                const fallbackRes = await fetch(targetUrl, {
+                  method: "POST",
+                  body: file,
+                  headers: { "Content-Type": file.type },
+                })
+                uploadOk = fallbackRes.ok
+              } catch {
+                uploadOk = false
+              }
+            }
+
+            if (!uploadOk && process.env.NODE_ENV !== "test") {
+              throw new Error(`Upload failed for ${file.name}`)
+            }
+          }
+
+          if (publicUrl) {
+            uploadedUrls.push(publicUrl)
+          } else if (res?.path) {
+            uploadedUrls.push(res.path)
+          } else if (typeof res === "string") {
+            uploadedUrls.push(res)
+          }
+
+          setUploadProgress(Math.round(((i + 1) / attachedFiles.length) * 100))
+        }
+
+        mediaUrls = uploadedUrls.length > 0 ? uploadedUrls : undefined
+        finalMediaType = attachedType
+        mediaFileNames = fileNames
+        setIsUploading(false)
+      } else if (linkPreviewData) {
+        finalMediaType = "link"
+      }
+
+      const createdPost = await createPost({
+        content: content.trim() || "",
+        mediaUrls,
+        media_urls: mediaUrls,
+        mediaType: finalMediaType,
+        media_type: finalMediaType,
+        mediaFileNames,
+        linkPreview: linkPreviewData ?? undefined,
+        ...(pollId ? { pollId: pollId as Id<"polls">, poll_id: pollId } : {}),
+        ...(communityId ? { communityId, community_id: communityId } : {}),
+      })
+      const postId = createdPost as string | undefined
+
+      if (pollId && postId) {
+        await linkPollToPost({
+          pollId: pollId as Id<"polls">,
+          postId: postId as Id<"posts">,
+        })
+      }
+
+      // Broadcast the new post
+      import("@/lib/supabase/client").then(({ createClient }) => {
+        const supabase = createClient()
+        supabase.channel("public:posts").send({
+          type: "broadcast",
+          event: "new_post",
+          payload: { id: postId },
+        })
+      })
+
+      setContent("")
+      setAttachedFiles([])
+      setAttachedType(null)
+      filePreviews.forEach((u) => URL.revokeObjectURL(u))
+      setFilePreviews([])
+      setLinkPreviewData(null)
+      setDetectedLink(null)
+      setUploadProgress(0)
+      setShowPollUI(false)
+      setPollOptions(["Option 1", "Option 2"])
+      setPollDuration(24)
+      setPollIsAnonymous(false)
+
+      if (onPostCreated) onPostCreated()
+      toast.success("Post published!")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create post")
+      setIsUploading(false)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const avatarInitial = user?.name ? user.name.substring(0, 2).toUpperCase() : "CC"
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="bg-card border border-border rounded-2xl mb-4 p-4 space-y-4 shadow-sm"
+    >
+      {/* Hidden file inputs */}
+      <input
+        ref={imageInputRef}
+        type="file"
+        className="hidden"
+        onChange={(e) => {
+          if (e.target.files && e.target.files.length > 0) {
+            handleFileSelect(e.target.files, "image")
+            e.target.value = ""
+          }
+        }}
+        accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/*"
+        multiple
+      />
+
+      <input
+        ref={videoInputRef}
+        type="file"
+        className="hidden"
+        onChange={(e) => {
+          if (e.target.files && e.target.files.length > 0) {
+            handleFileSelect(e.target.files, "video")
+            e.target.value = ""
+          }
+        }}
+        accept="video/mp4,video/webm,video/quicktime,video/*"
+      />
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        className="hidden"
+        onChange={(e) => {
+          if (e.target.files && e.target.files.length > 0) {
+            handleFileSelect(e.target.files, "file")
+            e.target.value = ""
+          }
+        }}
+        accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.csv,.xlsx,application/pdf,text/plain"
+        multiple
+      />
+
+      <div className="flex gap-3">
+        {user && (
+          <div className="h-10 w-10 shrink-0 rounded-full bg-muted overflow-hidden border border-border mt-1">
+            {user.profilePicture ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={user.profilePicture}
+                alt={user.name || "User"}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="h-full w-full flex items-center justify-center bg-primary text-on-primary font-bold text-sm">
+                {avatarInitial}
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="relative flex-1" onKeyDown={handleWrapperKeyDown}>
+          <textarea
+            value={content}
+            onChange={(e) => handleContentChange(e.target.value)}
+            placeholder="What's on your mind?"
+            aria-label="What's on your mind?"
+            disabled={isSubmitting}
+            className="w-full min-h-[80px] bg-transparent border-none focus:outline-none focus:ring-0 resize-none text-[16px] text-foreground placeholder:text-muted-foreground py-2"
+          />
+
+          {/* Hashtag autocomplete */}
+          {showHashtagAutocomplete && hashtagSuggestions && hashtagSuggestions.length > 0 && (
+            <div className="absolute z-50 mt-1 w-64 bg-card border border-border rounded-xl shadow-product overflow-hidden">
+              <ul className="py-1">
+                {hashtagSuggestions.map((hashtag: any, index: any) => (
+                  <li
+                    key={hashtag._id}
+                    className={cn(
+                      "px-4 py-2 cursor-pointer text-xs transition-colors",
+                      index === selectedHashtagIndex
+                        ? "bg-primary/10 text-primary"
+                        : "text-foreground hover:bg-muted"
+                    )}
+                    onClick={() => insertHashtag(hashtag.tag)}
+                    onMouseEnter={() => setSelectedHashtagIndex(index)}
+                  >
+                    <div className="flex items-center justify-between font-semibold">
+                      <span>#{hashtag.tag}</span>
+                      <span className="text-[10px] text-muted-foreground">{hashtag.postCount}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Mention autocomplete */}
+          {showMentionAutocomplete && (
+            <MentionAutocomplete
+              query={mentionAutocompleteQuery}
+              onSelect={insertMention}
+              onClose={() => setShowMentionAutocomplete(false)}
+              position={{ top: 100, left: 0 }}
+            />
+          )}
+
+          {error && <p className="mt-1 text-xs text-critical font-medium">{error}</p>}
         </div>
       </div>
-      <button
-        type="button"
-        onClick={() => removeFile(0)}
-        className="rounded-full p-1.5 text-muted-foreground hover:bg-card hover:text-foreground transition-colors"
-        title="Remove video"
-      >
-        <X className="h-4 w-4" />
-      </button>
-    </div>
-  )}
 
-  {/* Document Previews */}
-  {attachedType === "file" && attachedFiles.length > 0 && (
-    <div className="space-y-2">
-      {attachedFiles.map((file, i) => (
-        <div key={i} className="rounded-lg border border-border bg-card p-3 flex items-center justify-between">
+      {/* Media Toolbar */}
+      <div className="flex items-center gap-2 border-t border-border/60 pt-3 flex-wrap">
+        <button
+          type="button"
+          onClick={() => imageInputRef.current?.click()}
+          disabled={!!attachedType && attachedType !== "image"}
+          className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-primary transition-colors disabled:opacity-30"
+          title="Attach photos"
+        >
+          <ImageIcon className="h-4 w-4 text-emerald-500" />
+          <span className="hidden sm:inline">Photos</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => videoInputRef.current?.click()}
+          disabled={!!attachedType && attachedType !== "video"}
+          className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-primary transition-colors disabled:opacity-30"
+          title="Attach video"
+        >
+          <Video className="h-4 w-4 text-sky-500" />
+          <span className="hidden sm:inline">Video</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={!!attachedType && attachedType !== "file"}
+          className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-primary transition-colors disabled:opacity-30"
+          title="Attach document"
+        >
+          <FileText className="h-4 w-4 text-amber-500" />
+          <span className="hidden sm:inline">Document</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setShowPollUI((v) => !v)}
+          className={cn(
+            "active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
+            showPollUI
+              ? "bg-primary/10 text-primary"
+              : "text-muted-foreground hover:bg-muted hover:text-primary"
+          )}
+          title="Create poll"
+        >
+          <BarChart2 className="h-4 w-4 text-purple-500" />
+          <span className="hidden sm:inline">Poll</span>
+        </button>
+
+        {isFetchingPreview && (
+          <div className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground italic">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            <span>Fetching preview...</span>
+          </div>
+        )}
+      </div>
+
+      {/* Poll Creator */}
+      {showPollUI && (
+        <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-xs text-foreground flex items-center gap-1.5">
+              <BarChart2 className="h-4 w-4 text-primary" /> Create Poll
+            </span>
+            <button
+              type="button"
+              onClick={() => setShowPollUI(false)}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="space-y-2">
+            {pollOptions.map((opt, i) => (
+              <input
+                key={i}
+                type="text"
+                value={opt}
+                onChange={(e) => {
+                  const next = [...pollOptions]
+                  next[i] = e.target.value
+                  setPollOptions(next)
+                }}
+                placeholder={`Option ${i + 1}`}
+                className="w-full rounded-lg border border-border bg-muted/30 px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+            ))}
+            {pollOptions.length < 5 && (
+              <button
+                type="button"
+                onClick={() => setPollOptions([...pollOptions, ""])}
+                className="text-xs text-primary font-semibold hover:opacity-80 transition-opacity"
+              >
+                + Add Option
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Image Previews */}
+      {attachedType === "image" && filePreviews.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {filePreviews.map((src, i) => (
+            <div
+              key={i}
+              className="relative h-20 w-20 rounded-xl overflow-hidden border border-border shadow-sm group"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt={`Preview ${i + 1}`} className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={() => removeFile(i)}
+                className="absolute top-1 right-1 rounded-full bg-black/70 p-1 text-white hover:bg-black transition-colors"
+                title="Remove image"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Video Preview */}
+      {attachedType === "video" && attachedFiles.length > 0 && (
+        <div className="relative rounded-xl overflow-hidden border border-border bg-card p-3 flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="h-9 w-9 rounded-lg bg-card flex items-center justify-center text-muted-foreground shrink-0 border border-border">
-              <FileText className="h-5 w-5" />
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+              <Video className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-semibold text-foreground truncate">{file.name}</p>
-              <p className="text-[10px] text-muted-foreground">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+              <p className="text-xs font-semibold text-foreground truncate">
+                {attachedFiles[0].name}
+              </p>
+              <p className="text-[10px] text-muted-foreground">
+                {(attachedFiles[0].size / (1024 * 1024)).toFixed(2)} MB
+              </p>
             </div>
           </div>
           <button
             type="button"
-            onClick={() => removeFile(i)}
-            className="rounded-full p-1.5 text-muted-foreground hover:bg-card hover:text-foreground transition-colors"
-            title="Remove document"
+            onClick={() => removeFile(0)}
+            className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            title="Remove video"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
-      ))}
-    </div>
-  )}
-
-  {/* Link Preview Chip */}
-  {linkPreviewData && !attachedType && (
-    <div className="relative rounded-lg border border-border bg-card p-3">
-      <button
-        type="button"
-        onClick={() => {
-          setLinkPreviewData(null)
-          setDetectedLink(null)
-        }}
-        className="absolute top-2 right-2 rounded-full p-1 text-muted-foreground hover:bg-card transition-colors"
-        title="Remove link preview"
-      >
-        <X className="h-3.5 w-3.5" />
-      </button>
-      <p className="text-xs font-semibold text-primary truncate pr-6">{linkPreviewData.title || linkPreviewData.url}</p>
-      {linkPreviewData.description && (
-        <p className="text-[11px] text-muted-foreground line-clamp-2 mt-0.5">{linkPreviewData.description}</p>
       )}
-    </div>
-  )}
 
- {/* Uploading Status */}
- {isUploading && (
- <div className="space-y-xs animate-pulse">
- <div className="flex justify-between text-[10px] text-muted-foreground font-semibold">
- <span>Uploading Assets</span>
- <span>{uploadProgress}%</span>
- </div>
- <div className="h-1 w-full rounded-full bg-hairline overflow-hidden">
- <div className="h-full bg-primary transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
- </div>
- </div>
- )}
+      {/* Document Previews */}
+      {attachedType === "file" && attachedFiles.length > 0 && (
+        <div className="space-y-2">
+          {attachedFiles.map((file, i) => (
+            <div
+              key={i}
+              className="rounded-xl border border-border bg-card p-3 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="h-9 w-9 rounded-xl bg-muted flex items-center justify-center text-muted-foreground shrink-0 border border-border">
+                  <FileText className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-foreground truncate">{file.name}</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {(file.size / (1024 * 1024)).toFixed(2)} MB
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => removeFile(i)}
+                className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                title="Remove document"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
- <Button
- type="submit"
- disabled={isSubmitting || isUploading || (content.trim().length === 0 && attachedFiles.length === 0 && !showPollUI)}
- variant="primary"
- className="w-full"
- >
- {isUploading ? `Uploading ${uploadProgress}%...` : isSubmitting ?"Posting..." :"Post"}
- </Button>
- </form>
- )
+      {/* Link Preview Chip */}
+      {linkPreviewData && !attachedType && (
+        <div className="relative rounded-xl border border-border bg-card p-3">
+          <button
+            type="button"
+            onClick={() => {
+              setLinkPreviewData(null)
+              setDetectedLink(null)
+            }}
+            className="absolute top-2 right-2 rounded-full p-1 text-muted-foreground hover:bg-muted transition-colors"
+            title="Remove link preview"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+          <p className="text-xs font-semibold text-primary truncate pr-6">
+            {linkPreviewData.title || linkPreviewData.url}
+          </p>
+          {linkPreviewData.description && (
+            <p className="text-[11px] text-muted-foreground line-clamp-2 mt-0.5">
+              {linkPreviewData.description}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Uploading Status */}
+      {isUploading && (
+        <div className="space-y-1 animate-pulse">
+          <div className="flex justify-between text-[10px] text-muted-foreground font-semibold">
+            <span>Uploading Assets</span>
+            <span>{uploadProgress}%</span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+            <div
+              className="h-full bg-primary transition-all duration-300"
+              style={{ width: `${uploadProgress}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between pt-2">
+        <span
+          className={cn(
+            "text-xs font-medium text-muted-foreground",
+            content.length > maxLength * 0.9 && "text-warning",
+            content.length > maxLength && "text-destructive font-bold"
+          )}
+        >
+          {content.length}/{maxLength}
+        </span>
+
+        <Button
+          type="submit"
+          disabled={
+            isSubmitting ||
+            isUploading ||
+            (content.trim().length === 0 && attachedFiles.length === 0 && !showPollUI)
+          }
+          variant="primary"
+          size="sm"
+        >
+          {isUploading ? `Uploading ${uploadProgress}%...` : isSubmitting ? "Posting..." : "Post"}
+        </Button>
+      </div>
+    </form>
+  )
 }
-
-
-
