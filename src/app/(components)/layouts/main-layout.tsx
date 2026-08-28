@@ -46,7 +46,7 @@ export function MainLayout({ children, title = "Campus Connect", fullWidth }: Ma
         Main Application Grid 
         Adds pt-14 on desktop to clear the fixed TopNav 
       */}
-      <div className={`flex flex-1 w-full mx-auto md:pt-14 ${isFullWidthPage ? 'max-w-none px-0' : 'max-w-[1920px] px-0'}`}>
+      <div className={`flex flex-1 w-full mx-auto md:pt-14 ${isFullWidthPage ? 'max-w-none px-0' : 'max-w-[1280px] px-0'}`}>
         
         {/* Left Sidebar - Desktop */}
         <aside className="hidden md:block w-[280px] shrink-0 sticky top-14 h-[calc(100vh-56px)] overflow-y-auto overflow-x-hidden hover:scrollbar-custom scrollbar-hide bg-transparent pl-2 pt-4">
@@ -62,7 +62,7 @@ export function MainLayout({ children, title = "Campus Connect", fullWidth }: Ma
 
         {/* Right Sidebar - Desktop Trending/Contacts */}
         {!isFullWidthPage && (
-          <aside className="hidden xl:block w-[360px] shrink-0 sticky top-14 h-[calc(100vh-56px)] overflow-y-auto pl-4 pr-2 pt-4">
+          <aside className="hidden xl:block w-[280px] shrink-0 sticky top-14 h-[calc(100vh-56px)] overflow-y-auto pl-4 pr-2 pt-4">
             <div id="right-sidebar-portal"></div>
           </aside>
         )}

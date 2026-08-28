@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import Link from "next/link";
@@ -21,26 +21,27 @@ export function TopNav() {
   ];
 
   return (
-    <header className="fixed top-0 inset-x-0 h-14 bg-card border-b border-border z-50 flex items-center justify-between px-4 shadow-sm">
-      {/* Left: Brand & Search */}
-      <div className="flex items-center gap-4 w-1/4 min-w-[320px]">
-        <Link href="/feed" className="flex items-center justify-center shrink-0">
-          <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center shadow-sm">
-            <span className="text-primary-foreground text-sm font-bold">CC</span>
+    <header className="fixed top-0 inset-x-0 h-14 bg-card border-b border-border z-50 shadow-sm flex justify-center">
+      <div className="w-full max-w-[1280px] flex items-center justify-between px-4">
+        {/* Left: Brand & Search */}
+        <div className="flex items-center gap-4 w-[280px] shrink-0">
+          <Link href="/feed" className="flex items-center justify-center shrink-0">
+            <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center shadow-sm">
+              <span className="text-primary-foreground text-sm font-bold">CC</span>
+            </div>
+          </Link>
+          <div className="hidden md:flex items-center bg-muted rounded-full px-3 py-2 flex-1 ml-2">
+            <Search className="h-4 w-4 text-muted-foreground shrink-0" />
+            <input 
+              type="text" 
+              placeholder="Search..." 
+              className="bg-transparent border-none outline-none text-[15px] ml-2 w-full placeholder:text-muted-foreground text-foreground"
+            />
           </div>
-        </Link>
-        <div className="hidden md:flex items-center bg-muted rounded-full px-3 py-2 flex-1 max-w-[240px] ml-2">
-          <Search className="h-4 w-4 text-muted-foreground shrink-0" />
-          <input 
-            type="text" 
-            placeholder="Search Campus Connect..." 
-            className="bg-transparent border-none outline-none text-[15px] ml-2 w-full placeholder:text-muted-foreground text-foreground"
-          />
         </div>
-      </div>
 
-      {/* Center: Main Navigation */}
-      <nav className="hidden md:flex items-center justify-center h-full flex-1 max-w-[600px]">
+        {/* Center: Main Navigation */}
+        <nav className="hidden md:flex items-center justify-center h-full flex-1 max-w-[590px]">
         <div className="flex items-center justify-between w-full px-4 h-full">
           {mainLinks.map((link) => {
             const active = isActive(link.href);
@@ -69,7 +70,7 @@ export function TopNav() {
       </nav>
 
       {/* Right: User Actions */}
-      <div className="flex items-center justify-end gap-4 w-1/4 min-w-[320px]">
+      <div className="flex items-center justify-end gap-4 w-[280px] shrink-0">
         {isLoaded && isSignedIn && user ? (
           <>
             <Link href="/messages" className="h-10 w-10 rounded-full bg-muted flex items-center justify-center hover:bg-border transition-colors text-foreground">
@@ -97,6 +98,7 @@ export function TopNav() {
             </Link>
           </div>
         )}
+      </div>
       </div>
     </header>
   );
