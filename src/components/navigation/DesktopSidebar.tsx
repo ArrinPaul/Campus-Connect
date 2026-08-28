@@ -35,21 +35,23 @@ export function DesktopSidebar() {
   ];
 
   return (
-    <div className="w-full flex flex-col py-4 px-2 h-full gap-4">
+    <div className="w-full flex flex-col py-4 px-3 h-full gap-4 overflow-y-auto overflow-x-hidden scrollbar-hide">
       
       {/* Brand Logo */}
-      <div className="px-3 pb-2">
-        <Link href="/feed" className="flex items-center gap-3 w-fit">
-          <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center shadow-sm">
+      <div className="pb-2 flex justify-start pl-1">
+        <Link href="/feed" className="flex items-center gap-4 w-fit group/logo">
+          <div className="h-10 w-10 shrink-0 rounded-full bg-primary flex items-center justify-center shadow-sm transition-transform group-hover/logo:scale-105">
             <span className="text-primary-foreground text-sm font-bold">CC</span>
           </div>
-          <span className="text-xl font-bold text-foreground hidden xl:block">Campus Connect</span>
+          <span className="text-xl font-bold text-foreground whitespace-nowrap opacity-0 translate-x-[-10px] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+            Campus Connect
+          </span>
         </Link>
       </div>
 
-      {/* Global Search Bar (replaces TopNav search) */}
-      <div className="px-2 pb-2">
-        <div className="flex items-center bg-muted rounded-full px-3 py-2.5 w-full">
+      {/* Global Search Bar (Only visible when expanded) */}
+      <div className="pb-2 opacity-0 h-0 invisible group-hover:opacity-100 group-hover:h-auto group-hover:visible transition-all duration-300 duration-delay-150 pl-1">
+        <div className="flex items-center bg-muted rounded-full px-3 py-2 w-[230px]">
           <Search className="h-4 w-4 text-muted-foreground shrink-0" />
           <input 
             type="text" 
@@ -61,19 +63,22 @@ export function DesktopSidebar() {
       
       {/* Current User Shortcut */}
       {isSignedIn && user && (
-        <Link href="/profile/me" className="flex items-center gap-4 px-2 py-2 rounded-lg hover:bg-accent transition-colors mb-4">
-          <Avatar className="h-9 w-9">
+        <Link href="/profile/me" className="flex items-center gap-4 py-2 pl-1.5 rounded-lg hover:bg-accent transition-colors mb-2 w-max">
+          <Avatar className="h-9 w-9 shrink-0">
             <AvatarImage src={user.profilePicture} alt={user.name} />
             <AvatarFallback className="bg-primary text-primary-foreground text-xs font-bold">
               {user.name.substring(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <span className="text-[15px] font-medium font-semibold text-foreground truncate">{user.name}</span>
+          <div className="flex flex-col opacity-0 translate-x-[-10px] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+            <span className="text-[15px] font-semibold text-foreground whitespace-nowrap">{user.name}</span>
+            <span className="text-xs text-muted-foreground whitespace-nowrap">@{user.username || 'user'}</span>
+          </div>
         </Link>
       )}
 
       {/* Main Nav Links */}
-      <nav className="flex-1 space-y-0.5">
+      <nav className="flex-1 space-y-1">
         {links.map((link) => {
           const active = isActive(link.href);
           return (
@@ -81,17 +86,19 @@ export function DesktopSidebar() {
               key={link.href}
               href={link.href}
               className={cn(
-                "flex items-center gap-4 px-2 py-2 rounded-lg transition-colors",
-                active ? "bg-accent" : "hover:bg-accent"
+                "flex items-center gap-4 py-3 pl-2.5 rounded-lg transition-colors relative w-max pr-6 group/link",
+                active ? "bg-accent/50" : "hover:bg-accent"
               )}
             >
-              <link.icon className={cn(
-                'h-[22px] w-[22px]',
-                active ? 'text-primary fill-primary/10' : 'text-muted-foreground'
-              )} strokeWidth={active ? 2 : 1.5} />
+              <div className="relative shrink-0 flex items-center justify-center">
+                <link.icon className={cn(
+                  'h-6 w-6 transition-transform group-hover/link:scale-110',
+                  active ? 'text-primary stroke-[2.5px]' : 'text-foreground stroke-2'
+                )} />
+              </div>
               <span className={cn(
-                'text-[15px] font-medium',
-                active ? 'font-semibold text-foreground' : 'font-medium text-foreground'
+                'text-[16px] whitespace-nowrap opacity-0 translate-x-[-10px] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300',
+                active ? 'font-bold text-foreground' : 'font-medium text-foreground'
               )}>
                 {link.label}
               </span>
@@ -100,9 +107,9 @@ export function DesktopSidebar() {
         })}
       </nav>
       
-      {/* Footer Links */}
-      <div className="mt-auto pt-6 px-3">
-        <div className="flex flex-wrap gap-x-3 gap-y-1 text-[13px] text-muted-foreground">
+      {/* Footer Links (Only visible when expanded) */}
+      <div className="mt-auto pt-6 px-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 delay-100">
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-[12px] text-muted-foreground w-[230px]">
           <Link href="#" className="hover:underline">Privacy</Link>
           <Link href="#" className="hover:underline">Terms</Link>
           <Link href="#" className="hover:underline">Advertising</Link>

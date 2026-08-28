@@ -39,9 +39,11 @@ export function MainLayout({ children, title = "Campus Connect", fullWidth }: Ma
       {/* Main Application Grid */}
       <div className="flex flex-1 w-full mx-auto max-w-[1280px] px-0">
         
-        {/* Left Sidebar - Desktop */}
-        <aside className="hidden md:block w-[280px] shrink-0 sticky top-0 h-screen overflow-y-auto overflow-x-hidden hover:scrollbar-custom scrollbar-hide bg-transparent pl-2 pt-4">
-          <DesktopSidebar />
+        {/* Left Sidebar - Desktop (Floating & Collapsible) */}
+        <aside className="hidden md:block w-[72px] shrink-0 sticky top-0 h-screen z-40">
+          <div className="absolute top-0 left-0 h-full w-[72px] hover:w-[280px] hover:shadow-xl transition-all duration-300 bg-canvas border-r border-border/50 overflow-hidden z-50 group">
+            <DesktopSidebar />
+          </div>
         </aside>
 
         {/* Center Main Content Area */}
