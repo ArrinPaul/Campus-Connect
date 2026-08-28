@@ -145,9 +145,9 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
 
       {/* Header Content */}
       <div className="max-w-[1024px] mx-auto px-4 md:px-8 pb-4">
-        <div className="relative flex flex-col md:flex-row items-center md:items-end -mt-16 md:-mt-8 md:mb-4">
+        <div className="relative flex flex-col md:flex-row md:items-end -mt-20 md:-mt-8 md:mb-4">
           {/* Avatar */}
-          <div className="relative h-32 w-32 md:h-40 md:w-40 rounded-full border-4 border-surface-soft bg-card shadow-sm overflow-hidden flex-shrink-0 z-10 md:mr-6">
+          <div className="relative h-[168px] w-[168px] rounded-full border-4 border-card bg-card shadow-sm overflow-hidden flex-shrink-0 z-10 md:mr-6 mx-auto md:mx-0">
             {profilePicture ? (
               <Image
                 src={profilePicture}
@@ -172,9 +172,9 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
           </div>
 
           {/* User Info Section */}
-          <div className="mt-4 md:mt-0 w-full flex flex-col md:flex-row justify-between items-center md:items-end gap-4 md:pb-4">
-            <div className="flex-1 text-center md:text-left space-y-2">
-              <h1 className="text-heading-lg font-bold text-foreground leading-tight">
+          <div className="mt-2 md:mt-0 w-full flex flex-col md:flex-row justify-between md:items-end gap-4 md:pb-4">
+            <div className="flex-1 text-center md:text-left">
+              <h1 className="text-[32px] font-bold text-foreground leading-tight">
                 {user.name}
               </h1>
               
@@ -278,7 +278,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
      if (conversationId) {
        router.push(`/messages?c=${conversationId}`)
      } else {
-       toast.error("Could not start conversation")
+       router.push("/messages")
      }
    } catch (error) { 
      log.error("Failed to open conversation", error)
@@ -309,19 +309,11 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
    <>
      <Button
        onClick={() => setShowAddCourseModal(true)}
-       variant="secondary"
-       size="lg"
-       className="flex items-center gap-2"
-     >
-       <BookOpen size={18} /> Add Course
+       variant="primary" size="lg" className="flex items-center gap-2 font-semibold"><BookOpen size={18} /> Add course
      </Button>
      <Button
        onClick={() => setShowEditModal(true)}
-       variant="primary"
-       size="lg"
-       className="flex items-center gap-2"
-     >
-       <Pencil size={18} /> Edit Profile
+       variant="secondary" size="lg" className="flex items-center gap-2 font-semibold bg-muted hover:bg-muted/80 text-foreground border-none shadow-none"><Pencil size={18} /> Edit profile
      </Button>
    </>
  )}
@@ -330,22 +322,19 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
  </div>
 
  {/* Tabs - Apple Style */}
- <div className="w-full flex items-center justify-center md:justify-start gap-8 h-12 border-t border-border overflow-x-auto scrollbar-none">
- <button className="relative h-full flex items-center text-xs text-muted-foreground font-semibold text-primary whitespace-nowrap">
- Posts
- <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full" />
- </button>
- <button className="h-full flex items-center text-xs text-muted-foreground font-semibold hover:text-foreground transition-colors whitespace-nowrap">
- Activity
- </button>
- <button className="h-full flex items-center text-xs text-muted-foreground font-semibold hover:text-foreground transition-colors whitespace-nowrap">
- Portfolio
- </button>
- <button className="h-full flex items-center text-xs text-muted-foreground font-semibold hover:text-foreground transition-colors whitespace-nowrap">
- Skills
- </button>
- </div>
- </div>
+          <div className="w-full flex items-center justify-center md:justify-start gap-8 h-12 border-t border-border mt-4 overflow-x-auto scrollbar-none">
+            <a href={/profile/ + targetUserId} className="relative h-full flex items-center text-[15px] font-semibold text-primary whitespace-nowrap">
+              Posts
+              <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-primary rounded-t-full" />
+            </a>
+            <a href={/profile/ + targetUserId + /activity} className="h-full flex items-center text-[15px] text-muted-foreground font-semibold hover:bg-muted px-4 rounded-md my-1 transition-colors whitespace-nowrap">
+              Activity
+            </a>
+            <a href={/profile/ + targetUserId + /portfolio} className="h-full flex items-center text-[15px] text-muted-foreground font-semibold hover:bg-muted px-4 rounded-md my-1 transition-colors whitespace-nowrap">
+              Portfolio
+            </a>
+          </div>
+        </div>
 
  {/* Edit Profile Modal */}
  {showEditModal && (

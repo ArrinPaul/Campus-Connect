@@ -519,14 +519,14 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
     </div>
   )}
   <div className="relative flex-1" onKeyDown={handleWrapperKeyDown}>
- <RichTextEditor
+ <textarea
  value={content}
- onChange={handleContentChange}
- placeholder={user ? `What's on your mind, ${user.name.split(" ")[0]}?` : "Share your thoughts..."}
+ onChange={(e) => handleContentChange(e.target.value)}
+ placeholder="What's on your mind?"
  maxLength={maxLength}
- minHeight="100px"
  disabled={isSubmitting}
- />
+ className="w-full min-h-[80px] bg-transparent border-none focus:outline-none focus:ring-0 resize-none text-[17px] text-foreground placeholder:text-muted-foreground py-2"
+/>
 
  {/* Hashtag autocomplete */}
  {showHashtagAutocomplete && hashtagSuggestions && hashtagSuggestions.length > 0 && (

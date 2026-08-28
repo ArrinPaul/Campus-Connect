@@ -15,7 +15,7 @@ type MainLayoutProps = {
 
 export function MainLayout({ children, title = "Campus Connect", fullWidth }: MainLayoutProps) {
   const pathname = usePathname();
-  const isFullWidthPage = fullWidth || pathname?.startsWith("/messages");
+  const isFullWidthPage = fullWidth || pathname?.startsWith("/messages") || pathname?.startsWith("/profile");
 
   return (
     <div className="min-h-screen bg-canvas overflow-x-hidden flex flex-col">

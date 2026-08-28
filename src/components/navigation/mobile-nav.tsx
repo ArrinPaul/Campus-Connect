@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from"react"
 import Link from"next/link"
@@ -26,7 +26,6 @@ import {
 import { UserButton } from"@/lib/auth/client"
 import { useQuery } from"@/lib/api"
 import { api } from"@/lib/api"
-import { ThemeToggle } from"@/components/theme/theme-toggle"
 import { Id } from"@/lib/api"
 import { cn } from"@/lib/utils"
 
@@ -219,7 +218,6 @@ export function MobileNav({ currentUserId }: MobileNavProps) {
  <div className="border-t border-border p-4">
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
- <ThemeToggle />
  <span className="text-xs text-muted-foreground">Theme</span>
  </div>
  <UserButton

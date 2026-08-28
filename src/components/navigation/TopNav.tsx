@@ -7,8 +7,6 @@ import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUser } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
-
 export function TopNav() {
   const pathname = usePathname();
   const { user, isLoaded, isSignedIn } = useUser();
@@ -25,7 +23,7 @@ export function TopNav() {
   return (
     <header className="fixed top-0 inset-x-0 h-14 bg-card border-b border-border z-50 flex items-center justify-between px-4 shadow-sm">
       {/* Left: Brand & Search */}
-      <div className="flex items-center gap-2 w-1/4 min-w-[280px]">
+      <div className="flex items-center gap-4 w-1/4 min-w-[320px]">
         <Link href="/feed" className="flex items-center justify-center shrink-0">
           <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center shadow-sm">
             <span className="text-primary-foreground text-sm font-bold">CC</span>
@@ -71,10 +69,9 @@ export function TopNav() {
       </nav>
 
       {/* Right: User Actions */}
-      <div className="flex items-center justify-end gap-2 w-1/4 min-w-[280px]">
+      <div className="flex items-center justify-end gap-4 w-1/4 min-w-[320px]">
         {isLoaded && isSignedIn && user ? (
           <>
-            <ThemeToggle />
             <Link href="/messages" className="h-10 w-10 rounded-full bg-muted flex items-center justify-center hover:bg-border transition-colors text-foreground">
               <MessageCircle className="h-5 w-5" strokeWidth={2} />
             </Link>
