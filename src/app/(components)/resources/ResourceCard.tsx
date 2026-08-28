@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -53,7 +53,7 @@ export function ResourceCard({ resource }: Props) {
                 )}
                 <p>{uploaderName}</p>
                 <span className="mx-1">â€¢</span>
-                <p>Uploaded {formatDistanceToNow(new Date(resource.createdAt), { addSuffix: true })}</p>
+                <p suppressHydrationWarning>Uploaded {formatDistanceToNow(new Date(resource.createdAt), { addSuffix: true })}</p>
                 {resource.fileUrl && (
                     <span className="ml-auto text-primary flex items-center gap-1">
                         View Resource <ExternalLink className="h-3.5 w-3.5" />

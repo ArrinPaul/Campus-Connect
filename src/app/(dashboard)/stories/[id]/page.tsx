@@ -200,7 +200,7 @@ function StoryViewerContent({ storyId }: { storyId: Id<'stories'> }) {
  <p className="text-sm font-semibold text-white leading-tight drop-shadow">
  {story.author?.name}
  </p>
- <p className="text-xs text-white/70">
+ <p className="text-xs text-white/70" suppressHydrationWarning>
  {formatDistanceToNow(new Date(story.createdAt), { addSuffix: true })}
  </p>
  </div>

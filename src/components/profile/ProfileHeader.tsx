@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import Image from"next/image"
 import { useState } from"react"
@@ -323,14 +323,14 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
 
  {/* Tabs - Apple Style */}
           <div className="w-full flex items-center justify-center md:justify-start gap-8 h-12 border-t border-border mt-4 overflow-x-auto scrollbar-none">
-            <a href={/profile/ + targetUserId} className="relative h-full flex items-center text-[15px] font-semibold text-primary whitespace-nowrap">
+            <a href={`/profile/${targetUserId}`} className="relative h-full flex items-center text-[15px] font-semibold text-primary whitespace-nowrap">
               Posts
               <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-primary rounded-t-full" />
             </a>
-            <a href={/profile/ + targetUserId + /activity} className="h-full flex items-center text-[15px] text-muted-foreground font-semibold hover:bg-muted px-4 rounded-md my-1 transition-colors whitespace-nowrap">
+            <a href={`/profile/${targetUserId}/activity`} className="h-full flex items-center text-[15px] text-muted-foreground font-semibold hover:bg-muted px-4 rounded-md my-1 transition-colors whitespace-nowrap">
               Activity
             </a>
-            <a href={/profile/ + targetUserId + /portfolio} className="h-full flex items-center text-[15px] text-muted-foreground font-semibold hover:bg-muted px-4 rounded-md my-1 transition-colors whitespace-nowrap">
+            <a href={`/profile/${targetUserId}/portfolio`} className="h-full flex items-center text-[15px] text-muted-foreground font-semibold hover:bg-muted px-4 rounded-md my-1 transition-colors whitespace-nowrap">
               Portfolio
             </a>
           </div>

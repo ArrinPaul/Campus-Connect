@@ -139,7 +139,7 @@ export function UserActivityFeed({ userId }: { userId: Id<'users'> }) {
                                         <MessageSquare className="h-3.5 w-3.5" />
                                         <span>Commented on a post</span>
                                         <span>•</span>
-                                        <span>{formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}</span>
+                                        <span suppressHydrationWarning>{formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}</span>
                                     </div>
                                     <p className="text-sm text-foreground whitespace-pre-wrap line-clamp-3">
                                         {comment.content}

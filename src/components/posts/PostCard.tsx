@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, memo, useRef, useEffect } from "react"
 import { motion } from "framer-motion"
@@ -452,7 +452,7 @@ export const PostCard = memo(function PostCard({
                   href={`/post/${post._id}`}
                   className="hover:underline text-muted-foreground"
                 >
-                  <span>
+                  <span suppressHydrationWarning>
                     {formatTimestamp(
                       post.createdAt ||
                         (post as any).created_at ||
@@ -480,7 +480,7 @@ export const PostCard = memo(function PostCard({
                     updated > created + 5000
                   )
                 })() && (
-                  <span className="text-[11px] text-muted-foreground/70 italic cursor-default select-none">
+                  <span suppressHydrationWarning className="text-[11px] text-muted-foreground/70 italic cursor-default select-none">
                     Â· edited {formatTimestamp(updatedAtTimestamp)}
                   </span>
                 )}

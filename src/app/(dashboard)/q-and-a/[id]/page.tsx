@@ -99,7 +99,7 @@ function QuestionDetailPageContent({ questionId }: { questionId: Id<'questions'>
  )}
  <p>{askerName}</p>
  </div>
- <div className="flex items-center gap-1.5"><Calendar className="h-4 w-4" /> Asked {formatDistanceToNow(new Date(question.createdAt), { addSuffix: true })}</div>
+ <div className="flex items-center gap-1.5"><Calendar className="h-4 w-4" /> Asked <span suppressHydrationWarning>{formatDistanceToNow(new Date(question.createdAt), { addSuffix: true })}</span></div>
  <div className="flex items-center gap-1.5"><Eye className="h-4 w-4" /> {question.viewCount} views</div>
  {question.course && <div className="flex items-center gap-1.5"><BookOpen className="h-4 w-4" /> {question.course}</div>}
  </div>

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -36,7 +36,7 @@ export function QuestionCard({ question }: Props) {
                     )}
                     <p>{askerName}</p>
                     <span className="mx-1">â€¢</span>
-                    <p>{formatDistanceToNow(new Date(question.createdAt), { addSuffix: true })}</p>
+                    <p suppressHydrationWarning>{formatDistanceToNow(new Date(question.createdAt), { addSuffix: true })}</p>
                 </div>
                 <div className="flex items-center gap-3">
                      <div className="flex items-center gap-1">

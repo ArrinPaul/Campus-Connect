@@ -219,7 +219,7 @@ function ResourceDetailContent({ id }: { id: string }) {
  <div className="flex items-center justify-center gap-1 text-muted-foreground mb-1">
  <Calendar className="h-5 w-5" />
  </div>
- <p className="text-xs text-muted-foreground">
+ <p className="text-xs text-muted-foreground" suppressHydrationWarning>
  {formatDistanceToNow(new Date(resource.createdAt), { addSuffix: true })}
  </p>
  </div>

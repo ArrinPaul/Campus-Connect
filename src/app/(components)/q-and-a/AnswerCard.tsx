@@ -87,7 +87,7 @@ export function AnswerCard({ answer, isQuestionOwner, onAccept }: Props) {
                             )}
                             <p>{answererName}</p>
                             <span className="mx-1">•</span>
-                            <p>{formatDistanceToNow(new Date(answer.createdAt), { addSuffix: true })}</p>
+                            <p suppressHydrationWarning>{formatDistanceToNow(new Date(answer.createdAt), { addSuffix: true })}</p>
                         </div>
                         <div className="flex items-center gap-2">
                              {answer.isAccepted && (

@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useRouter } from"next/navigation"
 import { OptimizedImage } from"@/components/ui/OptimizedImage"
@@ -119,7 +119,7 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
  )}>
  {notification.message}
  </p>
- <p className="text-xs text-muted-foreground mt-1 font-medium">
+ <p className="text-xs text-muted-foreground mt-1 font-medium" suppressHydrationWarning>
  {formatDistanceToNow(notification.createdAt, { addSuffix: true })}
  </p>
  </div>

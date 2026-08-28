@@ -78,7 +78,7 @@ export function ConversationListItem({
           )}>
             {otherUser.name}
           </h3>
-          <span className="text-[10px] text-foreground-muted-48 font-semibold uppercase tracking-wider">
+          <span className="text-[10px] text-foreground-muted-48 font-semibold uppercase tracking-wider" suppressHydrationWarning>
             {formatDistanceToNow(conversation.updatedAt, { addSuffix: false })}
           </span>
         </div>

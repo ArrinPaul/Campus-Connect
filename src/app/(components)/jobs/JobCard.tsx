@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import type { Doc } from '@/lib/api';
@@ -35,7 +35,7 @@ export function JobCard({ job }: Props) {
                 </div>
             </div>
              <div className="text-xs text-muted-foreground mt-3 flex items-center gap-1">
-                <Clock className="h-3 w-3" /> Posted {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}
+                <Clock className="h-3 w-3" /> <span suppressHydrationWarning>Posted {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}</span>
             </div>
         </Link>
     );

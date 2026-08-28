@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
@@ -65,7 +65,7 @@ export function ListingCard({ listing }: Props) {
                     )}
                     <p>{sellerName}</p>
                     <span className="mx-1">â€¢</span>
-                    <p>Listed {formatDistanceToNow(new Date(listing.createdAt), { addSuffix: true })}</p>
+                    <p suppressHydrationWarning>Listed {formatDistanceToNow(new Date(listing.createdAt), { addSuffix: true })}</p>
                 </div>
             </div>
         </Link>

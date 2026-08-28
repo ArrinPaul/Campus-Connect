@@ -202,7 +202,7 @@ export function NotificationBell() {
  <p className="text-sm text-foreground">
  {notification.message}
  </p>
- <p className="text-xs text-muted-foreground mt-1">
+ <p className="text-xs text-muted-foreground mt-1" suppressHydrationWarning>
  {formatDistanceToNow(notification.createdAt, { addSuffix: true })}
  </p>
  </div>

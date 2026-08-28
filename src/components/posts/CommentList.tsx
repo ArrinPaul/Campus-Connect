@@ -217,9 +217,9 @@ export function CommentList({
                 {comment.author?.name || "Unknown User"}
               </p>
             )}
- <span className="text-xs text-muted-foreground whitespace-nowrap">
- {formatTimestamp(comment.createdAt)}
- </span>
+            <span suppressHydrationWarning className="text-[11px] font-medium text-muted-foreground">
+              {formatTimestamp(comment.createdAt)}
+            </span>
  </div>
  <p className="mt-1 whitespace-pre-wrap text-sm text-foreground break-words">
  {parseMentions(comment.content).map((segment, index) => {

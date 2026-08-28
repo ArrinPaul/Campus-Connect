@@ -12,16 +12,7 @@ import { toast } from"sonner"
 import { Button } from"@/components/ui/button"
 import { cn } from"@/lib/utils"
 
-// Lazy load the heavy Tiptap editor (~300KB)
-const RichTextEditor = dynamic(
- () => import("@/components/editor/RichTextEditor").then((m) => m.RichTextEditor),
- {
- loading: () => (
- <div className="h-32 animate-pulse rounded-lg bg-card" />
- ),
- ssr: false,
- }
-)
+
 import Image from"next/image"
 import {
  Image as ImageIcon,

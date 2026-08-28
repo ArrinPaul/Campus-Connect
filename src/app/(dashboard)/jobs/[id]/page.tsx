@@ -78,7 +78,7 @@ export default function JobDetailPage({ params }: PageProps) {
  <div className="flex items-center gap-1.5"><MapPin className="h-4 w-4" /> {job.location} {job.remote && '(Remote)'}</div>
  <div className="flex items-center gap-1.5"><Briefcase className="h-4 w-4" /> {job.type}</div>
  {job.salary && <div className="flex items-center gap-1.5"><DollarSign className="h-4 w-4" /> {job.salary}</div>}
- <div className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> Posted {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}</div>
+ <div className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> Posted <span suppressHydrationWarning>{formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}</span></div>
  </div>
 
  <div>
