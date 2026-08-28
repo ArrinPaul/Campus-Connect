@@ -11,7 +11,12 @@ export function BookmarkedPostList() {
         return <div className="text-center py-16">Loading bookmarks...</div>
     }
 
-    const bookmarks = Array.isArray(bookmarksData) ? bookmarksData : (bookmarksData?.bookmarks || []);
+    let bookmarks: any[] = [];
+    if (Array.isArray(bookmarksData)) {
+        bookmarks = bookmarksData;
+    } else if (bookmarksData && Array.isArray(bookmarksData.bookmarks)) {
+        bookmarks = bookmarksData.bookmarks;
+    }
 
     if (bookmarks.length === 0) {
         return (
