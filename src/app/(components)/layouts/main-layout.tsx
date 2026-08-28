@@ -27,7 +27,6 @@ export function MainLayout({ children, title = "Campus Connect", fullWidth }: Ma
     pathname?.startsWith("/communities") || 
     pathname?.startsWith("/q-and-a") || 
     pathname?.startsWith("/leaderboard") || 
-    pathname?.startsWith("/bookmarks") ||
     pathname?.startsWith("/admin");
 
   return (
@@ -46,7 +45,7 @@ export function MainLayout({ children, title = "Campus Connect", fullWidth }: Ma
         Main Application Grid 
         Adds pt-14 on desktop to clear the fixed TopNav 
       */}
-      <div className={`flex flex-1 w-full mx-auto md:pt-14 ${isFullWidthPage ? 'max-w-none px-0' : 'max-w-[1280px] px-0'}`}>
+      <div className="flex flex-1 w-full mx-auto md:pt-14 max-w-[1280px] px-0">
         
         {/* Left Sidebar - Desktop */}
         <aside className="hidden md:block w-[280px] shrink-0 sticky top-14 h-[calc(100vh-56px)] overflow-y-auto overflow-x-hidden hover:scrollbar-custom scrollbar-hide bg-transparent pl-2 pt-4">
