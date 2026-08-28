@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import Link from "next/link";
@@ -8,7 +8,8 @@ import { useUser } from "@/lib/auth/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   Users, Briefcase, Store, Bookmark, Hash, Trophy, 
-  BookOpen, FolderOpen, Calendar, HelpCircle 
+  BookOpen, FolderOpen, Calendar, HelpCircle,
+  Home, Bell, MessageCircle, Search
 } from "lucide-react";
 
 export function DesktopSidebar() {
@@ -18,7 +19,10 @@ export function DesktopSidebar() {
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
 
   const links = [
+    { href: "/feed", icon: Home, label: "Home" },
     { href: "/explore", icon: Hash, label: "Explore" },
+    { href: "/notifications", icon: Bell, label: "Notifications" },
+    { href: "/messages", icon: MessageCircle, label: "Messages" },
     { href: "/bookmarks", icon: Bookmark, label: "Saved" },
     { href: "/communities", icon: Users, label: "Groups" },
     { href: "/events", icon: Calendar, label: "Events" },
@@ -31,7 +35,29 @@ export function DesktopSidebar() {
   ];
 
   return (
-    <div className="w-full flex flex-col py-4 px-2 h-full">
+    <div className="w-full flex flex-col py-4 px-2 h-full gap-4">
+      
+      {/* Brand Logo */}
+      <div className="px-3 pb-2">
+        <Link href="/feed" className="flex items-center gap-3 w-fit">
+          <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center shadow-sm">
+            <span className="text-primary-foreground text-sm font-bold">CC</span>
+          </div>
+          <span className="text-xl font-bold text-foreground hidden xl:block">Campus Connect</span>
+        </Link>
+      </div>
+
+      {/* Global Search Bar (replaces TopNav search) */}
+      <div className="px-2 pb-2">
+        <div className="flex items-center bg-muted rounded-full px-3 py-2.5 w-full">
+          <Search className="h-4 w-4 text-muted-foreground shrink-0" />
+          <input 
+            type="text" 
+            placeholder="Search..." 
+            className="bg-transparent border-none outline-none text-[15px] ml-2 w-full placeholder:text-muted-foreground text-foreground"
+          />
+        </div>
+      </div>
       
       {/* Current User Shortcut */}
       {isSignedIn && user && (

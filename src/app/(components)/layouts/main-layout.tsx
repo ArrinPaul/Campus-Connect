@@ -31,24 +31,16 @@ export function MainLayout({ children, title = "Campus Connect", fullWidth }: Ma
 
   return (
     <div className="min-h-screen bg-canvas overflow-x-hidden flex flex-col">
-      {/* Global Desktop Header */}
-      <div className="hidden md:block">
-        <TopNav />
-      </div>
-
       {/* Mobile Top Bar */}
       <div className="md:hidden sticky top-0 z-50">
         <MobileTopBar />
       </div>
 
-      {/* 
-        Main Application Grid 
-        Adds pt-14 on desktop to clear the fixed TopNav 
-      */}
-      <div className="flex flex-1 w-full mx-auto md:pt-14 max-w-[1280px] px-0">
+      {/* Main Application Grid */}
+      <div className="flex flex-1 w-full mx-auto max-w-[1280px] px-0">
         
         {/* Left Sidebar - Desktop */}
-        <aside className="hidden md:block w-[280px] shrink-0 sticky top-14 h-[calc(100vh-56px)] overflow-y-auto overflow-x-hidden hover:scrollbar-custom scrollbar-hide bg-transparent pl-2 pt-4">
+        <aside className="hidden md:block w-[280px] shrink-0 sticky top-0 h-screen overflow-y-auto overflow-x-hidden hover:scrollbar-custom scrollbar-hide bg-transparent pl-2 pt-4">
           <DesktopSidebar />
         </aside>
 
@@ -61,7 +53,7 @@ export function MainLayout({ children, title = "Campus Connect", fullWidth }: Ma
 
         {/* Right Sidebar - Desktop Trending/Contacts */}
         {!isFullWidthPage && (
-          <aside className="hidden xl:block w-[280px] shrink-0 sticky top-14 h-[calc(100vh-56px)] overflow-y-auto pl-4 pr-2 pt-4">
+          <aside className="hidden xl:block w-[280px] shrink-0 sticky top-0 h-screen overflow-y-auto pl-4 pr-2 pt-4">
             <div id="right-sidebar-portal"></div>
           </aside>
         )}
