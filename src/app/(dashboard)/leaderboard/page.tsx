@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import { useQuery } from "@/lib/api"
@@ -204,7 +204,7 @@ export default function LeaderboardPage() {
               <p className="text-[11px] text-muted-foreground truncate max-w-[160px]">{topThree[1].university || "Campus Scholar"}</p>
               <div className="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/60 text-muted-foreground-700 dark:text-muted-foreground-300 text-xs font-bold">
                 <span>{topThree[1].points} pts</span>
-                <span className="text-[10px] text-muted-foreground">Â· Lvl {topThree[1].level}</span>
+                <span className="text-[10px] text-muted-foreground">· Lvl {topThree[1].level}</span>
               </div>
             </div>
           )}
@@ -231,7 +231,7 @@ export default function LeaderboardPage() {
               <div className="mt-3 flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-400 text-sm font-extrabold">
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>{topThree[0].points} pts</span>
-                <span className="text-[11px] font-semibold opacity-80">Â· Lvl {topThree[0].level}</span>
+                <span className="text-[11px] font-semibold opacity-80">· Lvl {topThree[0].level}</span>
               </div>
             </div>
           )}
@@ -257,7 +257,7 @@ export default function LeaderboardPage() {
               <p className="text-[11px] text-muted-foreground truncate max-w-[160px]">{topThree[2].university || "Campus Scholar"}</p>
               <div className="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-700/10 text-amber-800 dark:text-amber-400 text-xs font-bold">
                 <span>{topThree[2].points} pts</span>
-                <span className="text-[10px] text-muted-foreground">Â· Lvl {topThree[2].level}</span>
+                <span className="text-[10px] text-muted-foreground">· Lvl {topThree[2].level}</span>
               </div>
             </div>
           )}

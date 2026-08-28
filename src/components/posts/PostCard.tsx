@@ -447,7 +447,7 @@ export const PostCard = memo(function PostCard({
                     {author.name}
                   </p>
                 )}
-                <span>Â·</span>
+                <span>·</span>
                 <Link
                   href={`/post/${post._id}`}
                   className="hover:underline text-muted-foreground"
@@ -481,7 +481,7 @@ export const PostCard = memo(function PostCard({
                   )
                 })() && (
                   <span suppressHydrationWarning className="text-[11px] text-muted-foreground/70 italic cursor-default select-none">
-                    Â· edited {formatTimestamp(updatedAtTimestamp)}
+                    · edited {formatTimestamp(updatedAtTimestamp)}
                   </span>
                 )}
               </div>

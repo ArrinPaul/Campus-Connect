@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import { TopNav } from "@/components/navigation/TopNav";
@@ -15,7 +15,20 @@ type MainLayoutProps = {
 
 export function MainLayout({ children, title = "Campus Connect", fullWidth }: MainLayoutProps) {
   const pathname = usePathname();
-  const isFullWidthPage = fullWidth || pathname?.startsWith("/messages") || pathname?.startsWith("/profile");
+  const isFullWidthPage = fullWidth || 
+    pathname?.startsWith("/messages") || 
+    pathname?.startsWith("/profile") || 
+    pathname?.startsWith("/explore") || 
+    pathname?.startsWith("/jobs") || 
+    pathname?.startsWith("/marketplace") || 
+    pathname?.startsWith("/events") || 
+    pathname?.startsWith("/research") || 
+    pathname?.startsWith("/resources") || 
+    pathname?.startsWith("/communities") || 
+    pathname?.startsWith("/q-and-a") || 
+    pathname?.startsWith("/leaderboard") || 
+    pathname?.startsWith("/bookmarks") ||
+    pathname?.startsWith("/admin");
 
   return (
     <div className="min-h-screen bg-canvas overflow-x-hidden flex flex-col">
