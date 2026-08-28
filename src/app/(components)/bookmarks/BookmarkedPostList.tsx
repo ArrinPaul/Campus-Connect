@@ -11,6 +11,9 @@ export function BookmarkedPostList() {
         return <div className="text-center py-16">Loading bookmarks...</div>
     }
 
+    // CACHE BUST: 2026-08-28T23:38
+    console.log("CACHE BUST: Loading bookmarks...", bookmarksData);
+    
     let bookmarks: any[] = [];
     if (Array.isArray(bookmarksData)) {
         bookmarks = bookmarksData;
@@ -18,7 +21,7 @@ export function BookmarkedPostList() {
         bookmarks = bookmarksData.bookmarks;
     }
 
-    if (bookmarks.length === 0) {
+    if (!bookmarks || bookmarks.length === 0) {
         return (
             <div className="text-center py-16">
                 <h3 className="text-lg font-semibold">No bookmarks yet</h3>

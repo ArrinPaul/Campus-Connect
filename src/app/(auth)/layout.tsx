@@ -1,13 +1,13 @@
-﻿import React from 'react'
+import React from 'react'
 import Link from 'next/link'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
  return (
  <div className="min-h-screen flex bg-canvas">
- {/* Left Panel â€” Decorative (desktop only) */}
+ {/* Left Panel — Decorative (desktop only) */}
  <div className="hidden lg:flex lg:w-[45%] xl:w-[50%] bg-card border-r border-border relative overflow-hidden flex-col justify-between p-12">
 
- {/* Logo â€” matches GlobalNav/DesktopSidebar CC icon pattern */}
+ {/* Logo — matches GlobalNav/DesktopSidebar CC icon pattern */}
  <Link href="/" className="relative z-10 flex items-center gap-3">
  <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center shrink-0 shadow-sm">
  <span className="text-white text-lg font-bold">CC</span>
@@ -29,11 +29,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
  {/* Bottom footer */}
  <p className="relative z-10 text-xs text-muted-foreground">
- Â© {new Date().getFullYear()} Campus Connect Inc.
+ © {new Date().getFullYear()} Campus Connect Inc.
  </p>
  </div>
 
- {/* Right Panel â€” Form */}
+ {/* Right Panel — Form */}
  <div className="flex-1 flex flex-col">
  {/* Mobile header with gradient accent */}
  <div className="lg:hidden bg-card border-b border-border shadow-sm px-4 py-4 flex items-center gap-3">
@@ -57,11 +57,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
  {/* Mobile footer */}
  <footer className="lg:hidden py-lg px-xl text-center">
  <p className="text-xs text-muted-foreground">
- Â© {new Date().getFullYear()} Campus Connect Inc.
+ © {new Date().getFullYear()} Campus Connect Inc.
  </p>
  </footer>
  </div>
  </div>
  )
 }
-
