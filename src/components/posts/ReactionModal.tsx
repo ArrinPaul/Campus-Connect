@@ -105,7 +105,7 @@ export function ReactionModal({
  <Link
  key={index}
  href={`/profile/${item.user!._id}`}
- className="flex items-center gap-3 p-2 rounded-lg hover:bg-canvas transition-colors"
+ className="flex items-center gap-3 p-2 rounded-lg hover:bg-card transition-colors"
  onClick={() => onOpenChange(false)}
  >
  <Avatar className="h-10 w-10">
@@ -121,7 +121,7 @@ export function ReactionModal({
  <p className="font-medium text-sm truncate">
  {item.user!.name}
  </p>
- <p className="text-xs text-slate">
+ <p className="text-xs text-muted-foreground">
  {item.user!.role}
  </p>
  </div>
@@ -132,7 +132,7 @@ export function ReactionModal({
  ))}
  </div>
  ) : (
- <div className="text-center py-8 text-slate">
+ <div className="text-center py-8 text-muted-foreground">
  No reactions yet
  </div>
  )}

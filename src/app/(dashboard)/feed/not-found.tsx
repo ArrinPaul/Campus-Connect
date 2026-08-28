@@ -3,7 +3,7 @@ import Link from"next/link"
 export default function FeedNotFound() {
  return (
  <div className="flex flex-col items-center justify-center py-16 text-center">
- <h2 className="text-xl font-semibold text-ink-deep">Feed not found</h2>
+ <h2 className="text-xl font-semibold text-foreground">Feed not found</h2>
  <p className="mt-2 text-sm text-muted-foreground">
  The feed you&apos;re looking for doesn&apos;t exist.
  </p>

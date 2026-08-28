@@ -44,18 +44,18 @@ export function MyInvitesBanner() {
  };
 
  return (
- <div className="rounded-lg border border-hairline bg-canvas/50 p-lg shadow-sm">
+ <div className="rounded-lg border border-border bg-card/50 p-lg shadow-sm">
  <div className="flex items-center gap-2 mb-lg">
  <div className="p-2 rounded-full bg-primary/10 text-primary">
  <Mail className="h-4 w-4" />
  </div>
- <h3 className="font-semibold text-ink">
+ <h3 className="font-semibold text-foreground">
  Community Invites ({invites.length})
  </h3>
  </div>
  <div className="space-y-3">
  {invites.map((invite: any) => (
- <div key={invite._id} className="flex items-center gap-md rounded-md bg-canvas p-md border border-hairline transition-all hover:shadow-product">
+ <div key={invite._id} className="flex items-center gap-md rounded-md bg-card p-md border border-border transition-all hover:shadow-product">
  {invite.community?.avatarUrl ? (
  <Image
  src={invite.community.avatarUrl}
@@ -65,7 +65,7 @@ export function MyInvitesBanner() {
  className="h-12 w-12 rounded-sm object-cover flex-shrink-0"
  />
  ) : (
- <div className="h-12 w-12 rounded-sm bg-canvas text-ink/20 flex items-center justify-center font-bold flex-shrink-0">
+ <div className="h-12 w-12 rounded-sm bg-card text-foreground/20 flex items-center justify-center font-bold flex-shrink-0">
  <Users size={20} />
  </div>
  )}
@@ -76,7 +76,7 @@ export function MyInvitesBanner() {
  >
  {invite.community?.name || 'Unknown Community'}
  </Link>
- <p className="text-caption text-slate">
+ <p className="text-caption text-muted-foreground">
  Invited by {invite.inviter?.name || 'someone'}
  </p>
  </div>

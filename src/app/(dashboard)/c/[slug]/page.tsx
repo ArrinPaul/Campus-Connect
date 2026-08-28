@@ -48,14 +48,14 @@ function CommunityPageContent({ slug }: { slug: string }) {
     
     {/* Left Column: About */}
     <div className="col-span-1 space-y-4">
-      <div className="bg-surface-soft border border-hairline rounded-xl p-4 shadow-sm">
-        <h2 className="text-[17px] font-bold text-ink-deep mb-3">About</h2>
-        <p className="text-sm text-slate mb-4 leading-relaxed">{community.description}</p>
-        <div className="flex items-center gap-2 text-sm text-ink-deep mb-2">
-          <Globe className="h-4 w-4 text-slate" />
+      <div className="bg-card border border-border rounded-lg p-4 shadow-sm">
+        <h2 className="text-[17px] font-bold text-foreground mb-3">About</h2>
+        <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{community.description}</p>
+        <div className="flex items-center gap-2 text-sm text-foreground mb-2">
+          <Globe className="h-4 w-4 text-muted-foreground" />
           <span className="font-semibold">{community.type === 'public' ? 'Public' : 'Private'} Group</span>
         </div>
-        <div className="text-xs text-slate ml-6">
+        <div className="text-xs text-muted-foreground ml-6">
           {community.type === 'public' ? 'Anyone can see who is in the group and what they post.' : 'Only members can see who is in the group and what they post.'}
         </div>
       </div>
@@ -67,13 +67,13 @@ function CommunityPageContent({ slug }: { slug: string }) {
       {canPost ? (
         <PostComposer communityId={community._id} />
       ) : (
-        <div className="rounded-xl border border-hairline bg-surface-soft p-8 text-center shadow-sm mb-4">
-          <h3 className="font-bold text-ink-deep">
+        <div className="rounded-lg border border-border bg-card p-8 text-center shadow-sm mb-4">
+          <h3 className="font-bold text-foreground">
             {viewerRole === 'pending'
             ? 'Membership Pending'
             : 'Connect with this Community'}
           </h3>
-          <p className="text-sm text-slate mt-2 max-w-xs mx-auto">
+          <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
             {viewerRole === 'pending'
             ? 'Your request is being reviewed by the moderators.'
             : 'Join this community to participate in discussions and share posts.'}
@@ -96,7 +96,7 @@ export default function CommunityPage({ params }: PageProps) {
  return (
  <Suspense fallback={
  <div className="flex items-center justify-center min-h-screen bg-canvas">
- <div className="animate-pulse text-ink/30 font-display text-2xl">Loading community...</div>
+ <div className="animate-pulse text-foreground/30 font-display text-2xl">Loading community...</div>
  </div>
  }>
  <CommunityPageContent slug={params.slug} />

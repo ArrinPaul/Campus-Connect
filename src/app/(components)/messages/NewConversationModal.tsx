@@ -39,7 +39,7 @@ export function NewConversationModal({ onClose }: NewConversationModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="bg-card border rounded-xl shadow-lg w-full max-w-md mx-4 max-h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-card border rounded-lg shadow-lg w-full max-w-md mx-4 max-h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-lg font-semibold">New Conversation</h2>
           <button onClick={onClose} className="p-1 rounded-lg hover:bg-muted">

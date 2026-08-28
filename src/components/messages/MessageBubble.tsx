@@ -119,13 +119,13 @@ export function MessageBubble({
  <>
  {showTimestamp && (
  <div className="flex justify-center my-4">
- <span className="text-xs text-slate bg-canvas px-3 py-1 rounded-full">
+ <span className="text-xs text-muted-foreground bg-card px-3 py-1 rounded-full">
  {formatDate(message.createdAt)}
  </span>
  </div>
  )}
  <div className="flex justify-center my-2">
- <span className="text-xs text-slate italic bg-canvas px-3 py-1 rounded-full">
+ <span className="text-xs text-muted-foreground italic bg-card px-3 py-1 rounded-full">
  {message.content}
  </span>
  </div>
@@ -139,8 +139,8 @@ export function MessageBubble({
  <div
  className={`flex ${message.isOwn ?"justify-end" :"justify-start"} my-1`}
  >
- <div className="max-w-[70%] px-4 py-2 rounded-2xl bg-canvas">
- <p className="text-sm text-slate italic">
+ <div className="max-w-[70%] px-4 py-2 rounded-lg bg-card">
+ <p className="text-sm text-muted-foreground italic">
  🚫 This message was deleted
  </p>
  </div>
@@ -159,7 +159,7 @@ export function MessageBubble({
  <>
  {showTimestamp && (
  <div className="flex justify-center my-4">
- <span className="text-xs text-slate bg-canvas px-3 py-1 rounded-full">
+ <span className="text-xs text-muted-foreground bg-card px-3 py-1 rounded-full">
  {formatDate(message.createdAt)}
  </span>
  </div>
@@ -180,7 +180,7 @@ export function MessageBubble({
  className="h-7 w-7 rounded-full object-cover ring-1 ring-hairline"
  />
  ) : (
- <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/20 to-accent-violet/20 flex items-center justify-center text-[10px] font-semibold text-ink-deep">
+ <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/20 to-accent-violet/20 flex items-center justify-center text-[10px] font-semibold text-foreground">
  {message.senderName[0]?.toUpperCase()}
  </div>
  )}
@@ -195,17 +195,17 @@ export function MessageBubble({
  <div className={`max-w-[70%] ${message.isOwn ?"items-end" :"items-start"}`}>
  {/* Sender name for groups */}
  {showSenderName && !message.isOwn && (
- <p className="text-xs font-medium text-slate mb-1 ml-1">
+ <p className="text-xs font-medium text-muted-foreground mb-1 ml-1">
  {message.senderName}
  </p>
  )}
 
  {/* Message bubble */}
  <div
- className={`relative px-4 py-2.5 rounded-2xl transition-colors shadow-sm ${
+ className={`relative px-4 py-2.5 rounded-lg transition-colors shadow-sm ${
  message.isOwn
  ?"bg-primary text-white rounded-br-sm"
- :"bg-canvas text-ink-deep rounded-bl-sm"
+ :"bg-card text-foreground rounded-bl-sm"
  }`}
  >
  {/* Reply quote */}
@@ -290,7 +290,7 @@ export function MessageBubble({
  >
  <span
  className={`text-[10px] ${
- message.isOwn ?"text-white/80" :"text-slate"
+ message.isOwn ?"text-white/80" :"text-muted-foreground"
  }`}
  >
  {formatTime(message.createdAt)}
@@ -298,7 +298,7 @@ export function MessageBubble({
  {message.updatedAt && (
  <span
  className={`text-[10px] italic ${
- message.isOwn ?"text-white/80" :"text-slate"
+ message.isOwn ?"text-white/80" :"text-muted-foreground"
  }`}
  >
  edited
@@ -327,7 +327,7 @@ export function MessageBubble({
  >
  <button
  onClick={() => setShowContextMenu(!showContextMenu)}
- className="p-1 rounded-full text-slate hover:text-ink-deep hover:bg-canvas transition-colors"
+ className="p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
  aria-label="Message options"
  >
  <MoreHorizontal className="h-4 w-4" />
@@ -342,7 +342,7 @@ export function MessageBubble({
  onClick={() => setShowContextMenu(false)}
  />
  <div
- className={`absolute top-full mt-1 z-20 w-44 rounded-xl bg-surface-soft shadow-sm border border-hairline py-1 animate-fade-in-scale ${
+ className={`absolute top-full mt-1 z-20 w-44 rounded-lg bg-card shadow-sm border border-border py-1 animate-fade-in-scale ${
  message.isOwn ?"right-0" :"left-0"
  }`}
  >
@@ -351,19 +351,19 @@ export function MessageBubble({
  onReply()
  setShowContextMenu(false)
  }}
- className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-ink-deep hover:bg-canvas transition-colors"
+ className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-foreground hover:bg-card transition-colors"
  >
  <Reply className="h-4 w-4" /> Reply
  </button>
  <button
  onClick={handleCopy}
- className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-ink-deep hover:bg-canvas transition-colors"
+ className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-foreground hover:bg-card transition-colors"
  >
  <Copy className="h-4 w-4" /> Copy
  </button>
  <button
  onClick={handleDeleteForMe}
- className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-ink-deep hover:bg-canvas transition-colors"
+ className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-foreground hover:bg-card transition-colors"
  >
  <Trash2 className="h-4 w-4" /> Delete for me
  </button>

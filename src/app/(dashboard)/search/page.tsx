@@ -18,7 +18,7 @@ type Tab = 'all' | 'posts' | 'people' | 'hashtags';
 const SearchResultsSkeleton = () => (
  <div className="w-full space-y-4">
  <div className="h-12 w-full bg-canvas animate-pulse rounded-pill" />
- <div className="flex gap-4 border-b border-hairline py-4">
+ <div className="flex gap-4 border-b border-border py-4">
  {[...Array(4)].map((_, i) => <div key={i} className="h-6 w-16 bg-canvas animate-pulse rounded" />)}
  </div>
  {[...Array(3)].map((_, i) => <div key={i} className="h-32 w-full bg-canvas animate-pulse rounded-lg" />)}
@@ -48,9 +48,9 @@ function SearchResultsContent() {
  if (!currentQuery) {
  return (
  <div className="flex flex-col items-center justify-center py-32 text-center opacity-50">
- <Search size={64} className="mb-4 text-slate" />
- <h3 className="text-display-md text-ink">Discover Campus Connect.</h3>
- <p className="text-body text-slate mt-2 max-w-sm">
+ <Search size={64} className="mb-4 text-muted-foreground" />
+ <h3 className="text-display-md text-foreground">Discover Campus Connect.</h3>
+ <p className="text-body text-muted-foreground mt-2 max-w-sm">
  Search for people, posts, or academic hashtags to expand your community.
  </p>
  </div>
@@ -66,9 +66,9 @@ function SearchResultsContent() {
  if (!hasResults) {
  return (
  <div className="flex flex-col items-center justify-center py-32 text-center">
- <Inbox size={64} className="mb-4 text-ink/10" />
- <h3 className="text-display-md text-ink">No matches found.</h3>
- <p className="text-body text-slate mt-2 max-w-sm">
+ <Inbox size={64} className="mb-4 text-foreground/10" />
+ <h3 className="text-display-md text-foreground">No matches found.</h3>
+ <p className="text-body text-muted-foreground mt-2 max-w-sm">
  We couldn&apos;t find anything for &ldquo;{currentQuery}&rdquo;. Try checking the spelling or using broader keywords.
  </p>
  </div>
@@ -108,19 +108,19 @@ function SearchResultsContent() {
  <div className="space-y-12">
  {posts.length > 0 && (
  <div className="space-y-4">
- <div className="text-fine-print text-slate font-bold uppercase tracking-widest border-b border-hairline pb-2">Top Posts</div>
+ <div className="text-fine-print text-muted-foreground font-bold uppercase tracking-widest border-b border-border pb-2">Top Posts</div>
  <PostGrid items={posts} />
  </div>
  )}
  {users.length > 0 && (
  <div className="space-y-4">
- <div className="text-fine-print text-slate font-bold uppercase tracking-widest border-b border-hairline pb-2">Relevant People</div>
+ <div className="text-fine-print text-muted-foreground font-bold uppercase tracking-widest border-b border-border pb-2">Relevant People</div>
  <UserGrid items={users} />
  </div>
  )}
  {hashtags.length > 0 && (
  <div className="space-y-4">
- <div className="text-fine-print text-slate font-bold uppercase tracking-widest border-b border-hairline pb-2">Academic Hashtags</div>
+ <div className="text-fine-print text-muted-foreground font-bold uppercase tracking-widest border-b border-border pb-2">Academic Hashtags</div>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  {hashtags.map((hashtag: any) => <HashtagCard key={hashtag._id} hashtag={hashtag as any} />)}
  </div>
@@ -144,7 +144,7 @@ function SearchResultsContent() {
  <div className="w-full max-w-4xl px-4 md:px-0">
  
  {/* Tabs - Apple Style */}
- <div className="w-full flex items-center justify-center md:justify-start gap-8 h-12 border-b border-hairline mt-4 sticky top-[96px] z-30 glass bg-surface-soft">
+ <div className="w-full flex items-center justify-center md:justify-start gap-8 h-12 border-b border-border mt-4 sticky top-[96px] z-30 glass bg-card">
  {[
  { id: 'all', label: 'All', count: (users?.length || 0) + (posts?.length || 0) + (hashtags?.length || 0) },
  { id: 'posts', label: 'Posts', count: posts?.length || 0 },
@@ -156,7 +156,7 @@ function SearchResultsContent() {
  onClick={() => setActiveTab(tab.id as Tab)}
  className={cn(
 "relative h-full flex items-center text-caption font-semibold transition-colors active:scale-[0.98] whitespace-nowrap",
- activeTab === tab.id ?"text-primary" :"text-slate hover:text-ink"
+ activeTab === tab.id ?"text-primary" :"text-muted-foreground hover:text-foreground"
  )}
  >
  {tab.label} ({tab.count})
@@ -180,7 +180,7 @@ export default function SearchPage() {
  return (
  <Suspense fallback={
  <div className="flex items-center justify-center min-h-screen bg-canvas">
- <div className="animate-pulse text-ink/30 font-display text-2xl">Searching...</div>
+ <div className="animate-pulse text-foreground/30 font-display text-2xl">Searching...</div>
  </div>
  }>
  <SearchResultsContent />

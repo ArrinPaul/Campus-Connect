@@ -5,14 +5,14 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
  return (
  <div className="min-h-screen flex bg-canvas">
  {/* Left Panel â€” Decorative (desktop only) */}
- <div className="hidden lg:flex lg:w-[45%] xl:w-[50%] bg-surface-soft border-r border-hairline relative overflow-hidden flex-col justify-between p-12">
+ <div className="hidden lg:flex lg:w-[45%] xl:w-[50%] bg-card border-r border-border relative overflow-hidden flex-col justify-between p-12">
 
  {/* Logo â€” matches GlobalNav/DesktopSidebar CC icon pattern */}
  <Link href="/" className="relative z-10 flex items-center gap-3">
- <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center shrink-0 shadow-sm">
+ <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center shrink-0 shadow-sm">
  <span className="text-white text-lg font-bold">CC</span>
  </div>
- <span className="text-body-md-bold text-ink-deep tracking-tight">
+ <span className="text-body-md-bold text-foreground tracking-tight">
  Campus Connect
  </span>
  </Link>
@@ -22,13 +22,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
  <h2 className="text-hero-display text-primary mb-6 tracking-tight font-bold leading-tight">
  Your campus,<br />reimagined.
  </h2>
- <p className="text-[20px] text-ink-deep leading-relaxed">
+ <p className="text-[20px] text-foreground leading-relaxed">
  Join thousands of students already connecting, collaborating, and thriving on the fastest growing campus platform.
  </p>
  </div>
 
  {/* Bottom footer */}
- <p className="relative z-10 text-xs text-slate">
+ <p className="relative z-10 text-xs text-muted-foreground">
  Â© {new Date().getFullYear()} Campus Connect Inc.
  </p>
  </div>
@@ -36,12 +36,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
  {/* Right Panel â€” Form */}
  <div className="flex-1 flex flex-col">
  {/* Mobile header with gradient accent */}
- <div className="lg:hidden bg-surface-soft border-b border-hairline shadow-sm px-4 py-4 flex items-center gap-3">
+ <div className="lg:hidden bg-card border-b border-border shadow-sm px-4 py-4 flex items-center gap-3">
  <Link href="/" className="flex items-center gap-2">
- <div className="h-8 w-8 rounded-xl bg-primary flex items-center justify-center shrink-0">
+ <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
  <span className="text-white text-sm font-bold">CC</span>
  </div>
- <span className="text-body-md-bold text-ink-deep tracking-tight">
+ <span className="text-body-md-bold text-foreground tracking-tight">
  Campus Connect
  </span>
  </Link>
@@ -56,7 +56,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
  {/* Mobile footer */}
  <footer className="lg:hidden py-lg px-xl text-center">
- <p className="text-xs text-slate">
+ <p className="text-xs text-muted-foreground">
  Â© {new Date().getFullYear()} Campus Connect Inc.
  </p>
  </footer>

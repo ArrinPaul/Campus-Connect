@@ -18,7 +18,7 @@ export function FeedRightSidebar() {
   return (
     <div className="sticky top-8 space-y-6">
       {/* Trending Topics */}
-      <div className="rounded-2xl border border-hairline bg-canvas-soft/50 backdrop-blur-xl p-5">
+      <div className="rounded-lg border border-border bg-card-soft/50 backdrop-blur-xl p-5">
         <h3 className="font-bold text-lg mb-4">Trending Topics</h3>
         {trendingHashtags === undefined ? (
           <div className="space-y-2">
@@ -47,7 +47,7 @@ export function FeedRightSidebar() {
       </div>
 
       {/* Who to Follow */}
-      <div className="rounded-2xl border border-hairline bg-canvas-soft/50 backdrop-blur-xl p-5">
+      <div className="rounded-lg border border-border bg-card-soft/50 backdrop-blur-xl p-5">
         <h3 className="font-bold text-lg mb-4">Who to Follow</h3>
         {suggestionsLoading || suggestions === undefined ? (
           <div className="space-y-4">

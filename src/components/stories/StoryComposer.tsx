@@ -164,10 +164,10 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
  className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80"
  onClick={(e) => e.target === e.currentTarget && handleClose()}
  >
- <div className="relative w-full max-w-sm h-auto bg-card rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+ <div className="relative w-full max-w-sm h-auto bg-card rounded-lg overflow-hidden shadow-2xl flex flex-col">
  {/* Header */}
- <div className="flex items-center justify-between px-4 py-3 border-b border-hairline">
- <h2 className="font-semibold text-ink-deep">Create Story</h2>
+ <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+ <h2 className="font-semibold text-foreground">Create Story</h2>
  <button
  onClick={handleClose}
  className="rounded-full p-1.5 hover:bg-muted transition-colors"
@@ -178,14 +178,14 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
  </div>
 
  {/* Mode tabs */}
- <div className="flex border-b border-hairline">
+ <div className="flex border-b border-border">
  <button
  onClick={() => { setMode("text"); setError("") }}
  className={cn(
 "flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors",
  mode ==="text"
  ?"text-primary border-b-2 border-blue-600"
- :"text-muted-foreground hover:text-ink-deep"
+ :"text-muted-foreground hover:text-foreground"
  )}
  >
  <Type className="h-4 w-4" /> Text
@@ -196,7 +196,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
 "flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors",
  mode ==="image"
  ?"text-primary border-b-2 border-blue-600"
- :"text-muted-foreground hover:text-ink-deep"
+ :"text-muted-foreground hover:text-foreground"
  )}
  >
  <ImageIcon className="h-4 w-4" /> Image
@@ -207,7 +207,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
 "flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors",
  mode ==="video"
  ?"text-primary border-b-2 border-blue-600"
- :"text-muted-foreground hover:text-ink-deep"
+ :"text-muted-foreground hover:text-foreground"
  )}
  >
  <VideoIcon className="h-4 w-4" /> Video
@@ -219,7 +219,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
  {mode ==="text" ? (
  <>
  <div
- className="relative mx-auto w-40 h-64 rounded-2xl overflow-hidden flex items-center justify-center shadow-md transition-colors"
+ className="relative mx-auto w-40 h-64 rounded-lg overflow-hidden flex items-center justify-center shadow-md transition-colors"
  style={{ backgroundColor: bgColor }}
  >
  <p
@@ -236,7 +236,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
  placeholder="Write something…"
  maxLength={500}
  rows={3}
- className="w-full rounded-xl border border-hairline bg-canvas px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+ className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
  />
  <div className="text-right text-xs text-muted-foreground">{text.length}/500</div>
 
@@ -270,7 +270,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
  />
 
  {mediaPreview ? (
- <div className="relative mx-auto w-40 h-64 rounded-2xl overflow-hidden shadow-md bg-black">
+ <div className="relative mx-auto w-40 h-64 rounded-lg overflow-hidden shadow-md bg-black">
  {mode ==="image" ? (
  // eslint-disable-next-line @next/next/no-img-element
  <img src={mediaPreview} alt="Preview" className="h-full w-full object-cover" />
@@ -292,7 +292,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
  <button
  type="button"
  onClick={() => fileInputRef.current?.click()}
- className="mx-auto flex h-64 w-40 flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-hairline bg-muted/50 hover:bg-muted transition-colors"
+ className="mx-auto flex h-64 w-40 flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-muted/50 hover:bg-muted transition-colors"
  >
  {mode ==="image" ? <ImageIcon className="h-10 w-10 text-muted-foreground" /> : <VideoIcon className="h-10 w-10 text-muted-foreground" />}
  <span className="text-sm text-muted-foreground">Select {mode}</span>
@@ -309,7 +309,7 @@ export function StoryComposer({ isOpen, onClose, onCreated }: StoryComposerProps
  <button
  onClick={handleSubmit}
  disabled={isSubmitting}
- className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-on-primary hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+ className="w-full rounded-lg bg-primary py-3 text-sm font-semibold text-on-primary hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
  >
  {isSubmitting ? (
  <>

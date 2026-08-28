@@ -80,9 +80,9 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-surface-soft min-w-0 h-full">
+    <div className="flex-1 flex flex-col bg-card min-w-0 h-full">
       {/* Top Bar Header */}
-      <div className="h-16 bg-surface-soft border-b border-hairline px-4 md:px-6 flex items-center justify-between sticky top-0 z-20 shadow-sm">
+      <div className="h-16 bg-card border-b border-border px-4 md:px-6 flex items-center justify-between sticky top-0 z-20 shadow-sm">
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/messages")}

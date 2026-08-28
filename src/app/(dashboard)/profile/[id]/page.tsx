@@ -44,7 +44,7 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
           
           {/* Courses Section */}
           <div className="w-full">
-            <div className="text-caption-bold text-steel uppercase tracking-wide mb-md border-b border-hairline pb-2">
+            <div className="text-caption-bold text-muted-foreground uppercase tracking-wide mb-md border-b border-border pb-2">
               Current Courses
             </div>
             {courses.length > 0 ? (
@@ -53,21 +53,21 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
                   <Link 
                     key={course.id} 
                     href={`/communities/${course.slug}`}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-surface-soft border border-hairline rounded-full hover:border-fb-blue transition-colors"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border rounded-full hover:border-fb-blue transition-colors"
                   >
                     <BookOpen className="w-4 h-4 text-fb-blue" />
-                    <span className="text-body-sm-bold text-ink-deep">{course.name}</span>
+                    <span className="text-body-sm-bold text-foreground">{course.name}</span>
                   </Link>
                 ))}
               </div>
             ) : (
-              <p className="text-body-sm text-steel">No courses added yet.</p>
+              <p className="text-body-sm text-muted-foreground">No courses added yet.</p>
             )}
           </div>
 
           {/* Skills Section */}
           <div className="w-full">
-            <div className="text-caption-bold text-steel uppercase tracking-wide mb-md border-b border-hairline pb-2">
+            <div className="text-caption-bold text-muted-foreground uppercase tracking-wide mb-md border-b border-border pb-2">
               Academic Expertise
             </div>
             <ProfileSkillsSection userId={userId} skills={(userProfile as any).skills || []} />
@@ -75,7 +75,7 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
 
           {/* Portfolio Section */}
           <div className="w-full">
-            <div className="text-caption-bold text-steel uppercase tracking-wide mb-md border-b border-hairline pb-2">
+            <div className="text-caption-bold text-muted-foreground uppercase tracking-wide mb-md border-b border-border pb-2">
               Portfolio & Credentials
             </div>
             <PortfolioSection 
@@ -87,7 +87,7 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
 
           {/* Posts Section */}
           <div className="w-full">
-            <div className="text-caption-bold text-steel uppercase tracking-wide mb-md border-b border-hairline pb-2">
+            <div className="text-caption-bold text-muted-foreground uppercase tracking-wide mb-md border-b border-border pb-2">
               Recent Contributions
             </div>
             <UserPostList userId={userId} />

@@ -32,10 +32,10 @@ export default function AuthError({
  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
  />
  </svg>
- <h2 className="mt-6 text-2xl font-bold text-ink-deep">
+ <h2 className="mt-6 text-2xl font-bold text-foreground">
  Authentication Error
  </h2>
- <p className="mt-3 text-sm text-slate">
+ <p className="mt-3 text-sm text-muted-foreground">
  {error.message ||"Something went wrong during authentication"}
  </p>
  <div className="mt-6 flex gap-3 justify-center">
@@ -47,7 +47,7 @@ export default function AuthError({
  </button>
  <a
  href="/"
- className="rounded-md border border-primary px-6 py-2 text-sm font-medium text-primary hover:bg-surface-soft"
+ className="rounded-md border border-primary px-6 py-2 text-sm font-medium text-primary hover:bg-card"
  >
  Go Home
  </a>

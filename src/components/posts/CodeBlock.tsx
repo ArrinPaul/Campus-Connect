@@ -53,7 +53,7 @@ export function CodeBlock({ code, language ="text", filename, className }: CodeB
  }
 
  return (
- <div className={cn("group relative my-3 rounded-xl overflow-hidden border border-hairline bg-[#1e1e2e]", className)}>
+ <div className={cn("group relative my-3 rounded-lg overflow-hidden border border-border bg-[#1e1e2e]", className)}>
  {/* Header */}
  <div className="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-card/5">
  <div className="flex items-center gap-2">

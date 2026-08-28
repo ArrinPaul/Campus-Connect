@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss"
+﻿import type { Config } from "tailwindcss"
 
 /**
  * Campus Connect Design System
@@ -14,13 +14,13 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      // ─── Typography ─────────────────────────────────────────────────────────
+      // â”€â”€â”€ Typography â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       fontFamily: {
-        sans: ["-apple-system", "BlinkMacSystemFont", "SF Pro Text", "var(--font-sans)", "Inter", "system-ui", "sans-serif"],
-        display: ["-apple-system", "BlinkMacSystemFont", "SF Pro Display", "var(--font-display)", "Inter", "system-ui", "sans-serif"],
+        sans: ["-apple-system", "BlinkMacSystemFont", "SF Pro Text", "Inter", "system-ui", "sans-serif"],
+        display: ["-apple-system", "BlinkMacSystemFont", "SF Pro Display", "Inter", "system-ui", "sans-serif"],
       },
 
-      // ─── Colors (from DESIGN.md) ────────────────────────────────────────────
+      // â”€â”€â”€ Colors (from DESIGN.md) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       colors: {
         // Brand & Accent
         primary: {
@@ -75,7 +75,7 @@ const config: Config = {
         },
         "disabled-text": "rgb(var(--disabled-text) / <alpha-value>)", 
 
-        // Legacy Compat — maps old/shadcn/stale tokens → Apple Minimal values
+        // Legacy Compat â€” maps old/shadcn/stale tokens â†’ Apple Minimal values
         border: "rgb(var(--hairline) / <alpha-value>)",
         input: "rgb(var(--hairline) / <alpha-value>)",
         ring: "rgb(var(--primary) / <alpha-value>)",
@@ -97,7 +97,7 @@ const config: Config = {
           foreground: "rgb(var(--card-foreground) / <alpha-value>)",
         },
 
-        // Destructive (shadcn compat → critical)
+        // Destructive (shadcn compat â†’ critical)
         destructive: {
           DEFAULT: "rgb(var(--critical) / <alpha-value>)",
           foreground: "rgb(var(--on-primary) / <alpha-value>)",
@@ -122,7 +122,7 @@ const config: Config = {
         },
       },
 
-      // ─── Border Radius (from DESIGN.md) ─────────────────────────────────────
+      // â”€â”€â”€ Border Radius (from DESIGN.md) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       borderRadius: {
         none: "0px",
         xs: "2px",       
@@ -137,7 +137,7 @@ const config: Config = {
         circle: "9999px",
       },
 
-      // ─── Spacing (from DESIGN.md) ───────────────────────────────────────────
+      // â”€â”€â”€ Spacing (from DESIGN.md) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       spacing: {
         xxs: "4px",      
         xs: "8px",       
@@ -154,7 +154,7 @@ const config: Config = {
         hero: "120px",        
       },
 
-      // ─── Typography (from DESIGN.md) ─────────────────────────────────────────
+      // â”€â”€â”€ Typography (from DESIGN.md) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       fontSize: {
         "hero-display": ["64px", { lineHeight: "1.16", fontWeight: "500", letterSpacing: "0px" }],
         "display-lg": ["48px", { lineHeight: "1.17", fontWeight: "500", letterSpacing: "0px" }],
@@ -173,7 +173,7 @@ const config: Config = {
         "link-md": ["16px", { lineHeight: "1.50", letterSpacing: "-0.16px", fontWeight: "700" }],
       },
 
-      // ─── Shadows ────────────────────────────────────────────────────────────
+      // â”€â”€â”€ Shadows â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       boxShadow: {
         subtle:          "0 1px 2px rgba(0,0,0,0.06)",
         sm:              "0 1px 4px rgba(0,0,0,0.08)",
@@ -194,3 +194,4 @@ const config: Config = {
   plugins: [],
 }
 export default config
+

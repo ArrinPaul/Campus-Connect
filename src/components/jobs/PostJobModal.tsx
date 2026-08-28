@@ -65,7 +65,7 @@ export function PostJobModal({ onClose }: PostJobModalProps) {
  return (
  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
  <div
- className="bg-card border rounded-xl shadow-lg w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto"
+ className="bg-card border rounded-lg shadow-lg w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto"
  onClick={(e) => e.stopPropagation()}
  >
  <div className="flex items-center justify-between p-4 border-b">
@@ -130,7 +130,7 @@ export function PostJobModal({ onClose }: PostJobModalProps) {
  id="remote"
  checked={remote}
  onChange={(e) => setRemote(e.target.checked)}
- className="rounded border-hairline"
+ className="rounded border-border"
  />
  <label htmlFor="remote" className="text-sm font-medium">Remote friendly</label>
  </div>

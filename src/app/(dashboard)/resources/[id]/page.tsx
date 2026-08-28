@@ -147,7 +147,7 @@ function ResourceDetailContent({ id }: { id: string }) {
  {/* Back link */}
  <Link
  href="/resources"
- className="flex items-center gap-2 text-sm text-muted-foreground hover:text-ink-deep mb-6"
+ className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6"
  >
  <ArrowLeft className="h-4 w-4" />
  Back to Resources

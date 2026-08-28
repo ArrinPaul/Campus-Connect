@@ -90,7 +90,7 @@ export function MobileNav({ currentUserId }: MobileNavProps) {
  {/* Toggle Button */}
  <button
  onClick={toggleMenu}
- className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-ink-deep transition-colors md:hidden"
+ className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors md:hidden"
  aria-expanded={isOpen}
  aria-label="Toggle navigation menu"
  >
@@ -110,22 +110,22 @@ export function MobileNav({ currentUserId }: MobileNavProps) {
  {/* Panel */}
  <div
  className={cn(
-"fixed left-0 top-0 z-50 h-full w-72 bg-card/90 border-r border-hairline shadow-elevation-4 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden",
+"fixed left-0 top-0 z-50 h-full w-72 bg-card/90 border-r border-border shadow-elevation-4 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden",
  isOpen ?"translate-x-0" :"-translate-x-full"
  )}
  >
  <div className="flex h-full flex-col">
  {/* Header */}
- <div className="flex h-16 items-center justify-between border-b border-hairline px-4">
+ <div className="flex h-16 items-center justify-between border-b border-border px-4">
  <div className="flex items-center gap-2.5">
- <div className="flex h-8 w-8 items-center justify-center rounded-xl brand-gradient shadow-glow-sm">
+ <div className="flex h-8 w-8 items-center justify-center rounded-lg brand-gradient shadow-glow-sm">
  <GraduationCap className="h-4 w-4 text-on-primary" />
  </div>
- <span className="font-semibold text-ink-deep">Menu</span>
+ <span className="font-semibold text-foreground">Menu</span>
  </div>
  <button
  onClick={closeMenu}
- className="h-10 w-10 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-ink-deep transition-colors"
+ className="h-10 w-10 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
  aria-label="Close menu"
  >
  <X className="h-5 w-5" />
@@ -141,10 +141,10 @@ export function MobileNav({ currentUserId }: MobileNavProps) {
  href={link.href}
  onClick={closeMenu}
  className={cn(
-"flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+"flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
  isActive(link.href)
  ?"bg-primary/10 text-primary"
- :"text-muted-foreground hover:bg-accent/70 hover:text-ink-deep"
+ :"text-muted-foreground hover:bg-accent/70 hover:text-foreground"
  )}
  >
  <link.icon className="h-[18px] w-[18px] shrink-0" />
@@ -170,10 +170,10 @@ export function MobileNav({ currentUserId }: MobileNavProps) {
  href={link.href}
  onClick={closeMenu}
  className={cn(
-"flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+"flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
  isActive(link.href)
  ?"bg-primary/10 text-primary"
- :"text-muted-foreground hover:bg-accent/70 hover:text-ink-deep"
+ :"text-muted-foreground hover:bg-accent/70 hover:text-foreground"
  )}
  >
  <link.icon className="h-[18px] w-[18px] shrink-0" />
@@ -183,16 +183,16 @@ export function MobileNav({ currentUserId }: MobileNavProps) {
  </div>
 
  {/* Profile & Settings */}
- <div className="mt-4 pt-4 border-t border-hairline space-y-0.5">
+ <div className="mt-4 pt-4 border-t border-border space-y-0.5">
  {currentUserId && (
  <Link
  href={`/profile/${currentUserId}`}
  onClick={closeMenu}
  className={cn(
-"flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+"flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
  pathname.startsWith("/profile")
  ?"bg-primary/10 text-primary"
- :"text-muted-foreground hover:bg-accent/70 hover:text-ink-deep"
+ :"text-muted-foreground hover:bg-accent/70 hover:text-foreground"
  )}
  >
  <User className="h-[18px] w-[18px] shrink-0" />
@@ -203,10 +203,10 @@ export function MobileNav({ currentUserId }: MobileNavProps) {
  href="/settings"
  onClick={closeMenu}
  className={cn(
-"flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+"flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
  pathname.startsWith("/settings")
  ?"bg-primary/10 text-primary"
- :"text-muted-foreground hover:bg-accent/70 hover:text-ink-deep"
+ :"text-muted-foreground hover:bg-accent/70 hover:text-foreground"
  )}
  >
  <Settings className="h-[18px] w-[18px] shrink-0" />
@@ -216,7 +216,7 @@ export function MobileNav({ currentUserId }: MobileNavProps) {
  </nav>
 
  {/* Footer */}
- <div className="border-t border-hairline p-4">
+ <div className="border-t border-border p-4">
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
  <ThemeToggle />

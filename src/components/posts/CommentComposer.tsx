@@ -16,7 +16,7 @@ const CompactRichTextEditor = dynamic(
  ),
  {
  loading: () => (
- <div className="h-20 animate-pulse rounded-lg bg-canvas" />
+ <div className="h-20 animate-pulse rounded-lg bg-card" />
  ),
  ssr: false,
  }
@@ -78,7 +78,7 @@ export function CommentComposer({
  return (
  <form onSubmit={handleSubmit} className="space-y-3">
  {replyingToName && (
- <div className="flex items-center justify-between text-xs text-slate">
+ <div className="flex items-center justify-between text-xs text-muted-foreground">
  <span>
  Replying to{""}
  <span className="font-medium text-primary">
@@ -89,7 +89,7 @@ export function CommentComposer({
  <button
  type="button"
  onClick={onCancel}
- className="text-slate hover:text-ink-deep"
+ className="text-muted-foreground hover:text-foreground"
  >
  ✕ Cancel
  </button>
@@ -114,7 +114,7 @@ export function CommentComposer({
  <button
  type="button"
  onClick={onCancel}
- className="rounded-md border border-hairline px-4 py-2 text-sm text-slate hover:bg-surface-soft"
+ className="rounded-md border border-border px-4 py-2 text-sm text-muted-foreground hover:bg-card"
  >
  Cancel
  </button>

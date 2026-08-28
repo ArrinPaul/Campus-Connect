@@ -1,6 +1,6 @@
 export function PostSkeleton() {
  return (
- <div className="rounded-xl border border-hairline/50 bg-card p-5 shadow-elevation-1 sm:p-6 animate-pulse">
+ <div className="rounded-lg border border-border/50 bg-card p-5 shadow-elevation-1 sm:p-6 animate-pulse">
  <div className="flex items-start gap-3">
  <div className="h-10 w-10 rounded-full bg-muted animate-shimmer flex-shrink-0" />
  <div className="flex-1 space-y-3">
@@ -25,7 +25,7 @@ export function PostSkeleton() {
 
 export function UserCardSkeleton() {
  return (
- <div className="rounded-xl border border-hairline/50 bg-card p-4 shadow-elevation-1 animate-pulse">
+ <div className="rounded-lg border border-border/50 bg-card p-4 shadow-elevation-1 animate-pulse">
  <div className="flex items-center gap-3">
  <div className="h-11 w-11 rounded-full bg-muted animate-shimmer flex-shrink-0" />
  <div className="flex-1 space-y-2">
@@ -43,7 +43,7 @@ export function UserCardSkeleton() {
 
 export function ProfileHeaderSkeleton() {
  return (
- <div className="rounded-xl border border-hairline/50 bg-card p-6 shadow-elevation-1 animate-pulse">
+ <div className="rounded-lg border border-border/50 bg-card p-6 shadow-elevation-1 animate-pulse">
  <div className="flex flex-col items-center gap-4 sm:flex-row">
  <div className="h-24 w-24 rounded-full bg-muted animate-shimmer" />
  <div className="flex-1 space-y-3">
@@ -68,7 +68,7 @@ export function LoadingSpinner({ size ="md" }: { size?:"sm" |"md" |"lg" }) {
 
  return (
  <div
- className={`animate-spin rounded-full border-hairline border-t-primary ${sizeClasses[size]}`}
+ className={`animate-spin rounded-full border-border border-t-primary ${sizeClasses[size]}`}
  role="status"
  aria-label="Loading"
  >
@@ -82,7 +82,7 @@ export function CommentSkeleton() {
  <div className="flex gap-3 animate-pulse">
  <div className="h-8 w-8 rounded-full bg-muted animate-shimmer flex-shrink-0" />
  <div className="flex-1 space-y-2">
- <div className="rounded-xl bg-muted/60 px-4 py-3 space-y-2">
+ <div className="rounded-lg bg-muted/60 px-4 py-3 space-y-2">
  <div className="h-3 w-24 rounded-md bg-muted animate-shimmer" />
  <div className="h-3 w-full rounded-md bg-muted animate-shimmer" />
  <div className="h-3 w-3/4 rounded-md bg-muted animate-shimmer" />
@@ -98,7 +98,7 @@ export function FullPageLoadingSpinner() {
  <div className="flex min-h-screen items-center justify-center" role="status">
  <div className="flex flex-col items-center gap-4">
  <div className="relative">
- <div className="h-10 w-10 animate-spin rounded-full border-[3px] border-hairline border-t-primary" />
+ <div className="h-10 w-10 animate-spin rounded-full border-[3px] border-border border-t-primary" />
  </div>
  <p className="text-sm text-muted-foreground">Loading...</p>
  </div>
@@ -144,7 +144,7 @@ export function MessageListSkeleton() {
  >
  {i % 2 !== 0 && <div className="h-7 w-7 rounded-full bg-muted animate-shimmer flex-shrink-0" />}
  <div className={`max-w-[65%] space-y-1 ${i % 2 === 0 ?"items-end" :""}`}>
- <div className={`rounded-2xl p-3.5 space-y-2 ${
+ <div className={`rounded-lg p-3.5 space-y-2 ${
  i % 2 === 0 ?"bg-primary/10 rounded-br-md" :"bg-muted/80 rounded-bl-md"
  }`}>
  <div className="h-3 w-44 rounded-md bg-muted animate-shimmer" />
@@ -161,7 +161,7 @@ export function MessageListSkeleton() {
 // Community Card Skeleton
 export function CommunityCardSkeleton() {
  return (
- <div className="rounded-xl border border-hairline/50 bg-card p-5 shadow-elevation-1">
+ <div className="rounded-lg border border-border/50 bg-card p-5 shadow-elevation-1">
  <div className="space-y-3">
  <div className="h-5 w-3/4 rounded-md bg-muted animate-shimmer" />
  <div className="h-3.5 w-full rounded-md bg-muted animate-shimmer" />
@@ -171,7 +171,7 @@ export function CommunityCardSkeleton() {
  <div className="h-6 w-16 rounded-full bg-muted animate-shimmer" />
  <div className="h-6 w-16 rounded-full bg-muted animate-shimmer" />
  </div>
- <div className="h-9 w-24 rounded-xl bg-muted animate-shimmer" />
+ <div className="h-9 w-24 rounded-lg bg-muted animate-shimmer" />
  </div>
  </div>
  </div>
@@ -181,10 +181,10 @@ export function CommunityCardSkeleton() {
 // Event Card Skeleton
 export function EventCardSkeleton() {
  return (
- <div className="rounded-xl border border-hairline/50 bg-card p-5 shadow-elevation-1">
+ <div className="rounded-lg border border-border/50 bg-card p-5 shadow-elevation-1">
  <div className="space-y-3">
  <div className="flex items-start gap-3">
- <div className="h-12 w-12 rounded-xl bg-muted animate-shimmer flex-shrink-0" />
+ <div className="h-12 w-12 rounded-lg bg-muted animate-shimmer flex-shrink-0" />
  <div className="flex-1 space-y-2">
  <div className="h-5 w-3/4 rounded-md bg-muted animate-shimmer" />
  <div className="h-3 w-1/2 rounded-md bg-muted animate-shimmer" />
@@ -202,7 +202,7 @@ export function EventCardSkeleton() {
  </div>
  <div className="flex items-center justify-between pt-2">
  <div className="h-3 w-20 rounded-md bg-muted animate-shimmer" />
- <div className="h-9 w-24 rounded-xl bg-muted animate-shimmer" />
+ <div className="h-9 w-24 rounded-lg bg-muted animate-shimmer" />
  </div>
  </div>
  </div>
@@ -218,7 +218,7 @@ export function ListingDetailSkeleton() {
  <div className="grid md:grid-cols-2 gap-8">
  {/* Image skeleton */}
  <div className="space-y-3">
- <div className="aspect-square rounded-xl bg-muted animate-shimmer" />
+ <div className="aspect-square rounded-lg bg-muted animate-shimmer" />
  <div className="flex gap-2">
  {[1, 2, 3].map((i) => (
  <div key={i} className="h-16 w-16 rounded-lg bg-muted animate-shimmer" />
@@ -235,8 +235,8 @@ export function ListingDetailSkeleton() {
  <div className="h-4 w-2/3 rounded-md bg-muted animate-shimmer" />
  </div>
  <div className="flex gap-4 pt-4">
- <div className="h-10 flex-1 rounded-xl bg-muted animate-shimmer" />
- <div className="h-10 flex-1 rounded-xl bg-muted animate-shimmer" />
+ <div className="h-10 flex-1 rounded-lg bg-muted animate-shimmer" />
+ <div className="h-10 flex-1 rounded-lg bg-muted animate-shimmer" />
  </div>
  </div>
  </div>
@@ -252,7 +252,7 @@ export function LeaderboardSkeleton() {
  {[1, 2, 3, 4, 5].map((i) => (
  <div
  key={i}
- className="bg-card border border-hairline/50 rounded-xl p-4 flex items-center gap-4"
+ className="bg-card border border-border/50 rounded-lg p-4 flex items-center gap-4"
  >
  <div className="w-8 h-8 bg-muted animate-shimmer rounded-full" />
  <div className="h-10 w-10 bg-muted animate-shimmer rounded-full" />

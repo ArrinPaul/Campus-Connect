@@ -106,7 +106,7 @@ export function IncomingCallNotification() {
  key={call._id}
  className="fixed top-4 right-4 z-[90] w-80 animate-in slide-in-from-top-2 fade-in duration-300"
  >
- <div className="rounded-2xl bg-surface-soft shadow-sm border border-hairline overflow-hidden">
+ <div className="rounded-lg bg-card shadow-sm border border-border overflow-hidden">
  {/* Header strip */}
  <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-2">
  <p className="text-xs font-medium text-white/80">
@@ -132,10 +132,10 @@ export function IncomingCallNotification() {
  )}
 
  <div className="flex-1 min-w-0">
- <p className="font-semibold text-ink-deep truncate">
+ <p className="font-semibold text-foreground truncate">
  {call.callerName}
  </p>
- <p className="text-xs text-slate truncate">
+ <p className="text-xs text-muted-foreground truncate">
  {call.conversationName !== call.callerName
  ? call.conversationName
  : call.type ==="video" ?"Video call" :"Audio call"}
@@ -153,7 +153,7 @@ export function IncomingCallNotification() {
  </div>
 
  {/* Action buttons */}
- <div className="flex border-t border-hairline">
+ <div className="flex border-t border-border">
  <button
  onClick={() => handleReject(call._id)}
  className="flex flex-1 items-center justify-center gap-2 py-3 text-sm font-medium text-critical hover:bg-critical/10 transition-colors"
@@ -161,7 +161,7 @@ export function IncomingCallNotification() {
  <PhoneOff className="h-4 w-4" />
  Decline
  </button>
- <div className="w-px bg-canvas" />
+ <div className="w-px bg-card" />
  <button
  onClick={() => handleAccept(call._id)}
  className="flex flex-1 items-center justify-center gap-2 py-3 text-sm font-medium text-accent-emerald hover:bg-accent-emerald/10 transition-colors"

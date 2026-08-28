@@ -198,12 +198,12 @@ export function CallModal({
  ) || []
 
  return (
- <div className="fixed inset-0 z-[100] flex items-center justify-center bg-canvas">
+ <div className="fixed inset-0 z-[100] flex items-center justify-center bg-card">
  <div className="relative flex h-full w-full max-w-4xl flex-col items-center justify-between py-12 px-6">
  {/* Close button */}
  <button
  onClick={callState ==="ended" ? onClose : handleEndCall}
- className="absolute right-4 top-4 rounded-full p-2 text-slate hover:bg-surface-soft hover:text-ink-deep transition-colors"
+ className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground hover:bg-card hover:text-foreground transition-colors"
  aria-label="Close"
  >
  <X className="h-6 w-6" />
@@ -242,7 +242,7 @@ export function CallModal({
  )}
 
  {/* Call type badge */}
- <div className="absolute -bottom-1 -right-1 rounded-full bg-surface-soft p-2">
+ <div className="absolute -bottom-1 -right-1 rounded-full bg-card p-2">
  {callType ==="video" ? (
  <Video className="h-4 w-4 text-primary" />
  ) : (
@@ -252,10 +252,10 @@ export function CallModal({
  </div>
 
  {/* Name */}
- <h2 className="text-2xl font-bold text-ink-deep">{callerName}</h2>
+ <h2 className="text-2xl font-bold text-foreground">{callerName}</h2>
 
  {/* Status text */}
- <p className="text-sm text-slate">
+ <p className="text-sm text-muted-foreground">
  {callState ==="ringing" && isIncoming &&"Incoming call..."}
  {callState ==="ringing" && !isIncoming &&"Calling..."}
  {callState ==="connecting" &&"Connecting..."}
@@ -265,7 +265,7 @@ export function CallModal({
 
  {/* Connected participants count */}
  {callState ==="active" && connectedParticipants.length > 0 && (
- <div className="flex items-center gap-2 text-sm text-slate">
+ <div className="flex items-center gap-2 text-sm text-muted-foreground">
  <Users className="h-4 w-4" />
  <span>{connectedParticipants.length} connected</span>
  </div>
@@ -275,7 +275,7 @@ export function CallModal({
  {/* Video area (placeholder for WebRTC) */}
  {callType ==="video" && callState ==="active" && (
  <div className="flex flex-1 items-center justify-center w-full max-w-2xl my-8 relative">
- <div className="flex w-full h-full relative rounded-2xl overflow-hidden bg-black shadow-2xl">
+ <div className="flex w-full h-full relative rounded-lg overflow-hidden bg-black shadow-2xl">
  {/* Remote video */}
  <video
  ref={remoteVideoRef}
@@ -285,7 +285,7 @@ export function CallModal({
  />
  {!remoteVideoRef.current?.srcObject && (
  <div className="absolute inset-0 flex items-center justify-center">
- <div className="text-center text-slate animate-pulse">
+ <div className="text-center text-muted-foreground animate-pulse">
  <Video className="h-12 w-12 mx-auto mb-2 opacity-50" />
  <p className="text-sm">Connecting...</p>
  </div>
@@ -294,7 +294,7 @@ export function CallModal({
 
  {/* Local video (picture-in-picture style) */}
  {!isVideoOff && (
- <div className="absolute bottom-4 right-4 w-32 aspect-video rounded-xl bg-canvas flex items-center justify-center border-2 border-hairline overflow-hidden shadow-lg z-10">
+ <div className="absolute bottom-4 right-4 w-32 aspect-video rounded-lg bg-card flex items-center justify-center border-2 border-border overflow-hidden shadow-lg z-10">
  <video
  ref={localVideoRef}
  autoPlay
@@ -340,7 +340,7 @@ export function CallModal({
  className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${
  isMuted
  ?"bg-critical/20 text-critical hover:bg-critical/30"
- :"bg-canvas text-ink-deep hover:bg-surface-soft"
+ :"bg-card text-foreground hover:bg-card"
  }`}
  aria-label={isMuted ?"Unmute" :"Mute"}
  >
@@ -354,7 +354,7 @@ export function CallModal({
  className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${
  isVideoOff
  ?"bg-critical/20 text-critical hover:bg-critical/30"
- :"bg-canvas text-ink-deep hover:bg-surface-soft"
+ :"bg-card text-foreground hover:bg-card"
  }`}
  aria-label={isVideoOff ?"Turn on video" :"Turn off video"}
  >
@@ -369,7 +369,7 @@ export function CallModal({
  className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${
  isScreenSharing
  ?"bg-primary/20 text-primary hover:bg-primary/30"
- :"bg-canvas text-ink-deep hover:bg-surface-soft"
+ :"bg-card text-foreground hover:bg-card"
  }`}
  aria-label={isScreenSharing ?"Stop sharing" :"Share screen"}
  >
@@ -390,7 +390,7 @@ export function CallModal({
 
  {/* Ended state */}
  {callState ==="ended" && (
- <p className="text-slate text-sm">
+ <p className="text-muted-foreground text-sm">
  {callDuration > 0
  ? `Call lasted ${formatDuration(callDuration)}`
  :"Call ended"}

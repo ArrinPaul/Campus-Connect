@@ -18,8 +18,8 @@ export function WelcomeStep({ nextStep }: Props) {
                     <span className="text-5xl">ðŸ‘‹</span>
                 </div>
             </div>
-            <h1 className="text-[28px] font-bold text-ink-deep mb-2">Welcome to Campus Connect</h1>
-            <p className="text-[15px] text-slate max-w-sm mb-8 leading-relaxed">
+            <h1 className="text-[28px] font-bold text-foreground mb-2">Welcome to Campus Connect</h1>
+            <p className="text-[15px] text-muted-foreground max-w-sm mb-8 leading-relaxed">
                 Let&apos;s get your profile set up so you can start connecting with peers and discovering opportunities.
             </p>
             <TempButton onClick={nextStep}>

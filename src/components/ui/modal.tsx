@@ -40,15 +40,15 @@ export function Modal({ children }: { children: React.ReactNode }) {
  animate={{ opacity: 1, scale: 1, y: 0 }}
  exit={{ opacity: 0, scale: 0.95, y: 20 }}
  transition={{ type: 'spring', damping: 25, stiffness: 300 }}
- className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-custom bg-canvas rounded-2xl shadow-2xl border border-hairline z-10"
+ className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-custom bg-card rounded-lg shadow-2xl border border-border z-10"
  >
- <div className="sticky top-0 z-20 flex justify-between items-center p-4 bg-surface-soft border-b border-hairline">
+ <div className="sticky top-0 z-20 flex justify-between items-center p-4 bg-card border-b border-border">
  <h2 className="font-semibold">Post</h2>
  <button
  onClick={handleClose}
- className="p-2 rounded-full hover:bg-surface-soft transition-colors"
+ className="p-2 rounded-full hover:bg-card transition-colors"
  >
- <X className="w-5 h-5 text-slate" />
+ <X className="w-5 h-5 text-muted-foreground" />
  </button>
  </div>
  

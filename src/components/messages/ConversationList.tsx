@@ -99,14 +99,14 @@ export function ConversationList({
  return (
  <div className="flex flex-col h-full">
  {/* Header */}
- <div className="p-4 border-b border-hairline">
+ <div className="p-4 border-b border-border">
  <div className="flex items-center justify-between mb-3">
- <h2 className="text-lg font-bold text-ink-deep font-display">
+ <h2 className="text-lg font-bold text-foreground font-display">
  Messages
  </h2>
  <button
  onClick={onCreateGroup}
- className="p-2 rounded-xl text-slate hover:text-primary hover:bg-primary/10 transition-colors"
+ className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
  title="Create group"
  >
  <Users className="h-5 w-5" />
@@ -115,13 +115,13 @@ export function ConversationList({
 
  {/* Search */}
  <div className="relative">
- <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate" />
+ <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
  <input
  type="text"
  placeholder="Search conversations..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
- className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-hairline bg-canvas text-ink-deep placeholder:text-slate focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
+ className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
  />
  </div>
  </div>
@@ -130,16 +130,16 @@ export function ConversationList({
  <div className="flex-1 overflow-y-auto">
  {filteredConversations.length === 0 ? (
  <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
- <div className="h-12 w-12 rounded-xl bg-canvas flex items-center justify-center mb-3">
- <MessageSquare className="h-6 w-6 text-slate" />
+ <div className="h-12 w-12 rounded-lg bg-card flex items-center justify-center mb-3">
+ <MessageSquare className="h-6 w-6 text-muted-foreground" />
  </div>
- <p className="text-sm font-medium text-slate">
+ <p className="text-sm font-medium text-muted-foreground">
  {searchQuery
  ?"No conversations match your search"
  :"No conversations yet"}
  </p>
  {!searchQuery && (
- <p className="text-xs text-slate mt-1">
+ <p className="text-xs text-muted-foreground mt-1">
  Visit a user&apos;s profile to start a conversation
  </p>
  )}
@@ -157,7 +157,7 @@ export function ConversationList({
  className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-150 ${
  isSelected
  ?"bg-primary/8 border-l-2 border-primary"
- :"border-l-2 border-transparent hover:bg-canvas"
+ :"border-l-2 border-transparent hover:bg-card"
  }`}
  >
  {/* Avatar */}
@@ -209,14 +209,14 @@ export function ConversationList({
  <span
  className={`text-sm truncate ${
  conv.unreadCount > 0
- ?"font-semibold text-ink-deep"
- :"font-medium text-ink-deep"
+ ?"font-semibold text-foreground"
+ :"font-medium text-foreground"
  }`}
  >
  {displayName}
  </span>
  {conv.lastMessageAt && (
- <span className="text-xs text-slate flex-shrink-0 ml-2">
+ <span className="text-xs text-muted-foreground flex-shrink-0 ml-2">
  {formatTime(conv.lastMessageAt)}
  </span>
  )}
@@ -226,8 +226,8 @@ export function ConversationList({
  <p
  className={`text-xs truncate mt-0.5 ${
  conv.unreadCount > 0
- ?"text-ink-deep font-medium"
- :"text-slate"
+ ?"text-foreground font-medium"
+ :"text-muted-foreground"
  }`}
  >
  {conv.lastMessagePreview}
@@ -236,7 +236,7 @@ export function ConversationList({
 
  {/* Group member count */}
  {conv.type ==="group" && (
- <p className="text-xs text-slate mt-0.5">
+ <p className="text-xs text-muted-foreground mt-0.5">
  {conv.otherUsers.length + 1} members
  </p>
  )}
@@ -244,7 +244,7 @@ export function ConversationList({
 
  {/* Muted indicator */}
  {conv.isMuted && (
- <span className="text-xs text-slate" title="Muted">
+ <span className="text-xs text-muted-foreground" title="Muted">
  🔇
  </span>
  )}

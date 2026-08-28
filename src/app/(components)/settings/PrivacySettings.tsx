@@ -242,7 +242,7 @@ function SettingSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
+    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-5">
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <div className="flex-1 flex items-start gap-3">
           <div className="mt-0.5">{icon}</div>

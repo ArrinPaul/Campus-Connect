@@ -2,7 +2,7 @@ export default function ProfileLoading() {
  return (
  <div className="mx-auto max-w-4xl px-4 py-6 animate-pulse">
  {/* Cover */}
- <div className="h-48 rounded-xl bg-muted" />
+ <div className="h-48 rounded-lg bg-muted" />
 
  {/* Profile header */}
  <div className="relative px-6 -mt-12">
@@ -36,7 +36,7 @@ export default function ProfileLoading() {
  </div>
 
  {/* Tab bar */}
- <div className="mt-6 border-b border-hairline flex gap-6 px-6">
+ <div className="mt-6 border-b border-border flex gap-6 px-6">
  {Array.from({ length: 4 }).map((_, i) => (
  <div key={i} className="h-10 w-16 rounded bg-muted" />
  ))}
@@ -45,7 +45,7 @@ export default function ProfileLoading() {
  {/* Post skeletons */}
  <div className="mt-6 space-y-4 px-6">
  {Array.from({ length: 3 }).map((_, i) => (
- <div key={i} className="rounded-xl border border-hairline bg-card p-5 space-y-3">
+ <div key={i} className="rounded-lg border border-border bg-card p-5 space-y-3">
  <div className="h-3 w-full rounded bg-muted" />
  <div className="h-3 w-4/5 rounded bg-muted" />
  <div className="h-3 w-2/5 rounded bg-muted" />

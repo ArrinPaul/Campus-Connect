@@ -139,7 +139,7 @@ export function MessageComposer({
  const quickEmojis = ["😀","😂","❤️","👍","🔥","😊","🎉","💯","🤔","😢","😍","👏"]
 
  return (
- <div className="border-t border-hairline bg-surface-soft flex-shrink-0">
+ <div className="border-t border-border bg-card flex-shrink-0">
  {/* Reply indicator */}
  {replyingTo && (
  <div className="flex items-center gap-2 px-4 pt-2">
@@ -148,13 +148,13 @@ export function MessageComposer({
  <p className="text-xs font-medium text-primary">
  Replying to {replyingTo.senderName}
  </p>
- <p className="text-xs text-slate truncate">
+ <p className="text-xs text-muted-foreground truncate">
  {replyingTo.content}
  </p>
  </div>
  <button
  onClick={onCancelReply}
- className="p-1 rounded-full text-slate hover:text-ink-deep"
+ className="p-1 rounded-full text-muted-foreground hover:text-foreground"
  aria-label="Cancel reply"
  >
  <X className="h-3 w-3" />
@@ -166,7 +166,7 @@ export function MessageComposer({
  {/* Emoji picker */}
  {showEmojiPicker && (
  <div className="px-4 pt-2">
- <div className="flex flex-wrap gap-1 p-2 bg-canvas rounded-lg">
+ <div className="flex flex-wrap gap-1 p-2 bg-card rounded-lg">
  {quickEmojis.map((emoji) => (
  <button
  key={emoji}
@@ -174,7 +174,7 @@ export function MessageComposer({
  setContent((prev) => prev + emoji)
  textareaRef.current?.focus()
  }}
- className="p-1.5 text-lg hover:bg-surface-soft rounded transition-colors"
+ className="p-1.5 text-lg hover:bg-card rounded transition-colors"
  aria-label={`Insert ${emoji} emoji`}
  >
  {emoji}
@@ -189,7 +189,7 @@ export function MessageComposer({
  {/* Emoji button */}
  <button
  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
- className="p-2 rounded-full text-slate hover:text-ink-deep hover:bg-canvas flex-shrink-0"
+ className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-card flex-shrink-0"
  title="Add emoji"
  aria-label="Add emoji"
  >
@@ -198,7 +198,7 @@ export function MessageComposer({
 
  {/* Attachment button */}
  <button
- className="p-2 rounded-full text-slate hover:text-ink-deep hover:bg-canvas flex-shrink-0"
+ className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-card flex-shrink-0"
  title="Attach file"
  aria-label="Attach file"
  >
@@ -214,7 +214,7 @@ export function MessageComposer({
  onKeyDown={handleKeyDown}
  placeholder="Type a message..."
  rows={1}
- className="w-full resize-none rounded-2xl border border-hairline bg-canvas px-4 py-2.5 text-sm text-ink-deep placeholder:text-slate focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+ className="w-full resize-none rounded-lg border border-border bg-card px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
  style={{ maxHeight:"120px" }}
  />
  </div>
@@ -226,7 +226,7 @@ export function MessageComposer({
  className={`p-2.5 rounded-full flex-shrink-0 transition-colors ${
  content.trim() && !isSending
  ?"bg-primary text-white hover:bg-primary/90"
- :"bg-canvas text-slate cursor-not-allowed"
+ :"bg-card text-muted-foreground cursor-not-allowed"
  }`}
  title="Send message"
  aria-label="Send message"

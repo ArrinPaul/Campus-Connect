@@ -30,12 +30,12 @@ export function LinkPreviewCard({
  href={url}
  target="_blank"
  rel="noopener noreferrer"
- className="mt-3 flex overflow-hidden rounded-xl border border-hairline bg-surface-soft hover:bg-canvas transition-colors group"
+ className="mt-3 flex overflow-hidden rounded-lg border border-border bg-card hover:bg-card transition-colors group"
  onClick={(e) => e.stopPropagation()}
  >
  {/* Thumbnail */}
  {image && (
- <div className="relative w-24 shrink-0 sm:w-36 bg-canvas">
+ <div className="relative w-24 shrink-0 sm:w-36 bg-card">
  <Image
  src={image}
  alt={title ||"Link preview"}
@@ -49,7 +49,7 @@ export function LinkPreviewCard({
  {/* Content */}
  <div className="flex flex-col justify-center gap-1 px-4 py-3 min-w-0">
  {/* Hostname row */}
- <div className="flex items-center gap-1.5 text-xs text-slate">
+ <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
  {favicon ? (
  // eslint-disable-next-line @next/next/no-img-element
  <img
@@ -74,14 +74,14 @@ export function LinkPreviewCard({
 
  {/* Title */}
  {title && (
- <p className="text-sm font-semibold text-ink-deep leading-snug line-clamp-2">
+ <p className="text-sm font-semibold text-foreground leading-snug line-clamp-2">
  {title}
  </p>
  )}
 
  {/* Description */}
  {description && (
- <p className="text-xs text-slate line-clamp-2 leading-relaxed">
+ <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
  {description}
  </p>
  )}

@@ -23,8 +23,8 @@ export function ListingCard({ listing }: Props) {
     const sellerAvatar = listing.seller?.avatarUrl;
 
     return (
-        <Link href={`/marketplace/${listing._id}`} className="block p-4 border border-hairline rounded-xl bg-surface-soft hover:bg-surface-hover transition-colors shadow-sm">
-            <div className="relative h-48 w-full rounded-lg bg-muted overflow-hidden border border-hairline">
+        <Link href={`/marketplace/${listing._id}`} className="block p-4 border border-border rounded-lg bg-card hover:bg-surface-hover transition-colors shadow-sm">
+            <div className="relative h-48 w-full rounded-lg bg-muted overflow-hidden border border-border">
                 {listing.images && listing.images.length > 0 ? (
                     <OptimizedImage src={listing.images[0]} alt={listing.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 400px" />
                 ) : (
@@ -38,9 +38,9 @@ export function ListingCard({ listing }: Props) {
             </div>
             <div className="mt-3">
                 <h3 className="font-bold text-[17px] text-primary hover:underline line-clamp-1 leading-tight">{listing.title}</h3>
-                <p className="text-[13px] text-slate mt-1.5 line-clamp-2 h-10 leading-relaxed">{listing.description}</p>
+                <p className="text-[13px] text-muted-foreground mt-1.5 line-clamp-2 h-10 leading-relaxed">{listing.description}</p>
                 
-                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate mt-3 font-semibold">
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mt-3 font-semibold">
                     <div className="flex items-center gap-1">
                         <DollarSign className="h-3.5 w-3.5" /> {(listing.price / 100).toFixed(2)}
                     </div>

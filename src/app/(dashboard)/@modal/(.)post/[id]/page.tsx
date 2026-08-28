@@ -25,7 +25,7 @@ export default function PostModal({ params }: { params: { id: string } }) {
       ) : post ? (
         <PostCard post={post} author={author} />
       ) : (
-        <div className="p-8 text-center text-slate">Post not found</div>
+        <div className="p-8 text-center text-muted-foreground">Post not found</div>
       )}
     </Modal>
   );

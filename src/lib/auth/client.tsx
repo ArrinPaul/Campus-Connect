@@ -125,7 +125,7 @@ export function UserButton(_props: Record<string, unknown>) {
   return (
     <button
       onClick={() => signOut()}
-      className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-soft text-ink-deep text-sm font-bold border border-hairline hover:bg-hairline-soft transition-colors"
+      className="flex h-10 w-10 items-center justify-center rounded-full bg-card text-foreground text-sm font-bold border border-border hover:bg-hairline-soft transition-colors"
       title="Sign Out"
     >
       {user.name.substring(0, 2).toUpperCase()}
@@ -185,37 +185,37 @@ export function SignIn(_props: Record<string, unknown>) {
   return (
     <div className="w-full max-w-md mx-auto space-y-8">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold text-ink-deep">Sign in to Campus Connect</h1>
-        <p className="text-body-sm text-steel">Enter your details to continue</p>
+        <h1 className="text-2xl font-bold text-foreground">Sign in to Campus Connect</h1>
+        <p className="text-body-sm text-muted-foreground">Enter your details to continue</p>
       </div>
 
       <form onSubmit={handleSignIn} className="space-y-4">
         <div className="space-y-3">
           <div className="relative group">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-steel group-focus-within:text-primary transition-colors" />
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email address"
-              className="w-full pl-11 pr-4 h-11 rounded-lg border border-hairline bg-canvas text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
+              className="w-full pl-11 pr-4 h-11 rounded-lg border border-border bg-card text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
               required
             />
           </div>
           <div className="relative group">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-steel group-focus-within:text-primary transition-colors" />
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-              className="w-full pl-11 pr-11 h-11 rounded-lg border border-hairline bg-canvas text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
+              className="w-full pl-11 pr-11 h-11 rounded-lg border border-border bg-card text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-steel hover:text-ink-deep transition-colors focus:outline-none"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
@@ -244,8 +244,8 @@ export function SignIn(_props: Record<string, unknown>) {
         </Button>
       </form>
 
-      <div className="text-center pt-4 border-t border-hairline-soft">
-        <p className="text-body-sm text-steel">
+      <div className="text-center pt-4 border-t border-border/50">
+        <p className="text-body-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
           <Link href="/sign-up" className="text-primary font-bold hover:underline">
             Create one for free
@@ -310,8 +310,8 @@ export function SignUp(_props: Record<string, unknown>) {
     return (
       <div className="w-full max-w-md mx-auto space-y-6 text-center">
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-ink-deep">Verify your email</h1>
-          <p className="text-body-sm text-steel">Check your inbox to get started</p>
+          <h1 className="text-2xl font-bold text-foreground">Verify your email</h1>
+          <p className="text-body-sm text-muted-foreground">Check your inbox to get started</p>
         </div>
         
         <p className="text-body-sm font-semibold text-green-600 bg-green-50 py-4 px-4 rounded-lg border border-green-200">
@@ -333,48 +333,48 @@ export function SignUp(_props: Record<string, unknown>) {
   return (
     <div className="w-full max-w-md mx-auto space-y-8">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold text-ink-deep">Create your account</h1>
-        <p className="text-body-sm text-steel">Join the academic community today</p>
+        <h1 className="text-2xl font-bold text-foreground">Create your account</h1>
+        <p className="text-body-sm text-muted-foreground">Join the academic community today</p>
       </div>
 
       <form onSubmit={handleSignUp} className="space-y-4">
         <div className="space-y-3">
           <div className="relative group">
-            <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-steel group-focus-within:text-primary transition-colors" />
+            <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Full name"
-              className="w-full pl-11 pr-4 h-11 rounded-lg border border-hairline bg-canvas text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
+              className="w-full pl-11 pr-4 h-11 rounded-lg border border-border bg-card text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
               required
             />
           </div>
           <div className="relative group">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-steel group-focus-within:text-primary transition-colors" />
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email address"
-              className="w-full pl-11 pr-4 h-11 rounded-lg border border-hairline bg-canvas text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
+              className="w-full pl-11 pr-4 h-11 rounded-lg border border-border bg-card text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
               required
             />
           </div>
           <div className="relative group">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-steel group-focus-within:text-primary transition-colors" />
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password (min 8 chars)"
-              className="w-full pl-11 pr-11 h-11 rounded-lg border border-hairline bg-canvas text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
+              className="w-full pl-11 pr-11 h-11 rounded-lg border border-border bg-card text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-steel hover:text-ink-deep transition-colors focus:outline-none"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
@@ -409,8 +409,8 @@ export function SignUp(_props: Record<string, unknown>) {
         </Button>
       </form>
 
-      <div className="text-center pt-4 border-t border-hairline-soft">
-        <p className="text-body-sm text-steel">
+      <div className="text-center pt-4 border-t border-border/50">
+        <p className="text-body-sm text-muted-foreground">
           Already have an account?{" "}
           <Link href="/sign-in" className="text-primary font-bold hover:underline">
             Sign in here

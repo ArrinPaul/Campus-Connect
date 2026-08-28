@@ -17,9 +17,9 @@ export default async function AdminLayout({ children }: { children: ReactNode })
  if (!userData || (!userData.is_admin && userData.role !=="admin")) {
  return (
  <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
- <div className="max-w-xl text-center text-slate bg-surface-soft p-12 border border-hairline rounded-xl shadow-sm">
+ <div className="max-w-xl text-center text-muted-foreground bg-card p-12 border border-border rounded-lg shadow-sm">
  <ShieldAlert className="h-16 w-16 mx-auto mb-4 text-critical" />
- <h3 className="text-2xl font-bold text-ink-deep">Access Denied</h3>
+ <h3 className="text-2xl font-bold text-foreground">Access Denied</h3>
  <p className="mt-2">You do not have administrative privileges to view this area.</p>
  <Link href="/feed" className="mt-6 inline-block text-primary hover:underline">
  &larr; Return to Feed
@@ -32,8 +32,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
  return (
  <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)]">
  {/* Admin Sidebar */}
- <aside className="w-full md:w-64 border-r border-hairline bg-surface-soft flex flex-col shrink-0">
- <div className="p-4 border-b border-hairline">
+ <aside className="w-full md:w-64 border-r border-border bg-card flex flex-col shrink-0">
+ <div className="p-4 border-b border-border">
  <h2 className="font-bold text-lg flex items-center gap-2">
  <ShieldAlert className="w-5 h-5 text-primary" />
  Admin Panel

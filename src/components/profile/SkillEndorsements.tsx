@@ -77,7 +77,7 @@ export function SkillEndorsements({
       {skillsList.map((skill: any) => (
  <div
  key={skill.name}
- className="flex items-center justify-between rounded-lg border border-hairline bg-card px-3 py-2 border-hairline bg-card"
+ className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2 border-border bg-card"
  >
  <div className="flex items-center gap-2 min-w-0">
  <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-sm font-medium text-primary">
@@ -116,7 +116,7 @@ export function SkillEndorsements({
  className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
  skill.endorsedByViewer
  ?"bg-primary text-on-primary hover:bg-primary/90"
- :"border border-hairline text-muted-foreground hover:bg-muted border-hairline text-muted-foreground hover:bg-accent"
+ :"border border-border text-muted-foreground hover:bg-muted border-border text-muted-foreground hover:bg-accent"
  } disabled:opacity-50`}
  title={
  skill.endorsedByViewer

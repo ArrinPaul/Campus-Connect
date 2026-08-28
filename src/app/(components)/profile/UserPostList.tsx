@@ -11,10 +11,10 @@ export function UserPostList({ userId }: { userId: Id<'users'> }) {
     if (postsData === undefined) {
         return (
              <div className="space-y-4 max-w-xl mx-auto">
-                <div className="rounded-xl border border-hairline bg-surface-soft p-4 animate-pulse">
+                <div className="rounded-lg border border-border bg-card p-4 animate-pulse">
                     <div className="space-y-2">
-                        <div className="h-4 w-full bg-canvas rounded" />
-                        <div className="h-4 w-5/6 bg-canvas rounded" />
+                        <div className="h-4 w-full bg-card rounded" />
+                        <div className="h-4 w-5/6 bg-card rounded" />
                     </div>
                 </div>
             </div>
@@ -25,9 +25,9 @@ export function UserPostList({ userId }: { userId: Id<'users'> }) {
 
     if (posts.length === 0) {
         return (
-            <div className="rounded-xl border border-hairline bg-surface-soft p-8 text-center mt-4 max-w-xl mx-auto">
-                <h3 className="text-lg font-semibold text-ink-deep">No posts yet</h3>
-                <p className="text-slate text-sm mt-1">
+            <div className="rounded-lg border border-border bg-card p-8 text-center mt-4 max-w-xl mx-auto">
+                <h3 className="text-lg font-semibold text-foreground">No posts yet</h3>
+                <p className="text-muted-foreground text-sm mt-1">
                     No posts to display.
                 </p>
             </div>

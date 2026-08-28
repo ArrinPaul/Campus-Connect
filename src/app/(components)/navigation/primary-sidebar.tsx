@@ -41,10 +41,10 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
   return (
     <Link
       href={item.href}
-      className={`flex items-center gap-3 rounded-xl px-3 py-2 text-body-sm font-medium transition-colors ${
+      className={`flex items-center gap-3 rounded-lg px-3 py-2 text-body-sm font-medium transition-colors ${
         active
           ? 'bg-primary/10 text-primary'
-          : 'text-steel hover:bg-surface-soft hover:text-ink-deep'
+          : 'text-muted-foreground hover:bg-card hover:text-foreground'
       }`}
     >
       <item.icon className="h-4 w-4 flex-shrink-0" />
@@ -59,21 +59,21 @@ export function PrimarySidebar() {
   const { signOut } = useAuthActions();
 
   return (
-    <aside className="hidden lg:flex h-full w-60 flex-col border-r border-hairline-soft bg-canvas">
+    <aside className="hidden lg:flex h-full w-60 flex-col border-r border-border/50 bg-card">
       {/* Logo */}
-      <div className="flex items-center gap-2 px-4 py-4 border-b border-hairline-soft">
+      <div className="flex items-center gap-2 px-4 py-4 border-b border-border/50">
         <Link href="/feed" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-xl bg-primary flex items-center justify-center shrink-0">
+          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
             <span className="text-white text-sm font-bold">CC</span>
           </div>
-          <span className="font-bold text-ink-deep text-body-md-bold tracking-tight">Campus Connect</span>
+          <span className="font-bold text-foreground text-body-md-bold tracking-tight">Campus Connect</span>
         </Link>
       </div>
 
       {/* User profile summary */}
       {user && (
-        <div className="px-3 py-3 border-b border-hairline-soft">
-          <Link href="/profile/me" className="flex items-center gap-3 p-2 rounded-xl hover:bg-surface-soft transition-colors">
+        <div className="px-3 py-3 border-b border-border/50">
+          <Link href="/profile/me" className="flex items-center gap-3 p-2 rounded-lg hover:bg-card transition-colors">
             <Avatar className="h-9 w-9">
               <AvatarImage src={user.profilePicture} alt={user.name} />
               <AvatarFallback className="bg-primary text-white text-caption-bold">
@@ -81,8 +81,8 @@ export function PrimarySidebar() {
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <p className="text-body-sm-bold text-ink-deep truncate">{user.name}</p>
-              <p className="text-caption text-steel truncate">{user.email}</p>
+              <p className="text-body-sm-bold text-foreground truncate">{user.name}</p>
+              <p className="text-caption text-muted-foreground truncate">{user.email}</p>
             </div>
           </Link>
         </div>
@@ -123,11 +123,11 @@ export function PrimarySidebar() {
       </div>
 
       {/* Bottom: settings, logout */}
-      <div className="border-t border-hairline-soft px-2 py-3 space-y-1">
+      <div className="border-t border-border/50 px-2 py-3 space-y-1">
         <NavLink item={{ href: '/settings', icon: Settings, label: 'Settings' }} pathname={pathname} />
         <button
           onClick={() => signOut({ redirectUrl: '/' })}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-body-sm font-medium text-steel transition-colors hover:bg-critical/5 hover:text-critical"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-body-sm font-medium text-muted-foreground transition-colors hover:bg-critical/5 hover:text-critical"
         >
           <LogOut className="h-4 w-4 flex-shrink-0" />
           <span>Sign Out</span>

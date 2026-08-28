@@ -80,14 +80,14 @@ export function GlobalNav() {
  ];
 
  return (
- <nav className="sticky top-0 z-50 h-16 bg-canvas border-b border-hairline-soft flex items-center px-4 md:px-6">
+ <nav className="sticky top-0 z-50 h-16 bg-card border-b border-border/50 flex items-center px-4 md:px-6">
  {/* Left: Logo + pill nav */}
  <div className="flex items-center gap-6">
  <Link href="/feed" className="flex items-center gap-2 shrink-0">
- <div className="h-8 w-8 rounded-xl bg-primary flex items-center justify-center">
+ <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
  <span className="text-white text-sm font-bold">CC</span>
  </div>
- <span className="hidden lg:block text-ink-deep font-bold text-body-md-bold tracking-tight">
+ <span className="hidden lg:block text-foreground font-bold text-body-md-bold tracking-tight">
  Campus Connect
  </span>
  </Link>
@@ -102,7 +102,7 @@ export function GlobalNav() {
  'px-4 py-2 rounded-full text-body-sm-bold font-medium transition-colors',
  isActive(link.href)
  ? 'bg-ink-deep text-canvas'
- : 'bg-canvas text-ink border border-hairline hover:bg-surface-soft'
+ : 'bg-card text-foreground border border-border hover:bg-card'
  )}
  >
  {link.label}
@@ -116,14 +116,14 @@ export function GlobalNav() {
  {/* Search pill */}
  {searchOpen ? (
  <form onSubmit={handleSearch} className="relative">
- <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-steel" />
+ <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
  <input
  ref={searchInputRef}
  type="text"
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  placeholder="Search Campus Connect..."
- className="w-56 md:w-72 h-10 pl-9 pr-9 rounded-full bg-surface-soft text-body-sm text-ink-deep placeholder:text-steel focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+ className="w-56 md:w-72 h-10 pl-9 pr-9 rounded-full bg-card text-body-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
  />
  <button
  type="button"
@@ -131,7 +131,7 @@ export function GlobalNav() {
  setSearchOpen(false);
  setSearchQuery('');
  }}
- className="absolute right-3 top-1/2 -translate-y-1/2 text-steel hover:text-ink-deep transition-colors"
+ className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
  >
  <X className="h-4 w-4" />
  </button>
@@ -139,7 +139,7 @@ export function GlobalNav() {
  ) : (
  <button
  onClick={() => setSearchOpen(true)}
- className="h-10 w-10 flex items-center justify-center rounded-full bg-canvas text-ink hover:bg-surface-soft transition-colors"
+ className="h-10 w-10 flex items-center justify-center rounded-full bg-card text-foreground hover:bg-card transition-colors"
  aria-label="Search"
  >
  <Search className="h-5 w-5" />
@@ -150,7 +150,7 @@ export function GlobalNav() {
  {isSignedIn && (
  <Link
  href="/notifications"
- className="relative h-10 w-10 flex items-center justify-center rounded-full bg-canvas text-ink hover:bg-surface-soft transition-colors"
+ className="relative h-10 w-10 flex items-center justify-center rounded-full bg-card text-foreground hover:bg-card transition-colors"
  aria-label="Notifications"
  >
  <Bell className="h-5 w-5" />
@@ -169,7 +169,7 @@ export function GlobalNav() {
  <div className="relative" ref={profileRef}>
  <button
  onClick={() => setProfileOpen(!profileOpen)}
- className="flex items-center gap-2 h-10 pl-1 pr-3 rounded-full hover:bg-surface-soft transition-colors"
+ className="flex items-center gap-2 h-10 pl-1 pr-3 rounded-full hover:bg-card transition-colors"
  >
  <Avatar className="h-8 w-8">
  <AvatarImage src={user.profilePicture} alt={user.name} />
@@ -177,30 +177,30 @@ export function GlobalNav() {
  {user.name.substring(0, 2).toUpperCase()}
  </AvatarFallback>
  </Avatar>
- <span className="hidden lg:block text-body-sm-bold text-ink-deep max-w-[100px] truncate">
+ <span className="hidden lg:block text-body-sm-bold text-foreground max-w-[100px] truncate">
  {user.name}
  </span>
  </button>
 
  {/* Profile dropdown */}
  {profileOpen && (
- <div className="absolute right-0 top-full mt-2 w-56 bg-canvas rounded-xl border border-hairline-soft shadow-sticky-panel overflow-hidden">
- <div className="p-3 border-b border-hairline-soft">
- <p className="text-body-sm-bold text-ink-deep truncate">{user.name}</p>
- <p className="text-caption text-steel truncate">{user.email}</p>
+ <div className="absolute right-0 top-full mt-2 w-56 bg-card rounded-lg border border-border/50 shadow-sticky-panel overflow-hidden">
+ <div className="p-3 border-b border-border/50">
+ <p className="text-body-sm-bold text-foreground truncate">{user.name}</p>
+ <p className="text-caption text-muted-foreground truncate">{user.email}</p>
  </div>
  <div className="p-1">
  <Link
  href="/profile/me"
  onClick={() => setProfileOpen(false)}
- className="flex items-center gap-2 px-3 py-2 text-body-sm text-ink-deep rounded-lg hover:bg-surface-soft transition-colors"
+ className="flex items-center gap-2 px-3 py-2 text-body-sm text-foreground rounded-lg hover:bg-card transition-colors"
  >
  Your Profile
  </Link>
  <Link
  href="/settings"
  onClick={() => setProfileOpen(false)}
- className="flex items-center gap-2 px-3 py-2 text-body-sm text-ink-deep rounded-lg hover:bg-surface-soft transition-colors"
+ className="flex items-center gap-2 px-3 py-2 text-body-sm text-foreground rounded-lg hover:bg-card transition-colors"
  >
  Settings
  </Link>
@@ -222,7 +222,7 @@ export function GlobalNav() {
  <div className="flex items-center gap-2">
  <Link
  href="/sign-in"
- className="px-6 py-2.5 rounded-full text-button-md text-ink-deep border-2 border-ink-deep hover:bg-surface-soft transition-colors"
+ className="px-6 py-2.5 rounded-full text-button-md text-foreground border-2 border-ink-deep hover:bg-card transition-colors"
  >
  Log In
  </Link>

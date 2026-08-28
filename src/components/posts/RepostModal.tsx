@@ -120,19 +120,19 @@ export function RepostModal({ post, isOpen, onClose, onSuccess }: RepostModalPro
 
  {/* Modal */}
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
- <div className="bg-surface-soft rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-auto">
+ <div className="bg-card rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-auto">
  {/* Header */}
- <div className="sticky top-0 bg-surface-soft border-b border-hairline px-4 py-3 flex items-center justify-between">
- <h2 className="text-lg font-semibold text-ink-deep">
+ <div className="sticky top-0 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
+ <h2 className="text-lg font-semibold text-foreground">
  Repost
  </h2>
  <button
  onClick={handleClose}
  disabled={isSubmitting}
- className="p-2 rounded-full hover:bg-canvas transition-colors disabled:opacity-50"
+ className="p-2 rounded-full hover:bg-card transition-colors disabled:opacity-50"
  aria-label="Close"
  >
- <X className="w-5 h-5 text-slate" />
+ <X className="w-5 h-5 text-muted-foreground" />
  </button>
  </div>
 
@@ -140,7 +140,7 @@ export function RepostModal({ post, isOpen, onClose, onSuccess }: RepostModalPro
  <div className="p-4 space-y-4">
  {/* Quote textarea */}
  <div>
- <label htmlFor="quoteContent" className="block text-sm font-medium text-ink-deep mb-2">
+ <label htmlFor="quoteContent" className="block text-sm font-medium text-foreground mb-2">
  Add your thoughts (optional)
  </label>
  <textarea
@@ -150,19 +150,19 @@ export function RepostModal({ post, isOpen, onClose, onSuccess }: RepostModalPro
  rows={3}
  maxLength={maxLength}
  placeholder="What do you think about this?"
- className="block w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-ink-deep shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+ className="block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
  disabled={isSubmitting}
  />
  <div className="mt-1 flex justify-between text-xs">
  <span className="text-critical dark:text-red-400">{error}</span>
- <span className={`${quoteContent.length > maxLength ?"text-critical dark:text-red-400" :"text-slate"}`}>
+ <span className={`${quoteContent.length > maxLength ?"text-critical dark:text-red-400" :"text-muted-foreground"}`}>
  {quoteContent.length}/{maxLength}
  </span>
  </div>
  </div>
 
  {/* Original post preview */}
- <div className="border border-hairline rounded-lg p-4 bg-surface-soft">
+ <div className="border border-border rounded-lg p-4 bg-card">
  <div className="flex items-center gap-3 mb-3">
  {post.author?.profilePicture ? (
  <Image
@@ -178,33 +178,33 @@ export function RepostModal({ post, isOpen, onClose, onSuccess }: RepostModalPro
  </div>
  )}
  <div>
- <p className="font-semibold text-ink-deep">
+ <p className="font-semibold text-foreground">
  {post.author?.name ||"Unknown User"}
  </p>
- <p className="text-sm text-slate">
+ <p className="text-sm text-muted-foreground">
  {new Date(post.createdAt).toLocaleDateString()}
  </p>
  </div>
  </div>
- <p className="text-ink-deep whitespace-pre-wrap">
+ <p className="text-foreground whitespace-pre-wrap">
  {post.content}
  </p>
  </div>
  </div>
 
  {/* Footer / Actions */}
- <div className="sticky bottom-0 bg-surface-soft border-t border-hairline px-4 py-3 flex items-center justify-end gap-3">
+ <div className="sticky bottom-0 bg-card border-t border-border px-4 py-3 flex items-center justify-end gap-3">
  <button
  onClick={handleClose}
  disabled={isSubmitting}
- className="px-4 py-2 text-sm font-medium text-ink-deep hover:bg-canvas rounded-md transition-colors disabled:opacity-50"
+ className="px-4 py-2 text-sm font-medium text-foreground hover:bg-card rounded-md transition-colors disabled:opacity-50"
  >
  Cancel
  </button>
  <button
  onClick={handlePlainRepost}
  disabled={isSubmitting}
- className="px-4 py-2 text-sm font-medium text-ink-deep bg-canvas hover:bg-canvas dark:hover:bg-canvas rounded-md transition-colors disabled:opacity-50 flex items-center gap-2"
+ className="px-4 py-2 text-sm font-medium text-foreground bg-card hover:bg-card dark:hover:bg-card rounded-md transition-colors disabled:opacity-50 flex items-center gap-2"
  >
  {isSubmitting && !quoteContent && <ButtonLoadingSpinner />}
  Repost

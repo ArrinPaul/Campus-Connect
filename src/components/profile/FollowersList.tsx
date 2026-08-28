@@ -20,7 +20,7 @@ export function FollowersList({ userId }: FollowersListProps) {
  if (followersData === undefined) {
  return (
  <div className="rounded-lg bg-card p-6 shadow-elevation-1">
- <h2 className="text-xl font-bold text-ink-deep mb-4">Followers</h2>
+ <h2 className="text-xl font-bold text-foreground mb-4">Followers</h2>
  <div className="space-y-3">
  {[1, 2, 3].map((i) => (
  <div key={i} className="h-20 animate-pulse rounded-lg bg-muted" />
@@ -35,7 +35,7 @@ export function FollowersList({ userId }: FollowersListProps) {
  if (!Array.isArray(followers) || followers.length === 0) {
  return (
  <div className="rounded-lg bg-card p-6 shadow-elevation-1">
- <h2 className="text-xl font-bold text-ink-deep mb-4">Followers</h2>
+ <h2 className="text-xl font-bold text-foreground mb-4">Followers</h2>
  <p className="text-muted-foreground text-center py-8">No followers yet</p>
  </div>
  )
@@ -43,7 +43,7 @@ export function FollowersList({ userId }: FollowersListProps) {
 
  return (
  <div className="rounded-lg bg-card p-6 shadow-elevation-1">
- <h2 className="text-xl font-bold text-ink-deep mb-4">
+ <h2 className="text-xl font-bold text-foreground mb-4">
  Followers ({followers.length})
  </h2>
  <div className="space-y-3">

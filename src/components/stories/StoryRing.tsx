@@ -75,7 +75,7 @@ export function StoryRing({
  }
  >
  <div className={avatarContainerClass} style={{ width: 66, height: 66 }}>
- <div className="relative h-full w-full rounded-full overflow-hidden bg-canvas">
+ <div className="relative h-full w-full rounded-full overflow-hidden bg-card">
  {user.profilePicture ? (
  <Image
  src={user.profilePicture}
@@ -85,7 +85,7 @@ export function StoryRing({
  className="object-cover"
  />
  ) : (
- <div className="flex h-full w-full items-center justify-center text-ink text-lg font-semibold">
+ <div className="flex h-full w-full items-center justify-center text-foreground text-lg font-semibold">
  {user.name.charAt(0).toUpperCase()}
  </div>
  )}
@@ -100,7 +100,7 @@ export function StoryRing({
  </div>
 
  {/* Label */}
- <span className="max-w-[72px] truncate text-fine-print text-ink text-center mt-1">
+ <span className="max-w-[72px] truncate text-fine-print text-foreground text-center mt-1">
  {isOwn ?"Your Story" : displayName}
  </span>
  </button>
@@ -178,12 +178,12 @@ function AddStoryButton({ onClick }: { onClick: () => void }) {
  aria-label="Add to story"
  >
  <div
- className="relative flex items-center justify-center rounded-full border border-hairline bg-canvas/50"
+ className="relative flex items-center justify-center rounded-full border border-border bg-card/50"
  style={{ width: 66, height: 66 }}
  >
  <Plus className="h-6 w-6 text-primary" />
  </div>
- <span className="max-w-[72px] truncate text-fine-print text-ink text-center mt-1">
+ <span className="max-w-[72px] truncate text-fine-print text-foreground text-center mt-1">
  Add Story
  </span>
  </button>

@@ -7,7 +7,7 @@ import { AdCard } from '../../../(components)/ads/AdCard';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
 
-const AdCardSkeleton = () => <div className="p-4 border border-hairline rounded-xl bg-surface-soft h-64 animate-pulse" />;
+const AdCardSkeleton = () => <div className="p-4 border border-border rounded-lg bg-card h-64 animate-pulse" />;
 
 export default function AdsDashboardPage() {
  const { isSignedIn } = useUser();
@@ -37,7 +37,7 @@ export default function AdsDashboardPage() {
  {ads?.length === 0 && (
  <div className="text-center py-16 col-span-full">
  <h3 className="text-lg font-semibold">No ads created yet</h3>
- <p className="text-slate mt-2">
+ <p className="text-muted-foreground mt-2">
  Start creating ads to reach your target audience.
  </p>
  </div>

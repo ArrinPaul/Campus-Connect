@@ -18,9 +18,9 @@ export function SettingsNav() {
   const currentTab = searchParams.get("tab") || "profile"
 
   return (
-    <nav className="flex flex-row md:flex-col gap-1 md:w-56 flex-shrink-0 md:pr-8 md:border-r border-hairline h-fit sticky top-24">
+    <nav className="flex flex-row md:flex-col gap-1 md:w-56 flex-shrink-0 md:pr-8 md:border-r border-border h-fit sticky top-24">
       <div className="hidden md:block mb-4 px-2">
-         <h2 className="text-display-md text-ink font-bold">Settings.</h2>
+         <h2 className="text-display-md text-foreground font-bold">Settings.</h2>
       </div>
       {navItems.map((item) => (
         <Link
@@ -30,11 +30,11 @@ export function SettingsNav() {
           className={cn(
             "flex items-center gap-3 px-3 py-2.5 rounded-sm transition-all btn-press text-caption font-semibold",
             currentTab === item.href
-              ? "bg-canvas-parchment text-primary shadow-sm"
-              : "hover:bg-canvas-parchment/50 text-ink-muted-48 hover:text-ink"
+              ? "bg-card-parchment text-primary shadow-sm"
+              : "hover:bg-card-parchment/50 text-foreground-muted-48 hover:text-foreground"
           )}
         >
-          <item.icon className={cn("h-4 w-4", currentTab === item.href ? "text-primary" : "text-ink-muted-48")} />
+          <item.icon className={cn("h-4 w-4", currentTab === item.href ? "text-primary" : "text-foreground-muted-48")} />
           <span className="hidden md:inline">{item.label}</span>
           
           {/* Action Blue dot for active tab on desktop */}

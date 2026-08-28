@@ -68,9 +68,9 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
  const hasActiveFilters = selectedRole !=="" || selectedSkills.length > 0
 
  return (
- <div className="rounded-lg border border-hairline bg-card p-4">
+ <div className="rounded-lg border border-border bg-card p-4">
  <div className="mb-4 flex items-center justify-between">
- <h3 className="text-lg font-semibold text-ink-deep">Filters</h3>
+ <h3 className="text-lg font-semibold text-foreground">Filters</h3>
  {hasActiveFilters && (
  <button
  type="button"
@@ -87,7 +87,7 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
  <div className="mb-4">
  <label
  htmlFor="role-filter"
- className="mb-2 block text-sm font-medium text-ink-deep"
+ className="mb-2 block text-sm font-medium text-foreground"
  >
  Role
  </label>
@@ -95,7 +95,7 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
  id="role-filter"
  value={selectedRole}
  onChange={(e) => handleRoleChange(e.target.value)}
- className="block w-full rounded-md border border-hairline bg-card px-3 py-2 text-ink-deep focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
+ className="block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
  aria-label="Filter by role"
  >
  <option value="">All Roles</option>
@@ -109,7 +109,7 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
  <div>
  <label
  htmlFor="skills-filter"
- className="mb-2 block text-sm font-medium text-ink-deep"
+ className="mb-2 block text-sm font-medium text-foreground"
  >
  Skills
  </label>
@@ -128,7 +128,7 @@ export function UserFilterPanel({ onFilterChange }: UserFilterPanelProps) {
  }
  }}
  placeholder="Add skill..."
- className="block flex-1 rounded-md border border-hairline bg-card px-3 py-2 text-ink-deep placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
+ className="block flex-1 rounded-md border border-border bg-card px-3 py-2 text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
  aria-label="Add skill filter"
  />
  <button

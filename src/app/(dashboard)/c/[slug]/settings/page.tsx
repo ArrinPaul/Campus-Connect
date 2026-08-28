@@ -97,7 +97,7 @@ function CommunitySettingsPageContent({ slug }: { slug: string }) {
 
  return (
  <form onSubmit={handleSubmit} className="max-w-4xl mx-auto py-8 px-4">
- <Link href={`/c/${slug}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-ink-deep mb-4">
+ <Link href={`/c/${slug}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4">
  <ArrowLeft className="h-4 w-4" />
  Back to {community.name}
  </Link>
@@ -108,7 +108,7 @@ function CommunitySettingsPageContent({ slug }: { slug: string }) {
  <Input label="Community Name" name="name" value={formData.name} onChange={handleChange} placeholder="Community Name" />
  <Textarea label="Description" name="description" value={formData.description} onChange={handleChange} placeholder="What is this community about?" />
  <div>
- <label className="block text-sm font-medium text-ink-deep">Type</label>
+ <label className="block text-sm font-medium text-foreground">Type</label>
  <p className="text-xs text-muted-foreground mb-2">Public is visible to everyone. Private requires approval to join. Secret is invite-only and hidden.</p>
  <select name="type" value={formData.type} onChange={handleChange} className="w-full px-3 py-2 text-sm bg-muted/50 rounded-md focus:outline-none focus:ring-1 focus:ring-primary">
  <option value="public">Public</option>
@@ -117,7 +117,7 @@ function CommunitySettingsPageContent({ slug }: { slug: string }) {
  </select>
  </div>
  <div>
- <label className="block text-sm font-medium text-ink-deep">Category</label>
+ <label className="block text-sm font-medium text-foreground">Category</label>
  <select name="category" value={formData.category} onChange={handleChange} className="w-full mt-1 px-3 py-2 text-sm bg-muted/50 rounded-md focus:outline-none focus:ring-1 focus:ring-primary">
  <option>Academic</option>
  <option>Research</option>

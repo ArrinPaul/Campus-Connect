@@ -207,7 +207,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
  <form onSubmit={handleSubmit} className="space-y-6">
  {/* Profile Picture Upload */}
  <div>
- <label htmlFor="profilePicture" className="block text-sm font-medium text-ink-deep">
+ <label htmlFor="profilePicture" className="block text-sm font-medium text-foreground">
  Profile Picture
  </label>
  <div className="mt-2 flex items-center gap-4">
@@ -241,7 +241,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
  <button
  type="button"
  onClick={() => fileInputRef.current?.click()}
- className="rounded-md border border-hairline bg-card px-4 py-2 text-sm font-medium text-ink-deep hover:bg-accent focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+ className="rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
  >
  Choose Image
  </button>
@@ -257,7 +257,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
 
  {/* Bio */}
  <div>
- <label htmlFor="bio" className="block text-sm font-medium text-ink-deep">
+ <label htmlFor="bio" className="block text-sm font-medium text-foreground">
  Bio
  </label>
  <textarea
@@ -266,7 +266,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
  onChange={(e) => setBio(e.target.value)}
  rows={4}
  maxLength={500}
- className="mt-1 block w-full rounded-md border border-hairline bg-card px-3 py-2 text-ink-deep shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
+ className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
  placeholder="Tell us about yourself..."
  />
  <div className="mt-1 flex justify-between text-sm">
@@ -279,7 +279,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
  <div>
  <label
  htmlFor="university"
- className="block text-sm font-medium text-ink-deep"
+ className="block text-sm font-medium text-foreground"
  >
  University
  </label>
@@ -289,7 +289,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
  value={university}
  onChange={(e) => setUniversity(e.target.value)}
  maxLength={200}
- className="mt-1 block w-full rounded-md border border-hairline bg-card px-3 py-2 text-ink-deep shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
+ className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
  placeholder="Your university name"
  />
  <div className="mt-1 flex justify-between text-sm">
@@ -300,7 +300,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
 
  {/* Role */}
  <div>
- <label htmlFor="role" className="block text-sm font-medium text-ink-deep">
+ <label htmlFor="role" className="block text-sm font-medium text-foreground">
  Role
  </label>
  <select
@@ -309,7 +309,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
  onChange={(e) =>
  setRole(e.target.value as"Student" |"Research Scholar" |"Faculty")
  }
- className="mt-1 block w-full rounded-md border border-hairline bg-card px-3 py-2 text-ink-deep shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
+ className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
  >
  <option value="Student">Student</option>
  <option value="Research Scholar">Research Scholar</option>
@@ -324,7 +324,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
  <div>
  <label
  htmlFor="experienceLevel"
- className="block text-sm font-medium text-ink-deep"
+ className="block text-sm font-medium text-foreground"
  >
  Experience Level
  </label>
@@ -336,7 +336,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
  e.target.value as"Beginner" |"Intermediate" |"Advanced" |"Expert"
  )
  }
- className="mt-1 block w-full rounded-md border border-hairline bg-card px-3 py-2 text-ink-deep shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
+ className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
  >
  <option value="Beginner">Beginner</option>
  <option value="Intermediate">Intermediate</option>
@@ -350,7 +350,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
 
  {/* Social Links */}
  <div className="space-y-4">
- <h3 className="text-sm font-medium text-ink-deep">Social Links</h3>
+ <h3 className="text-sm font-medium text-foreground">Social Links</h3>
 
  <div>
  <label
@@ -364,7 +364,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
  id="github"
  value={github}
  onChange={(e) => setGithub(e.target.value)}
- className="mt-1 block w-full rounded-md border border-hairline bg-card px-3 py-2 text-ink-deep shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
+ className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
  placeholder="https://github.com/username"
  />
  </div>
@@ -381,7 +381,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
  id="linkedin"
  value={linkedin}
  onChange={(e) => setLinkedin(e.target.value)}
- className="mt-1 block w-full rounded-md border border-hairline bg-card px-3 py-2 text-ink-deep shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
+ className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
  placeholder="https://linkedin.com/in/username"
  />
  </div>
@@ -398,7 +398,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
  id="twitter"
  value={twitter}
  onChange={(e) => setTwitter(e.target.value)}
- className="mt-1 block w-full rounded-md border border-hairline bg-card px-3 py-2 text-ink-deep shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
+ className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
  placeholder="https://twitter.com/username"
  />
  </div>
@@ -415,7 +415,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
  id="website"
  value={website}
  onChange={(e) => setWebsite(e.target.value)}
- className="mt-1 block w-full rounded-md border border-hairline bg-card px-3 py-2 text-ink-deep shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
+ className="mt-1 block w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
  placeholder="https://yourwebsite.com"
  />
  </div>

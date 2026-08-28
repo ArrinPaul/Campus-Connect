@@ -39,7 +39,7 @@ export function Feed() {
       </div>
 
       {/* Feed Filters */}
-      <div className="w-full mb-4 flex items-center justify-between border-b border-hairline pb-2">
+      <div className="w-full mb-4 flex items-center justify-between border-b border-border pb-2">
         <div className="flex items-center gap-1">
           {TABS.map((tab) => (
             <button

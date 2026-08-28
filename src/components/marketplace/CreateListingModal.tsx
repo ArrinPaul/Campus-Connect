@@ -62,10 +62,10 @@ export function CreateListingModal({ onClose }: CreateListingModalProps) {
  className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-deep/20"
  onClick={(e) => e.target === e.currentTarget && onClose()}
  >
- <div className="w-full max-w-lg rounded-2xl bg-canvas shadow-2xl border p-6 max-h-[90vh] overflow-y-auto">
+ <div className="w-full max-w-lg rounded-lg bg-card shadow-2xl border p-6 max-h-[90vh] overflow-y-auto">
  <div className="flex items-center justify-between mb-5">
  <h2 className="text-lg font-bold">Post a Listing</h2>
- <button onClick={onClose} className="text-muted-foreground hover:text-ink-deep p-1 rounded-md">
+ <button onClick={onClose} className="text-muted-foreground hover:text-foreground p-1 rounded-md">
  ✕
  </button>
  </div>
@@ -80,7 +80,7 @@ export function CreateListingModal({ onClose }: CreateListingModalProps) {
  value={form.title}
  onChange={update("title")}
  placeholder="What are you selling?"
- className="w-full rounded-lg border bg-canvas px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+ className="w-full rounded-lg border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
  />
  </div>
 
@@ -94,7 +94,7 @@ export function CreateListingModal({ onClose }: CreateListingModalProps) {
  value={form.description}
  onChange={update("description")}
  placeholder="Describe your item, include any relevant details"
- className="w-full rounded-lg border bg-canvas px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+ className="w-full rounded-lg border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
  />
  </div>
 
@@ -105,7 +105,7 @@ export function CreateListingModal({ onClose }: CreateListingModalProps) {
  <select
  value={form.category}
  onChange={update("category")}
- className="w-full rounded-lg border bg-canvas px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+ className="w-full rounded-lg border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
  >
  {CATEGORIES.map((c) => (
  <option key={c} value={c}>
@@ -119,7 +119,7 @@ export function CreateListingModal({ onClose }: CreateListingModalProps) {
  <select
  value={form.condition}
  onChange={update("condition")}
- className="w-full rounded-lg border bg-canvas px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+ className="w-full rounded-lg border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
  >
  {CONDITIONS.map((c) => (
  <option key={c.value} value={c.value}>
@@ -141,7 +141,7 @@ export function CreateListingModal({ onClose }: CreateListingModalProps) {
  value={form.price}
  onChange={update("price")}
  placeholder="0.00 for free"
- className="w-full rounded-lg border bg-canvas px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+ className="w-full rounded-lg border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
  />
  </div>
  <div className="space-y-1">
@@ -150,7 +150,7 @@ export function CreateListingModal({ onClose }: CreateListingModalProps) {
  value={form.university}
  onChange={update("university")}
  placeholder="e.g. MIT"
- className="w-full rounded-lg border bg-canvas px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+ className="w-full rounded-lg border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
  />
  </div>
  </div>

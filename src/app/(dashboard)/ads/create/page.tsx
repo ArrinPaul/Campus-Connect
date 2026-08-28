@@ -80,7 +80,7 @@ export default function CreateAdPage() {
 
  return (
  <div className="max-w-4xl mx-auto py-8 px-4">
- <Link href="/ads/dashboard" className="flex items-center gap-2 text-sm text-slate hover:text-ink-deep mb-4">
+ <Link href="/ads/dashboard" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4">
  <ArrowLeft className="h-4 w-4" />
  Back to Ad Dashboard
  </Link>
@@ -103,8 +103,8 @@ export default function CreateAdPage() {
  <SettingsSection title="Targeting" description="Who do you want to see your ad?">
  <Input label="Target University (optional)" name="targetUniversity" value={formData.targetUniversity} onChange={handleChange} placeholder="e.g., Harvard" />
  <div>
- <label className="block text-sm font-medium text-ink-deep">Target Role (optional)</label>
- <select name="targetRole" value={formData.targetRole} onChange={handleChange} className="w-full mt-1 px-3 py-2 text-sm bg-canvas rounded-md focus:outline-none focus:ring-1 focus:ring-primary border border-hairline">
+ <label className="block text-sm font-medium text-foreground">Target Role (optional)</label>
+ <select name="targetRole" value={formData.targetRole} onChange={handleChange} className="w-full mt-1 px-3 py-2 text-sm bg-canvas rounded-md focus:outline-none focus:ring-1 focus:ring-primary border border-border">
  <option value="">Any Role</option>
  <option value="Student">Student</option>
  <option value="Research Scholar">Research Scholar</option>

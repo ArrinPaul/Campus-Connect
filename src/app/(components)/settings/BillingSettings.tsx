@@ -60,7 +60,7 @@ export function BillingSettings() {
       </div>
 
       {/* Current Plan Card */}
-      <div className={`rounded-xl border p-6 ${
+      <div className={`rounded-lg border p-6 ${
         isPro ? 'bg-gradient-to-br from-yellow-900/20 to-amber-900/10 border-yellow-800/50' : 'bg-zinc-900 border-zinc-800'
       }`}>
         <div className="flex items-center justify-between mb-4">
@@ -141,7 +141,7 @@ export function BillingSettings() {
             return (
               <div
                 key={feature.label}
-                className={`rounded-xl border p-4 flex items-start gap-3 ${
+                className={`rounded-lg border p-4 flex items-start gap-3 ${
                   isPro
                     ? 'bg-zinc-900 border-zinc-800'
                     : 'bg-zinc-900/50 border-zinc-800/50'
@@ -164,7 +164,7 @@ export function BillingSettings() {
       </div>
 
       {/* Billing History Section */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-5">
         <h3 className="font-medium text-white mb-3">Billing History</h3>
         {isPro ? (
           <div className="text-sm text-zinc-400">
@@ -180,7 +180,7 @@ export function BillingSettings() {
 
       {/* Payment Method */}
       {isPro && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-5">
           <h3 className="font-medium text-white mb-3">Payment Method</h3>
           <div className="flex items-center gap-3 text-sm text-zinc-400">
             <CreditCard className="w-5 h-5 text-zinc-500" />

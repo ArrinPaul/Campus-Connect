@@ -99,7 +99,7 @@ export function ChatInput({ onSendMessage, disabled, placeholder = "Type a messa
   }
 
   return (
-    <div className="relative p-4 bg-surface-soft border-t border-hairline flex flex-col gap-2">
+    <div className="relative p-4 bg-card border-t border-border flex flex-col gap-2">
       {/* Hidden File Inputs */}
       <input
         type="file"
@@ -118,7 +118,7 @@ export function ChatInput({ onSendMessage, disabled, placeholder = "Type a messa
 
       {/* Emoji Picker Popover */}
       {showEmojiPicker && (
-        <div className="absolute bottom-16 right-12 z-30 bg-card border border-border rounded-xl shadow-xl p-3 w-64 animate-in fade-in zoom-in duration-150">
+        <div className="absolute bottom-16 right-12 z-30 bg-card border border-border rounded-lg shadow-xl p-3 w-64 animate-in fade-in zoom-in duration-150">
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-border">
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Emojis</span>
             <button
@@ -200,7 +200,7 @@ export function ChatInput({ onSendMessage, disabled, placeholder = "Type a messa
             placeholder={placeholder}
             disabled={disabled}
             className={cn(
-              "w-full resize-none bg-canvas border-none rounded-2xl px-4 py-2.5 text-[15px] text-ink-deep placeholder:text-slate focus:outline-none focus:ring-0 transition-all max-h-32 scrollbar-custom pr-10",
+              "w-full resize-none bg-card border-none rounded-lg px-4 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-0 transition-all max-h-32 scrollbar-custom pr-10",
               disabled && "opacity-50 cursor-not-allowed"
             )}
             style={{ height: "44px" }}

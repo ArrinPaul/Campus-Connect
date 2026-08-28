@@ -113,7 +113,7 @@ const COMPONENTS: Components = {
  pre({ children, ...props }) {
  return (
  <pre
- className="my-3 overflow-x-auto rounded-lg bg-canvas p-4 text-sm text-ink-deep"
+ className="my-3 overflow-x-auto rounded-lg bg-card p-4 text-sm text-foreground"
  {...props}
  >
  {children}
@@ -133,7 +133,7 @@ const COMPONENTS: Components = {
  }
  return (
  <code
- className="rounded bg-canvas px-1 py-0.5 text-sm font-mono text-rose-600 dark:text-rose-400"
+ className="rounded bg-card px-1 py-0.5 text-sm font-mono text-rose-600 dark:text-rose-400"
  {...props}
  >
  {children}
@@ -145,7 +145,7 @@ const COMPONENTS: Components = {
  blockquote({ children, ...props }) {
  return (
  <blockquote
- className="my-3 border-l-4 border-primary/50 pl-4 italic text-slate"
+ className="my-3 border-l-4 border-primary/50 pl-4 italic text-muted-foreground"
  {...props}
  >
  {children}
@@ -158,7 +158,7 @@ const COMPONENTS: Components = {
  return (
  <div className="my-3 overflow-x-auto">
  <table
- className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-hairline rounded-lg text-sm"
+ className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-border rounded-lg text-sm"
  {...props}
  >
  {children}
@@ -169,7 +169,7 @@ const COMPONENTS: Components = {
  th({ children, ...props }) {
  return (
  <th
- className="bg-canvas px-4 py-2 text-left text-xs font-semibold text-slate uppercase tracking-wide"
+ className="bg-card px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide"
  {...props}
  >
  {children}
@@ -179,7 +179,7 @@ const COMPONENTS: Components = {
  td({ children, ...props }) {
  return (
  <td
- className="border-t border-hairline px-4 py-2 text-ink-deep"
+ className="border-t border-border px-4 py-2 text-foreground"
  {...props}
  >
  {children}
@@ -191,7 +191,7 @@ const COMPONENTS: Components = {
  hr(props) {
  return (
  <hr
- className="my-4 border-hairline"
+ className="my-4 border-border"
  {...props}
  />
  )

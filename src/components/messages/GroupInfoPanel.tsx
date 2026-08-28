@@ -166,15 +166,15 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
  )
 
  return (
- <div className="fixed inset-y-0 right-0 z-40 w-80 bg-surface-soft border-l border-hairline shadow-xl flex flex-col">
+ <div className="fixed inset-y-0 right-0 z-40 w-80 bg-card border-l border-border shadow-xl flex flex-col">
  {/* Header */}
- <div className="flex items-center justify-between p-4 border-b border-hairline">
- <h3 className="text-lg font-bold text-ink-deep">
+ <div className="flex items-center justify-between p-4 border-b border-border">
+ <h3 className="text-lg font-bold text-foreground">
  Group Info
  </h3>
  <button
  onClick={onClose}
- className="p-1 rounded-lg text-slate hover:text-ink-deep hover:bg-canvas"
+ className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-card"
  >
  <X className="h-5 w-5" />
  </button>
@@ -182,7 +182,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
 
  <div className="flex-1 overflow-y-auto">
  {/* Group Header */}
- <div className="p-4 text-center border-b border-hairline">
+ <div className="p-4 text-center border-b border-border">
  <div className="mx-auto h-16 w-16 rounded-full bg-accent-violet/10 flex items-center justify-center mb-3">
  {conversation.avatar ? (
  <Image
@@ -205,7 +205,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
  type="text"
  value={editName}
  onChange={(e) => setEditName(e.target.value)}
- className="w-full text-center text-sm px-3 py-1.5 rounded-lg border border-hairline bg-canvas text-ink-deep focus:outline-none focus:ring-2 focus:ring-primary"
+ className="w-full text-center text-sm px-3 py-1.5 rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
  maxLength={100}
  />
  <textarea
@@ -213,7 +213,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
  onChange={(e) => setEditDescription(e.target.value)}
  placeholder="Group description..."
  rows={2}
- className="w-full text-center text-xs px-3 py-1.5 rounded-lg border border-hairline bg-canvas text-ink-deep focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+ className="w-full text-center text-xs px-3 py-1.5 rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
  />
  <div className="flex gap-2 justify-center">
  <button
@@ -224,7 +224,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
  </button>
  <button
  onClick={() => setEditingInfo(false)}
- className="px-3 py-1 text-xs text-slate rounded-lg hover:bg-canvas"
+ className="px-3 py-1 text-xs text-muted-foreground rounded-lg hover:bg-card"
  >
  Cancel
  </button>
@@ -232,15 +232,15 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
  </div>
  ) : (
  <>
- <h4 className="text-lg font-semibold text-ink-deep">
+ <h4 className="text-lg font-semibold text-foreground">
  {conversation.name}
  </h4>
  {conversation.description && (
- <p className="text-sm text-slate mt-1">
+ <p className="text-sm text-muted-foreground mt-1">
  {conversation.description}
  </p>
  )}
- <p className="text-xs text-slate mt-1">
+ <p className="text-xs text-muted-foreground mt-1">
  {conversation.participants?.length || 0} members
  </p>
  {isAdmin && (
@@ -256,10 +256,10 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
  </div>
 
  {/* Pinned Messages Section */}
- <div className="border-b border-hairline">
+ <div className="border-b border-border">
  <button
  onClick={() => setShowPinned(!showPinned)}
- className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-ink-deep hover:bg-canvas"
+ className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-foreground hover:bg-card"
  >
  <span className="flex items-center gap-2">
  <Pin className="h-4 w-4" />
@@ -277,12 +277,12 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
  {pinnedMessages.map((msg: any) => (
  <div
  key={msg._id}
- className="p-2 bg-canvas rounded-lg text-sm"
+ className="p-2 bg-card rounded-lg text-sm"
  >
- <p className="text-xs font-medium text-slate">
+ <p className="text-xs font-medium text-muted-foreground">
  {msg.senderName}
  </p>
- <p className="text-ink-deep text-xs mt-0.5 line-clamp-2">
+ <p className="text-foreground text-xs mt-0.5 line-clamp-2">
  {msg.content}
  </p>
  </div>
@@ -292,10 +292,10 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
  </div>
 
  {/* Members Section */}
- <div className="border-b border-hairline">
+ <div className="border-b border-border">
  <button
  onClick={() => setShowMembers(!showMembers)}
- className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-ink-deep hover:bg-canvas"
+ className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-foreground hover:bg-card"
  >
  <span>Members ({conversation.participants?.length || 0})</span>
  {showMembers ? (
@@ -313,32 +313,32 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
  {showAddMember ? (
  <div className="space-y-2">
  <div className="relative">
- <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-slate" />
+ <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
  <input
  type="text"
  value={addMemberSearch}
  onChange={(e) => setAddMemberSearch(e.target.value)}
  placeholder="Search users..."
- className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-hairline bg-canvas text-ink-deep placeholder:text-slate focus:outline-none focus:ring-2 focus:ring-primary"
+ className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
  autoFocus
  />
  </div>
 
  {addMemberSearch.trim().length >= 2 && filteredSearchResults && (
- <div className="max-h-32 overflow-y-auto border border-hairline rounded-lg">
+ <div className="max-h-32 overflow-y-auto border border-border rounded-lg">
  {filteredSearchResults.length === 0 ? (
- <p className="text-xs text-slate p-2">No users found</p>
+ <p className="text-xs text-muted-foreground p-2">No users found</p>
  ) : (
  filteredSearchResults.map((user: any) => (
  <button
  key={user._id}
  onClick={() => handleAddMember(user._id)}
- className="w-full flex items-center gap-2 p-2 hover:bg-canvas text-left"
+ className="w-full flex items-center gap-2 p-2 hover:bg-card text-left"
  >
- <div className="h-6 w-6 rounded-full bg-canvas flex items-center justify-center text-[8px] font-medium">
+ <div className="h-6 w-6 rounded-full bg-card flex items-center justify-center text-[8px] font-medium">
  {getInitials(user.name)}
  </div>
- <span className="text-xs text-ink-deep truncate">
+ <span className="text-xs text-foreground truncate">
  {user.name}
  </span>
  </button>
@@ -352,7 +352,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
  setShowAddMember(false)
  setAddMemberSearch("")
  }}
- className="text-xs text-slate hover:text-ink-deep"
+ className="text-xs text-muted-foreground hover:text-foreground"
  >
  Cancel
  </button>
@@ -372,7 +372,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
  {conversation.participants?.map((member: any) => (
  <div
  key={member._id}
- className="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-canvas group"
+ className="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-card group"
  >
  {member.profilePicture ? (
  <Image
@@ -383,20 +383,20 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
  className="h-8 w-8 rounded-full object-cover"
  />
  ) : (
- <div className="h-8 w-8 rounded-full bg-canvas flex items-center justify-center text-xs font-medium text-slate">
+ <div className="h-8 w-8 rounded-full bg-card flex items-center justify-center text-xs font-medium text-muted-foreground">
  {getInitials(member.name)}
  </div>
  )}
 
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-1.5">
- <span className="text-sm font-medium text-ink-deep truncate">
+ <span className="text-sm font-medium text-foreground truncate">
  {member.name}
  </span>
  {getRoleBadge(member.role)}
  </div>
  {member.username && (
- <p className="text-[10px] text-slate">
+ <p className="text-[10px] text-muted-foreground">
  @{member.username}
  </p>
  )}
@@ -409,7 +409,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
  <button
  onClick={() => handlePromote(member._id)}
  title="Promote to admin"
- className="p-1 rounded text-slate hover:text-primary hover:bg-canvas"
+ className="p-1 rounded text-muted-foreground hover:text-primary hover:bg-card"
  >
  <ShieldCheck className="h-3.5 w-3.5" />
  </button>
@@ -418,7 +418,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
  <button
  onClick={() => handleDemote(member._id)}
  title="Demote from admin"
- className="p-1 rounded text-slate hover:text-amber-600 hover:bg-canvas"
+ className="p-1 rounded text-muted-foreground hover:text-amber-600 hover:bg-card"
  >
  <Shield className="h-3.5 w-3.5" />
  </button>
@@ -426,7 +426,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
  <button
  onClick={() => handleRemoveMember(member._id)}
  title="Remove member"
- className="p-1 rounded text-slate hover:text-critical hover:bg-canvas"
+ className="p-1 rounded text-muted-foreground hover:text-critical hover:bg-card"
  >
  <UserMinus className="h-3.5 w-3.5" />
  </button>

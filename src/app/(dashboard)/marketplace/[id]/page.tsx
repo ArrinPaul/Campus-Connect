@@ -107,7 +107,7 @@ export default function ListingDetailPage({ params }: PageProps) {
 
  return (
  <div className="max-w-4xl mx-auto py-8 px-4">
- <Link href="/marketplace" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-ink-deep mb-4">
+ <Link href="/marketplace" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4">
  <ArrowLeft className="h-4 w-4" />
  Back to marketplace
  </Link>
@@ -120,14 +120,14 @@ export default function ListingDetailPage({ params }: PageProps) {
  <div className="flex items-center justify-center h-full text-muted-foreground">No Image</div>
  )}
  {listing.status === 'sold' && (
- <div className="absolute inset-0 flex items-center justify-center bg-canvas/80 text-ink-deep font-bold text-2xl">
+ <div className="absolute inset-0 flex items-center justify-center bg-canvas/80 text-foreground font-bold text-2xl">
  SOLD
  </div>
  )}
  </div>
 
  <h1 className="text-3xl font-bold text-primary mb-2">{listing.title}</h1>
- <p className="text-2xl font-semibold text-ink-deep mb-4">${listing.price.toFixed(2)}</p>
+ <p className="text-2xl font-semibold text-foreground mb-4">${listing.price.toFixed(2)}</p>
  
  <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground my-4 border-y py-4">
  <div className="flex items-center gap-1.5"><Tag className="h-4 w-4" /> {listing.category}</div>

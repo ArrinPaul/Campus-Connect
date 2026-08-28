@@ -49,7 +49,7 @@ export default function ResearchDetailPage({ params }: PageProps) {
   const [reviewError, setReviewError] = useState('');
 
   if (paper === undefined) {
-    return <div className="text-center py-16 text-slate">Loading paper details...</div>;
+    return <div className="text-center py-16 text-muted-foreground">Loading paper details...</div>;
   }
 
   if (paper === null) {
@@ -113,7 +113,7 @@ export default function ResearchDetailPage({ params }: PageProps) {
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
-      <Link href="/research" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-ink-deep mb-4">
+      <Link href="/research" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4">
         <ArrowLeft className="h-4 w-4" />
         Back to research papers
       </Link>
@@ -143,13 +143,13 @@ export default function ResearchDetailPage({ params }: PageProps) {
         </div>
 
         {/* Voting & Review Action Bar */}
-        <div className="flex items-center gap-3 bg-canvas p-3 rounded-lg border border-hairline">
+        <div className="flex items-center gap-3 bg-canvas p-3 rounded-lg border border-border">
           <button
             type="button"
             onClick={handleVote}
             disabled={isVoting}
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-colors ${
-              hasVoted ? 'bg-primary text-on-primary' : 'bg-surface-soft text-slate hover:text-primary hover:bg-surface'
+              hasVoted ? 'bg-primary text-on-primary' : 'bg-card text-muted-foreground hover:text-primary hover:bg-surface'
             }`}
             title="Upvote preprint"
           >
@@ -160,7 +160,7 @@ export default function ResearchDetailPage({ params }: PageProps) {
           <button
             type="button"
             onClick={() => setShowReviewForm((v) => !v)}
-            className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold bg-surface-soft text-slate hover:text-primary hover:bg-surface transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold bg-card text-muted-foreground hover:text-primary hover:bg-surface transition-colors"
           >
             <MessageSquarePlus className="h-4 w-4" />
             <span>Peer Review ({currentReviews})</span>
@@ -169,18 +169,18 @@ export default function ResearchDetailPage({ params }: PageProps) {
 
         {/* Peer Review Form Modal/Drawer */}
         {showReviewForm && (
-          <form onSubmit={handleReviewSubmit} className="bg-canvas border border-hairline rounded-xl p-4 space-y-4 animate-in">
+          <form onSubmit={handleReviewSubmit} className="bg-canvas border border-border rounded-lg p-4 space-y-4 animate-in">
             <div className="flex items-center justify-between border-b pb-2">
-              <h3 className="font-semibold text-sm text-ink-deep flex items-center gap-1.5">
+              <h3 className="font-semibold text-sm text-foreground flex items-center gap-1.5">
                 <Star className="h-4 w-4 text-amber-500 fill-amber-500" /> Submit Peer Review
               </h3>
-              <button type="button" onClick={() => setShowReviewForm(false)} className="text-xs text-slate hover:text-ink-deep">
+              <button type="button" onClick={() => setShowReviewForm(false)} className="text-xs text-muted-foreground hover:text-foreground">
                 Cancel
               </button>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate mb-1">Overall Rating</label>
+              <label className="block text-xs font-semibold text-muted-foreground mb-1">Overall Rating</label>
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -189,19 +189,19 @@ export default function ResearchDetailPage({ params }: PageProps) {
                     onClick={() => setRating(star)}
                     className="p-1 text-amber-500 hover:scale-110 transition-transform"
                   >
-                    <Star className={`h-5 w-5 ${star <= rating ? 'fill-amber-500' : 'text-slate-300'}`} />
+                    <Star className={`h-5 w-5 ${star <= rating ? 'fill-amber-500' : 'text-muted-foreground-300'}`} />
                   </button>
                 ))}
-                <span className="text-xs text-slate ml-2">{rating} / 5</span>
+                <span className="text-xs text-muted-foreground ml-2">{rating} / 5</span>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate mb-1">Recommendation</label>
+              <label className="block text-xs font-semibold text-muted-foreground mb-1">Recommendation</label>
               <select
                 value={recommendation}
                 onChange={(e) => setRecommendation(e.target.value as any)}
-                className="w-full text-xs rounded-md border border-hairline bg-surface-soft p-2 focus:ring-1 focus:ring-primary"
+                className="w-full text-xs rounded-md border border-border bg-card p-2 focus:ring-1 focus:ring-primary"
               >
                 <option value="accept">Accept (High Quality)</option>
                 <option value="minor_revision">Minor Revision Needed</option>
@@ -211,13 +211,13 @@ export default function ResearchDetailPage({ params }: PageProps) {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate mb-1">Peer Review Feedback</label>
+              <label className="block text-xs font-semibold text-muted-foreground mb-1">Peer Review Feedback</label>
               <textarea
                 value={comments}
                 onChange={(e) => setComments(e.target.value)}
                 placeholder="Detail the methodology strengths, clarity, data reproducibility, and suggested improvements..."
                 rows={4}
-                className="w-full text-xs rounded-md border border-hairline bg-surface-soft p-2 focus:ring-1 focus:ring-primary"
+                className="w-full text-xs rounded-md border border-border bg-card p-2 focus:ring-1 focus:ring-primary"
               />
             </div>
 
@@ -248,7 +248,7 @@ export default function ResearchDetailPage({ params }: PageProps) {
 
         <div>
           <h3 className="font-bold text-lg mb-2">Abstract</h3>
-          <p className="whitespace-pre-wrap text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{paper.abstract}</p>
+          <p className="whitespace-pre-wrap text-sm text-muted-foreground-700 dark:text-muted-foreground-300 leading-relaxed">{paper.abstract}</p>
         </div>
 
         {paper.tags && paper.tags.length > 0 && (

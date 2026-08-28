@@ -22,7 +22,7 @@ export const UserCard = memo(function UserCard({ user }: UserCardProps) {
   const userId = user._id || (user as any).id || (user as any).userId;
  return (
  <Link href={`/profile/${userId}`}>
- <div className="flex items-start gap-3 rounded-lg border border-hairline bg-card p-3 transition-shadow hover:shadow-md dark:hover:shadow-gray-900/50 sm:gap-4 sm:p-4">
+ <div className="flex items-start gap-3 rounded-lg border border-border bg-card p-3 transition-shadow hover:shadow-md dark:hover:shadow-gray-900/50 sm:gap-4 sm:p-4">
  {/* Avatar */}
  <div className="relative h-10 w-10 flex-shrink-0 sm:h-12 sm:w-12">
  {user.profilePicture ? (
@@ -43,7 +43,7 @@ export const UserCard = memo(function UserCard({ user }: UserCardProps) {
 
  {/* User Info */}
  <div className="flex-1 min-w-0">
- <h3 className="text-sm font-semibold text-ink-deep truncate sm:text-base">{user.name}</h3>
+ <h3 className="text-sm font-semibold text-foreground truncate sm:text-base">{user.name}</h3>
  <div className="flex flex-col gap-1 mt-1 sm:flex-row sm:items-center sm:gap-2">
  <span className="text-xs rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary w-fit">
  {user.role}
@@ -61,7 +61,7 @@ export const UserCard = memo(function UserCard({ user }: UserCardProps) {
  {user.skills.slice(0, 5).map((skill) => (
  <span
  key={skill}
- className="text-xs rounded-full bg-muted px-2 py-0.5 text-ink-deep"
+ className="text-xs rounded-full bg-muted px-2 py-0.5 text-foreground"
  >
  {skill}
  </span>

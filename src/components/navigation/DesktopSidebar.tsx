@@ -35,7 +35,7 @@ export function DesktopSidebar() {
       
       {/* Current User Shortcut */}
       {isSignedIn && user && (
-        <Link href="/profile/me" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-accent transition-colors mb-4">
+        <Link href="/profile/me" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent transition-colors mb-4">
           <Avatar className="h-9 w-9">
             <AvatarImage src={user.profilePicture} alt={user.name} />
             <AvatarFallback className="bg-primary text-primary-foreground text-xs font-bold">
@@ -55,7 +55,7 @@ export function DesktopSidebar() {
               key={link.href}
               href={link.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors",
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors",
                 active ? "bg-accent" : "hover:bg-accent"
               )}
             >
@@ -88,3 +88,4 @@ export function DesktopSidebar() {
     </div>
   );
 }
+

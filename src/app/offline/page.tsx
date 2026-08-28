@@ -10,11 +10,11 @@ export const revalidate = false
 export default function OfflinePage() {
  return (
  <div className="flex min-h-screen flex-col items-center justify-center bg-canvas px-4 text-center">
- <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-muted">
+ <div className="flex h-20 w-20 items-center justify-center rounded-lg bg-muted">
  <WifiOff className="h-10 w-10 text-muted-foreground" />
  </div>
 
- <h1 className="mt-6 text-2xl font-bold tracking-tight text-ink-deep sm:text-3xl">
+ <h1 className="mt-6 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
  You&apos;re offline
  </h1>
 

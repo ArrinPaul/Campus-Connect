@@ -18,11 +18,11 @@ export function UserCard({ user }: Props) {
     return (
         <Link 
             href={`/profile/${userId}`} 
-            className="group block p-4 bg-surface-soft border border-hairline rounded-xl transition-all shadow-sm hover:shadow-md cursor-pointer"
+            className="group block p-4 bg-card border border-border rounded-lg transition-all shadow-sm hover:shadow-md cursor-pointer"
         >
             <div className="flex items-center gap-4">
                 {/* Avatar */}
-                <div className="h-14 w-14 rounded-full overflow-hidden border border-hairline bg-muted shadow-sm flex-shrink-0">
+                <div className="h-14 w-14 rounded-full overflow-hidden border border-border bg-muted shadow-sm flex-shrink-0">
                     {user.profilePicture ? (
                         <Image 
                             src={user.profilePicture} 
@@ -32,7 +32,7 @@ export function UserCard({ user }: Props) {
                             className="h-full w-full object-cover" 
                         />
                     ) : (
-                        <div className="h-full w-full flex items-center justify-center text-ink/20 font-bold text-xl uppercase">
+                        <div className="h-full w-full flex items-center justify-center text-foreground/20 font-bold text-xl uppercase">
                             {user.name.charAt(0)}
                         </div>
                     )}
@@ -41,17 +41,17 @@ export function UserCard({ user }: Props) {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2">
-                        <h3 className="text-[17px] font-bold text-ink-deep truncate group-hover:underline transition-colors">
+                        <h3 className="text-[17px] font-bold text-foreground truncate group-hover:underline transition-colors">
                             {user.name}
                         </h3>
                         {user.username && (
-                            <span className="text-caption text-ink-muted-48 truncate">
+                            <span className="text-caption text-foreground-muted-48 truncate">
                                 @{user.username}
                             </span>
                         )}
                     </div>
                     {user.bio && (
-                        <p className="text-xs text-slate mt-1 line-clamp-1">
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
                             {user.bio}
                         </p>
                     )}
@@ -63,7 +63,7 @@ export function UserCard({ user }: Props) {
                 </div>
 
                 {/* Indicator */}
-                <div className="flex-shrink-0 text-ink-muted-48 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                <div className="flex-shrink-0 text-foreground-muted-48 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
                     <ChevronRight size={20} />
                 </div>
             </div>

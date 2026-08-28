@@ -57,8 +57,8 @@ function Kbd({ children }: { children: React.ReactNode }) {
  className={[
 "inline-flex items-center justify-center",
 "min-w-[1.75rem] h-7 px-1.5",
-"rounded border border-hairline bg-canvas",
-"text-xs font-mono font-medium text-slate",
+"rounded border border-border bg-card",
+"text-xs font-mono font-medium text-muted-foreground",
 "shadow-sm",
  ].join("")}
  >
@@ -101,7 +101,7 @@ export function KeyboardShortcutsModal({
  <div className="mt-2 space-y-6 max-h-[60vh] overflow-y-auto pr-1 scrollbar-thin">
  {SHORTCUT_GROUPS.map((group) => (
  <section key={group.label} aria-label={group.label}>
- <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate">
+ <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
  {group.label}
  </h3>
  <dl className="space-y-2">
@@ -110,12 +110,12 @@ export function KeyboardShortcutsModal({
  key={s.description}
  className="flex items-center justify-between gap-4"
  >
- <dt className="text-sm text-ink-deep">{s.description}</dt>
+ <dt className="text-sm text-foreground">{s.description}</dt>
  <dd className="flex items-center gap-1 flex-shrink-0">
  {s.keys.map((key, i) => (
  <span key={key} className="flex items-center gap-1">
  {i > 0 && (
- <span className="text-xs text-slate" aria-label="then">
+ <span className="text-xs text-muted-foreground" aria-label="then">
  +
  </span>
  )}
@@ -130,7 +130,7 @@ export function KeyboardShortcutsModal({
  ))}
  </div>
 
- <div className="mt-4 flex justify-end border-t border-hairline pt-4">
+ <div className="mt-4 flex justify-end border-t border-border pt-4">
  <DialogClose asChild>
  <Button variant="secondary" size="sm">
  Close

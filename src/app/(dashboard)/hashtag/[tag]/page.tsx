@@ -17,9 +17,9 @@ type PageProps = {
 
 const HashtagPostsSkeleton = () => (
  <div className="space-y-4">
- <div className="h-24 w-full bg-canvas rounded-xl animate-pulse" />
- <div className="border border-hairline rounded-xl bg-surface-soft p-4 h-32 animate-pulse" />
- <div className="border border-hairline rounded-xl bg-surface-soft p-4 h-32 animate-pulse" />
+ <div className="h-24 w-full bg-canvas rounded-lg animate-pulse" />
+ <div className="border border-border rounded-lg bg-card p-4 h-32 animate-pulse" />
+ <div className="border border-border rounded-lg bg-card p-4 h-32 animate-pulse" />
  </div>
 );
 
@@ -36,17 +36,17 @@ function HashtagPageContent({ tag }: { tag: string }) {
  
  return (
  <div className="max-w-xl mx-auto py-8 px-4">
- <Link href="/explore" className="flex items-center gap-2 text-sm text-slate hover:text-ink-deep mb-4">
+ <Link href="/explore" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4">
  <ArrowLeft className="h-4 w-4" />
  Back to Explore
  </Link>
 
- <div className="bg-surface-soft border border-hairline rounded-xl p-6 mb-8">
+ <div className="bg-card border border-border rounded-lg p-6 mb-8">
  <div className="flex items-center gap-4">
  <Hash className="h-10 w-10 text-primary" />
  <div>
- <h1 className="text-3xl font-bold text-ink-deep">#{hashtag?.tag}</h1>
- <p className="text-sm text-slate">{hashtag?.postCount} posts</p>
+ <h1 className="text-3xl font-bold text-foreground">#{hashtag?.tag}</h1>
+ <p className="text-sm text-muted-foreground">{hashtag?.postCount} posts</p>
  </div>
  </div>
  </div>
@@ -58,8 +58,8 @@ function HashtagPageContent({ tag }: { tag: string }) {
  </div>
 
  {posts.length === 0 && (
- <div className="text-center py-16 text-slate">
- <h3 className="text-lg font-semibold text-ink-deep">No posts with this hashtag yet</h3>
+ <div className="text-center py-16 text-muted-foreground">
+ <h3 className="text-lg font-semibold text-foreground">No posts with this hashtag yet</h3>
  <p className="text-sm mt-2">Be the first to use #{hashtag?.tag}!</p>
  </div>
  )}

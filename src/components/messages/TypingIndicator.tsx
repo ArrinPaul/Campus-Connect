@@ -29,7 +29,7 @@ export function TypingIndicator({ users }: TypingIndicatorProps) {
  return (
  <div className="flex items-center gap-2 py-1.5 px-1">
  {/* Animated dots */}
- <div className="flex items-center gap-0.5 bg-canvas rounded-full px-3 py-2">
+ <div className="flex items-center gap-0.5 bg-card rounded-full px-3 py-2">
  <span
  className="w-1.5 h-1.5 bg-ink-deep/50 rounded-full animate-bounce"
  style={{ animationDelay:"0ms", animationDuration:"1s" }}
@@ -45,7 +45,7 @@ export function TypingIndicator({ users }: TypingIndicatorProps) {
  </div>
 
  {/* Typing text */}
- <span className="text-xs text-slate italic">
+ <span className="text-xs text-muted-foreground italic">
  {getTypingText()}...
  </span>
  </div>

@@ -25,7 +25,7 @@ export function MobileBottomNav() {
  );
 
  return (
- <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface-soft border-t border-hairline flex items-center justify-around px-2 z-50 pb-safe">
+ <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t border-border flex items-center justify-around px-2 z-50 pb-safe">
  {navItems.map((item) => {
  const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
  
@@ -35,11 +35,11 @@ export function MobileBottomNav() {
  href={item.href}
  className={cn(
 "flex flex-col items-center justify-center w-full h-full gap-1 transition-all duration-200 relative active:scale-[0.92] group",
- isActive ? "text-primary font-bold" : "text-slate hover:text-primary"
+ isActive ? "text-primary font-bold" : "text-muted-foreground hover:text-primary"
  )}
  >
  <item.icon className={cn("w-6 h-6 transition-transform duration-200 group-hover:scale-110", isActive ? "stroke-[2.5px] text-primary" : "stroke-2")} />
- <span className={cn("text-[10px] font-bold transition-colors", isActive ? "text-primary" : "text-slate group-hover:text-primary")}>
+ <span className={cn("text-[10px] font-bold transition-colors", isActive ? "text-primary" : "text-muted-foreground group-hover:text-primary")}>
  {item.label}
  </span>
  {item.href === '/notifications' && typeof unreadCount === 'number' && unreadCount > 0 && (

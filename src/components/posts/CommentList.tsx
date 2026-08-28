@@ -22,7 +22,7 @@ const CompactRichTextEditor = dynamic(
  ),
  {
  loading: () => (
- <div className="h-20 animate-pulse rounded-lg bg-canvas" />
+ <div className="h-20 animate-pulse rounded-lg bg-card" />
  ),
  ssr: false,
  }
@@ -182,7 +182,7 @@ export function CommentList({
  const isAtMaxDepth = depth >= MAX_INDENT_DEPTH
 
  return (
- <div key={comment._id} style={{ marginLeft: `${indentPx}px` }} className="border-l border-hairline pl-3 mt-3 first:mt-0 first:border-l-0 first:pl-0">
+ <div key={comment._id} style={{ marginLeft: `${indentPx}px` }} className="border-l border-border pl-3 mt-3 first:mt-0 first:border-l-0 first:pl-0">
  <div className="flex gap-3">
  {/* Author Avatar */}
  <div className="relative h-7 w-7 flex-shrink-0">
@@ -203,25 +203,25 @@ export function CommentList({
 
  {/* Comment body */}
  <div className="flex-1 min-w-0">
- <div className="rounded-lg bg-canvas px-3 py-2">
+ <div className="rounded-lg bg-card px-3 py-2">
  <div className="flex items-center justify-between gap-2 flex-wrap">
             {comment.author?._id ? (
               <Link
                 href={`/profile/${comment.author._id}`}
-                className="text-sm font-semibold text-ink-deep hover:underline"
+                className="text-sm font-semibold text-foreground hover:underline"
               >
                 {comment.author.name}
               </Link>
             ) : (
-              <p className="text-sm font-semibold text-ink-deep">
+              <p className="text-sm font-semibold text-foreground">
                 {comment.author?.name || "Unknown User"}
               </p>
             )}
- <span className="text-xs text-slate whitespace-nowrap">
+ <span className="text-xs text-muted-foreground whitespace-nowrap">
  {formatTimestamp(comment.createdAt)}
  </span>
  </div>
- <p className="mt-1 whitespace-pre-wrap text-sm text-ink-deep break-words">
+ <p className="mt-1 whitespace-pre-wrap text-sm text-foreground break-words">
  {parseMentions(comment.content).map((segment, index) => {
  if (segment.type ==="mention") {
  return (
@@ -270,7 +270,7 @@ export function CommentList({
  {replyCount > 0 && (
  <button
  onClick={() => toggleCollapse(comment._id)}
- className="text-xs text-slate hover:text-ink-deep flex items-center gap-1"
+ className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
  >
  {isCollapsed ? (
  <>
@@ -300,14 +300,14 @@ export function CommentList({
  {/* Inline reply composer */}
  {replyingTo === comment._id && (
  <div className="mt-2 space-y-2">
- <p className="text-xs text-slate">
+ <p className="text-xs text-muted-foreground">
  Replying to{""}
  <span className="font-medium text-primary">
  @{comment.author?.name ||"user"}
  </span>{""}
  <button
  onClick={() => { setReplyingTo(null); setReplyContent(""); setReplyError("") }}
- className="ml-1 text-slate hover:text-ink-deep"
+ className="ml-1 text-muted-foreground hover:text-foreground"
  >
  ✕ Cancel
  </button>
@@ -362,12 +362,12 @@ export function CommentList({
  <div className="space-y-2">
  {/* Sort header */}
  {comments.length > 0 && onSortChange && (
- <div className="flex items-center justify-between pb-1 border-b border-hairline">
- <span className="text-xs font-medium text-slate">
+ <div className="flex items-center justify-between pb-1 border-b border-border">
+ <span className="text-xs font-medium text-muted-foreground">
  {comments.length} comment{comments.length !== 1 ?"s" :""}
  </span>
  <div className="flex items-center gap-1">
- <span className="text-xs text-slate mr-1">Sort:</span>
+ <span className="text-xs text-muted-foreground mr-1">Sort:</span>
  {(["best","new","old","controversial"] as SortOption[]).map((opt) => (
  <button
  key={opt}
@@ -375,7 +375,7 @@ export function CommentList({
  className={`text-xs px-2 py-0.5 rounded-full capitalize transition-colors ${
  sortBy === opt
  ?"bg-primary text-on-primary"
- :"text-slate hover:text-primary"
+ :"text-muted-foreground hover:text-primary"
  }`}
  >
  {opt}
@@ -387,7 +387,7 @@ export function CommentList({
 
  {comments.length === 0 ? (
  <div className="py-8 text-center">
- <p className="text-sm text-slate">No comments yet. Be the first to comment!</p>
+ <p className="text-sm text-muted-foreground">No comments yet. Be the first to comment!</p>
  </div>
  ) : (
  <div className="space-y-3">

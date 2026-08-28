@@ -15,7 +15,7 @@ function MessagesPageContent() {
   return (
     <div className="flex h-[calc(100vh-61px)] md:h-[calc(100vh-56px)] w-full min-w-0 bg-canvas overflow-hidden">
       {/* Desktop: Two-column expanded layout */}
-      <div className="hidden md:flex flex-col w-72 xl:w-80 border-r border-hairline bg-surface-soft flex-shrink-0 h-full shadow-sm z-10">
+      <div className="hidden md:flex flex-col w-72 xl:w-80 border-r border-border bg-card flex-shrink-0 h-full shadow-sm z-10">
         <ConversationList selectedConversationId={selectedConversationId as Id<'conversations'> | null} />
       </div>
 

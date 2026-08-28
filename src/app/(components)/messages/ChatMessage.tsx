@@ -87,7 +87,7 @@ export function ChatMessage({ message, isOwn, showSenderInfo }: ChatMessageProps
         {/* Message Bubble Container */}
         <div
           className={cn(
-            "p-3.5 rounded-2xl text-sm shadow-sm transition-all overflow-hidden flex flex-col gap-2",
+            "p-3.5 rounded-lg text-sm shadow-sm transition-all overflow-hidden flex flex-col gap-2",
             isOwn
               ? "bg-primary text-primary-foreground rounded-br-xs"
               : "bg-card text-card-foreground border border-border/60 rounded-bl-xs"
@@ -95,7 +95,7 @@ export function ChatMessage({ message, isOwn, showSenderInfo }: ChatMessageProps
         >
           {/* Image Attachment */}
           {imageUrl && (
-            <div className="rounded-xl overflow-hidden border border-border/40 max-w-xs max-h-64 shadow-inner">
+            <div className="rounded-lg overflow-hidden border border-border/40 max-w-xs max-h-64 shadow-inner">
               <a href={imageUrl} target="_blank" rel="noopener noreferrer">
                 <OptimizedImage
                   src={imageUrl}
@@ -115,7 +115,7 @@ export function ChatMessage({ message, isOwn, showSenderInfo }: ChatMessageProps
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
-                "flex items-center gap-3 p-2.5 rounded-xl border transition-colors",
+                "flex items-center gap-3 p-2.5 rounded-lg border transition-colors",
                 isOwn
                   ? "bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/20"
                   : "bg-muted/50 border-border text-foreground hover:bg-muted"

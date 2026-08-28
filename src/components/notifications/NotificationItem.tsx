@@ -74,8 +74,8 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
  <button
  onClick={handleClick}
  className={cn(
-"w-full px-4 py-3 flex gap-3 text-left transition-all active:scale-[0.98] border-b border-hairline relative group",
- !notification.isRead ?"bg-surface-soft" :"bg-surface-soft hover:bg-canvas"
+"w-full px-4 py-3 flex gap-3 text-left transition-all active:scale-[0.98] border-b border-border relative group",
+ !notification.isRead ?"bg-card" :"bg-card hover:bg-card"
  )}
  >
  <div className="max-w-2xl mx-auto flex items-start gap-4">
@@ -88,7 +88,7 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
 
  {/* Actor Avatar */}
  <div className="relative flex-shrink-0">
- <div className="h-12 w-12 rounded-full overflow-hidden border border-hairline bg-canvas shadow-sm">
+ <div className="h-12 w-12 rounded-full overflow-hidden border border-border bg-card shadow-sm">
  {notification.actor?.profilePicture ? (
  <OptimizedImage
  src={notification.actor.profilePicture}
@@ -99,14 +99,14 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
  className="h-full w-full object-cover"
  />
  ) : (
- <div className="h-full w-full flex items-center justify-center text-slate font-bold text-lg">
+ <div className="h-full w-full flex items-center justify-center text-muted-foreground font-bold text-lg">
  {notification.actor?.name.charAt(0) ||"?"}
  </div>
  )}
  </div>
  
  {/* Notification Icon Badge */}
- <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-canvas border border-hairline flex items-center justify-center shadow-sm">
+ <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center shadow-sm">
  {getIcon()}
  </div>
  </div>
@@ -114,19 +114,19 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
  {/* Notification Content */}
  <div className="flex-1 min-w-0 py-0.5">
  <p className={cn(
-"text-sm text-ink-deep leading-snug",
+"text-sm text-foreground leading-snug",
  !notification.isRead ?"font-semibold" :"font-normal"
  )}>
  {notification.message}
  </p>
- <p className="text-xs text-slate mt-1 font-medium">
+ <p className="text-xs text-muted-foreground mt-1 font-medium">
  {formatDistanceToNow(notification.createdAt, { addSuffix: true })}
  </p>
  </div>
  
  {/* Right Arrow (Apple Style) */}
  <div className="flex-shrink-0 self-center opacity-0 group-hover:opacity-100 transition-opacity">
- <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="3" fill="none" className="text-slate">
+ <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="3" fill="none" className="text-muted-foreground">
  <path d="M9 18l6-6-6-6" />
  </svg>
  </div>

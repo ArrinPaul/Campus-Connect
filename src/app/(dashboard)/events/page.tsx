@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { Plus, Filter, Calendar } from 'lucide-react';
 import { useState } from 'react';
 
-const EventCardSkeleton = () => <div className="p-4 border border-hairline-soft rounded-xl bg-surface-soft h-[192px] animate-pulse" />;
+const EventCardSkeleton = () => <div className="p-4 border border-border/50 rounded-lg bg-card h-[192px] animate-pulse" />;
 
 export default function EventsPage() {
  const [eventTypeFilter, setEventTypeFilter] = useState('all'); // 'in_person', 'virtual', 'hybrid'
@@ -21,21 +21,21 @@ export default function EventsPage() {
  return (
  <div className="w-full bg-canvas min-h-screen">
  {/* Header Section */}
- <section className="bg-canvas py-section-sm px-base md:px-xl border-b border-hairline-soft">
+ <section className="bg-canvas py-section-sm px-base md:px-xl border-b border-border/50">
  <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-xl">
  <div className="max-w-2xl flex items-center gap-md">
- <div className="w-14 h-14 bg-surface-soft rounded-circle flex items-center justify-center shrink-0 border border-hairline">
- <Calendar className="w-7 h-7 text-ink-deep" />
+ <div className="w-14 h-14 bg-card rounded-circle flex items-center justify-center shrink-0 border border-border">
+ <Calendar className="w-7 h-7 text-foreground" />
  </div>
  <div>
- <h1 className="text-display-lg text-ink-deep mb-xs">Events.</h1>
- <p className="text-subtitle-md text-ink">Discover upcoming campus events and activities</p>
+ <h1 className="text-display-lg text-foreground mb-xs">Events.</h1>
+ <p className="text-subtitle-md text-foreground">Discover upcoming campus events and activities</p>
  </div>
  </div>
  <div className="flex gap-sm w-full md:w-auto">
  <button
  onClick={() => setShowCreateModal(true)}
- className="button-buy-cta flex-1 md:flex-none"
+ className="bg-primary text-white hover:bg-primary/90 font-semibold rounded-md px-4 py-2 shadow-sm transition-colors flex items-center justify-center flex-1 md:flex-none"
  >
  Create Event
  </button>
@@ -47,13 +47,13 @@ export default function EventsPage() {
  <section className="py-section-sm px-base md:px-xl">
  <div className="w-full max-w-6xl mx-auto space-y-xl">
  {/* Filter Controls */}
- <div className="flex items-center justify-between pb-md border-b border-hairline">
- <div className="flex items-center gap-2 w-full md:w-auto bg-surface-soft rounded-lg p-xs border border-hairline shrink-0">
- <Filter className="w-4 h-4 text-steel ml-2" />
+ <div className="flex items-center justify-between pb-md border-b border-border">
+ <div className="flex items-center gap-2 w-full md:w-auto bg-card rounded-lg p-xs border border-border shrink-0">
+ <Filter className="w-4 h-4 text-muted-foreground ml-2" />
  <select 
  value={eventTypeFilter} 
  onChange={(e) => setEventTypeFilter(e.target.value)}
- className="text-body-sm-bold text-ink bg-transparent px-3 py-1.5 focus:outline-none appearance-none cursor-pointer"
+ className="text-body-sm-bold text-foreground bg-transparent px-3 py-1.5 focus:outline-none appearance-none cursor-pointer"
  >
  <option value="all">All Event Types</option>
  <option value="in_person">In-Person</option>
@@ -71,7 +71,7 @@ export default function EventsPage() {
  )}
  
  {events && events.length > 0 && (
- <div className="text-caption-bold text-steel uppercase tracking-wide">
+ <div className="text-caption-bold text-muted-foreground uppercase tracking-wide">
  {events.length} {events.length === 1 ? 'Upcoming Event' : 'Upcoming Events'}
  </div>
  )}
@@ -83,10 +83,10 @@ export default function EventsPage() {
  </div>
  
  {events?.length === 0 && (
- <div className="text-center py-section bg-surface-soft rounded-xxxl border border-hairline-soft">
- <Calendar className="w-16 h-16 text-steel/50 mx-auto mb-md" />
- <h3 className="text-heading-lg text-ink-deep mb-sm">No upcoming events</h3>
- <p className="text-body-md text-steel max-w-sm mx-auto mb-xl">
+ <div className="text-center py-section bg-card rounded-lg border border-border/50">
+ <Calendar className="w-16 h-16 text-muted-foreground/50 mx-auto mb-md" />
+ <h3 className="text-heading-lg text-foreground mb-sm">No upcoming events</h3>
+ <p className="text-body-md text-muted-foreground max-w-sm mx-auto mb-6">
  Check back later or be the first to create a new event!
  </p>
  </div>

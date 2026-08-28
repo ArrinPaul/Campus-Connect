@@ -136,7 +136,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
   }
 
   return (
-    <div className="w-full bg-surface-soft border-b border-hairline shadow-sm">
+    <div className="w-full bg-card border-b border-border shadow-sm">
       {/* Cover Image / Gradient Area */}
       <div className="relative h-48 md:h-80 w-full max-w-[1096px] mx-auto bg-muted overflow-hidden md:rounded-b-lg">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-canvas/20" />
@@ -147,7 +147,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
       <div className="max-w-[1024px] mx-auto px-4 md:px-8 pb-4">
         <div className="relative flex flex-col md:flex-row items-center md:items-end -mt-16 md:-mt-8 md:mb-4">
           {/* Avatar */}
-          <div className="relative h-32 w-32 md:h-40 md:w-40 rounded-full border-4 border-surface-soft bg-surface-soft shadow-sm overflow-hidden flex-shrink-0 z-10 md:mr-6">
+          <div className="relative h-32 w-32 md:h-40 md:w-40 rounded-full border-4 border-surface-soft bg-card shadow-sm overflow-hidden flex-shrink-0 z-10 md:mr-6">
             {profilePicture ? (
               <Image
                 src={profilePicture}
@@ -158,7 +158,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
                 priority
               />
             ) : (
-              <div className="h-full w-full flex items-center justify-center text-ink/20 font-display text-6xl">
+              <div className="h-full w-full flex items-center justify-center text-foreground/20 font-display text-6xl">
                 {user.name.charAt(0).toUpperCase()}
               </div>
             )}
@@ -174,18 +174,18 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
           {/* User Info Section */}
           <div className="mt-4 md:mt-0 w-full flex flex-col md:flex-row justify-between items-center md:items-end gap-4 md:pb-4">
             <div className="flex-1 text-center md:text-left space-y-2">
-              <h1 className="text-heading-lg font-bold text-ink-deep leading-tight">
+              <h1 className="text-heading-lg font-bold text-foreground leading-tight">
                 {user.name}
               </h1>
               
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-semibold text-slate uppercase tracking-wider">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 <span className="text-primary">{user.role}</span>
-                <span className="border-l border-hairline pl-4">{user.university || "Global Academic"}</span>
-                <span className="border-l border-hairline pl-4">{user.experienceLevel}</span>
+                <span className="border-l border-border pl-4">{user.university || "Global Academic"}</span>
+                <span className="border-l border-border pl-4">{user.experienceLevel}</span>
               </div>
 
               {user.bio && (
-                <p className="text-body text-slate max-w-2xl mt-4 leading-relaxed italic">
+                <p className="text-body text-muted-foreground max-w-2xl mt-4 leading-relaxed italic">
                   &ldquo;{user.bio}&rdquo;
                 </p>
               )}
@@ -194,41 +194,41 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 mt-4 pt-4 w-full">
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="text-center md:text-left">
-                    <p className="text-tagline font-bold text-ink-deep">{followerCount}</p>
-                    <p className="text-[10px] text-slate uppercase font-semibold">Followers</p>
+                    <p className="text-tagline font-bold text-foreground">{followerCount}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase font-semibold">Followers</p>
                   </div>
-                  <div className="text-center md:text-left border-l border-hairline pl-4">
-                    <p className="text-tagline font-bold text-ink-deep">{followingCount}</p>
-                    <p className="text-[10px] text-slate uppercase font-semibold">Following</p>
+                  <div className="text-center md:text-left border-l border-border pl-4">
+                    <p className="text-tagline font-bold text-foreground">{followingCount}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase font-semibold">Following</p>
                   </div>
-                  <div className="text-center md:text-left border-l border-hairline pl-4">
+                  <div className="text-center md:text-left border-l border-border pl-4">
                     <p className="text-tagline font-bold text-primary flex items-center gap-1">
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>{reputation?.points ?? (user as any).reputation ?? 0}</span>
                     </p>
-                    <p className="text-[10px] text-slate uppercase font-semibold">Reputation (Lvl {reputation?.level ?? 1})</p>
+                    <p className="text-[10px] text-muted-foreground uppercase font-semibold">Reputation (Lvl {reputation?.level ?? 1})</p>
                   </div>
-                  <div className="text-center md:text-left border-l border-hairline pl-4">
+                  <div className="text-center md:text-left border-l border-border pl-4">
                     <p className="text-tagline font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
                       <Trophy className="w-3.5 h-3.5" />
                       <span>{reputation?.rank ? `#${reputation.rank}` : "â€”"}</span>
                     </p>
-                    <p className="text-[10px] text-slate uppercase font-semibold">Campus Rank</p>
+                    <p className="text-[10px] text-muted-foreground uppercase font-semibold">Campus Rank</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3 ml-auto">
                   {user.socialLinks?.website && (
-                    <a href={user.socialLinks.website} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-canvas text-slate transition-colors"><Globe size={18} /></a>
+                    <a href={user.socialLinks.website} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-card text-muted-foreground transition-colors"><Globe size={18} /></a>
                   )}
                   {user.socialLinks?.github && (
-                    <a href={user.socialLinks.github} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-canvas text-slate transition-colors"><Github size={18} /></a>
+                    <a href={user.socialLinks.github} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-card text-muted-foreground transition-colors"><Github size={18} /></a>
                   )}
                   {user.socialLinks?.linkedin && (
-                    <a href={user.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-canvas text-slate transition-colors"><Linkedin size={18} /></a>
+                    <a href={user.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-card text-muted-foreground transition-colors"><Linkedin size={18} /></a>
                   )}
                   {user.socialLinks?.twitter && (
-                    <a href={user.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-canvas text-slate transition-colors"><Twitter size={18} /></a>
+                    <a href={user.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-card text-muted-foreground transition-colors"><Twitter size={18} /></a>
                   )}
                 </div>
               </div>
@@ -236,7 +236,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
               {/* Achievement Badges Row */}
               {reputation?.badges && reputation.badges.length > 0 && (
                 <div className="flex flex-wrap items-center gap-2 pt-4 w-full">
-                  <span className="text-[10px] font-bold text-slate uppercase tracking-wider mr-1">Badges:</span>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mr-1">Badges:</span>
                   {reputation.badges.map((b: any) => (
                     <div
                       key={b.id}
@@ -330,18 +330,18 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
  </div>
 
  {/* Tabs - Apple Style */}
- <div className="w-full flex items-center justify-center md:justify-start gap-8 h-12 border-t border-hairline overflow-x-auto scrollbar-none">
- <button className="relative h-full flex items-center text-xs text-slate font-semibold text-primary whitespace-nowrap">
+ <div className="w-full flex items-center justify-center md:justify-start gap-8 h-12 border-t border-border overflow-x-auto scrollbar-none">
+ <button className="relative h-full flex items-center text-xs text-muted-foreground font-semibold text-primary whitespace-nowrap">
  Posts
  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full" />
  </button>
- <button className="h-full flex items-center text-xs text-slate font-semibold hover:text-ink-deep transition-colors whitespace-nowrap">
+ <button className="h-full flex items-center text-xs text-muted-foreground font-semibold hover:text-foreground transition-colors whitespace-nowrap">
  Activity
  </button>
- <button className="h-full flex items-center text-xs text-slate font-semibold hover:text-ink-deep transition-colors whitespace-nowrap">
+ <button className="h-full flex items-center text-xs text-muted-foreground font-semibold hover:text-foreground transition-colors whitespace-nowrap">
  Portfolio
  </button>
- <button className="h-full flex items-center text-xs text-slate font-semibold hover:text-ink-deep transition-colors whitespace-nowrap">
+ <button className="h-full flex items-center text-xs text-muted-foreground font-semibold hover:text-foreground transition-colors whitespace-nowrap">
  Skills
  </button>
  </div>
@@ -351,12 +351,12 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
  {showEditModal && (
  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowEditModal(false)}>
  <div
- className="bg-surface-soft border border-hairline rounded-lg shadow-sm w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto"
+ className="bg-card border border-border rounded-lg shadow-sm w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto"
  onClick={(e) => e.stopPropagation()}
  >
- <div className="flex items-center justify-between p-lg border-b border-hairline">
- <h2 className="text-display-md text-ink-deep">Edit Profile</h2>
- <button onClick={() => setShowEditModal(false)} className="p-2 rounded-full hover:bg-canvas text-slate transition-colors">
+ <div className="flex items-center justify-between p-lg border-b border-border">
+ <h2 className="text-display-md text-foreground">Edit Profile</h2>
+ <button onClick={() => setShowEditModal(false)} className="p-2 rounded-full hover:bg-card text-muted-foreground transition-colors">
  <X className="h-5 w-5" />
  </button>
  </div>
@@ -381,16 +381,16 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
   {showAddCourseModal && (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowAddCourseModal(false)}>
       <div
-        className="bg-surface-soft border border-hairline rounded-lg shadow-sm w-full max-w-sm mx-4 p-6"
+        className="bg-card border border-border rounded-lg shadow-sm w-full max-w-sm mx-4 p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-display-md text-ink-deep">Add Course</h2>
-          <button onClick={() => setShowAddCourseModal(false)} className="p-2 rounded-full hover:bg-canvas text-slate transition-colors">
+          <h2 className="text-display-md text-foreground">Add Course</h2>
+          <button onClick={() => setShowAddCourseModal(false)} className="p-2 rounded-full hover:bg-card text-muted-foreground transition-colors">
             <X className="h-5 w-5" />
           </button>
         </div>
-        <p className="text-body-sm text-steel mb-4">
+        <p className="text-body-sm text-muted-foreground mb-4">
           Enter your course code (e.g., CS101, BIO205) to automatically join its community and connect with classmates.
         </p>
         <div className="space-y-4">
@@ -399,7 +399,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
             placeholder="Course Code"
             value={courseCode}
             onChange={(e) => setCourseCode(e.target.value.toUpperCase())}
-            className="w-full px-4 h-12 bg-canvas border border-hairline rounded-lg text-ink focus:outline-none focus:border-fb-blue transition-colors"
+            className="w-full px-4 h-12 bg-card border border-border rounded-lg text-foreground focus:outline-none focus:border-fb-blue transition-colors"
           />
           <Button
             onClick={handleAddCourse}

@@ -46,8 +46,8 @@ export function SkillsStep({ data, updateFormData, prevStep, submit }: Props) {
 
     return (
         <div>
-            <h1 className="text-[28px] font-bold text-ink-deep mb-2">What are your skills?</h1>
-            <p className="text-[15px] text-slate mb-6">Select a few skills to help others understand your expertise. You can add more later.</p>
+            <h1 className="text-[28px] font-bold text-foreground mb-2">What are your skills?</h1>
+            <p className="text-[15px] text-muted-foreground mb-6">Select a few skills to help others understand your expertise. You can add more later.</p>
 
             <div className="flex flex-wrap gap-2">
                 {PREDEFINED_SKILLS.map(skill => (

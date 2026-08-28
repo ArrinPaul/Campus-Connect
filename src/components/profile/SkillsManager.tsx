@@ -83,7 +83,7 @@ export function SkillsManager({ skills, onUpdate }: SkillsManagerProps) {
  onChange={handleInputChange}
  maxLength={50}
  placeholder="Add a skill (e.g., React, Python, Machine Learning)"
- className="w-full rounded-md border border-hairline bg-card px-3 py-2 text-ink-deep shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
+ className="w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
  />
  {error && <p className="mt-1 text-sm text-critical dark:text-red-400">{error}</p>}
  </div>

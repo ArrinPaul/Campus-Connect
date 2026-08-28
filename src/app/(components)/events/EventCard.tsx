@@ -36,7 +36,7 @@ export function EventCard({ event }: Props) {
     const eventTypeIcon = event.eventType === 'virtual' ? Video : event.eventType === 'in_person' ? MapPin : Globe;
 
     return (
-        <Link href={`/events/${event._id}`} className="block p-4 border border-hairline rounded-xl bg-surface-soft hover:bg-canvas transition-colors">
+        <Link href={`/events/${event._id}`} className="block p-4 border border-border rounded-lg bg-card hover:bg-card transition-colors">
             <h3 className="font-bold text-lg text-primary line-clamp-2">{event.title}</h3>
             <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{event.description}</p>
             

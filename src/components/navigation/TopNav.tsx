@@ -17,7 +17,7 @@ export function TopNav() {
 
   const mainLinks = [
     { href: "/feed", icon: Home, label: "Home" },
-    { href: "/communities", icon: Users, label: "Communities" },
+    { href: "/communities", icon: Users, label: "Groups" },
     { href: "/jobs", icon: Briefcase, label: "Jobs" },
     { href: "/marketplace", icon: Store, label: "Marketplace" },
   ];
@@ -53,7 +53,7 @@ export function TopNav() {
                 className="relative h-full flex flex-col items-center justify-center w-24 group px-1"
               >
                 <div className={cn(
-                  "flex items-center justify-center w-full h-11 rounded-xl transition-colors",
+                  "flex items-center justify-center w-full h-11 rounded-lg transition-colors",
                   !active && "group-hover:bg-accent"
                 )}>
                   <link.icon className={cn(
@@ -104,3 +104,4 @@ export function TopNav() {
     </header>
   );
 }
+

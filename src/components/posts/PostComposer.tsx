@@ -17,7 +17,7 @@ const RichTextEditor = dynamic(
  () => import("@/components/editor/RichTextEditor").then((m) => m.RichTextEditor),
  {
  loading: () => (
- <div className="h-32 animate-pulse rounded-lg bg-canvas" />
+ <div className="h-32 animate-pulse rounded-lg bg-card" />
  ),
  ssr: false,
  }
@@ -462,7 +462,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
  return (
  <form
  onSubmit={handleSubmit}
- className="bg-surface-soft border border-hairline rounded-xl mb-4 p-4 space-y-4 shadow-sm"
+ className="bg-card border border-border rounded-lg mb-4 p-4 space-y-4 shadow-sm"
  >
   {/* Hidden file inputs */}
   <input
@@ -508,7 +508,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
 
  <div className="flex gap-3">
   {user && (
-    <div className="h-10 w-10 shrink-0 rounded-full bg-muted overflow-hidden border border-hairline mt-1">
+    <div className="h-10 w-10 shrink-0 rounded-full bg-muted overflow-hidden border border-border mt-1">
       {user.profilePicture ? (
         <img src={user.profilePicture} alt={user.name} className="h-full w-full object-cover" />
       ) : (
@@ -530,21 +530,21 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
 
  {/* Hashtag autocomplete */}
  {showHashtagAutocomplete && hashtagSuggestions && hashtagSuggestions.length > 0 && (
- <div className="absolute z-50 mt-1 w-64 bg-surface-soft border border-hairline rounded-xl shadow-product overflow-hidden">
+ <div className="absolute z-50 mt-1 w-64 bg-card border border-border rounded-lg shadow-product overflow-hidden">
  <ul className="py-1">
  {hashtagSuggestions.map((hashtag: any, index: any) => (
  <li
  key={hashtag._id}
  className={cn(
-"px-4 py-2 cursor-pointer text-xs text-slate transition-colors",
- index === selectedHashtagIndex ?"bg-canvas text-primary" :"text-ink-deep hover:bg-canvas"
+"px-4 py-2 cursor-pointer text-xs text-muted-foreground transition-colors",
+ index === selectedHashtagIndex ?"bg-card text-primary" :"text-foreground hover:bg-card"
  )}
  onClick={() => insertHashtag(hashtag.tag)}
  onMouseEnter={() => setSelectedHashtagIndex(index)}
  >
  <div className="flex items-center justify-between font-semibold">
  <span>#{hashtag.tag}</span>
- <span className="text-[10px] text-slate">{hashtag.postCount}</span>
+ <span className="text-[10px] text-muted-foreground">{hashtag.postCount}</span>
  </div>
  </li>
  ))}
@@ -567,12 +567,12 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
  </div>
 
   {/* Media Toolbar */}
-  <div className="flex items-center gap-xs border-t border-hairline pt-sm flex-wrap">
+  <div className="flex items-center gap-xs border-t border-border pt-sm flex-wrap">
   <button
   type="button"
   onClick={() => imageInputRef.current?.click()}
   disabled={!!attachedType && attachedType !== "image"}
-  className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-slate hover:bg-canvas hover:text-primary transition-colors disabled:opacity-30"
+  className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-card hover:text-primary transition-colors disabled:opacity-30"
   title="Attach photos"
   >
   <ImageIcon className="h-4 w-4" />
@@ -583,7 +583,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
   type="button"
   onClick={() => videoInputRef.current?.click()}
   disabled={!!attachedType && attachedType !== "video"}
-  className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-slate hover:bg-canvas hover:text-primary transition-colors disabled:opacity-30"
+  className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-card hover:text-primary transition-colors disabled:opacity-30"
   title="Attach video"
   >
   <Video className="h-4 w-4" />
@@ -594,7 +594,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
   type="button"
   onClick={() => fileInputRef.current?.click()}
   disabled={!!attachedType && attachedType !== "file"}
-  className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-slate hover:bg-canvas hover:text-primary transition-colors disabled:opacity-30"
+  className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-card hover:text-primary transition-colors disabled:opacity-30"
   title="Attach document"
   >
   <FileText className="h-4 w-4" />
@@ -606,7 +606,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
   onClick={() => setShowPollUI((v) => !v)}
   className={cn(
   "active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
-  showPollUI ? "bg-canvas text-primary" : "text-slate hover:bg-canvas hover:text-primary"
+  showPollUI ? "bg-card text-primary" : "text-muted-foreground hover:bg-card hover:text-primary"
   )}
   title="Create poll"
   >
@@ -615,7 +615,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
   </button>
 
  {isFetchingPreview && (
- <div className="ml-auto flex items-center gap-1.5 text-xs text-slate italic">
+ <div className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground italic">
  <Loader2 className="h-3.5 w-3.5 animate-spin" />
  <span>Fetching preview...</span>
  </div>
@@ -624,15 +624,15 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
 
  {/* Poll Creator */}
  {showPollUI && (
- <div className="rounded-lg border border-hairline bg-canvas p-md space-y-md animate-in">
+ <div className="rounded-lg border border-border bg-card p-md space-y-md animate-in">
  <div className="flex items-center justify-between">
- <span className="font-semibold text-xs text-ink-deep flex items-center gap-1.5">
+ <span className="font-semibold text-xs text-foreground flex items-center gap-1.5">
  <BarChart2 className="h-4 w-4" /> Create Poll
  </span>
  <button
  type="button"
  onClick={() => setShowPollUI(false)}
- className="text-slate hover:text-ink-deep transition-colors"
+ className="text-muted-foreground hover:text-foreground transition-colors"
  >
  <X className="h-4 w-4" />
  </button>
@@ -649,7 +649,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
  setPollOptions(next);
  }}
  placeholder={`Option ${i + 1}`}
- className="w-full rounded-sm border border-hairline bg-canvas px-3 py-2 text-xs text-slate focus:outline-none focus:ring-1 focus:ring-primary"
+ className="w-full rounded-sm border border-border bg-card px-3 py-2 text-xs text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
  />
  ))}
  {pollOptions.length < 5 && (
@@ -669,7 +669,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
   {attachedType === "image" && filePreviews.length > 0 && (
     <div className="flex flex-wrap gap-2">
       {filePreviews.map((src, i) => (
-        <div key={i} className="relative h-20 w-20 rounded-xl overflow-hidden border border-hairline shadow-sm group">
+        <div key={i} className="relative h-20 w-20 rounded-lg overflow-hidden border border-border shadow-sm group">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={src} alt={`Preview ${i + 1}`} className="h-full w-full object-cover" />
           <button
@@ -687,20 +687,20 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
 
   {/* Video Preview */}
   {attachedType === "video" && attachedFiles.length > 0 && (
-    <div className="relative rounded-xl overflow-hidden border border-hairline bg-canvas p-2 flex items-center justify-between">
+    <div className="relative rounded-lg overflow-hidden border border-border bg-card p-2 flex items-center justify-between">
       <div className="flex items-center gap-3 min-w-0">
         <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
           <Video className="h-5 w-5" />
         </div>
         <div className="min-w-0">
-          <p className="text-xs font-semibold text-ink-deep truncate">{attachedFiles[0].name}</p>
-          <p className="text-[10px] text-slate">{(attachedFiles[0].size / (1024 * 1024)).toFixed(2)} MB</p>
+          <p className="text-xs font-semibold text-foreground truncate">{attachedFiles[0].name}</p>
+          <p className="text-[10px] text-muted-foreground">{(attachedFiles[0].size / (1024 * 1024)).toFixed(2)} MB</p>
         </div>
       </div>
       <button
         type="button"
         onClick={() => removeFile(0)}
-        className="rounded-full p-1.5 text-slate hover:bg-surface-soft hover:text-ink-deep transition-colors"
+        className="rounded-full p-1.5 text-muted-foreground hover:bg-card hover:text-foreground transition-colors"
         title="Remove video"
       >
         <X className="h-4 w-4" />
@@ -712,20 +712,20 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
   {attachedType === "file" && attachedFiles.length > 0 && (
     <div className="space-y-2">
       {attachedFiles.map((file, i) => (
-        <div key={i} className="rounded-xl border border-hairline bg-canvas p-3 flex items-center justify-between">
+        <div key={i} className="rounded-lg border border-border bg-card p-3 flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="h-9 w-9 rounded-lg bg-surface-soft flex items-center justify-center text-slate shrink-0 border border-hairline">
+            <div className="h-9 w-9 rounded-lg bg-card flex items-center justify-center text-muted-foreground shrink-0 border border-border">
               <FileText className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-semibold text-ink-deep truncate">{file.name}</p>
-              <p className="text-[10px] text-slate">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+              <p className="text-xs font-semibold text-foreground truncate">{file.name}</p>
+              <p className="text-[10px] text-muted-foreground">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
             </div>
           </div>
           <button
             type="button"
             onClick={() => removeFile(i)}
-            className="rounded-full p-1.5 text-slate hover:bg-surface-soft hover:text-ink-deep transition-colors"
+            className="rounded-full p-1.5 text-muted-foreground hover:bg-card hover:text-foreground transition-colors"
             title="Remove document"
           >
             <X className="h-4 w-4" />
@@ -737,21 +737,21 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
 
   {/* Link Preview Chip */}
   {linkPreviewData && !attachedType && (
-    <div className="relative rounded-xl border border-hairline bg-canvas p-3">
+    <div className="relative rounded-lg border border-border bg-card p-3">
       <button
         type="button"
         onClick={() => {
           setLinkPreviewData(null)
           setDetectedLink(null)
         }}
-        className="absolute top-2 right-2 rounded-full p-1 text-slate hover:bg-surface-soft transition-colors"
+        className="absolute top-2 right-2 rounded-full p-1 text-muted-foreground hover:bg-card transition-colors"
         title="Remove link preview"
       >
         <X className="h-3.5 w-3.5" />
       </button>
       <p className="text-xs font-semibold text-primary truncate pr-6">{linkPreviewData.title || linkPreviewData.url}</p>
       {linkPreviewData.description && (
-        <p className="text-[11px] text-slate line-clamp-2 mt-0.5">{linkPreviewData.description}</p>
+        <p className="text-[11px] text-muted-foreground line-clamp-2 mt-0.5">{linkPreviewData.description}</p>
       )}
     </div>
   )}
@@ -759,7 +759,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
  {/* Uploading Status */}
  {isUploading && (
  <div className="space-y-xs animate-pulse">
- <div className="flex justify-between text-[10px] text-slate font-semibold">
+ <div className="flex justify-between text-[10px] text-muted-foreground font-semibold">
  <span>Uploading Assets</span>
  <span>{uploadProgress}%</span>
  </div>

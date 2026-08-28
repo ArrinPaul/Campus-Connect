@@ -96,10 +96,10 @@ export function BookmarkButton({
  whileTap={{ scale: 0.85 }}
  whileHover={{ scale: 1.05 }}
  onClick={handleToggleBookmark}
- className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all hover:bg-canvas ${
+ className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all hover:bg-card ${
  isBookmarked
  ?"text-primary"
- :"text-slate hover:text-primary"
+ :"text-muted-foreground hover:text-primary"
  } ${compact ?"px-2 py-1 text-sm" :""}`}
  aria-label={isBookmarked ?"Remove bookmark" :"Bookmark post"}
  >
@@ -114,7 +114,7 @@ export function BookmarkButton({
  {isBookmarked && (
  <DropdownMenuTrigger asChild>
  <button
- className="px-2 py-1.5 rounded-full text-xs text-slate hover:text-ink-deep hover:bg-canvas transition-colors"
+ className="px-2 py-1.5 rounded-full text-xs text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
  onClick={(e) => {
  e.stopPropagation()
  setShowCollectionMenu(true)
@@ -161,7 +161,7 @@ export function BookmarkButton({
  >
  <Bookmark className="h-4 w-4 mr-2" />
  {collection.name}
- <span className="ml-auto text-xs text-slate">
+ <span className="ml-auto text-xs text-muted-foreground">
  {collection.count}
  </span>
  {bookmarkDetails?.collectionName === collection.name && (

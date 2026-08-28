@@ -46,11 +46,11 @@ export function SuggestedUsers({ limit = 5, showSeeAll = false, className = "" }
   };
 
   return (
-    <div className={`rounded-xl border border-hairline bg-canvas p-4 shadow-sm ${className}`} data-testid="suggested-users-widget">
-      <div className="flex items-center justify-between pb-3 border-b border-hairline mb-3">
+    <div className={`rounded-lg border border-border bg-card p-4 shadow-sm ${className}`} data-testid="suggested-users-widget">
+      <div className="flex items-center justify-between pb-3 border-b border-border mb-3">
         <div className="flex items-center gap-2">
           <Users className="h-5 w-5 text-primary" />
-          <h3 className="font-semibold text-ink text-sm">Suggested Connections</h3>
+          <h3 className="font-semibold text-foreground text-sm">Suggested Connections</h3>
         </div>
         {showSeeAll && (
           <Link href="/find-partners" className="text-xs font-medium text-primary hover:underline">
@@ -65,13 +65,13 @@ export function SuggestedUsers({ limit = 5, showSeeAll = false, className = "" }
           {[...Array(3)].map((_, i) => (
             <div key={i} className="animate-pulse flex items-center justify-between py-1">
               <div className="flex items-center gap-2.5">
-                <div className="h-9 w-9 rounded-full bg-surface-soft"></div>
+                <div className="h-9 w-9 rounded-full bg-card"></div>
                 <div className="space-y-1">
-                  <div className="h-3.5 bg-surface-soft rounded w-20"></div>
-                  <div className="h-2.5 bg-surface-soft rounded w-14"></div>
+                  <div className="h-3.5 bg-card rounded w-20"></div>
+                  <div className="h-2.5 bg-card rounded w-14"></div>
                 </div>
               </div>
-              <div className="h-7 w-16 bg-surface-soft rounded-lg"></div>
+              <div className="h-7 w-16 bg-card rounded-lg"></div>
             </div>
           ))}
         </div>
@@ -90,7 +90,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = false, className = "" }
             return (
               <div
                 key={user.id}
-                className="flex items-center justify-between py-1 hover:bg-surface-soft/50 rounded-lg px-1.5 transition-colors"
+                className="flex items-center justify-between py-1 hover:bg-card/50 rounded-lg px-1.5 transition-colors"
                 data-testid={`suggested-user-${user.id}`}
               >
                 <Link href={`/profile/${user.id}`} className="flex items-center gap-2.5 min-w-0 flex-1 group">
@@ -110,7 +110,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = false, className = "" }
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-ink truncate group-hover:text-primary transition-colors">
+                    <p className="text-xs font-semibold text-foreground truncate group-hover:text-primary transition-colors">
                       {user.name}
                     </p>
                     <p className="text-[11px] text-charcoal truncate">
@@ -125,7 +125,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = false, className = "" }
                   disabled={isLoading || isFollowed}
                   className={`ml-2 flex items-center justify-center gap-1 rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
                     isFollowed
-                      ? "bg-surface-soft text-charcoal border border-hairline cursor-default"
+                      ? "bg-card text-charcoal border border-border cursor-default"
                       : "bg-primary text-white hover:bg-primary-hover active:scale-95"
                   }`}
                   data-testid={`follow-btn-${user.id}`}

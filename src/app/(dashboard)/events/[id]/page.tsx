@@ -54,7 +54,7 @@ export default function EventDetailPage({ params }: PageProps) {
 
  return (
  <div className="max-w-4xl mx-auto py-8 px-4">
- <Link href="/events" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-ink-deep mb-4">
+ <Link href="/events" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4">
  <ArrowLeft className="h-4 w-4" />
  Back to all events
  </Link>

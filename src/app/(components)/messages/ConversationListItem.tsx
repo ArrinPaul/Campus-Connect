@@ -35,8 +35,8 @@ export function ConversationListItem({
     <button
       onClick={onClick}
       className={cn(
-        "w-full px-4 py-4 text-left transition-all btn-press border-b border-hairline relative flex items-center gap-4 group",
-        isSelected ? "bg-canvas-parchment" : "bg-canvas hover:bg-canvas-parchment/30"
+        "w-full px-4 py-4 text-left transition-all btn-press border-b border-border relative flex items-center gap-4 group",
+        isSelected ? "bg-card-parchment" : "bg-card hover:bg-card-parchment/30"
       )}
     >
       {/* Selected Indicator Bar */}
@@ -46,7 +46,7 @@ export function ConversationListItem({
 
       {/* Avatar */}
       <div className="relative flex-shrink-0">
-        <div className="h-12 w-12 rounded-full overflow-hidden border border-hairline bg-canvas-parchment shadow-sm">
+        <div className="h-12 w-12 rounded-full overflow-hidden border border-border bg-card-parchment shadow-sm">
           {otherUser.profilePicture ? (
             <OptimizedImage
               src={otherUser.profilePicture}
@@ -57,7 +57,7 @@ export function ConversationListItem({
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="h-full w-full flex items-center justify-center text-ink/20 font-bold text-lg">
+            <div className="h-full w-full flex items-center justify-center text-foreground/20 font-bold text-lg">
               {otherUser.name.charAt(0).toUpperCase()}
             </div>
           )}
@@ -74,18 +74,18 @@ export function ConversationListItem({
         <div className="flex justify-between items-baseline mb-0.5">
           <h3 className={cn(
             "text-body-strong truncate",
-            isSelected ? "text-ink" : "text-ink-muted-80"
+            isSelected ? "text-foreground" : "text-foreground-muted-80"
           )}>
             {otherUser.name}
           </h3>
-          <span className="text-[10px] text-ink-muted-48 font-semibold uppercase tracking-wider">
+          <span className="text-[10px] text-foreground-muted-48 font-semibold uppercase tracking-wider">
             {formatDistanceToNow(conversation.updatedAt, { addSuffix: false })}
           </span>
         </div>
         <div className="flex justify-between items-center gap-2">
           <p className={cn(
             "text-caption truncate",
-            (conversation.unreadCount ?? 0) > 0 ? "text-ink font-semibold" : "text-ink-muted-48"
+            (conversation.unreadCount ?? 0) > 0 ? "text-foreground font-semibold" : "text-foreground-muted-48"
           )}>
             {conversation.lastMessage || "No messages yet"}
           </p>

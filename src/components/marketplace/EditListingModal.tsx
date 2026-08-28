@@ -67,7 +67,7 @@ export function EditListingModal({ listing, onClose }: EditListingModalProps) {
  return (
  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
  <div
- className="bg-canvas rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[85vh] flex flex-col"
+ className="bg-card rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[85vh] flex flex-col"
  onClick={(e) => e.stopPropagation()}
  >
  {/* Header */}
@@ -87,7 +87,7 @@ export function EditListingModal({ listing, onClose }: EditListingModalProps) {
  value={title}
  onChange={(e) => setTitle(e.target.value)}
  maxLength={150}
- className="w-full rounded-md border bg-canvas px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+ className="w-full rounded-md border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
  />
  </div>
 
@@ -98,7 +98,7 @@ export function EditListingModal({ listing, onClose }: EditListingModalProps) {
  onChange={(e) => setDescription(e.target.value)}
  rows={4}
  maxLength={2000}
- className="w-full rounded-md border bg-canvas px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none"
+ className="w-full rounded-md border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none"
  />
  </div>
 
@@ -111,7 +111,7 @@ export function EditListingModal({ listing, onClose }: EditListingModalProps) {
  onChange={(e) => setPrice(e.target.value)}
  min="0.01"
  step="0.01"
- className="w-full rounded-md border bg-canvas px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+ className="w-full rounded-md border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
  />
  </div>
  <div>
@@ -119,7 +119,7 @@ export function EditListingModal({ listing, onClose }: EditListingModalProps) {
  <select
  value={condition}
  onChange={(e) => setCondition(e.target.value)}
- className="w-full rounded-md border bg-canvas px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+ className="w-full rounded-md border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
  >
  {CONDITIONS.map((c) => (
  <option key={c} value={c}>

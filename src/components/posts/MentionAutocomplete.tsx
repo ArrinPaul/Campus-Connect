@@ -86,7 +86,7 @@ export function MentionAutocomplete({
 
  return (
  <div
- className="absolute z-50 w-64 bg-card border border-hairline rounded-lg shadow-lg overflow-hidden"
+ className="absolute z-50 w-64 bg-card border border-border rounded-lg shadow-lg overflow-hidden"
  style={position ? { top: position.top, left: position.left } : undefined}
  >
  <div className="py-1">
@@ -115,7 +115,7 @@ export function MentionAutocomplete({
  </div>
  )}
  <div className="flex-1 text-left">
- <div className="font-medium text-ink-deep text-sm">
+ <div className="font-medium text-foreground text-sm">
  {user.name}
  </div>
  <div className="text-xs text-muted-foreground">

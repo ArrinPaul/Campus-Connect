@@ -48,7 +48,7 @@ export default function LeaderboardPage() {
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6 pb-12">
       {/* Header */}
-      <div className="bg-surface-soft border border-hairline rounded-2xl p-6 shadow-sm relative overflow-hidden">
+      <div className="bg-card border border-border rounded-lg p-6 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-0" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
@@ -56,39 +56,39 @@ export default function LeaderboardPage() {
               <Trophy className="w-4 h-4 text-amber-500" />
               <span>Campus Leaderboard</span>
             </div>
-            <h1 className="text-[28px] md:text-3xl font-extrabold text-ink-deep tracking-tight">
+            <h1 className="text-[28px] md:text-3xl font-extrabold text-foreground tracking-tight">
               Academic & Peer Recognition
             </h1>
-            <p className="text-sm text-slate mt-1 max-w-lg leading-relaxed">
+            <p className="text-sm text-muted-foreground mt-1 max-w-lg leading-relaxed">
               Rankings driven by validated contributions: accepted answers (+15), research preprints (+10), helpful peer reviews (+10), and community upvotes (+5).
             </p>
           </div>
 
           {/* Current User Quick Rank Pill */}
           {currentUserRank !== null && currentUserRank !== undefined && (
-            <div className="flex items-center gap-3 bg-primary/10 border border-primary/20 rounded-xl px-4 py-3 shrink-0">
+            <div className="flex items-center gap-3 bg-primary/10 border border-primary/20 rounded-lg px-4 py-3 shrink-0">
               <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-extrabold text-base shadow-sm">
                 #{currentUserRank}
               </div>
               <div>
                 <p className="text-xs font-semibold text-primary uppercase">Your Rank</p>
-                <p className="text-sm font-bold text-ink">{currentUserPoints ?? 0} pts</p>
+                <p className="text-sm font-bold text-foreground">{currentUserPoints ?? 0} pts</p>
               </div>
             </div>
           )}
         </div>
 
         {/* Filter Controls Bar */}
-        <div className="mt-6 pt-6 border-t border-hairline flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="mt-6 pt-6 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           {/* Period Tabs */}
-          <div className="flex items-center bg-muted/60 p-1 rounded-xl border border-hairline">
+          <div className="flex items-center bg-muted/60 p-1 rounded-lg border border-border">
             <button
               onClick={() => setPeriod("weekly")}
               className={cn(
                 "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all",
                 period === "weekly"
                   ? "bg-card text-primary shadow-sm"
-                  : "text-muted-foreground hover:text-ink"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               Weekly
@@ -99,7 +99,7 @@ export default function LeaderboardPage() {
                 "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all",
                 period === "monthly"
                   ? "bg-card text-primary shadow-sm"
-                  : "text-muted-foreground hover:text-ink"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               Monthly
@@ -110,7 +110,7 @@ export default function LeaderboardPage() {
                 "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all",
                 period === "all-time"
                   ? "bg-card text-primary shadow-sm"
-                  : "text-muted-foreground hover:text-ink"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               All Time
@@ -124,7 +124,7 @@ export default function LeaderboardPage() {
               <select
                 value={selectedUniversity}
                 onChange={(e) => setSelectedUniversity(e.target.value)}
-                className="w-full text-xs rounded-xl border border-hairline bg-card pl-8 pr-3 py-2 text-ink focus:outline-none focus:ring-1 focus:ring-primary shadow-sm"
+                className="w-full text-xs rounded-lg border border-border bg-card pl-8 pr-3 py-2 text-foreground focus:outline-none focus:ring-1 focus:ring-primary shadow-sm"
               >
                 <option value="all">All Universities</option>
                 {universities.map((uni: any) => (
@@ -142,7 +142,7 @@ export default function LeaderboardPage() {
                 placeholder="Search..."
                 value={searchFilter}
                 onChange={(e) => setSearchFilter(e.target.value)}
-                className="w-full text-xs rounded-xl border border-hairline bg-card pl-8 pr-3 py-2 text-ink placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary shadow-sm"
+                className="w-full text-xs rounded-lg border border-border bg-card pl-8 pr-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary shadow-sm"
               />
             </div>
           </div>
@@ -153,25 +153,25 @@ export default function LeaderboardPage() {
       {isLoading && (
         <div className="space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-16 rounded-xl bg-card border border-hairline animate-pulse" />
+            <div key={i} className="h-16 rounded-lg bg-card border border-border animate-pulse" />
           ))}
         </div>
       )}
 
       {/* Empty State */}
       {!isLoading && filteredEntries.length === 0 && (
-        <div className="bg-card border border-hairline rounded-2xl p-12 text-center space-y-3">
+        <div className="bg-card border border-border rounded-lg p-12 text-center space-y-3">
           <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mx-auto text-muted-foreground">
             <Flame className="w-6 h-6" />
           </div>
-          <h3 className="font-bold text-base text-ink">No Activity Found for this Period</h3>
+          <h3 className="font-bold text-base text-foreground">No Activity Found for this Period</h3>
           <p className="text-xs text-muted-foreground max-w-sm mx-auto">
             Be the first to earn reputation by answering questions, publishing research preprints, or reviewing peers!
           </p>
           <div className="pt-2">
             <Link
               href="/q-and-a"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity"
             >
               <span>Explore Questions</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
@@ -185,24 +185,24 @@ export default function LeaderboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
           {/* Rank 2 (Silver) */}
           {topThree[1] && (
-            <div className="bg-card border border-hairline rounded-2xl p-5 flex flex-col items-center text-center relative order-2 md:order-1 hover:border-border transition-colors">
-              <div className="absolute top-3 right-3 text-slate-400 font-black text-xs flex items-center gap-1">
-                <Medal className="w-4 h-4 text-slate-400" /> #2
+            <div className="bg-card border border-border rounded-lg p-5 flex flex-col items-center text-center relative order-2 md:order-1 hover:border-border transition-colors">
+              <div className="absolute top-3 right-3 text-muted-foreground-400 font-black text-xs flex items-center gap-1">
+                <Medal className="w-4 h-4 text-muted-foreground-400" /> #2
               </div>
               <div className="h-16 w-16 rounded-full overflow-hidden border-2 border-slate-300 relative mb-3 bg-muted">
                 {topThree[1].profilePicture ? (
                   <Image src={topThree[1].profilePicture} alt={topThree[1].name} fill className="object-cover" />
                 ) : (
-                  <div className="h-full w-full flex items-center justify-center font-bold text-lg text-slate-500">
+                  <div className="h-full w-full flex items-center justify-center font-bold text-lg text-muted-foreground-500">
                     {topThree[1].name[0]}
                   </div>
                 )}
               </div>
-              <Link href={`/profile/${topThree[1].userId}`} className="font-bold text-sm text-ink hover:underline">
+              <Link href={`/profile/${topThree[1].userId}`} className="font-bold text-sm text-foreground hover:underline">
                 {topThree[1].name}
               </Link>
               <p className="text-[11px] text-muted-foreground truncate max-w-[160px]">{topThree[1].university || "Campus Scholar"}</p>
-              <div className="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 text-xs font-bold">
+              <div className="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/60 text-muted-foreground-700 dark:text-muted-foreground-300 text-xs font-bold">
                 <span>{topThree[1].points} pts</span>
                 <span className="text-[10px] text-muted-foreground">Â· Lvl {topThree[1].level}</span>
               </div>
@@ -211,7 +211,7 @@ export default function LeaderboardPage() {
 
           {/* Rank 1 (Gold) */}
           {topThree[0] && (
-            <div className="bg-card border-2 border-amber-500/30 rounded-2xl p-6 flex flex-col items-center text-center relative order-1 md:order-2 bg-gradient-to-b from-amber-500/5 to-transparent shadow-md">
+            <div className="bg-card border-2 border-amber-500/30 rounded-lg p-6 flex flex-col items-center text-center relative order-1 md:order-2 bg-gradient-to-b from-amber-500/5 to-transparent shadow-md">
               <div className="absolute -top-3 px-3 py-0.5 rounded-full bg-amber-500 text-white font-extrabold text-[11px] flex items-center gap-1 shadow-sm">
                 <Trophy className="w-3.5 h-3.5 fill-current" /> #1 Champion
               </div>
@@ -224,7 +224,7 @@ export default function LeaderboardPage() {
                   </div>
                 )}
               </div>
-              <Link href={`/profile/${topThree[0].userId}`} className="font-extrabold text-base text-ink hover:underline">
+              <Link href={`/profile/${topThree[0].userId}`} className="font-extrabold text-base text-foreground hover:underline">
                 {topThree[0].name}
               </Link>
               <p className="text-xs text-muted-foreground truncate max-w-[180px]">{topThree[0].university || "Campus Scholar"}</p>
@@ -238,7 +238,7 @@ export default function LeaderboardPage() {
 
           {/* Rank 3 (Bronze) */}
           {topThree[2] && (
-            <div className="bg-card border border-hairline rounded-2xl p-5 flex flex-col items-center text-center relative order-3 hover:border-border transition-colors">
+            <div className="bg-card border border-border rounded-lg p-5 flex flex-col items-center text-center relative order-3 hover:border-border transition-colors">
               <div className="absolute top-3 right-3 text-amber-700 dark:text-amber-500 font-black text-xs flex items-center gap-1">
                 <Medal className="w-4 h-4 text-amber-700 dark:text-amber-500" /> #3
               </div>
@@ -251,7 +251,7 @@ export default function LeaderboardPage() {
                   </div>
                 )}
               </div>
-              <Link href={`/profile/${topThree[2].userId}`} className="font-bold text-sm text-ink hover:underline">
+              <Link href={`/profile/${topThree[2].userId}`} className="font-bold text-sm text-foreground hover:underline">
                 {topThree[2].name}
               </Link>
               <p className="text-[11px] text-muted-foreground truncate max-w-[160px]">{topThree[2].university || "Campus Scholar"}</p>
@@ -266,7 +266,7 @@ export default function LeaderboardPage() {
 
       {/* Full Leaderboard List */}
       {!isLoading && (searchFilter ? filteredEntries : remainingEntries).length > 0 && (
-        <div className="bg-card border border-hairline rounded-2xl overflow-hidden shadow-sm divide-y divide-hairline">
+        <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm divide-y divide-hairline">
           <div className="px-5 py-3 bg-muted/40 text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
             <div className="flex items-center gap-4">
               <span className="w-6 text-center">#</span>
@@ -302,7 +302,7 @@ export default function LeaderboardPage() {
                   <div className="flex items-center gap-2">
                     <Link
                       href={`/profile/${entry.userId}`}
-                      className="font-bold text-xs sm:text-sm text-ink hover:underline truncate"
+                      className="font-bold text-xs sm:text-sm text-foreground hover:underline truncate"
                     >
                       {entry.name}
                     </Link>

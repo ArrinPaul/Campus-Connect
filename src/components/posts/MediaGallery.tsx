@@ -33,13 +33,13 @@ export function MediaGallery({
  href={url}
  target="_blank"
  rel="noopener noreferrer"
- className="flex items-center gap-3 rounded-xl border border-hairline bg-canvas px-4 py-3 hover:bg-surface-soft transition-colors group"
+ className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 hover:bg-card transition-colors group"
  >
- <FileText className="h-5 w-5 text-slate shrink-0" />
- <span className="flex-1 truncate text-sm font-medium text-ink-deep">
+ <FileText className="h-5 w-5 text-muted-foreground shrink-0" />
+ <span className="flex-1 truncate text-sm font-medium text-foreground">
  {name}
  </span>
- <Download className="h-4 w-4 text-slate opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+ <Download className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
  </a>
  )
  })}
@@ -49,7 +49,7 @@ export function MediaGallery({
 
  if (mediaType ==="video") {
  return (
- <div className="mt-3 rounded-xl overflow-hidden bg-black aspect-video relative">
+ <div className="mt-3 rounded-lg overflow-hidden bg-black aspect-video relative">
  <video
  src={mediaUrls[0]}
  controls
@@ -65,7 +65,7 @@ export function MediaGallery({
  // Image grid
  const count = mediaUrls.length
  const gridClass = cn(
-"mt-3 grid gap-1 rounded-xl overflow-hidden",
+"mt-3 grid gap-1 rounded-lg overflow-hidden",
  count === 1 &&"grid-cols-1",
  count === 2 &&"grid-cols-2",
  count === 3 &&"grid-cols-2",
@@ -85,7 +85,7 @@ export function MediaGallery({
  key={url}
  onClick={() => setLightboxIndex(i)}
  className={cn(
-"relative overflow-hidden bg-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+"relative overflow-hidden bg-card focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
  isThirdOfThree &&"col-span-2 row-span-1",
  count === 1 ?"aspect-video" :"aspect-square"
  )}
@@ -169,7 +169,7 @@ export function ImageLightbox({
  {/* Close button */}
  <button
  onClick={onClose}
- className="absolute top-4 right-4 z-10 rounded-full bg-surface-soft p-2 text-on-primary hover:bg-canvas transition-colors"
+ className="absolute top-4 right-4 z-10 rounded-full bg-card p-2 text-on-primary hover:bg-card transition-colors"
  aria-label="Close lightbox"
  >
  <X className="h-5 w-5" />
@@ -178,7 +178,7 @@ export function ImageLightbox({
  {/* Zoom toggle */}
  <button
  onClick={() => setZoomed((z) => !z)}
- className="absolute top-4 right-16 z-10 rounded-full bg-surface-soft p-2 text-on-primary hover:bg-canvas transition-colors"
+ className="absolute top-4 right-16 z-10 rounded-full bg-card p-2 text-on-primary hover:bg-card transition-colors"
  aria-label={zoomed ?"Zoom out" :"Zoom in"}
  >
  <ZoomIn className="h-5 w-5" />
@@ -188,7 +188,7 @@ export function ImageLightbox({
  {images.length > 1 && (
  <button
  onClick={goToPrev}
- className="absolute left-4 top-1/2 -translate-y-1/2 z-10 rounded-full bg-surface-soft p-3 text-on-primary hover:bg-canvas transition-colors"
+ className="absolute left-4 top-1/2 -translate-y-1/2 z-10 rounded-full bg-card p-3 text-on-primary hover:bg-card transition-colors"
  aria-label="Previous image"
  >
  <ChevronLeft className="h-6 w-6" />
@@ -231,7 +231,7 @@ export function ImageLightbox({
  {images.length > 1 && (
  <button
  onClick={goToNext}
- className="absolute right-4 top-1/2 -translate-y-1/2 z-10 rounded-full bg-surface-soft p-3 text-on-primary hover:bg-canvas transition-colors"
+ className="absolute right-4 top-1/2 -translate-y-1/2 z-10 rounded-full bg-card p-3 text-on-primary hover:bg-card transition-colors"
  aria-label="Next image"
  >
  <ChevronRight className="h-6 w-6" />
@@ -248,7 +248,7 @@ export function ImageLightbox({
  onClick={() => setCurrentIndex(i)}
  className={cn(
 "w-2 h-2 rounded-full transition-colors",
- i === currentIndex ?"bg-surface-soft" :"bg-surface-soft"
+ i === currentIndex ?"bg-card" :"bg-card"
  )}
  aria-label={`Go to image ${i + 1}`}
  />

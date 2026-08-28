@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 const CATEGORIES = ['All', 'Academic', 'Research', 'Social', 'Sports', 'Clubs', 'Technology', 'Arts', 'Professional'];
 
 const CommunityCardSkeleton = () => (
-  <div className="bg-surface-soft border border-hairline rounded-2xl h-[320px] animate-pulse" />
+  <div className="bg-card border border-border rounded-lg h-[320px] animate-pulse" />
 );
 
 export default function CommunitiesPage() {
@@ -47,12 +47,12 @@ export default function CommunitiesPage() {
   return (
     <div className="w-full bg-canvas min-h-screen pb-16">
       {/* Header Section */}
-      <section className="bg-canvas pt-8 pb-6 px-4 md:px-8 border-b border-hairline">
+      <section className="bg-canvas pt-8 pb-6 px-4 md:px-8 border-b border-border">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-ink-deep tracking-tight">Communities</h1>
-              <p className="text-sm text-slate mt-1 max-w-xl">
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">Communities</h1>
+              <p className="text-sm text-muted-foreground mt-1 max-w-xl">
                 Discover, join, and collaborate with student groups that match your passions.
               </p>
             </div>
@@ -75,18 +75,18 @@ export default function CommunitiesPage() {
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             {/* Search Bar */}
             <div className="relative w-full md:max-w-md group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate group-focus-within:text-primary transition-colors" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <input
                 type="text"
                 placeholder="Search communities..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full pl-11 pr-10 h-11 rounded-full border border-hairline bg-surface-soft text-xs text-ink-deep placeholder:text-slate focus:outline-none focus:border-primary focus:bg-canvas transition-all"
+                className="w-full pl-11 pr-10 h-11 rounded-full border border-border bg-card text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:bg-canvas transition-all"
               />
               {searchInput && (
                 <button
                   onClick={() => setSearchInput('')}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-canvas text-slate"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-canvas text-muted-foreground"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -94,8 +94,8 @@ export default function CommunitiesPage() {
             </div>
 
             {/* Sort Control */}
-            <div className="flex items-center gap-2 shrink-0 bg-surface-soft rounded-full px-4 py-2 border border-hairline text-xs font-semibold text-ink-deep">
-              <SlidersHorizontal className="h-3.5 w-3.5 text-slate" />
+            <div className="flex items-center gap-2 shrink-0 bg-card rounded-full px-4 py-2 border border-border text-xs font-semibold text-foreground">
+              <SlidersHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
               <span>Sort:</span>
               <select
                 value={sortBy}
@@ -109,7 +109,7 @@ export default function CommunitiesPage() {
           </div>
 
           {/* Category Pill Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-hairline">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-border">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
@@ -118,7 +118,7 @@ export default function CommunitiesPage() {
                   "px-4 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 cursor-pointer active:scale-[0.96]",
                   selectedCategory === cat
                     ? "bg-primary text-white shadow-sm"
-                    : "bg-surface-soft text-slate border border-hairline hover:border-primary/40 hover:text-primary"
+                    : "bg-card text-muted-foreground border border-border hover:border-primary/40 hover:text-primary"
                 )}
               >
                 {cat}
@@ -128,7 +128,7 @@ export default function CommunitiesPage() {
 
           {/* Active Filters Bar */}
           {hasActiveFilters && (
-            <div className="flex items-center gap-2 text-xs text-slate">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span>Active filters:</span>
               {selectedCategory !== 'All' && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
@@ -158,17 +158,17 @@ export default function CommunitiesPage() {
                 {[...Array(8)].map((_, i) => <CommunityCardSkeleton key={i} />)}
               </div>
             ) : sortedCommunities.length === 0 ? (
-              <div className="text-center py-16 bg-surface-soft rounded-2xl border border-hairline max-w-lg mx-auto">
-                <Users className="h-12 w-12 mx-auto mb-3 text-slate opacity-40" />
-                <h3 className="text-base font-semibold text-ink-deep">No communities found</h3>
-                <p className="text-xs text-slate mt-1 max-w-xs mx-auto">
+              <div className="text-center py-16 bg-card rounded-lg border border-border max-w-lg mx-auto">
+                <Users className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-40" />
+                <h3 className="text-base font-semibold text-foreground">No communities found</h3>
+                <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
                   {hasActiveFilters 
                     ? 'Try adjusting your search query or category filters.' 
                     : 'Be the first to create a community and invite peers!'}
                 </p>
                 {hasActiveFilters && (
                   <button
-                    className="mt-4 rounded-full border border-hairline px-4 py-1.5 text-xs font-semibold text-ink-deep hover:bg-canvas transition-colors"
+                    className="mt-4 rounded-full border border-border px-4 py-1.5 text-xs font-semibold text-foreground hover:bg-canvas transition-colors"
                     onClick={() => { setSelectedCategory('All'); setSearchInput(''); }}
                   >
                     Clear Filters
@@ -177,7 +177,7 @@ export default function CommunitiesPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="text-xs font-bold text-slate uppercase tracking-wider">
+                <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                   {sortedCommunities.length} {sortedCommunities.length === 1 ? 'Community' : 'Communities'}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

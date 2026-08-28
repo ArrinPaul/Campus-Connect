@@ -19,15 +19,15 @@ type Props = {
 
 export function JobCard({ job }: Props) {
     return (
-        <Link href={`/jobs/${job._id}`} className="block p-4 border border-hairline rounded-xl bg-surface-soft hover:bg-surface-hover transition-colors shadow-sm">
+        <Link href={`/jobs/${job._id}`} className="block p-4 border border-border rounded-lg bg-card hover:bg-surface-hover transition-colors shadow-sm">
             <div className="flex gap-4">
-                <div className="h-12 w-12 rounded-lg bg-muted flex-shrink-0 flex items-center justify-center font-bold text-lg border border-hairline shadow-sm">
+                <div className="h-12 w-12 rounded-lg bg-muted flex-shrink-0 flex items-center justify-center font-bold text-lg border border-border shadow-sm">
                     {job.company.charAt(0)}
                 </div>
                 <div className="flex-1">
                     <p className="font-bold text-[17px] text-primary hover:underline leading-tight">{job.title}</p>
                     <p className="font-semibold">{job.company}</p>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate mt-2 font-semibold">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mt-2 font-semibold">
                         <div className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" /> {job.location} {job.remote && '(Remote)'}</div>
                         <div className="flex items-center gap-1.5"><Briefcase className="h-3.5 w-3.5" /> {job.type}</div>
                         {job.salary && <div className="flex items-center gap-1.5"><DollarSign className="h-3.5 w-3.5" /> {job.salary}</div>}

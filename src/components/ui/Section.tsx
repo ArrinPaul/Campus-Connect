@@ -9,9 +9,9 @@ interface SectionProps {
 
 export function Section({ children, className, variant ="light" }: SectionProps) {
  const variants = {
- light:"bg-canvas text-ink",
+ light:"bg-card text-foreground",
  dark:"bg-tile-1 text-white",
- parchment:"bg-canvas text-ink",
+ parchment:"bg-card text-foreground",
  dark2:"bg-tile-2 text-white",
  dark3:"bg-tile-3 text-white",
  };

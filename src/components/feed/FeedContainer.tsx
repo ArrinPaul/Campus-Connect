@@ -170,17 +170,17 @@ export function FeedContainer({ feedType ="following" }: FeedContainerProps) {
  const LoadingSkeleton = () => (
    <div className="space-y-3 sm:space-y-4">
      {[...Array(3)].map((_, i) => (
-       <div key={i} className="animate-pulse rounded-lg bg-surface-soft p-4 shadow-elevation-1 sm:p-6">
+       <div key={i} className="animate-pulse rounded-lg bg-card p-4 shadow-elevation-1 sm:p-6">
          <div className="flex items-center gap-2 sm:gap-3">
-           <div className="h-8 w-8 rounded-full bg-canvas sm:h-10 sm:w-10" />
+           <div className="h-8 w-8 rounded-full bg-card sm:h-10 sm:w-10" />
            <div className="flex-1 space-y-2">
-             <div className="h-3 w-24 rounded bg-canvas sm:h-4 sm:w-32" />
-             <div className="h-2 w-16 rounded bg-canvas sm:h-3 sm:w-24" />
+             <div className="h-3 w-24 rounded bg-card sm:h-4 sm:w-32" />
+             <div className="h-2 w-16 rounded bg-card sm:h-3 sm:w-24" />
            </div>
          </div>
          <div className="mt-3 space-y-2 sm:mt-4">
-           <div className="h-3 w-full rounded bg-canvas sm:h-4" />
-           <div className="h-3 w-3/4 rounded bg-canvas sm:h-4" />
+           <div className="h-3 w-full rounded bg-card sm:h-4" />
+           <div className="h-3 w-3/4 rounded bg-card sm:h-4" />
          </div>
        </div>
      ))}
@@ -195,8 +195,8 @@ export function FeedContainer({ feedType ="following" }: FeedContainerProps) {
  // Handle not authenticated
  if (!isSignedIn) {
    return (
-     <div className="rounded-lg bg-surface-soft p-8 text-center shadow-elevation-1">
-       <p className="text-slate">Please sign in to view the feed.</p>
+     <div className="rounded-lg bg-card p-8 text-center shadow-elevation-1">
+       <p className="text-muted-foreground">Please sign in to view the feed.</p>
      </div>
    )
  }
@@ -227,12 +227,12 @@ export function FeedContainer({ feedType ="following" }: FeedContainerProps) {
 
  return (
  <div className="space-y-4">
- <div className="rounded-2xl border border-hairline/60 bg-surface-soft p-6 text-center shadow-elevation-1 sm:p-8">
- <div className="mx-auto h-12 w-12 rounded-2xl brand-gradient flex items-center justify-center shadow-glow-sm">
+ <div className="rounded-lg border border-border/60 bg-card p-6 text-center shadow-elevation-1 sm:p-8">
+ <div className="mx-auto h-12 w-12 rounded-lg brand-gradient flex items-center justify-center shadow-glow-sm">
  <Repeat2 className="h-5 w-5 text-white" />
  </div>
- <h3 className="mt-4 text-lg font-semibold text-ink-deep sm:text-xl font-display">{title}</h3>
- <p className="mt-2 text-sm text-slate">{description}</p>
+ <h3 className="mt-4 text-lg font-semibold text-foreground sm:text-xl font-display">{title}</h3>
+ <p className="mt-2 text-sm text-muted-foreground">{description}</p>
  <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
  <Link
  href="/discover"
@@ -242,7 +242,7 @@ export function FeedContainer({ feedType ="following" }: FeedContainerProps) {
  </Link>
  <Link
  href="/search"
- className="inline-flex items-center rounded-full border border-hairline/60 px-4 py-2 text-xs font-semibold text-ink-deep hover:bg-surface-soft transition-colors"
+ className="inline-flex items-center rounded-full border border-border/60 px-4 py-2 text-xs font-semibold text-foreground hover:bg-card transition-colors"
  >
  Search topics
  </Link>
@@ -250,11 +250,11 @@ export function FeedContainer({ feedType ="following" }: FeedContainerProps) {
  </div>
 
  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
- <div className="rounded-2xl border border-hairline/60 bg-surface-soft shadow-elevation-1 overflow-hidden">
+ <div className="rounded-lg border border-border/60 bg-card shadow-elevation-1 overflow-hidden">
  <div className="h-[3px] w-full gradient-warm" />
  <SuggestedUsers limit={4} showSeeAll />
  </div>
- <div className="rounded-2xl border border-hairline/60 bg-surface-soft shadow-elevation-1 overflow-hidden">
+ <div className="rounded-lg border border-border/60 bg-card shadow-elevation-1 overflow-hidden">
  <div className="h-[3px] w-full brand-gradient" />
  <TrendingHashtags limit={8} />
  </div>

@@ -1,5 +1,5 @@
-import type { Metadata, Viewport } from "next";
-import { Syne, Manrope } from "next/font/google";
+﻿import type { Metadata, Viewport } from "next";
+
 
 import { AppQueryProvider } from "@/components/providers/query-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
@@ -11,18 +11,9 @@ import { ServiceWorkerRegister } from "@/components/providers/sw-register";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const manrope = Manrope({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-sans",
-});
 
-const syne = Syne({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-display",
-  weight: ["700", "800"],
-});
+
+
 
 export const metadata: Metadata = {
   title: {
@@ -44,7 +35,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: "Campus Connect",
-    title: "Campus Connect — Academic Collaboration Platform",
+    title: "Campus Connect â€” Academic Collaboration Platform",
     description:
       "Connect with peers, collaborate on research, and accelerate your academic career.",
   },
@@ -75,7 +66,7 @@ export default function RootLayout({
       <html
         lang="en"
         suppressHydrationWarning
-        className={`${manrope.variable} ${syne.variable}`}
+        
       >
         <body className="font-sans antialiased">
           <SkipLink />
@@ -101,3 +92,4 @@ export default function RootLayout({
       </html>
   );
 }
+

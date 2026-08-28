@@ -116,7 +116,7 @@ export function StatusSelector({
  >
  <span className="flex-shrink-0">{option.icon}</span>
  <div className="flex-1 min-w-0">
- <p className="text-sm font-medium text-ink-deep">
+ <p className="text-sm font-medium text-foreground">
  {option.label}
  </p>
  <p className="text-xs text-muted-foreground">
@@ -132,7 +132,7 @@ export function StatusSelector({
 
  {/* Custom Status Input */}
  <div>
- <label className="block text-sm font-medium text-ink-deep mb-1">
+ <label className="block text-sm font-medium text-foreground mb-1">
  Custom Status
  </label>
  <div className="flex gap-2">
@@ -144,7 +144,7 @@ export function StatusSelector({
  onBlur={handleCustomStatusSave}
  placeholder="What's on your mind? (e.g., Studying 📚)"
  maxLength={100}
- className="flex-1 rounded-lg border border-hairline bg-card bg-muted px-3 py-2 text-sm text-ink-deep placeholder:text-muted-foreground dark:placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+ className="flex-1 rounded-lg border border-border bg-card bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground dark:placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
  />
  {customStatus !== currentCustomStatus && (
  <button

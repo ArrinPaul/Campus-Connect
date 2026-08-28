@@ -106,7 +106,7 @@ export function LikeButton({
             className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-all ${
               isLiked
                 ? "bg-rose-500/10 text-rose-500"
-                : "text-slate hover:bg-rose-500/10 hover:text-rose-500"
+                : "text-muted-foreground hover:bg-rose-500/10 hover:text-rose-500"
             } ${compact ? "px-2 py-1 text-sm" : ""}`}
             aria-label={isLiked ? "Unlike" : "Like"}
           >
@@ -116,7 +116,7 @@ export function LikeButton({
               }`}
             />
             {totalReactions > 0 && (
-              <span className={`text-xs font-semibold ${isLiked ? "text-rose-500" : "text-slate"}`}>
+              <span className={`text-xs font-semibold ${isLiked ? "text-rose-500" : "text-muted-foreground"}`}>
                 {totalReactions}
               </span>
             )}
@@ -155,7 +155,7 @@ export function ReactionSummary({ targetId, targetType, onClick }: ReactionSumma
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-1 text-xs text-slate hover:text-ink-deep transition-colors"
+      className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
     >
       <Heart className="h-3.5 w-3.5 fill-rose-500 text-rose-500 inline" />
       <span>{total}</span>

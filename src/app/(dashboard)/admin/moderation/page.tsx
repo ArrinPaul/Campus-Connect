@@ -16,7 +16,7 @@ export default function AdminModerationPage() {
 
  if (!currentUser || (!currentUser.is_admin && currentUser.role !=="admin")) {
  return (
- <div className="max-w-xl mx-auto py-16 text-center text-slate">
+ <div className="max-w-xl mx-auto py-16 text-center text-muted-foreground">
  <ShieldAlert className="h-16 w-16 mx-auto mb-4 text-critical" />
  <h3 className="text-xl font-semibold">Access Denied</h3>
  <p className="mt-2">You do not have administrative privileges to view this page.</p>
@@ -41,18 +41,18 @@ export default function AdminModerationPage() {
  <AlertTriangle className="text-amber-500" />
  Content Moderation
  </h1>
- <p className="text-slate">Review reported posts and comments from the community.</p>
+ <p className="text-muted-foreground">Review reported posts and comments from the community.</p>
  </div>
 
  <div className="space-y-6">
  {(!reportedContent || reportedContent.length === 0) ? (
- <div className="text-center py-12 bg-surface-soft border border-hairline rounded-xl text-slate">
+ <div className="text-center py-12 bg-card border border-border rounded-lg text-muted-foreground">
  <Check className="w-12 h-12 mx-auto text-green-500 mb-4 opacity-50" />
  <p>The moderation queue is empty. Great job!</p>
  </div>
  ) : (
  reportedContent.map((item: any) => (
- <div key={item.id} className="bg-surface-soft border border-hairline rounded-xl overflow-hidden flex flex-col md:flex-row">
+ <div key={item.id} className="bg-card border border-border rounded-lg overflow-hidden flex flex-col md:flex-row">
  <div className="bg-critical/10 p-4 md:w-48 border-b md:border-b-0 md:border-r border-critical/20 flex flex-col justify-center items-center text-center">
  <span className="text-xs uppercase font-bold tracking-wider text-critical mb-1">
  {item.reportReason}
@@ -73,7 +73,7 @@ export default function AdminModerationPage() {
  </div>
  )}
  <span className="text-sm font-medium">{item.author?.name ||"Unknown"}</span>
- <span className="text-xs text-slate">
+ <span className="text-xs text-muted-foreground">
  {item.created_at ? formatDistanceToNow(new Date(item.created_at), { addSuffix: true }) :""}
  </span>
  </div>
@@ -82,7 +82,7 @@ export default function AdminModerationPage() {
  <div className="flex gap-3 justify-end pt-3 border-t">
  <button 
  onClick={() => handleAction(item.id, item.type,"ignore")}
- className="px-3 py-1.5 text-sm font-medium rounded-md hover:bg-canvas text-slate transition-colors"
+ className="px-3 py-1.5 text-sm font-medium rounded-md hover:bg-canvas text-muted-foreground transition-colors"
  >
  Dismiss Reports
  </button>

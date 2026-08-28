@@ -23,9 +23,9 @@ export function QuestionCard({ question }: Props) {
     const askerAvatar = question.asker?.profilePicture;
 
     return (
-        <Link href={`/q-and-a/${question._id}`} className="block p-4 border border-hairline rounded-xl bg-surface-soft hover:bg-surface-hover transition-colors shadow-sm">
+        <Link href={`/q-and-a/${question._id}`} className="block p-4 border border-border rounded-lg bg-card hover:bg-surface-hover transition-colors shadow-sm">
             <h3 className="font-bold text-[17px] text-primary hover:underline line-clamp-2">{question.title}</h3>
-            <p className="text-[13px] text-slate mt-1.5 line-clamp-2 leading-relaxed">{question.content}</p>
+            <p className="text-[13px] text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">{question.content}</p>
 
             <div className="flex flex-wrap items-center justify-between mt-3 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">

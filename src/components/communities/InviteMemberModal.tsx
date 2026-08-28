@@ -62,7 +62,7 @@ export function InviteMemberModal({ communityId, communityName, onClose }: Invit
  return (
  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
  <div
- className="bg-canvas rounded-xl shadow-xl w-full max-w-md mx-4 max-h-[80vh] flex flex-col"
+ className="bg-card rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[80vh] flex flex-col"
  onClick={(e) => e.stopPropagation()}
  >
  {/* Header */}

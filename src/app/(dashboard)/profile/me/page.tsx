@@ -29,10 +29,10 @@ export default function MyProfileRedirect() {
  if (!isLoading && !isAuthenticated) {
  return (
  <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
- <p className="text-steel">Please sign in to view your profile.</p>
+ <p className="text-muted-foreground">Please sign in to view your profile.</p>
  <button
  onClick={() => router.push('/sign-in')}
- className="button-buy-cta"
+ className="bg-primary text-white hover:bg-primary/90 font-semibold rounded-md px-4 py-2 shadow-sm transition-colors flex items-center justify-center"
  >
  Sign In
  </button>

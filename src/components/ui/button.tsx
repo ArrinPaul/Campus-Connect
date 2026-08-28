@@ -17,8 +17,8 @@ const buttonVariants = cva(
  utility:
 "bg-ink-deep text-white text-xs rounded-sm",
  pearl:
-"bg-surface-soft text-ink-deep border-[3px] border-hairline rounded-md",
- ghost:"hover:bg-canvas text-ink-deep",
+"bg-card text-foreground border-[3px] border-border rounded-md",
+ ghost:"hover:bg-card text-foreground",
  link:"text-primary hover:underline underline-offset-4",
  },
  size: {

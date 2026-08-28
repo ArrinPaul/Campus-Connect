@@ -30,9 +30,9 @@ export default function NotificationsPage() {
     return (
       <div className="w-full bg-canvas min-h-screen py-8 px-4">
         <div className="max-w-2xl mx-auto space-y-4">
-          <div className="h-10 w-48 bg-surface-soft animate-pulse rounded-xl" />
+          <div className="h-10 w-48 bg-card animate-pulse rounded-lg" />
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-20 w-full bg-surface-soft animate-pulse rounded-2xl border border-hairline" />
+            <div key={i} className="h-20 w-full bg-card animate-pulse rounded-lg border border-border" />
           ))}
         </div>
       </div>
@@ -45,8 +45,8 @@ export default function NotificationsPage() {
         <div className="p-5 rounded-full bg-primary/10 text-primary mb-4">
           <Bell size={48} />
         </div>
-        <h2 className="text-2xl font-bold text-ink-deep">Stay in the loop</h2>
-        <p className="text-xs text-slate mt-1 max-w-xs">
+        <h2 className="text-2xl font-bold text-foreground">Stay in the loop</h2>
+        <p className="text-xs text-muted-foreground mt-1 max-w-xs">
           Sign in to view your notifications and stay updated with your campus network.
         </p>
         <Button variant="primary" size="default" className="mt-6 rounded-full px-6" onClick={() => window.location.href = '/sign-in'}>
@@ -59,11 +59,11 @@ export default function NotificationsPage() {
   return (
     <div className="w-full bg-canvas min-h-screen pb-16">
       {/* Header Section */}
-      <section className="bg-surface-soft py-6 px-4 md:px-8 border-b border-hairline shadow-sm">
+      <section className="bg-card py-6 px-4 md:px-8 border-b border-border shadow-sm">
         <div className="max-w-2xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-heading-lg font-bold text-ink-deep mb-1">Notifications</h1>
-            <p className="text-xs text-slate mt-1">
+            <h1 className="text-heading-lg font-bold text-foreground mb-1">Notifications</h1>
+            <p className="text-xs text-muted-foreground mt-1">
               Keep track of likes, comments, and community updates.
             </p>
           </div>
@@ -81,14 +81,14 @@ export default function NotificationsPage() {
       {/* Main Content */}
       <main className="max-w-2xl mx-auto px-4 pt-6 space-y-4">
         {/* Filter Pills */}
-        <div className="flex items-center gap-2 border-b border-hairline pb-3">
+        <div className="flex items-center gap-2 border-b border-border pb-3">
           <button
             onClick={() => setFilter('all')}
             className={cn(
               "px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-[0.96]",
               filter === 'all'
                 ? "bg-primary text-white shadow-sm"
-                : "bg-surface-soft text-slate border border-hairline hover:border-primary/40 hover:text-primary"
+                : "bg-card text-muted-foreground border border-border hover:border-primary/40 hover:text-primary"
             )}
           >
             All Activity
@@ -99,7 +99,7 @@ export default function NotificationsPage() {
               "px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-[0.96] flex items-center gap-1.5",
               filter === 'unread'
                 ? "bg-primary text-white shadow-sm"
-                : "bg-surface-soft text-slate border border-hairline hover:border-primary/40 hover:text-primary"
+                : "bg-card text-muted-foreground border border-border hover:border-primary/40 hover:text-primary"
             )}
           >
             Unread
@@ -118,23 +118,23 @@ export default function NotificationsPage() {
         {notifications === undefined ? (
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-20 w-full bg-surface-soft animate-pulse rounded-2xl border border-hairline" />
+              <div key={i} className="h-20 w-full bg-card animate-pulse rounded-lg border border-border" />
             ))}
           </div>
         ) : filteredNotifications?.length === 0 ? (
-          <div className="text-center py-20 bg-surface-soft rounded-2xl border border-hairline">
-            <Inbox className="h-12 w-12 mx-auto mb-3 text-slate opacity-40" />
-            <h3 className="text-base font-semibold text-ink-deep">
+          <div className="text-center py-20 bg-card rounded-lg border border-border">
+            <Inbox className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-40" />
+            <h3 className="text-base font-semibold text-foreground">
               {filter === 'unread' ? 'No unread notifications' : 'All caught up'}
             </h3>
-            <p className="text-xs text-slate mt-1 max-w-xs mx-auto">
+            <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
               {filter === 'unread'
                 ? 'You have read all your notifications.'
                 : 'When new activity happens, it will appear here.'}
             </p>
           </div>
         ) : (
-          <div className="rounded-2xl border border-hairline bg-surface-soft overflow-hidden divide-y divide-hairline">
+          <div className="rounded-lg border border-border bg-card overflow-hidden divide-y divide-hairline">
             {filteredNotifications?.map((notification: any) => (
               <NotificationItem key={notification._id} notification={notification} />
             ))}

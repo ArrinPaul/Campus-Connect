@@ -31,8 +31,8 @@ export function ConversationList({ selectedConversationId }: Props) {
     }, [conversations, searchQuery]);
 
     return (
-        <div className="flex flex-col h-full bg-transparent border-r border-hairline">
-            <div className="p-4 border-b border-hairline flex-shrink-0 space-y-3 bg-surface-soft">
+        <div className="flex flex-col h-full bg-transparent border-r border-border">
+            <div className="p-4 border-b border-border flex-shrink-0 space-y-3 bg-card">
                  <div className="flex justify-between items-center">
                     <h2 className="text-xl font-bold tracking-tight">Inbox</h2>
                      <button
@@ -50,12 +50,12 @@ export function ConversationList({ selectedConversationId }: Props) {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search chats..." 
-                        className="w-full pl-9 pr-3 py-2 text-[15px] bg-canvas border-none rounded-full focus:outline-none focus:ring-0 text-ink-deep placeholder:text-slate transition-all" 
+                        className="w-full pl-9 pr-3 py-2 text-[15px] bg-card border-none rounded-full focus:outline-none focus:ring-0 text-foreground placeholder:text-muted-foreground transition-all" 
                     />
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto bg-surface-soft scrollbar-custom">
+            <div className="flex-1 overflow-y-auto bg-card scrollbar-custom">
                 {conversations === undefined && (
                     <div className="p-8 text-center text-sm text-muted-foreground animate-pulse">Loading conversations...</div>
                 )}

@@ -3,7 +3,7 @@ const Skeleton = ({ className }: { className?: string }) => (
 );
 
 const PostCardSkeleton = () => (
-  <div className="w-full bg-canvas/70 dark:bg-canvas/40 backdrop-blur-md border-b border-hairline py-lg md:py-xl">
+  <div className="w-full bg-card/70 dark:bg-card/40 backdrop-blur-md border-b border-border py-lg md:py-xl">
     <div className="max-w-2xl mx-auto px-4 md:px-0 flex gap-3 md:gap-4">
       {/* Left Column: Avatar */}
       <div className="shrink-0 mt-1">
@@ -37,7 +37,7 @@ export const FeedSkeleton = () => {
   return (
     <div className="space-y-4">
       {/* Create Post Skeleton */}
-      <div className="w-full bg-canvas/70 dark:bg-canvas/40 backdrop-blur-md border-b border-hairline p-4">
+      <div className="w-full bg-card/70 dark:bg-card/40 backdrop-blur-md border-b border-border p-4">
         <div className="max-w-2xl mx-auto flex items-center gap-3">
           <Skeleton className="h-10 w-10 rounded-full shrink-0" />
           <Skeleton className="h-12 flex-1 rounded-full" />

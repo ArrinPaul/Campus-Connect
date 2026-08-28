@@ -7,7 +7,7 @@ import { Compass } from 'lucide-react';
 const ExplorePostGridSkeleton = () => (
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
  {[...Array(9)].map((_, i) => (
- <div key={i} className="border border-hairline-soft rounded-xl bg-surface-soft p-4 h-[320px] animate-pulse" />
+ <div key={i} className="border border-border/50 rounded-lg bg-card p-4 h-[320px] animate-pulse" />
  ))}
  </div>
 );
@@ -16,15 +16,15 @@ export default function ExplorePage() {
  return (
  <div className="w-full bg-canvas min-h-screen">
  {/* Header Section */}
- <section className="bg-surface-soft py-6 px-4 md:px-8 border-b border-hairline shadow-sm">
+ <section className="bg-card py-6 px-4 md:px-8 border-b border-border shadow-sm">
  <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-xl">
  <div className="max-w-2xl flex items-center gap-md">
- <div className="w-14 h-14 bg-surface-soft rounded-circle flex items-center justify-center shrink-0 border border-hairline">
- <Compass className="w-7 h-7 text-ink-deep" />
+ <div className="w-14 h-14 bg-card rounded-circle flex items-center justify-center shrink-0 border border-border">
+ <Compass className="w-7 h-7 text-foreground" />
  </div>
  <div>
- <h1 className="text-heading-lg font-bold text-ink-deep mb-1">Explore</h1>
- <p className="text-subtitle-md text-ink">Discover trending posts across campus</p>
+ <h1 className="text-heading-lg font-bold text-foreground mb-1">Explore</h1>
+ <p className="text-subtitle-md text-foreground">Discover trending posts across campus</p>
  </div>
  </div>
  </div>

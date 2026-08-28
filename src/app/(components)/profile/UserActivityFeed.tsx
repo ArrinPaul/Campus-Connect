@@ -23,14 +23,14 @@ export function UserActivityFeed({ userId }: { userId: Id<'users'> }) {
         return (
             <div className="space-y-4 mt-4">
                 {[...Array(3)].map((_, i) => (
-                    <div key={i} className="rounded-xl border border-hairline bg-surface-soft p-4 animate-pulse">
+                    <div key={i} className="rounded-lg border border-border bg-card p-4 animate-pulse">
                         <div className="flex items-center gap-3 mb-3">
-                            <div className="h-8 w-8 rounded-full bg-canvas" />
-                            <div className="h-4 w-32 bg-canvas rounded" />
+                            <div className="h-8 w-8 rounded-full bg-card" />
+                            <div className="h-4 w-32 bg-card rounded" />
                         </div>
                         <div className="space-y-2">
-                            <div className="h-4 w-full bg-canvas rounded" />
-                            <div className="h-4 w-3/4 bg-canvas rounded" />
+                            <div className="h-4 w-full bg-card rounded" />
+                            <div className="h-4 w-3/4 bg-card rounded" />
                         </div>
                     </div>
                 ))}
@@ -90,7 +90,7 @@ export function UserActivityFeed({ userId }: { userId: Id<'users'> }) {
                         className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-colors ${
                             filter === value
                                 ? 'bg-primary text-white'
-                                : 'bg-surface-soft text-slate border border-hairline hover:bg-canvas hover:text-ink-deep'
+                                : 'bg-card text-muted-foreground border border-border hover:bg-card hover:text-foreground'
                         }`}
                     >
                         {label}
@@ -100,9 +100,9 @@ export function UserActivityFeed({ userId }: { userId: Id<'users'> }) {
 
             {/* Activity Items */}
             {activityItems.length === 0 ? (
-                <div className="rounded-xl border border-hairline bg-surface-soft p-8 text-center">
-                    <h3 className="text-lg font-semibold text-ink-deep">No activity yet</h3>
-                    <p className="text-slate text-sm mt-1">
+                <div className="rounded-lg border border-border bg-card p-8 text-center">
+                    <h3 className="text-lg font-semibold text-foreground">No activity yet</h3>
+                    <p className="text-muted-foreground text-sm mt-1">
                         Activity will appear here when this user posts or comments.
                     </p>
                 </div>
@@ -134,14 +134,14 @@ export function UserActivityFeed({ userId }: { userId: Id<'users'> }) {
                             const comment = item.data;
                             const commentId = comment._id || comment.id || `act-comm-${idx}`;
                             return (
-                                <div key={`comment-${commentId}`} className="rounded-xl border border-hairline bg-surface-soft p-4">
-                                    <div className="flex items-center gap-2 text-xs text-slate mb-2">
+                                <div key={`comment-${commentId}`} className="rounded-lg border border-border bg-card p-4">
+                                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
                                         <MessageSquare className="h-3.5 w-3.5" />
                                         <span>Commented on a post</span>
                                         <span>•</span>
                                         <span>{formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}</span>
                                     </div>
-                                    <p className="text-sm text-ink-deep whitespace-pre-wrap line-clamp-3">
+                                    <p className="text-sm text-foreground whitespace-pre-wrap line-clamp-3">
                                         {comment.content}
                                     </p>
                                     <Link

@@ -103,7 +103,7 @@ export function NotificationBell() {
  {/* Bell Icon Button */}
  <button
  onClick={() => setIsOpen(!isOpen)}
- className="relative p-2 text-slate hover:bg-canvas rounded-lg transition-colors"
+ className="relative p-2 text-muted-foreground hover:bg-card rounded-lg transition-colors"
  aria-label={
  unreadCount
  ? `Notifications, ${unreadCount} unread`
@@ -133,11 +133,11 @@ export function NotificationBell() {
  role="dialog"
  aria-label="Notifications"
  aria-modal="false"
- className="absolute right-0 mt-2 w-80 bg-surface-soft border border-hairline rounded-lg shadow-sm z-50"
+ className="absolute right-0 mt-2 w-80 bg-card border border-border rounded-lg shadow-sm z-50"
  >
  {/* Header */}
- <div className="flex items-center justify-between px-4 py-3 border-b border-hairline">
- <h3 className="font-semibold text-ink-deep">Notifications</h3>
+ <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+ <h3 className="font-semibold text-foreground">Notifications</h3>
  <div className="flex items-center gap-2">
  {unreadCount !== undefined && unreadCount > 0 && (
  <button
@@ -163,7 +163,7 @@ export function NotificationBell() {
  {/* Notifications List */}
  <div className="max-h-96 overflow-y-auto">
  {!recentNotifications || recentNotifications.length === 0 ? (
- <div className="px-4 py-8 text-center text-slate">
+ <div className="px-4 py-8 text-center text-muted-foreground">
  <Bell className="w-12 h-12 mx-auto mb-2 opacity-50" />
  <p>No notifications yet</p>
  </div>
@@ -173,8 +173,8 @@ export function NotificationBell() {
  <button
  key={notification._id}
  onClick={() => handleNotificationClick(notification)}
- className={`w-full px-4 py-3 text-left hover:bg-canvas transition-colors ${
- !notification.isRead ?"bg-primary/10" :"bg-surface-soft"
+ className={`w-full px-4 py-3 text-left hover:bg-card transition-colors ${
+ !notification.isRead ?"bg-primary/10" :"bg-card"
  }`}
  >
  <div className="flex items-start space-x-3">
@@ -199,10 +199,10 @@ export function NotificationBell() {
 
  {/* Notification Content */}
  <div className="flex-1 min-w-0">
- <p className="text-sm text-ink-deep">
+ <p className="text-sm text-foreground">
  {notification.message}
  </p>
- <p className="text-xs text-slate mt-1">
+ <p className="text-xs text-muted-foreground mt-1">
  {formatDistanceToNow(notification.createdAt, { addSuffix: true })}
  </p>
  </div>
@@ -222,7 +222,7 @@ export function NotificationBell() {
 
  {/* View All Link (Footer) */}
  {recentNotifications && recentNotifications.length > 0 && (
- <div className="px-4 py-3 border-t border-hairline">
+ <div className="px-4 py-3 border-t border-border">
  <Link
  href="/notifications"
  className="block text-center text-sm text-primary hover:underline"
