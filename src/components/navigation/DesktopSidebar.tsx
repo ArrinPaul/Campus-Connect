@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -28,7 +28,8 @@ import {
   Sun,
   LogOut,
   Settings,
-  Sparkles,
+  HelpCircle,
+  Activity,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -49,6 +50,7 @@ export function DesktopSidebar({
   const [internalCollapsed, setInternalCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const moreMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -56,6 +58,19 @@ export function DesktopSidebar({
     if (saved !== null) {
       setInternalCollapsed(saved === "true");
     }
+
+    // Outside click listener for More menu
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        moreMenuRef.current &&
+        !moreMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowMoreMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const isCollapsed =
@@ -68,7 +83,7 @@ export function DesktopSidebar({
     api.notifications.getUnreadCount,
     isSignedIn ? {} : "skip"
   );
-  const unreadMessages = useQuery(
+  const totalUnreadMessages = useQuery(
     api.conversations.getTotalUnreadCount,
     isSignedIn ? {} : "skip"
   );
@@ -100,7 +115,7 @@ export function DesktopSidebar({
       label: "Messages",
       href: "/messages",
       icon: Send,
-      badge: typeof unreadMessages === "number" ? unreadMessages : 0,
+      badge: typeof totalUnreadMessages === "number" ? totalUnreadMessages : 0,
       iconClass: "-rotate-12",
       isActive: pathname?.startsWith("/messages"),
     },
@@ -146,7 +161,7 @@ export function DesktopSidebar({
     <TooltipProvider delayDuration={150}>
       <aside
         className={cn(
-          "flex flex-col h-full bg-background dark:bg-black border-r border-border transition-all duration-200 select-none z-30 px-3 py-5 justify-between",
+          "flex flex-col h-full bg-background dark:bg-black border-r border-border transition-all duration-200 select-none z-30 px-3 py-5 justify-between relative",
           isCollapsed ? "w-[72px]" : "w-[245px] xl:w-[260px]"
         )}
         aria-label="Instagram Style Desktop Sidebar"
@@ -156,7 +171,7 @@ export function DesktopSidebar({
           <div className="px-3 pt-2">
             <Link
               href="/feed"
-              className="flex items-center gap-3 active:scale-95 transition-transform"
+              className="flex items-center gap-3 active:scale-95 transition-transform focus:outline-none"
             >
               {isCollapsed ? (
                 <span className="text-[20px] font-black tracking-tight text-foreground font-sans">
@@ -246,44 +261,83 @@ export function DesktopSidebar({
         </div>
 
         {/* Bottom Menu / More Options */}
-        <div className="relative pt-2">
+        <div className="relative pt-2" ref={moreMenuRef}>
           {showMoreMenu && (
-            <div className="absolute bottom-14 left-0 w-56 bg-card border border-border rounded-2xl shadow-xl p-1.5 z-50 animate-in fade-in slide-in-from-bottom-2 duration-150">
+            <div
+              className={cn(
+                "absolute bottom-full mb-3 bg-card border border-border rounded-2xl shadow-2xl p-1.5 z-50 animate-in fade-in slide-in-from-bottom-2 duration-150 backdrop-blur-xl",
+                isCollapsed ? "left-0 w-60" : "left-0 w-64"
+              )}
+            >
+              {/* Settings */}
               <Link
                 href="/settings"
                 onClick={() => setShowMoreMenu(false)}
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors"
               >
-                <Settings className="h-4 w-4" />
+                <Settings className="h-4 w-4 text-muted-foreground" />
                 <span>Settings</span>
               </Link>
 
+              {/* Your Activity */}
+              <Link
+                href="/notifications"
+                onClick={() => setShowMoreMenu(false)}
+                className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors"
+              >
+                <Activity className="h-4 w-4 text-muted-foreground" />
+                <span>Your Activity</span>
+              </Link>
+
+              {/* Saved */}
+              <Link
+                href="/bookmarks"
+                onClick={() => setShowMoreMenu(false)}
+                className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors"
+              >
+                <Bookmark className="h-4 w-4 text-muted-foreground" />
+                <span>Saved</span>
+              </Link>
+
+              {/* Theme Toggle */}
               {mounted && (
                 <button
+                  type="button"
                   onClick={() => {
                     setTheme(theme === "dark" ? "light" : "dark");
-                    setShowMoreMenu(false);
                   }}
-                  className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors text-left"
+                  className="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors text-left"
                 >
-                  {theme === "dark" ? (
-                    <>
+                  <div className="flex items-center gap-3">
+                    {theme === "dark" ? (
+                      <Moon className="h-4 w-4 text-indigo-400" />
+                    ) : (
                       <Sun className="h-4 w-4 text-amber-500" />
-                      <span>Light Mode</span>
-                    </>
-                  ) : (
-                    <>
-                      <Moon className="h-4 w-4 text-indigo-500" />
-                      <span>Dark Mode</span>
-                    </>
-                  )}
+                    )}
+                    <span>Switch Appearance</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground capitalize">
+                    {theme === "dark" ? "Dark" : "Light"}
+                  </span>
                 </button>
               )}
 
+              {/* Help & Support */}
+              <Link
+                href="/q-and-a"
+                onClick={() => setShowMoreMenu(false)}
+                className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors"
+              >
+                <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                <span>Help & Q&A</span>
+              </Link>
+
+              {/* Log Out */}
               {isSignedIn && (
                 <button
+                  type="button"
                   onClick={() => signOut({ redirectUrl: "/" })}
-                  className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#ED4956] hover:bg-rose-500/10 transition-colors text-left border-t border-border mt-1 pt-2"
+                  className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium text-[#ED4956] hover:bg-rose-500/10 transition-colors text-left border-t border-border mt-1 pt-3"
                 >
                   <LogOut className="h-4 w-4" />
                   <span>Log Out</span>
@@ -293,15 +347,18 @@ export function DesktopSidebar({
           )}
 
           <button
-            onClick={() => setShowMoreMenu(!showMoreMenu)}
+            type="button"
+            onClick={() => setShowMoreMenu((prev) => !prev)}
             className={cn(
-              "flex items-center gap-4 px-3 py-3 rounded-xl transition-all font-medium text-foreground hover:bg-muted/60 w-full group focus:outline-none",
+              "flex items-center gap-4 px-3 py-3 rounded-xl transition-all font-medium text-foreground hover:bg-muted/60 w-full group focus:outline-none cursor-pointer",
+              showMoreMenu && "bg-muted/70 font-bold",
               isCollapsed && "justify-center px-0 w-12 h-12 mx-auto"
             )}
             aria-label="More options"
+            aria-expanded={showMoreMenu}
           >
             <Menu className="h-[22px] w-[22px] stroke-[1.8] text-foreground group-hover:scale-105 transition-transform" />
-            {!isCollapsed && <span className="text-[15px] font-medium">More</span>}
+            {!isCollapsed && <span className="text-[15px]">More</span>}
           </button>
         </div>
       </aside>
