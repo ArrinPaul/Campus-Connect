@@ -193,6 +193,14 @@ audit.
       `.focus()` on the dialog ref and switched its `tabIndex` from `0` to
       `-1` (correct pattern for a programmatically-focused dialog — reachable
       via script, not inserted into normal Tab order).
+- [x] **Composer drag-drop attach** — `PostComposer.tsx` had click-to-browse
+      file inputs (image/video/file, all wired to `handleFileSelect`) but no
+      drop zone at all. Added `onDragOver`/`onDragLeave`/`onDrop` on the
+      composer form, routing dropped files through the existing
+      `handleFileSelect` (same validation/compression path as the file
+      picker — no new validation logic needed), with a "Drop to attach"
+      overlay while dragging. Images win if a mix of file types is dropped;
+      falls back to video, then generic file.
 - [ ] Notifications: grouped notifications ("X and N others...").
 - [ ] Messaging: read receipts + unread-per-conversation badge.
 - [ ] Build one shared `<EmptyState>` / `<ErrorState>` / `<LoadingState>`

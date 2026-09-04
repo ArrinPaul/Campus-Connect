@@ -76,6 +76,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
     favicon?: string
   } | null>(null)
   const [isFetchingPreview, setIsFetchingPreview] = useState(false)
+  const [isDraggingOver, setIsDraggingOver] = useState(false)
 
   // Poll state
   const [showPollUI, setShowPollUI] = useState(false)
@@ -444,11 +445,56 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
 
   const avatarInitial = user?.name ? user.name.substring(0, 2).toUpperCase() : "CC"
 
+  const handleComposerDragOver = useCallback((e: React.DragEvent<HTMLFormElement>) => {
+    if (!e.dataTransfer.types.includes("Files")) return
+    e.preventDefault()
+    setIsDraggingOver(true)
+  }, [])
+
+  const handleComposerDragLeave = useCallback((e: React.DragEvent<HTMLFormElement>) => {
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return
+    setIsDraggingOver(false)
+  }, [])
+
+  const handleComposerDrop = useCallback(
+    (e: React.DragEvent<HTMLFormElement>) => {
+      if (!e.dataTransfer.files?.length) return
+      e.preventDefault()
+      setIsDraggingOver(false)
+
+      const dropped = Array.from(e.dataTransfer.files)
+      const images = dropped.filter(isImageFile)
+      const videos = dropped.filter(isVideoFile)
+
+      if (images.length > 0) {
+        handleFileSelect(images, "image")
+      } else if (videos.length > 0) {
+        handleFileSelect([videos[0]], "video")
+      } else {
+        handleFileSelect(dropped, "file")
+      }
+    },
+    [handleFileSelect]
+  )
+
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-card border border-border rounded-2xl mb-4 p-4 space-y-4 shadow-sm"
+      onDragOver={handleComposerDragOver}
+      onDragLeave={handleComposerDragLeave}
+      onDrop={handleComposerDrop}
+      className={cn(
+        "relative bg-card border rounded-2xl mb-4 p-4 space-y-4 shadow-sm transition-colors",
+        isDraggingOver ? "border-primary border-2 bg-primary/5" : "border-border"
+      )}
     >
+      {isDraggingOver && (
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-2xl">
+          <span className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-on-primary shadow-lg">
+            Drop to attach
+          </span>
+        </div>
+      )}
       {/* Hidden file inputs */}
       <input
         ref={imageInputRef}
