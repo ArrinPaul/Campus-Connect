@@ -1,5 +1,12 @@
 # Project QA & UI/UX Audit - Campus Connect
 
+> **Note (2026-09-05):** This tracker's page rows are largely marked
+> "Pending" and were never completed — that's consistent with what a later
+> forensic audit found in the code (see `docs/PHASE_8_FINAL_REPORT.md`'s
+> correction banner). Current project status lives in `docs/ROADMAP.md` and
+> `docs/TASKS.md`; use this file for its original page/route inventory, not
+> as a QA source of truth.
+
 ## 1. Project Overview
 * **Project Name**: Campus Connect
 * **Framework**: Next.js 14.2 (App Router), React 18, Tailwind CSS, TypeScript

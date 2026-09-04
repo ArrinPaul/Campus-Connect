@@ -121,11 +121,13 @@ passing) after the changes.
 
 ## §4 — UI pass ("feels like Facebook")
 
-- [ ] Feed: confirm `@tanstack/react-virtual` is actually applied to the
-      feed list, not just installed.
+- [x] Feed: confirmed `@tanstack/react-virtual` is genuinely applied —
+      `VirtualizedFeed.tsx` is used by `FeedContainer.tsx` (which has its
+      own test file). Not dead code.
 - [ ] Feed: skeleton loaders instead of spinners on first load.
-- [ ] Composer: confirm Tiptap mention/hashtag autocomplete is wired into
-      the real post composer (not just present as a dependency).
+- [x] Composer: confirmed Tiptap mention autocomplete is real and wired —
+      `PostComposer.tsx` uses `MentionAutocomplete` with live `@`-trigger
+      state, not just an unused import.
 - [ ] Notifications: grouped notifications ("X and N others...").
 - [ ] Messaging: read receipts + unread-per-conversation badge.
 - [ ] Build one shared `<EmptyState>` / `<ErrorState>` / `<LoadingState>`

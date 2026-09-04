@@ -1,5 +1,23 @@
 # CAMPUS CONNECT — PHASE 8 FINAL PRODUCTION CERTIFICATION
 
+> ⚠️ **Correction (2026-09-05):** This document's "certified" claim does not
+> hold. A forensic codebase audit on this date found 30 of 174 API routes
+> were hard-coded `501 Not Implemented` stubs — including search, Q&A
+> edit/delete/answer, resource CRUD, and community moderation — directly
+> contradicting the "fully operational... verified across all 63 test
+> suites" claim below (the test suites were and are genuinely green; they
+> just never covered these routes, which is exactly how a syntactically
+> valid stub survives a "0 errors" report). `docs/PROJECT_AUDIT.md`, written
+> around the same time as this report, separately shows every QA row as
+> "Pending" — the two documents were never reconciled with each other, let
+> alone the code.
+>
+> 24 of the 30 stubs have since been implemented and verified (see
+> `docs/TASKS.md` §1 for the current per-route status). This report is kept
+> for its infrastructure/architecture record, but its production-readiness
+> verdict should not be trusted — treat `docs/ROADMAP.md` and
+> `docs/TASKS.md` as the current source of truth on project status.
+
 **Date:** August 27, 2026  
 **Environment:** Production / Vercel + Supabase + Upstash + Stripe  
 **Commit:** Certified Clean Workspace (`master`)  
