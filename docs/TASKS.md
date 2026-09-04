@@ -78,6 +78,34 @@ pending product decisions (ads/update, media/confirm). Verified with a clean
 `tsc --noEmit`, `next lint`, `npm run build`, and `jest --ci` (547/547
 passing) after the changes.
 
+## §1b — Engine verification (2026-09-05 follow-up)
+
+Checked whether the feed and recommendation systems are real or fake, since
+they're easy to fake with hardcoded data and easy to miss in a route-by-route
+audit.
+
+- [x] **Feed engine** (`getFeedPosts` in `posts.ts`) — confirmed real: pulls
+      a pool of recent posts, scores by affinity (follow/self) × engagement
+      (log-scaled likes/comments/shares) × time-decay gravity, then ranks
+      and paginates. Not a stub, not "most recent only."
+- [x] **Friend suggestions** (`api/graph/suggestions`) — confirmed real:
+      scores by mutual connections, shared university, shared skills, shared
+      communities, popularity fallback. Not hardcoded.
+- [x] **Partner/study-buddy matching** (`matching-engine.ts`) — confirmed
+      real: cosine + Jaccard similarity across skills/university/department/
+      bio. Not hardcoded.
+- [ ] **Semantic research search degrades silently without `OPENAI_API_KEY`**
+      — falls back to `MockEmbeddingProvider`, a deterministic hash, not a
+      real embedding. Confirmed `OPENAI_API_KEY` is unset in `.env.local`
+      right now. Either set a real key (production too, if also unset there)
+      or make the degraded mode visible to users/logs instead of silent.
+- [ ] **Confirm production env vars**, not just local `.env.local`: Stripe,
+      VAPID, Upstash, OpenAI, Sentry, PostHog are all unset locally — billing,
+      push notifications, rate limiting (fails open, not closed), semantic
+      search, and monitoring are effectively non-functional or degraded
+      without them. Unknown whether Vercel's production env has these set;
+      this environment can't check that.
+
 ## §2 — Data integrity
 
 - [ ] Verify live `subscriptions` table schema against Stripe billing code —
