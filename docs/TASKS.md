@@ -137,11 +137,30 @@ passing) after the changes.
 
 ## §5 — Test coverage for fixed stubs
 
-- [ ] Playwright spec for search (posts/users/communities)
-- [ ] Playwright spec for Q&A update/delete/answer flow
-- [ ] Playwright spec for resource open/download/delete flow
-- [ ] Playwright spec for community moderation (approve/remove/invite)
-- [ ] Playwright spec for marketplace contact-seller flow
+Existing Playwright specs in `src/e2e/` are unauthenticated smoke tests
+(page renders, nothing more) and can't exercise these ownership/auth-gated
+flows without a live app + seeded DB session, which this environment
+doesn't have. Used the same pattern as `marketplace-mutations.test.ts`
+instead — Jest route-handler tests with a mocked Supabase client, runnable
+right now with no live backend. Added
+`src/tests/stub-routes-regression.test.ts` (10 tests, all passing):
+questions/update (401, 403 non-author, 200 author), questions/delete (403
+non-author), resources/update (403 non-uploader), resources/delete (200
+uploader), search/posts (empty-query short-circuit + real match), and
+communities/slug (400 missing slug, 404 not found).
+
+- [x] Jest regression coverage for the previously-stubbed routes above
+      (`src/tests/stub-routes-regression.test.ts`) — 557/557 tests passing
+      repo-wide after adding it.
+- [ ] Extend the same file (or add siblings) for the remaining fixed routes
+      not yet covered: communities/members/{approve,remove}, invite/respond,
+      stories/{user,delete}, marketplace/contact, events/my-events,
+      reactions/counts, polls/single, hashtags/search, comments/replies,
+      posts/activity.
+- [ ] Real Playwright e2e (login → act → assert) for at least the highest-
+      value flows once there's a way to run against a live/seeded
+      environment — search, Q&A, resource download, community moderation,
+      marketplace contact.
 
 ## §6 — Production readiness
 
