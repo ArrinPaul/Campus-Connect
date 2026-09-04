@@ -3,7 +3,7 @@
 import { Suspense, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Id } from '@/lib/api';
-import { ChatWindow } from '../../../(components)/messages/ChatWindow';
+import { ChatArea } from '@/components/messages/ChatArea';
 import { MessagesSkeleton } from '../../../(components)/messages/skeletons';
 
 type Props = {
@@ -13,9 +13,10 @@ type Props = {
 };
 
 function MobileChatPageContent({ conversationId }: { conversationId: Id<'conversations'> }) {
+ const router = useRouter();
  return (
  <div className="h-[calc(100vh-61px)]">
- <ChatWindow conversationId={conversationId} />
+ <ChatArea conversationId={conversationId} onBack={() => router.push('/messages')} />
  </div>
  );
 }

@@ -286,13 +286,58 @@ audit.
       deciding which UI ships** — attempted that fix in this session and
       reverted it once the orphaning was discovered, see the route's
       inline comment.
-      **Needs a decision:** (a) swap the live pages over to
-      `ChatArea`/`MessageBubble` (bigger change — need to verify its
-      mutations against current API routes: `markAsRead`, `muteConversation`,
-      `deleteConversation`, `searchMessages`), (b) port read
-      receipts/reply-quoting/search into the live `ChatWindow`/`ChatMessage`
-      instead and delete the orphaned tree, or (c) leave as-is for now.
-      Not resolved in this pass — asked the user directly.
+      **Resolved — user chose to swap to the built-out UI.** Done:
+      - Verified every mutation/query `ChatArea`/`MessageComposer` use
+        against `src/lib/api.ts` and the actual route files. Two were
+        listed as endpoints but the route file didn't exist at all (not
+        even a 501 stub): `api/conversations/delete` and
+        `api/messages/search`. Implemented both — `deleteConversationForUser`
+        and `searchMessages` in `server/db/messages.ts`, wired through new
+        route files, matching the exact response shape each caller expects
+        (`deleteConversation` returns `{success}`; `searchMessages` returns
+        a bare array — `ChatArea` does `searchResults.map`, not
+        `searchResults.messages.map`, confirmed by reading the call site
+        before writing the route, not assumed).
+      - Applied the `GET /api/messages` response-shape fix that was reverted
+        earlier — now safe since `ChatArea` (which expects
+        `{ messages: [...] }`) is becoming the only consumer.
+      - Swapped `ChatWindow` → `ChatArea` in both
+        `(dashboard)/messages/page.tsx` (desktop + mobile branches) and
+        `(dashboard)/messages/[id]/page.tsx` (mobile deep link), wiring a
+        real `onBack` handler (`router.push('/messages')`) since `ChatArea`
+        takes one and `ChatWindow` didn't.
+      - Deleted the now-fully-dead `ChatWindow.tsx`, `ChatMessage.tsx`, and
+        `ChatInput.tsx` (all three orphaned — nothing else imported any of
+        them).
+      - Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`
+        (all passed before the file deletions; jest re-run is pending as of
+        this note — see commit for final status).
+      - **Not done / explicitly deferred:** `GroupInfoPanel`'s pinned-
+        messages and promote/demote-admin features hit a *deeper* gap than
+        a missing route — `conversation_participants` has no admin/role
+        column and `messages` has no pinned flag at the schema level. Building
+        the routes wouldn't be enough; needs a migration first. Only
+        surfaces when a user opens group info on a group conversation and
+        tries those two specific actions — doesn't block 1:1 messaging or
+        anything else in `ChatArea`. Tracked as its own line item below.
+      - **Could not do a live interactive browser check** — Chrome
+        automation tooling failed at the navigate/screenshot layer in this
+        session (tab reported successful navigation then reverted to
+        `chrome://newtab/` on every follow-up call, 3 attempts). Verification
+        for this swap rests on: clean typecheck/lint/build, and manually
+        tracing every mutation/query each component makes against the
+        actual route files and their response shapes — not on seeing it
+        render. Recommend an actual click-through before considering this
+        fully done.
+- [ ] Add an admin/role column to `conversation_participants` and a
+      `pinned`/`pinned_at` column to `messages` (migration), then implement
+      `api/conversations/admin` (promote/demote) and
+      `api/conversations/pinned` (GET) so `GroupInfoPanel`'s admin controls
+      and pinned-messages tab actually work instead of hitting a 404.
+- [ ] `src/components/messages/ConversationList.tsx` is also dead code (same
+      orphaning pattern as `ChatWindow` — the live conversation list is
+      `(components)/messages/ConversationListItem.tsx`), just not deleted in
+      this pass to keep the messaging-swap commit focused.
 
 ## §5 — Test coverage for fixed stubs
 

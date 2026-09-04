@@ -1,16 +1,18 @@
 ﻿'use client';
 
 import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { MessagesSkeleton } from '../../(components)/messages/skeletons';
 import { ConversationList } from '../../(components)/messages/ConversationList';
-import { ChatWindow } from '../../(components)/messages/ChatWindow';
+import { ChatArea } from '@/components/messages/ChatArea';
 import type { Id } from '@/lib/api';
 import { MessageSquare } from 'lucide-react';
 
 function MessagesPageContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const selectedConversationId = searchParams.get('c');
+  const handleBack = () => router.push('/messages');
 
   return (
     <div className="flex h-[calc(100vh-61px)] md:h-[calc(100vh-56px)] w-full min-w-0 bg-canvas overflow-hidden">
@@ -21,7 +23,7 @@ function MessagesPageContent() {
 
       <div className="hidden md:flex flex-1 w-full min-w-0 h-full">
         {selectedConversationId ? (
-          <ChatWindow key={selectedConversationId} conversationId={selectedConversationId as Id<'conversations'>} />
+          <ChatArea key={selectedConversationId} conversationId={selectedConversationId as Id<'conversations'>} onBack={handleBack} />
         ) : (
           <div className="flex flex-col h-full w-full items-center justify-center text-center p-8 bg-canvas">
             <div className="rounded-full bg-primary/10 p-6 mb-4 animate-bounce duration-1000">
@@ -38,7 +40,7 @@ function MessagesPageContent() {
       {/* Mobile: Full screen list or active chat window */}
       <div className="md:hidden w-full h-full bg-background">
         {selectedConversationId ? (
-          <ChatWindow key={selectedConversationId} conversationId={selectedConversationId as Id<'conversations'>} />
+          <ChatArea key={selectedConversationId} conversationId={selectedConversationId as Id<'conversations'>} onBack={handleBack} />
         ) : (
           <ConversationList selectedConversationId={null} />
         )}

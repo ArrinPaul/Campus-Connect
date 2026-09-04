@@ -136,6 +136,35 @@ async function notifyOtherParticipants(
   }
 }
 
+export async function searchMessages(conversationId: string, query: string, limit = 20) {
+  const supabase = await getSupabase()
+  const escaped = query.replace(/[%_]/g, (m) => `\\${m}`)
+  const { data, error } = await supabase
+    .from("messages")
+    .select("*, sender:users!messages_sender_id_fkey(id, name, username, profile_picture)")
+    .eq("conversation_id", conversationId)
+    .is("deleted_at", null)
+    .ilike("content", `%${escaped}%`)
+    .order("created_at", { ascending: false })
+    .limit(limit)
+  if (error) return []
+  return data ?? []
+}
+
+// Removes the current user from a conversation (leaves it) rather than
+// deleting the conversation for every participant — matches how the group
+// "leave" flow and DM etiquette both expect this to behave.
+export async function deleteConversationForUser(conversationId: string, userId: string) {
+  const supabase = await getSupabase()
+  const { error } = await supabase
+    .from("conversation_participants")
+    .delete()
+    .eq("conversation_id", conversationId)
+    .eq("user_id", userId)
+  if (error) return { error: error.message, status: 500 }
+  return { success: true }
+}
+
 export async function deleteMessage(messageId: string) {
   const supabase = await getSupabase()
   await supabase
