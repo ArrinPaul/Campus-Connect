@@ -152,10 +152,36 @@ audit.
 - [x] Feed: confirmed `@tanstack/react-virtual` is genuinely applied —
       `VirtualizedFeed.tsx` is used by `FeedContainer.tsx` (which has its
       own test file). Not dead code.
-- [ ] Feed: skeleton loaders instead of spinners on first load.
+- [x] Feed: skeleton loaders instead of spinners on first load — confirmed
+      **already present** (`FeedContainer.tsx` used `LoadingSkeleton`, not a
+      spinner), but found and fixed two real bugs while verifying it:
+      1. `FeedContainer`'s inline skeleton and `SuggestedUsers`' inline
+         skeleton both used `bg-card` for the pulsing bars *inside* a
+         `bg-card` panel — same color on same color, so the "loading"
+         state was invisible gray-on-gray. Fixed by pointing `FeedContainer`
+         at the existing shared `PostSkeleton` (`loading-skeleton.tsx`) and
+         fixing `SuggestedUsers`' bars to `bg-muted`.
+      2. The shared skeleton library (`loading-skeleton.tsx`, 40+ call
+         sites: `PostSkeleton`, `UserCardSkeleton`, `MessageListSkeleton`,
+         `CommunityCardSkeleton`, `EventCardSkeleton`,
+         `ListingDetailSkeleton`, `LeaderboardSkeleton`, etc.) all use an
+         `animate-shimmer` class that was **never defined** anywhere —
+         Tailwind silently drops unknown utility classes, so none of these
+         skeletons were actually animating (a few also lack a `animate-pulse`
+         fallback on their parent, so those were fully static). Fixed by
+         adding a real `shimmer` keyframe + `animation` to
+         `tailwind.config.ts` — no component code needed to change, the
+         existing class names now do what they always claimed to do.
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
+      `jest --ci` (557/557).
 - [x] Composer: confirmed Tiptap mention autocomplete is real and wired —
       `PostComposer.tsx` uses `MentionAutocomplete` with live `@`-trigger
       state, not just an unused import.
+- [ ] **Not yet swept:** 61 files in `src/` use `animate-pulse` for loading
+      states; only the feed and suggested-users widgets were checked
+      component-by-component for the bg-card-on-bg-card bug above. Worth a
+      dedicated pass to confirm the rest don't have the same contrast bug —
+      tracked here rather than assumed clean.
 - [ ] Notifications: grouped notifications ("X and N others...").
 - [ ] Messaging: read receipts + unread-per-conversation badge.
 - [ ] Build one shared `<EmptyState>` / `<ErrorState>` / `<LoadingState>`

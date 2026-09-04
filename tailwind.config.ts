@@ -174,6 +174,21 @@ const config: Config = {
       },
 
       // â”€â”€â”€ Shadows â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      // Motion — `animate-shimmer` is used across
+      // src/components/ui/loading-skeleton.tsx (40+ call sites) but had no
+      // matching keyframes/animation defined here; Tailwind silently drops
+      // unknown utility classes, so every skeleton bar using it was static.
+      // This makes the existing class names actually work.
+      keyframes: {
+        shimmer: {
+          "0%, 100%": { opacity: "0.5" },
+          "50%": { opacity: "1" },
+        },
+      },
+      animation: {
+        shimmer: "shimmer 1.6s ease-in-out infinite",
+      },
+
       boxShadow: {
         subtle:          "0 1px 2px rgba(0,0,0,0.06)",
         sm:              "0 1px 4px rgba(0,0,0,0.08)",

@@ -65,13 +65,13 @@ export function SuggestedUsers({ limit = 5, showSeeAll = false, className = "" }
           {[...Array(3)].map((_, i) => (
             <div key={i} className="animate-pulse flex items-center justify-between py-1">
               <div className="flex items-center gap-2.5">
-                <div className="h-9 w-9 rounded-full bg-card"></div>
+                <div className="h-9 w-9 rounded-full bg-muted"></div>
                 <div className="space-y-1">
-                  <div className="h-3.5 bg-card rounded w-20"></div>
-                  <div className="h-2.5 bg-card rounded w-14"></div>
+                  <div className="h-3.5 bg-muted rounded w-20"></div>
+                  <div className="h-2.5 bg-muted rounded w-14"></div>
                 </div>
               </div>
-              <div className="h-7 w-16 bg-card rounded-lg"></div>
+              <div className="h-7 w-16 bg-muted rounded-lg"></div>
             </div>
           ))}
         </div>
