@@ -44,6 +44,15 @@ export function MainLayout({
     localStorage.setItem("cc_sidebar_collapsed", String(next));
   };
 
+  // The dedicated mobile single-conversation route (/messages/[id]) sizes
+  // its chat area to the full viewport height itself (composer pinned to
+  // its own bottom) — the shared shell's bottom padding and fixed mobile
+  // tab bar would otherwise overlap/hide that composer. Real chat UIs
+  // (Instagram, Messenger) hide the tab bar entirely inside an open
+  // conversation for the same reason; desktop never hits this route (it
+  // redirects to /messages), so this only affects mobile.
+  const isMobileConversationView = /^\/messages\/[^/]+$/.test(pathname ?? "");
+
   const isFullWidthPage =
     fullWidth ||
     pathname?.startsWith("/messages") ||
@@ -82,7 +91,8 @@ export function MainLayout({
         <main
           id="main-content"
           className={cn(
-            "flex-1 min-w-0 flex flex-col justify-start pb-24 md:pb-12 transition-all duration-300 border-x border-border/40 px-4 sm:px-6 md:px-8 py-4 md:py-6",
+            "flex-1 min-w-0 flex flex-col justify-start transition-all duration-300 border-x border-border/40 md:px-8 md:py-6",
+            isMobileConversationView ? "px-0 py-0 pb-0 md:pb-12" : "px-4 sm:px-6 py-4 pb-24 md:pb-12",
             isFullWidthPage ? "w-full" : "items-center"
           )}
         >
@@ -97,8 +107,9 @@ export function MainLayout({
         </main>
       </div>
 
-      {/* Modern Floating Mobile Bottom Navigation */}
-      <MobileBottomNav />
+      {/* Modern Floating Mobile Bottom Navigation — hidden inside an open
+          mobile conversation, see isMobileConversationView above */}
+      {!isMobileConversationView && <MobileBottomNav />}
     </div>
   );
 }

@@ -250,7 +250,55 @@ audit.
       ChatArea swap). Kept here as a pointer rather than duplicating detail.
 - [ ] Build one shared `<EmptyState>` / `<ErrorState>` / `<LoadingState>`
       component set and replace ad hoc per-page versions.
-- [ ] Mobile pass: verify every dashboard page at 375px width.
+- [x] **Mobile pass, part 1 — found and fixed a real layout bug in the
+      highest-traffic mobile flow (opening a chat).** Swept `src/app` and
+      `src/components` for the two most common mobile anti-patterns
+      (fixed pixel widths that would overflow at 375px, unresponsive
+      multi-column grids with no mobile-first default) — repo is largely
+      clean on both; the couple of hits found (2-column onboarding
+      button row, 3-column event-type picker) are legitimate at 375px, not
+      bugs.
+      The real find: `/messages` (mobile branch) rendered `ChatArea` nested
+      inside the shared shell (`MainLayout`), which adds `pb-24` bottom
+      padding *and* a `fixed` 49px+safe-area bottom tab bar on every page.
+      `ChatArea` expects to own the full viewport (it renders its own
+      header and pins its own composer to the bottom) — the two height
+      systems weren't reconciled, so the message composer would end up
+      partially hidden behind the fixed bottom nav. Root cause also
+      affects the dedicated (but currently unreachable from any link —
+      confirmed by grep, only reachable by typing the URL directly)
+      `/messages/[id]` route, which additionally used a hardcoded
+      `calc(100vh-61px)` that didn't match `MobileTopBar`'s real height
+      (48px, not 61px).
+      Fixed both: `/messages/page.tsx`'s mobile chat branch now renders
+      `ChatArea` in a `fixed inset-0 z-[60]` overlay when a conversation is
+      open, covering the full viewport above the shell's top bar (z-40) and
+      bottom nav (z-50) rather than trying to keep two independent height
+      calculations in sync. `main-layout.tsx` also gained an
+      `isMobileConversationView` check (for the `/messages/[id]` route) that
+      drops the shell's own padding and hides the bottom nav on that route
+      too, and its height constant was corrected to the real 48px.
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`
+      (whole-app build since this touches the shared layout), and
+      `jest --ci` (562/562 passing). **Not visually verified in a browser**
+      — Chrome automation in this session is blocked on a host-permission
+      grant only the user can make (see below); reasoning here is from
+      tracing the actual CSS/z-index values against each other, not from
+      seeing it render. Recommend a real click-through on a phone or
+      responsive dev tools before fully trusting this.
+- [ ] **Chrome DevTools/extension automation is blocked in this
+      environment** — `mcp__claude-in-chrome__computer` (screenshot) fails
+      with "Extension manifest must request permission to access the
+      respective host" for `localhost`. This is a host-permission grant in
+      the Chrome extension's own settings, not something fixable from
+      inside a session. Grant it (extension icon → site permissions →
+      allow `localhost`) to unblock live visual verification of this and
+      future UI work.
+- [ ] Mobile pass, part 2: everything beyond the messages flow above still
+      needs an actual visual check (not just a static-code grep) at 375px —
+      feed, profile, communities, marketplace, and modals in particular,
+      since modals/dialogs are a common place for mobile overflow bugs that
+      grep can't catch.
 - [ ] Dark mode: verify every page (not just shell/nav) respects theme.
 
 ## §4b — Messaging (Phase D of the UI pass, 2026-09-05)

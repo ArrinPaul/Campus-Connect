@@ -14,8 +14,13 @@ type Props = {
 
 function MobileChatPageContent({ conversationId }: { conversationId: Id<'conversations'> }) {
  const router = useRouter();
+ // 48px matches MobileTopBar's actual sticky height (MobileTopBar.tsx
+ // h-[48px]) — was 61px, which didn't match anything real. The shared
+ // shell no longer adds its own padding or a fixed bottom nav on this
+ // route (see main-layout.tsx isMobileConversationView), so this is the
+ // only offset left to account for.
  return (
- <div className="h-[calc(100vh-61px)]">
+ <div className="h-[calc(100vh-48px)]">
  <ChatArea conversationId={conversationId} onBack={() => router.push('/messages')} />
  </div>
  );

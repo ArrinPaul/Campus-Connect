@@ -37,14 +37,26 @@ function MessagesPageContent() {
         )}
       </div>
 
-      {/* Mobile: Full screen list or active chat window */}
-      <div className="md:hidden w-full h-full bg-background">
-        {selectedConversationId ? (
-          <ChatArea key={selectedConversationId} conversationId={selectedConversationId as Id<'conversations'>} onBack={handleBack} />
-        ) : (
+      {/* Mobile: full-screen conversation list */}
+      {!selectedConversationId && (
+        <div className="md:hidden w-full h-full bg-background">
           <ConversationList selectedConversationId={null} />
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Mobile: active chat, as a true full-viewport overlay. ChatArea
+          renders its own header/composer and expects the full screen — the
+          shared shell's bottom padding and fixed bottom tab bar (both sized
+          for scrollable list-style pages) would otherwise fight it for
+          space and partially cover the composer. A fixed overlay sidesteps
+          that entirely instead of trying to keep two independent height
+          calculations in sync with the shell. z-[60] sits above the shell's
+          sticky top bar (z-40) and fixed bottom nav (z-50). */}
+      {selectedConversationId && (
+        <div className="md:hidden fixed inset-0 z-[60] bg-background">
+          <ChatArea key={selectedConversationId} conversationId={selectedConversationId as Id<'conversations'>} onBack={handleBack} />
+        </div>
+      )}
     </div>
   );
 }
