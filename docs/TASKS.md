@@ -182,6 +182,17 @@ audit.
       component-by-component for the bg-card-on-bg-card bug above. Worth a
       dedicated pass to confirm the rest don't have the same contrast bug —
       tracked here rather than assumed clean.
+- [x] **Media lightbox** — checked `MediaGallery.tsx` / `ImageLightbox`:
+      already fully built to a high standard (grid layout, double-tap-to-like
+      heart burst, zoom, keyboard nav, dot indicators, file/video/image
+      handling) — no new component needed. Found and fixed one real bug:
+      the dialog's `onKeyDown` (arrows/Escape) never worked on open because
+      nothing moved focus into it — the thumbnail button that triggered it
+      stayed focused (now hidden behind the backdrop), so keyboard nav
+      required an extra throwaway click first. Fixed with a mount-time
+      `.focus()` on the dialog ref and switched its `tabIndex` from `0` to
+      `-1` (correct pattern for a programmatically-focused dialog — reachable
+      via script, not inserted into normal Tab order).
 - [ ] Notifications: grouped notifications ("X and N others...").
 - [ ] Messaging: read receipts + unread-per-conversation badge.
 - [ ] Build one shared `<EmptyState>` / `<ErrorState>` / `<LoadingState>`

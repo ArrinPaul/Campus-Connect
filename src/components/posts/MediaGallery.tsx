@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { FileText, Download, X, ChevronLeft, ChevronRight, ZoomIn, Heart } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -183,6 +183,15 @@ export function ImageLightbox({
 }: ImageLightboxProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
   const [zoomed, setZoomed] = useState(false)
+  const dialogRef = useRef<HTMLDivElement>(null)
+
+  // Move focus into the dialog on open so Escape/arrow keys work
+  // immediately, without requiring an extra click first — the trigger
+  // button that opened this stays focused otherwise, since it's now
+  // hidden behind the backdrop.
+  useEffect(() => {
+    dialogRef.current?.focus()
+  }, [])
 
   const goToPrev = () => setCurrentIndex((i) => (i - 1 + images.length) % images.length)
   const goToNext = () => setCurrentIndex((i) => (i + 1) % images.length)
@@ -198,12 +207,13 @@ export function ImageLightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md"
+      ref={dialogRef}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md outline-none"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
       onKeyDown={handleKeyDown}
-      tabIndex={0}
+      tabIndex={-1}
       role="dialog"
       aria-modal="true"
       aria-label="Image lightbox"
