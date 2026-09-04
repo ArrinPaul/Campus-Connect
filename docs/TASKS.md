@@ -336,10 +336,9 @@ audit.
       `api/conversations/admin` (promote/demote) and
       `api/conversations/pinned` (GET) so `GroupInfoPanel`'s admin controls
       and pinned-messages tab actually work instead of hitting a 404.
-- [ ] `src/components/messages/ConversationList.tsx` is also dead code (same
-      orphaning pattern as `ChatWindow` — the live conversation list is
-      `(components)/messages/ConversationListItem.tsx`), just not deleted in
-      this pass to keep the messaging-swap commit focused.
+- [x] `src/components/messages/ConversationList.tsx` was also dead code
+      (same orphaning pattern as `ChatWindow` — the live conversation list
+      is `(components)/messages/ConversationListItem.tsx`). Deleted.
 
 ## §5 — Test coverage for fixed stubs
 
