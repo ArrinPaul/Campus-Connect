@@ -1,26 +1,26 @@
+import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
+import { getResourceDownloadUrl } from "@/server/db/content"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
+// GET /api/resources/download?id=...
+export async function GET(req: Request) {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-export async function GET() {
-  return notImplemented()
-}
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get("id") || searchParams.get("resourceId")
+    if (!id) return NextResponse.json({ error: "Resource ID required" }, { status: 400 })
 
-export async function POST() {
-  return notImplemented()
-}
+    const result = await getResourceDownloadUrl(id)
+    if ("error" in result) {
+      return NextResponse.json({ error: result.error }, { status: result.status })
+    }
 
-export async function PATCH() {
-  return notImplemented()
-}
-
-export async function DELETE() {
-  return notImplemented()
+    return NextResponse.json(result.data)
+  } catch (err) {
+    return internalError(err)
+  }
 }

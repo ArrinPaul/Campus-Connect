@@ -44,6 +44,16 @@ export async function unattendEvent(eventId: string, userId: string) {
   if (data) await supabase.from("events").update({ attendee_count: Math.max(0, (data.attendee_count ?? 0) - 1) }).eq("id", eventId)
 }
 
+export async function getUserEvents(userId: string) {
+  const supabase = await getSupabase()
+  const { data, error } = await supabase
+    .from("event_attendees")
+    .select("event:events(*, creator:users!events_created_by_fkey(id, name, profile_picture))")
+    .eq("user_id", userId)
+  if (error) return []
+  return (data ?? []).map((row: any) => row.event).filter(Boolean)
+}
+
 export async function updateEvent(
   eventId: string,
   userId: string,

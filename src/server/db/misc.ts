@@ -224,6 +224,44 @@ export async function universalSearch(query: string) {
   }
 }
 
+export async function searchUsers(query: string, limit = 20, offset = 0) {
+  const supabase = await getSupabase()
+  const escaped = query.replace(/[%_]/g, (m) => `\\${m}`)
+  const { data, error } = await supabase
+    .from("users")
+    .select("id, name, username, profile_picture, university, role")
+    .or(`name.ilike.%${escaped}%,username.ilike.%${escaped}%`)
+    .range(offset, offset + limit - 1)
+  if (error) return []
+  return data ?? []
+}
+
+export async function searchPosts(query: string, limit = 20, offset = 0) {
+  const supabase = await getSupabase()
+  const escaped = query.replace(/[%_]/g, (m) => `\\${m}`)
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*, author:users!posts_author_id_fkey(id, name, username, profile_picture)")
+    .ilike("content", `%${escaped}%`)
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1)
+  if (error) return []
+  return data ?? []
+}
+
+export async function searchCommunities(query: string, limit = 20, offset = 0) {
+  const supabase = await getSupabase()
+  const escaped = query.replace(/[%_]/g, (m) => `\\${m}`)
+  const { data, error } = await supabase
+    .from("communities")
+    .select("id, name, slug, description, cover_image, member_count")
+    .or(`name.ilike.%${escaped}%,description.ilike.%${escaped}%`)
+    .order("member_count", { ascending: false })
+    .range(offset, offset + limit - 1)
+  if (error) return []
+  return data ?? []
+}
+
 // ─── Skill Endorsements ─────────────────────────────────────────────────────
 
 export async function endorseSkill(userId: string, endorserId: string, skill: string) {

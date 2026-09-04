@@ -1,26 +1,39 @@
+import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
+import { deleteResource } from "@/server/db/content"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
-
-export async function GET() {
-  return notImplemented()
+// POST or DELETE /api/resources/delete
+export async function POST(req: Request) {
+  return handleDelete(req)
 }
 
-export async function POST() {
-  return notImplemented()
+export async function DELETE(req: Request) {
+  return handleDelete(req)
 }
 
-export async function PATCH() {
-  return notImplemented()
-}
+async function handleDelete(req: Request) {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-export async function DELETE() {
-  return notImplemented()
+    const body = await req.json().catch(() => ({}))
+    const { searchParams } = new URL(req.url)
+    const resourceId = body.id || body.resourceId || body.resource_id || searchParams.get("id")
+
+    if (!resourceId) {
+      return NextResponse.json({ error: "resourceId is required" }, { status: 400 })
+    }
+
+    const result = await deleteResource(resourceId, userId)
+    if ("error" in result) {
+      return NextResponse.json({ error: result.error }, { status: result.status })
+    }
+
+    return NextResponse.json({ success: true, id: resourceId })
+  } catch (err) {
+    return internalError(err)
+  }
 }

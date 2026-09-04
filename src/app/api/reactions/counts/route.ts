@@ -1,26 +1,18 @@
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
+import { getReactionCounts } from "@/server/db/reactions"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
+// GET /api/reactions/counts?targetId=...&targetType=post
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const targetId = searchParams.get("targetId") || searchParams.get("id")
+    const targetType = searchParams.get("targetType") ?? "post"
+    if (!targetId) return NextResponse.json({ error: "targetId required" }, { status: 400 })
 
-export async function GET() {
-  return notImplemented()
-}
-
-export async function POST() {
-  return notImplemented()
-}
-
-export async function PATCH() {
-  return notImplemented()
-}
-
-export async function DELETE() {
-  return notImplemented()
+    const counts = await getReactionCounts(targetId, targetType)
+    return NextResponse.json({ counts })
+  } catch (err) {
+    return internalError(err)
+  }
 }

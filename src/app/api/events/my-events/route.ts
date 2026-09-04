@@ -1,26 +1,18 @@
+import { createClient } from "@/lib/supabase/server"
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
+import { getUserEvents } from "@/server/db/events-jobs"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
-
+// GET /api/events/my-events
 export async function GET() {
-  return notImplemented()
-}
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-export async function POST() {
-  return notImplemented()
-}
-
-export async function PATCH() {
-  return notImplemented()
-}
-
-export async function DELETE() {
-  return notImplemented()
+    const events = await getUserEvents(user.id)
+    return NextResponse.json({ events })
+  } catch (err) {
+    return internalError(err)
+  }
 }

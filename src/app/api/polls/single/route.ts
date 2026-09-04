@@ -1,26 +1,19 @@
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
+import { getPollResults } from "@/server/db/misc"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
+// GET /api/polls/single?id=...
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get("id") || searchParams.get("pollId")
+    if (!id) return NextResponse.json({ error: "Poll ID required" }, { status: 400 })
 
-export async function GET() {
-  return notImplemented()
-}
+    const poll = await getPollResults(id)
+    if (!poll) return NextResponse.json({ error: "Poll not found" }, { status: 404 })
 
-export async function POST() {
-  return notImplemented()
-}
-
-export async function PATCH() {
-  return notImplemented()
-}
-
-export async function DELETE() {
-  return notImplemented()
+    return NextResponse.json(poll)
+  } catch (err) {
+    return internalError(err)
+  }
 }

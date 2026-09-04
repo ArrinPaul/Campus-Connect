@@ -37,3 +37,10 @@ next-env.d.ts
 .convex/
 
 .github/workflows/*.yml
+
+# one-off local debug/seed scripts often contain live credentials — never commit these
+seed.js
+seed.*.js
+test_db.js
+test_db.*.js
+*.debug.js

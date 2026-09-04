@@ -113,6 +113,59 @@ export async function getMembership(communityId: string, userId: string) {
   return data
 }
 
+async function isCommunityModerator(communityId: string, userId: string) {
+  const supabase = await getSupabase()
+  const { data } = await supabase
+    .from("community_members")
+    .select("role")
+    .eq("community_id", communityId)
+    .eq("user_id", userId)
+    .single()
+  return data?.role === "admin" || data?.role === "moderator"
+}
+
+// Approves a pending join request, recorded as a community_invites row where
+// the requester invited themselves (inviter_id = invitee_id). Only a
+// community admin/moderator may approve.
+export async function approveMember(communityId: string, requestId: string, approverId: string) {
+  const supabase = await getSupabase()
+  if (!(await isCommunityModerator(communityId, approverId))) {
+    return { error: "Forbidden: Only community admins/moderators can approve members", status: 403 }
+  }
+
+  const { data: request } = await supabase
+    .from("community_invites")
+    .select("*")
+    .eq("id", requestId)
+    .eq("community_id", communityId)
+    .single()
+  if (!request) return { error: "Join request not found", status: 404 }
+
+  await respondToInvite(requestId, "accepted")
+  return { success: true }
+}
+
+export async function removeMember(communityId: string, memberUserId: string, removerId: string) {
+  const supabase = await getSupabase()
+  if (!(await isCommunityModerator(communityId, removerId))) {
+    return { error: "Forbidden: Only community admins/moderators can remove members", status: 403 }
+  }
+
+  const { data: target } = await supabase
+    .from("community_members")
+    .select("role")
+    .eq("community_id", communityId)
+    .eq("user_id", memberUserId)
+    .single()
+  if (!target) return { error: "Member not found", status: 404 }
+  if (target.role === "admin") {
+    return { error: "Cannot remove a community admin", status: 403 }
+  }
+
+  await leaveCommunity(communityId, memberUserId)
+  return { success: true }
+}
+
 export async function updateCommunity(id: string, updates: Partial<{ name: string; description: string; type: string; category: string; slug: string }>) {
   const supabase = await getSupabase()
   

@@ -1,26 +1,18 @@
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
+import { searchHashtags } from "@/server/db/hashtags"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
+// GET /api/hashtags/search?q=...&limit=10
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const query = searchParams.get("q") ?? searchParams.get("query") ?? ""
+    if (!query.trim()) return NextResponse.json({ hashtags: [] })
 
-export async function GET() {
-  return notImplemented()
-}
-
-export async function POST() {
-  return notImplemented()
-}
-
-export async function PATCH() {
-  return notImplemented()
-}
-
-export async function DELETE() {
-  return notImplemented()
+    const limit = parseInt(searchParams.get("limit") ?? "10")
+    const hashtags = await searchHashtags(query, limit)
+    return NextResponse.json({ hashtags })
+  } catch (err) {
+    return internalError(err)
+  }
 }

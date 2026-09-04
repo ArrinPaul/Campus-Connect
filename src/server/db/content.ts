@@ -33,6 +33,31 @@ export async function viewStory(storyId: string, userId: string) {
   })
 }
 
+export async function getUserStories(userId: string) {
+  const supabase = await getSupabase()
+  const { data, error } = await supabase
+    .from("stories")
+    .select("*, author:users!stories_author_id_fkey(id, name, profile_picture)")
+    .eq("author_id", userId)
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false })
+  if (error) return []
+  return data ?? []
+}
+
+export async function deleteStory(storyId: string, userId: string) {
+  const supabase = await getSupabase()
+  const { data: story } = await supabase.from("stories").select("author_id").eq("id", storyId).single()
+  if (!story) return { error: "Story not found", status: 404 }
+  if (story.author_id !== userId) {
+    return { error: "Forbidden: Only the story author can delete this story", status: 403 }
+  }
+
+  const { error } = await supabase.from("stories").delete().eq("id", storyId)
+  if (error) return { error: error.message, status: 500 }
+  return { success: true }
+}
+
 // ─── Resources ──────────────────────────────────────────────────────────────
 
 export async function getResources(limit = 20, offset = 0, filters?: { course?: string; search?: string }) {
@@ -53,6 +78,70 @@ export async function uploadResource(data: any) {
   const { data: resource, error } = await supabase.from("resources").insert(data).select().single()
   if (error) return null
   return resource
+}
+
+export async function getResourceById(resourceId: string) {
+  const supabase = await getSupabase()
+  const { data: resource, error } = await supabase
+    .from("resources")
+    .select("*, uploader:users!resources_uploaded_by_fkey(id, name, username, profile_picture)")
+    .eq("id", resourceId)
+    .single()
+  if (error || !resource) return null
+  return resource
+}
+
+export async function updateResource(resourceId: string, userId: string, updates: Partial<{ title: string; description: string; course: string }>) {
+  const supabase = await getSupabase()
+  const { data: resource } = await supabase.from("resources").select("uploaded_by").eq("id", resourceId).single()
+  if (!resource) return { error: "Resource not found", status: 404 }
+
+  const { data: user } = await supabase.from("users").select("is_admin").eq("id", userId).single()
+  const isAdmin = user?.is_admin ?? false
+  if (resource.uploaded_by !== userId && !isAdmin) {
+    return { error: "Forbidden: Only the uploader or admin can update this resource", status: 403 }
+  }
+
+  const { data: updated, error } = await supabase
+    .from("resources")
+    .update(updates)
+    .eq("id", resourceId)
+    .select()
+    .single()
+
+  if (error) return { error: error.message, status: 500 }
+  return { data: updated }
+}
+
+export async function deleteResource(resourceId: string, userId: string) {
+  const supabase = await getSupabase()
+  const { data: resource } = await supabase.from("resources").select("uploaded_by").eq("id", resourceId).single()
+  if (!resource) return { error: "Resource not found", status: 404 }
+
+  const { data: user } = await supabase.from("users").select("is_admin").eq("id", userId).single()
+  const isAdmin = user?.is_admin ?? false
+  if (resource.uploaded_by !== userId && !isAdmin) {
+    return { error: "Forbidden: Only the uploader or admin can delete this resource", status: 403 }
+  }
+
+  const { error } = await supabase.from("resources").delete().eq("id", resourceId)
+  if (error) return { error: error.message, status: 500 }
+  return { success: true }
+}
+
+export async function getResourceDownloadUrl(resourceId: string) {
+  const supabase = await getSupabase()
+  const { data: resource, error } = await supabase.from("resources").select("file_url, download_count").eq("id", resourceId).single()
+  if (error || !resource) return { error: "Resource not found", status: 404 }
+
+  await supabase.rpc("increment_field", {
+    table_name: "resources",
+    field_name: "download_count",
+    row_id: resourceId,
+    increment_by: 1,
+  })
+
+  return { data: { url: resource.file_url, downloadCount: (resource.download_count ?? 0) + 1 } }
 }
 
 // ─── Research Papers ────────────────────────────────────────────────────────
@@ -253,6 +342,56 @@ export async function voteQuestion(questionId: string, userId: string, voteType:
     voteCount: updatedQuestion?.vote_count ?? 0,
     userVote,
   }
+}
+
+export async function updateQuestion(questionId: string, userId: string, updates: Partial<{ title: string; content: string; tags: string[] }>) {
+  const supabase = await getSupabase()
+  const { data: question } = await supabase.from("questions").select("author_id").eq("id", questionId).single()
+  if (!question) return { error: "Question not found", status: 404 }
+
+  const { data: user } = await supabase.from("users").select("is_admin").eq("id", userId).single()
+  const isAdmin = user?.is_admin ?? false
+  if (question.author_id !== userId && !isAdmin) {
+    return { error: "Forbidden: Only the question author or admin can update this question", status: 403 }
+  }
+
+  const { data: updated, error } = await supabase
+    .from("questions")
+    .update(updates)
+    .eq("id", questionId)
+    .select()
+    .single()
+
+  if (error) return { error: error.message, status: 500 }
+  return { data: updated }
+}
+
+export async function deleteQuestion(questionId: string, userId: string) {
+  const supabase = await getSupabase()
+  const { data: question } = await supabase.from("questions").select("author_id").eq("id", questionId).single()
+  if (!question) return { error: "Question not found", status: 404 }
+
+  const { data: user } = await supabase.from("users").select("is_admin").eq("id", userId).single()
+  const isAdmin = user?.is_admin ?? false
+  if (question.author_id !== userId && !isAdmin) {
+    return { error: "Forbidden: Only the question author or admin can delete this question", status: 403 }
+  }
+
+  const { error } = await supabase.from("questions").delete().eq("id", questionId)
+  if (error) return { error: error.message, status: 500 }
+  return { success: true }
+}
+
+export async function getQuestionAnswers(questionId: string) {
+  const supabase = await getSupabase()
+  const { data, error } = await supabase
+    .from("question_answers")
+    .select("*, author:users!question_answers_author_id_fkey(id, name, username, profile_picture)")
+    .eq("question_id", questionId)
+    .order("is_accepted", { ascending: false })
+    .order("created_at", { ascending: true })
+  if (error) return []
+  return data ?? []
 }
 
 // ─── Research Paper Extended Features ───────────────────────────────────────

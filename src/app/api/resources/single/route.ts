@@ -1,26 +1,19 @@
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
+import { getResourceById } from "@/server/db/content"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
+// GET /api/resources/single?id=...
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get("id") || searchParams.get("resourceId")
+    if (!id) return NextResponse.json({ error: "Resource ID required" }, { status: 400 })
 
-export async function GET() {
-  return notImplemented()
-}
+    const resource = await getResourceById(id)
+    if (!resource) return NextResponse.json({ error: "Resource not found" }, { status: 404 })
 
-export async function POST() {
-  return notImplemented()
-}
-
-export async function PATCH() {
-  return notImplemented()
-}
-
-export async function DELETE() {
-  return notImplemented()
+    return NextResponse.json(resource)
+  } catch (err) {
+    return internalError(err)
+  }
 }

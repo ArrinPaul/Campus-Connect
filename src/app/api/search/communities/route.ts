@@ -1,26 +1,20 @@
+import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
+import { searchCommunities } from "@/server/db/misc"
 
-const notImplemented = () =>
-  NextResponse.json(
-    {
-      error: "Not implemented",
-      message: "Endpoint scaffolded during backend migration. Implement business logic as needed.",
-    },
-    { status: 501 }
-  )
+// GET /api/search/communities?q=...&limit=20&offset=0
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const query = searchParams.get("q") ?? searchParams.get("query") ?? ""
+    if (!query.trim()) return NextResponse.json({ communities: [] })
 
-export async function GET() {
-  return notImplemented()
-}
+    const limit = parseInt(searchParams.get("limit") ?? "20")
+    const offset = parseInt(searchParams.get("offset") ?? "0")
 
-export async function POST() {
-  return notImplemented()
-}
-
-export async function PATCH() {
-  return notImplemented()
-}
-
-export async function DELETE() {
-  return notImplemented()
+    const communities = await searchCommunities(query, limit, offset)
+    return NextResponse.json({ communities, hasMore: communities.length === limit })
+  } catch (err) {
+    return internalError(err)
+  }
 }
