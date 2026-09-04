@@ -1,7 +1,16 @@
 import { createClient } from "@/lib/supabase/server"
 import { internalError } from "@/lib/api-error"
+import { parseBody } from "@/lib/validation"
 import { NextResponse } from "next/server"
 import { getQuestions, createQuestion } from "@/server/db/content"
+import { z } from "zod"
+
+const createQuestionSchema = z.object({
+  title: z.string().trim().min(5, "Title must be at least 5 characters").max(300),
+  content: z.string().trim().min(10, "Content must be at least 10 characters").max(10000),
+  course: z.string().trim().max(100).optional(),
+  tags: z.array(z.string().trim().max(30)).max(10).optional(),
+})
 
 // GET /api/questions?limit=...&offset=...&sort=...&tag=...&search=...
 export async function GET(req: Request) {
@@ -28,8 +37,13 @@ export async function POST(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const body = await req.json().catch(() => ({}));
-    const question = await createQuestion({ ...body, author_id: userId })
+    const parsed = await parseBody(req, createQuestionSchema)
+    if ("response" in parsed) return parsed.response
+    const { title, content, tags } = parsed.data
+    // Note: the `questions` table has no `course` column (frontend sends one,
+    // schema doesn't have it — see docs/TASKS.md §2) — intentionally dropped
+    // here rather than forwarded to the insert, which would error.
+    const question = await createQuestion({ title, content, tags, author_id: userId })
     return NextResponse.json(question)
   } catch (err) {
     return internalError(err)

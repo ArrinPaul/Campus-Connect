@@ -1,7 +1,16 @@
 import { createClient } from "@/lib/supabase/server"
 import { internalError } from "@/lib/api-error"
+import { parseBody } from "@/lib/validation"
 import { NextResponse } from "next/server"
 import { getCommunities, createCommunity, getCommunityBySlug } from "@/server/db/communities"
+import { z } from "zod"
+
+const createCommunitySchema = z.object({
+  name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
+  slug: z.string().trim().toLowerCase().regex(/^[a-z0-9-]+$/, "Slug may only contain lowercase letters, numbers, and hyphens").min(2).max(100),
+  description: z.string().trim().max(2000).default(""),
+  category: z.string().trim().max(50).default("General"),
+})
 
 // GET /api/communities?slug=...&limit=...&cursor=...
 export async function GET(req: Request) {
@@ -34,7 +43,10 @@ export async function POST(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const body = await req.json().catch(() => ({}));
+    const parsed = await parseBody(req, createCommunitySchema)
+    if ("response" in parsed) return parsed.response
+    const body = parsed.data
+
     const community = await createCommunity({
       name: body.name,
       slug: body.slug,

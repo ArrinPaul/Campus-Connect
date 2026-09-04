@@ -1,7 +1,18 @@
 import { createClient } from "@/lib/supabase/server"
 import { internalError } from "@/lib/api-error"
+import { parseBody } from "@/lib/validation"
 import { NextResponse } from "next/server"
 import { getListings, createListing } from "@/server/db/misc"
+import { z } from "zod"
+
+const createListingSchema = z.object({
+  title: z.string().trim().min(2, "Title must be at least 2 characters").max(200),
+  description: z.string().trim().max(5000).default(""),
+  price: z.number().nonnegative("Price must be 0 or more").max(1000000).optional(),
+  category: z.enum(["books", "electronics", "furniture", "services", "other"]).default("other"),
+  images: z.array(z.string().url()).max(10).default([]),
+  contact_info: z.string().trim().max(500).optional(),
+})
 
 // GET /api/marketplace?limit=...&offset=...&category=...
 export async function GET(req: Request) {
@@ -26,8 +37,10 @@ export async function POST(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const body = await req.json()
-    const listing = await createListing({ ...body, posted_by: userId })
+    const parsed = await parseBody(req, createListingSchema)
+    if ("response" in parsed) return parsed.response
+
+    const listing = await createListing({ ...parsed.data, posted_by: userId })
     return NextResponse.json(listing)
   } catch (err) {
     return internalError(err)

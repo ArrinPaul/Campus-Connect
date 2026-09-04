@@ -1,8 +1,18 @@
 import { createClient } from "@/lib/supabase/server"
 import { internalError } from "@/lib/api-error"
+import { parseBody } from "@/lib/validation"
 import { NextResponse } from "next/server"
 import { createPost } from "@/server/db/posts"
 import DOMPurify from "isomorphic-dompurify"
+import { z } from "zod"
+
+const createPostSchema = z.object({
+  content: z.string().trim().min(1, "Content required").max(10000, "Content too long"),
+  media_urls: z.array(z.string().url()).max(10).optional(),
+  media_type: z.string().max(50).optional(),
+  community_id: z.string().uuid().optional(),
+  poll_id: z.string().uuid().optional(),
+})
 
 // POST /api/posts
 export async function POST(req: Request) {
@@ -12,8 +22,9 @@ export async function POST(req: Request) {
     const userId = user?.id
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const body = await req.json().catch(() => ({}));
-    if (!body.content?.trim()) return NextResponse.json({ error: "Content required" }, { status: 400 })
+    const parsed = await parseBody(req, createPostSchema)
+    if ("response" in parsed) return parsed.response
+    const body = parsed.data
 
     const sanitizedContent = DOMPurify.sanitize(body.content)
 

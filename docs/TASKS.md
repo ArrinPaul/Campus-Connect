@@ -85,8 +85,24 @@ passing) after the changes.
       didn't have** — do this first when you have dashboard/psql access).
 - [ ] If schema drift confirmed, write a migration to reconcile
       `subscriptions` to one shape and update any code using the old shape.
-- [ ] Add Zod schemas for write-path routes (posts, comments, messages,
-      communities create/update) — start with the highest-traffic ones.
+- [x] Add Zod schemas for the highest-traffic write-path routes: `api/posts`
+      (create), `api/comments` (create), `api/communities` (create — had
+      **zero** validation before), `api/questions` (create — previously
+      spread the raw request body into the DB insert). Added a shared
+      `parseBody()` helper in `src/lib/validation.ts`. `api/messages` (send)
+      already had adequate hand-rolled validation, left as-is.
+      **Found in the process:** `api/questions` POST was forwarding a
+      `course` field from the frontend into an insert against a `questions`
+      table that has no `course` column — would have errored in production
+      the first time a real client sent one. Fixed by dropping the field at
+      the API boundary; a real fix is either adding the column or removing
+      it from the frontend form (tracked below).
+- [ ] Add a `course` column to `questions` (or remove the field from
+      `AskQuestionModal.tsx`) to resolve the frontend/schema mismatch found
+      above.
+- [ ] Extend Zod validation to the remaining write routes (marketplace
+      update, resources upload, research upload, events/jobs create) —
+      `api/marketplace` create is now covered; the rest are not yet.
 - [ ] Confirm no client-side code can call `notifications` insert directly
       (RLS policy is currently `WITH CHECK (true)`); tighten policy if any
       client path exists.
