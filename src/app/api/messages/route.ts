@@ -20,6 +20,11 @@ export async function GET(req: Request) {
     const offset = Math.max(Number(searchParams.get("cursor") ?? "0"), 0)
 
     const result = await getMessages(conversationId, limit, offset)
+    // NOTE: kept as a bare array on purpose — see docs/TASKS.md §4 "two
+    // messaging UIs" note. The live UI (ChatWindow.tsx, actually wired into
+    // /messages) expects a bare array. A second, more complete but
+    // completely unused UI (ChatArea.tsx) expects { messages: [...] } —
+    // do not "fix" this shape without first resolving which UI ships.
     return NextResponse.json(result)
   } catch (err) {
     return internalError(err)

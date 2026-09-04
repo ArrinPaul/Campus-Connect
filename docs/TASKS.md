@@ -251,6 +251,49 @@ audit.
 - [ ] Mobile pass: verify every dashboard page at 375px width.
 - [ ] Dark mode: verify every page (not just shell/nav) respects theme.
 
+## §4b — Messaging (Phase D of the UI pass, 2026-09-05)
+
+- [x] **Unread badge showed "1" for every conversation with any unread
+      message, never a real count.** `getConversations()` (messages.ts)
+      computed `unreadCount` as a 0/1 boolean instead of counting actual
+      unread messages, even though the live UI
+      (`(components)/messages/ConversationListItem.tsx`) already renders it
+      as a real number with a "99+" cap. Fixed to count every message from
+      someone else newer than the viewer's `last_read_at` for that
+      conversation (the full message list was already being fetched
+      per-conversation, just not counted). Added
+      `src/tests/messages-unread-count.test.ts` to lock it in.
+- [ ] **Major finding: there are two complete, parallel messaging UIs, and
+      the more built one is dead code.** `src/components/messages/` (
+      `ChatArea.tsx` 497 lines + `MessageBubble.tsx` 384 lines, plus
+      `MessageComposer.tsx`, `TypingIndicator.tsx`, `GroupInfoPanel.tsx`) is
+      a significantly more complete messaging UI — real read receipts
+      (single/double/blue check marks), reply quoting, in-conversation
+      search, mute/delete, voice/video call integration via `CallModal` —
+      but **is imported by zero pages.** The live UI, wired into
+      `/messages` and `/messages/[id]` on both desktop and mobile, is
+      `src/app/(components)/messages/ChatWindow.tsx` (185 lines) +
+      `ChatMessage.tsx` (157 lines), which is materially more basic and has
+      no read-receipt UI at all.
+      Confirmed by grepping every import of `ChatArea`/`ConversationList`
+      under `src/app` — `src/components/messages/ConversationList.tsx` is
+      *also* orphaned the same way; the live conversation list is
+      `(components)/messages/ConversationListItem.tsx`.
+      This also means `GET /api/messages`'s response shape is contested:
+      the live `ChatWindow.tsx` expects a bare array (what the route
+      currently returns); the orphaned `ChatArea.tsx` expects
+      `{ messages: [...] }`. **Do not "fix" this shape without first
+      deciding which UI ships** — attempted that fix in this session and
+      reverted it once the orphaning was discovered, see the route's
+      inline comment.
+      **Needs a decision:** (a) swap the live pages over to
+      `ChatArea`/`MessageBubble` (bigger change — need to verify its
+      mutations against current API routes: `markAsRead`, `muteConversation`,
+      `deleteConversation`, `searchMessages`), (b) port read
+      receipts/reply-quoting/search into the live `ChatWindow`/`ChatMessage`
+      instead and delete the orphaned tree, or (c) leave as-is for now.
+      Not resolved in this pass — asked the user directly.
+
 ## §5 — Test coverage for fixed stubs
 
 Existing Playwright specs in `src/e2e/` are unauthenticated smoke tests

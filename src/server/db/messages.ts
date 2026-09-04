@@ -240,6 +240,23 @@ export async function getConversations(userId: string) {
     }
   })
 
+  // Real per-conversation unread counts (not just an is-there-anything-new
+  // boolean) — count every message from someone else, newer than my
+  // last_read_at for that conversation.
+  const myLastReadByConv = new Map<string, number>()
+  participantsByConv.forEach((parts, convId) => {
+    const mine = parts.find((p: any) => p.user_id === userId)
+    myLastReadByConv.set(convId, mine?.last_read_at ? new Date(mine.last_read_at).getTime() : 0)
+  })
+  const unreadCountByConv = new Map<string, number>()
+  messages.forEach((m) => {
+    if (m.sender_id === userId) return
+    const lastRead = myLastReadByConv.get(m.conversation_id) ?? 0
+    if (new Date(m.created_at).getTime() > lastRead) {
+      unreadCountByConv.set(m.conversation_id, (unreadCountByConv.get(m.conversation_id) ?? 0) + 1)
+    }
+  })
+
   // Format conversations
   const formatted = convs.map((conv) => {
     const parts = participantsByConv.get(conv.id) || []
@@ -293,9 +310,7 @@ export async function getConversations(userId: string) {
     }
 
     const lastMsg = lastMessageByConv.get(conv.id)
-    const myParticipant = parts.find((p: any) => p.user_id === userId)
-    const lastReadAt = myParticipant?.last_read_at ? new Date(myParticipant.last_read_at).getTime() : 0
-    const unreadCount = lastMsg && new Date(lastMsg.created_at).getTime() > lastReadAt && lastMsg.sender_id !== userId ? 1 : 0
+    const unreadCount = unreadCountByConv.get(conv.id) ?? 0
 
     return {
       _id: conv.id,
