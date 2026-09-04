@@ -245,7 +245,9 @@ audit.
 - [ ] Respect conversation mute state before sending a message notification
       (`toggleMute` in messages.ts sets it but `notifyOtherParticipants`
       doesn't check it yet).
-- [ ] Messaging: read receipts + unread-per-conversation badge.
+- [x] Messaging: read receipts + unread-per-conversation badge — both done
+      via §4b (unread count fixed; read receipts now live after the
+      ChatArea swap). Kept here as a pointer rather than duplicating detail.
 - [ ] Build one shared `<EmptyState>` / `<ErrorState>` / `<LoadingState>`
       component set and replace ad hoc per-page versions.
 - [ ] Mobile pass: verify every dashboard page at 375px width.
@@ -263,7 +265,7 @@ audit.
       conversation (the full message list was already being fetched
       per-conversation, just not counted). Added
       `src/tests/messages-unread-count.test.ts` to lock it in.
-- [ ] **Major finding: there are two complete, parallel messaging UIs, and
+- [x] **Major finding: there are two complete, parallel messaging UIs, and
       the more built one is dead code.** `src/components/messages/` (
       `ChatArea.tsx` 497 lines + `MessageBubble.tsx` 384 lines, plus
       `MessageComposer.tsx`, `TypingIndicator.tsx`, `GroupInfoPanel.tsx`) is
@@ -368,9 +370,11 @@ communities/slug (400 missing slug, 404 not found).
 
 ## §6 — Production readiness
 
-- [ ] Replace `docs/PHASE_8_FINAL_REPORT.md`'s false "certified" claim with
-      an accurate status (link to the audit or this roadmap).
-- [ ] Reconcile `docs/PROJECT_AUDIT.md` QA tracker with actual state.
+- [x] Replace `docs/PHASE_8_FINAL_REPORT.md`'s false "certified" claim with
+      an accurate status (link to the audit or this roadmap) — done via a
+      correction banner (§10 of the earlier audit, commit `069050f`).
+- [x] Reconcile `docs/PROJECT_AUDIT.md` QA tracker with actual state — same
+      commit, added a note pointing to ROADMAP.md/TASKS.md as current truth.
 - [ ] Re-run full audit checklist (build/lint/tsc/jest/security) before any
       real launch.
 - [x] Delete `patch.js`, `refactor_ui.js`, `refactor_ui.py`,
