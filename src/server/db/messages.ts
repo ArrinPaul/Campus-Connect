@@ -81,7 +81,10 @@ export async function sendMessage(data: {
       })
       .select()
     const rawMsg = rawMsgs?.[0]
-    if (rawMsg) return { ...rawMsg, _id: rawMsg.id }
+    if (rawMsg) {
+      await notifyOtherParticipants(supabase, convId, data.sender_id, data.content)
+      return { ...rawMsg, _id: rawMsg.id }
+    }
     return null
   }
 
@@ -92,7 +95,45 @@ export async function sendMessage(data: {
     .eq("id", convId)
     .then(() => null, () => null)
 
+  await notifyOtherParticipants(supabase, convId, data.sender_id, data.content)
+
   return { ...msg, _id: msg.id }
+}
+
+// Notifies every other participant in the conversation that a new message
+// arrived. Best-effort — a notification failure should never block the
+// message itself from having been sent.
+async function notifyOtherParticipants(
+  supabase: Awaited<ReturnType<typeof getSupabase>>,
+  conversationId: string,
+  senderId: string,
+  content: string
+) {
+  try {
+    const { data: participants } = await supabase
+      .from("conversation_participants")
+      .select("user_id")
+      .eq("conversation_id", conversationId)
+      .neq("user_id", senderId)
+    if (!participants || participants.length === 0) return
+
+    const { data: sender } = await supabase.from("users").select("name").eq("id", senderId).single()
+    const { createNotification } = await import("@/server/db/notifications")
+    const preview = content.length > 80 ? `${content.slice(0, 80)}…` : content
+
+    for (const p of participants) {
+      await createNotification({
+        user_id: p.user_id,
+        type: "message",
+        message: `${sender?.name ?? "Someone"}: ${preview}`,
+        reference_id: conversationId,
+        reference_type: "conversation",
+        from_user_id: senderId,
+      })
+    }
+  } catch {
+    // Notification failure must never fail message delivery.
+  }
 }
 
 export async function deleteMessage(messageId: string) {

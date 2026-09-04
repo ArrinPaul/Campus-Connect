@@ -34,6 +34,20 @@ export async function followUser(followerId: string, followingId: string): Promi
   // Increment counts in database
   try { await supabase.rpc("increment_field", { table_name: "users", field_name: "following_count", row_id: followerId }) } catch { /* ignore */ }
   try { await supabase.rpc("increment_field", { table_name: "users", field_name: "follower_count", row_id: followingId }) } catch { /* ignore */ }
+
+  // Notify the followed user
+  try {
+    const { data: actor } = await supabase.from("users").select("name").eq("id", followerId).single()
+    const { createNotification } = await import("@/server/db/notifications")
+    await createNotification({
+      user_id: followingId,
+      type: "follow",
+      message: `${actor?.name ?? "Someone"} started following you`,
+      reference_id: followerId,
+      reference_type: "user",
+      from_user_id: followerId,
+    })
+  } catch { /* ignore notification failure */ }
 }
 
 export async function unfollowUser(followerId: string, followingId: string): Promise<void> {

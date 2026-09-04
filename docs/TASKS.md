@@ -201,7 +201,50 @@ audit.
       picker — no new validation logic needed), with a "Drop to attach"
       overlay while dragging. Images win if a mix of file types is dropped;
       falls back to video, then generic file.
-- [ ] Notifications: grouped notifications ("X and N others...").
+- [x] **Notifications were never actually created — the single biggest
+      finding of the UI pass.** `createNotification()`
+      (`src/server/db/notifications.ts`) was fully and well built: inserts
+      the row, broadcasts on the `notifications:${userId}` realtime channel
+      the bell already subscribes to, and dispatches a Web Push notification
+      with per-type deep-link routing. It was called **nowhere in the
+      codebase.** The entire notification UI — bell, live badge, dropdown,
+      mark-as-read, realtime hook — was fully working against a table that
+      could never have a row in it, because nothing ever inserted one.
+      Wired it into the four core trigger points:
+        - `addReaction` (reactions.ts) — notifies the post author on a like,
+          skips self-likes.
+        - `createComment` (comments.ts) — notifies the post author on a
+          comment, and separately the parent comment's author on a reply
+          (deduped so the same person isn't notified twice).
+        - `followUser` (follows.ts) — notifies the followed user.
+        - `createPost` (posts.ts) — parses `@username` mentions out of post
+          content (cap 20 per post), resolves to user IDs, notifies each,
+          skipping the author.
+      Added `src/tests/notification-triggers.test.ts` to lock this in — it
+      exists specifically so this can't silently regress back to "fully
+      built, never called" again. 560/560 tests passing after this change.
+- [ ] Notifications: grouped notifications ("X and N others..."). Now that
+      notifications are actually created, a popular post will generate one
+      row per like — grouping/collapsing in the UI is a real next step, not
+      just a nice-to-have.
+- [ ] Extend notification triggers to the remaining domains that don't have
+      them yet: question answers/votes (gamification.ts already awards
+      reputation on `accepted_answer` but doesn't notify), event RSVPs,
+      community invites/approvals, marketplace contact (the DM it opens
+      won't itself notify unless `api/messages` triggers a notification too
+      — check that path specifically).
+- [x] Checked whether `api/messages` (send) notifies the recipient — it
+      didn't, same root cause as everything else above. Fixed: `sendMessage`
+      (messages.ts) now notifies every other conversation participant (not
+      just a 1:1 peer — group conversations too) via
+      `conversation_participants`, skipping the sender, with a truncated
+      message preview. Best-effort — wrapped so a notification failure can
+      never block message delivery itself. Not yet respecting per-conversation
+      mute (`toggleMute` exists in messages.ts but isn't checked before
+      notifying) — tracked as a follow-up, not blocking.
+- [ ] Respect conversation mute state before sending a message notification
+      (`toggleMute` in messages.ts sets it but `notifyOtherParticipants`
+      doesn't check it yet).
 - [ ] Messaging: read receipts + unread-per-conversation badge.
 - [ ] Build one shared `<EmptyState>` / `<ErrorState>` / `<LoadingState>`
       component set and replace ad hoc per-page versions.

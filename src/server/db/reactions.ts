@@ -55,6 +55,21 @@ export async function addReaction(data: {
       increment_by: 1,
     })
     if (rpcErr) console.error(rpcErr)
+
+    // Notify the post author (skip self-reactions)
+    const { data: post } = await supabase.from("posts").select("author_id").eq("id", data.target_id).single()
+    if (post && post.author_id !== data.user_id) {
+      const { data: actor } = await supabase.from("users").select("name").eq("id", data.user_id).single()
+      const { createNotification } = await import("@/server/db/notifications")
+      await createNotification({
+        user_id: post.author_id,
+        type: "like",
+        message: `${actor?.name ?? "Someone"} liked your post`,
+        reference_id: data.target_id,
+        reference_type: "post",
+        from_user_id: data.user_id,
+      })
+    }
   }
 
   return reaction as DbReaction

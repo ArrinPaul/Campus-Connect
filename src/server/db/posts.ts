@@ -233,6 +233,28 @@ export async function createPost(data: {
     `)
     .single()
   if (error) return null
+
+  // Notify @mentioned users (cap at 20 to bound abuse / accidental mass-tag)
+  const usernames = Array.from(new Set(data.content.match(/(?:^|\s)@([a-zA-Z0-9_.]+)/g)?.map((m) => m.trim().slice(1)) ?? [])).slice(0, 20)
+  if (usernames.length > 0) {
+    const { data: mentioned } = await supabase.from("users").select("id").in("username", usernames)
+    if (mentioned && mentioned.length > 0) {
+      const { data: actor } = await supabase.from("users").select("name").eq("id", data.author_id).single()
+      const { createNotification } = await import("@/server/db/notifications")
+      for (const u of mentioned) {
+        if (u.id === data.author_id) continue
+        await createNotification({
+          user_id: u.id,
+          type: "mention",
+          message: `${actor?.name ?? "Someone"} mentioned you in a post`,
+          reference_id: post.id,
+          reference_type: "post",
+          from_user_id: data.author_id,
+        })
+      }
+    }
+  }
+
   return post as DbPost
 }
 

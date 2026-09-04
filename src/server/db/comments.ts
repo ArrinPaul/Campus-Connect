@@ -81,6 +81,41 @@ export async function createComment(data: {
     `)
     .single()
   if (error) return null
+
+  // Notify the post author, and separately the parent comment's author on a
+  // reply — skip self-notifications and don't double-notify if both are the
+  // same person.
+  const { data: post } = await supabase.from("posts").select("author_id").eq("id", data.post_id).single()
+  const { createNotification } = await import("@/server/db/notifications")
+  const { data: actor } = await supabase.from("users").select("name").eq("id", data.author_id).single()
+  const notifiedIds = new Set<string>()
+
+  if (post && post.author_id !== data.author_id) {
+    await createNotification({
+      user_id: post.author_id,
+      type: "comment",
+      message: `${actor?.name ?? "Someone"} commented on your post`,
+      reference_id: data.post_id,
+      reference_type: "post",
+      from_user_id: data.author_id,
+    })
+    notifiedIds.add(post.author_id)
+  }
+
+  if (data.parent_id) {
+    const { data: parentComment } = await supabase.from("comments").select("author_id").eq("id", data.parent_id).single()
+    if (parentComment && parentComment.author_id !== data.author_id && !notifiedIds.has(parentComment.author_id)) {
+      await createNotification({
+        user_id: parentComment.author_id,
+        type: "reply",
+        message: `${actor?.name ?? "Someone"} replied to your comment`,
+        reference_id: data.post_id,
+        reference_type: "post",
+        from_user_id: data.author_id,
+      })
+    }
+  }
+
   return comment as DbComment
 }
 
