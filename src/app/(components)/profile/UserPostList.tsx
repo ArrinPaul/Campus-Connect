@@ -38,20 +38,15 @@ export function UserPostList({ userId }: { userId: Id<'users'> }) {
         <div className="space-y-4 mt-4 max-w-xl mx-auto">
             {posts.map((post: any, idx: number) => {
                 if (!post) return null;
-                const postId = post._id || post.id || `user-post-${idx}`;
                 const author = post.author || {
-                    _id: post.author_id || post.authorId || userId,
+                    id: post.author_id || userId,
                     name: 'User',
                     role: 'Student'
                 };
                 return (
                     <PostCard
-                        key={postId}
-                        post={{
-                            ...post,
-                            _id: postId,
-                            authorId: author._id || author.id,
-                        }}
+                        key={post.id ?? `user-post-${idx}`}
+                        post={post}
                         author={author}
                     />
                 );

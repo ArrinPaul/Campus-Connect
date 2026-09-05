@@ -111,20 +111,15 @@ export function UserActivityFeed({ userId }: { userId: Id<'users'> }) {
                     {activityItems.map((item, idx) => {
                         if (item.type === 'post') {
                             const post = item.data;
-                            const postId = post._id || post.id || `act-post-${idx}`;
                             const author = post.author || {
-                                _id: post.author_id || post.authorId || userId,
+                                id: post.author_id || userId,
                                 name: 'User',
                                 role: 'Student'
                             };
                             return (
                                 <PostCard
-                                    key={`post-${postId}`}
-                                    post={{
-                                        ...post,
-                                        _id: postId,
-                                        authorId: author._id || author.id,
-                                    }}
+                                    key={`post-${post.id ?? `act-post-${idx}`}`}
+                                    post={post}
                                     author={author}
                                 />
                             );

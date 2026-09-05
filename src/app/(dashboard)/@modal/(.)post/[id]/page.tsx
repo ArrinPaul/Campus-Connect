@@ -9,9 +9,9 @@ import { FeedSkeleton } from '@/app/(components)/feed/skeletons';
 export default function PostModal({ params }: { params: { id: string } }) {
   const result = useQuery(api.posts.getPostById, { postId: params.id });
 
-  const post = result?.post ?? (result?._id || result?.id ? result : null);
+  const post = result?.post ?? (result?.id ? result : null);
   const author = result?.author ?? post?.author ?? {
-    _id: post?.authorId || post?.author_id,
+    id: post?.author_id,
     name: 'User',
     role: 'Student',
   };

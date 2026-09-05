@@ -20,10 +20,17 @@ export interface ReactionCounts {
 
 // ─── Post Types ───────────────────────────────────────────────────────────────
 
+// Matches the real Supabase row shape (see DbPost in src/server/db/posts.ts)
+// — these used to be Convex-style camelCase (_id/authorId/likeCount/
+// createdAt as a number), which don't exist on the actual API response.
+// VirtualizedFeed.tsx force-cast real feed data through `as unknown as
+// Post` to paper over the mismatch, meaning every post rendered by the
+// main feed was silently passed an undefined id to every interactive
+// action (like, comment, delete, repost, bookmark).
 export interface PostAuthor {
-  _id: Id<"users">
+  id: Id<"users">
   name: string
-  profilePicture?: string
+  profile_picture?: string
   role: "Student" | "Research Scholar" | "Faculty"
   username?: string
 }
@@ -38,21 +45,20 @@ export interface PostLinkPreview {
 
 /** Full post shape used by PostCard and feed-related components */
 export interface Post {
-  _id: Id<"posts">
-  authorId: Id<"users">
+  id: Id<"posts">
+  author_id: Id<"users">
   content: string
-  likeCount: number
-  commentCount: number
-  shareCount: number
-  createdAt: number
-  updatedAt: number
-  reactionCounts?: ReactionCounts
-  mediaUrls?: string[]
-  mediaType?: "image" | "video" | "file" | "link"
-  mediaFileNames?: string[]
-  linkPreview?: PostLinkPreview
-  pollId?: Id<"polls">
-  communityId?: Id<"communities">
+  like_count?: number
+  comment_count?: number
+  share_count?: number
+  created_at?: string
+  updated_at?: string
+  media_urls?: string[]
+  media_type?: "image" | "video" | "file" | "link"
+  media_file_names?: string[]
+  link_preview?: PostLinkPreview
+  poll_id?: Id<"polls">
+  community_id?: Id<"communities">
 }
 
 /** Feed item – may be a regular post or a repost */

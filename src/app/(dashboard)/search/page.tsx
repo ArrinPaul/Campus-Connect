@@ -34,7 +34,7 @@ function SearchResultsContent() {
  const isAuthenticated = isSignedIn ?? false;
  const searchResult = useQuery(
  api.search.universalSearch,
- isAuthenticated && currentQuery ? { query: currentQuery } :"skip"
+ isAuthenticated && currentQuery ? { q: currentQuery } :"skip"
  );
  const users = searchResult?.users ?? [];
  const posts = searchResult?.posts ?? [];
@@ -78,7 +78,7 @@ function SearchResultsContent() {
  const PostGrid = ({ items }: { items: any[] }) => (
  <div className="space-y-4">
  {items.map(post => (
- <PostCard key={post._id} post={post} author={post.author} />
+ <PostCard key={post.id} post={post} author={post.author} />
  ))}
  </div>
  );
@@ -86,7 +86,7 @@ function SearchResultsContent() {
  const UserGrid = ({ items }: { items: any[] }) => (
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  {items.map(user => (
- <UserCard key={user._id} user={user as any} />
+ <UserCard key={user.id} user={user as any} />
  ))}
  </div>
  );
@@ -99,7 +99,7 @@ function SearchResultsContent() {
  case 'hashtags':
  return hashtags.length > 0 ? (
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
- {hashtags.map((hashtag: any) => <HashtagCard key={hashtag._id} hashtag={hashtag as any} />)}
+ {hashtags.map((hashtag: any) => <HashtagCard key={hashtag.id} hashtag={hashtag as any} />)}
  </div>
  ) : <p className="text-center py-8">No hashtags found.</p>;
  case 'all':
@@ -122,7 +122,7 @@ function SearchResultsContent() {
  <div className="space-y-4">
  <div className="text-fine-print text-muted-foreground font-bold uppercase tracking-widest border-b border-border pb-2">Academic Hashtags</div>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
- {hashtags.map((hashtag: any) => <HashtagCard key={hashtag._id} hashtag={hashtag as any} />)}
+ {hashtags.map((hashtag: any) => <HashtagCard key={hashtag.id} hashtag={hashtag as any} />)}
  </div>
  </div>
  )}

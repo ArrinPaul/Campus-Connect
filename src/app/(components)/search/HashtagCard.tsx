@@ -17,7 +17,7 @@ export function HashtagCard({ hashtag }: Props) {
                 <Hash className="h-8 w-8 text-primary opacity-80" />
                 <div>
                     <p className="font-bold text-[17px] text-foreground leading-tight">#{hashtag.tag}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{hashtag.postCount} posts</p>
+                    <p className="text-xs text-muted-foreground mt-1">{hashtag.post_count ?? 0} posts</p>
                 </div>
             </div>
         </Link>

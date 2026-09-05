@@ -17,49 +17,53 @@ const ExplorePostGridSkeleton = () => (
 
 export function ExplorePostGrid() {
     const [posts, setPosts] = useState<FeedItem[]>([]);
-    const [cursor, setCursor] = useState<string | null>(null);
+    // /api/posts/explore is offset-paginated, not cursor-based — it never
+    // reads a `cursor` param or returns a `nextCursor`, so the previous
+    // cursor-based version always re-requested offset 0 and appended the
+    // same first page forever.
+    const [offset, setOffset] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-    // Use raw result to distinguish "loading" (undefined) from "loaded empty" 
+    // Use raw result to distinguish "loading" (undefined) from "loaded empty"
     const queryResult = useQuery(
         api.posts.getExplorePosts,
-        hasMore ? { cursor: cursor || undefined, limit: 9 } : "skip"
+        hasMore ? { offset, limit: 9 } : "skip"
     );
-    
+
     const isInitialLoading = queryResult === undefined && posts.length === 0;
 
     useEffect(() => {
         // Don't process while query is still loading (undefined)
         if (queryResult === undefined) return;
 
-        const { posts: newPosts, nextCursor, hasMore: newHasMore } = queryResult;
-        
+        const { posts: newPosts, hasMore: newHasMore } = queryResult;
+
         if (isLoadingMore) {
             // Append new page to existing posts
             if (newPosts && newPosts.length > 0) {
                 setPosts(prev => [...prev, ...newPosts.map((post: any) => ({
                     type: 'post' as const,
-                    _id: post._id,
-                    createdAt: post.createdAt,
+                    _id: post.id,
+                    createdAt: post.created_at,
                     post: post as any,
                 }))]);
             }
-            setCursor(nextCursor);
+            setOffset(prev => prev + newPosts.length);
             setHasMore(newHasMore);
             setIsLoadingMore(false);
-        } else if (cursor === null && posts.length === 0) {
+        } else if (offset === 0 && posts.length === 0) {
             // Initial load
             setPosts(newPosts.map((post: any) => ({
                 type: 'post' as const,
-                _id: post._id,
-                createdAt: post.createdAt,
+                _id: post.id,
+                createdAt: post.created_at,
                 post: post as any,
             })));
-            setCursor(nextCursor);
+            setOffset(newPosts.length);
             setHasMore(newHasMore);
         }
-        
+
     }, [queryResult]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const observerTargetRef = useRef<HTMLDivElement>(null);

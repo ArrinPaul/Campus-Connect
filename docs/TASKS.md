@@ -836,3 +836,100 @@ communities/slug (400 missing slug, 404 not found).
       this session's own changes is broken or leaking a secret.
 - [x] Delete `patch.js`, `refactor_ui.js`, `refactor_ui.py`,
       `skills_output*.txt` — confirmed unused by any tooling/CI, removed.
+
+## §7 — Full-app correctness sweep (2026-09-06)
+
+User asked to test everything and fix all remaining issues. Ran 4 parallel
+investigation passes over areas not yet audited this session (portfolio/
+settings, calls/WebRTC, admin/jobs/marketplace/community, search/explore/
+feed) with a fresh set of eyes on each, then fixed the confirmed bugs.
+
+- [x] **The single biggest bug of the entire session: `PostCard.tsx` —
+      the interactive post component used everywhere a post renders
+      (main feed, profile, search, hashtag pages, post detail, bookmarks)
+      — was built entirely against Convex-style camelCase fields
+      (`post._id`, `post.authorId`, `post.likeCount`, `post.createdAt` as
+      a number) that never existed on the real Supabase rows (`id`,
+      `author_id`, `like_count`, `created_at` as an ISO string).**
+      Confirmed via the actual `posts` table schema and `DbPost` type
+      (`src/server/db/posts.ts`) — no `_id` alias anywhere. This meant
+      `post._id` was `undefined` at every one of ~15 internal call sites:
+      liking (`ReactionPicker targetId`), commenting (query + composer +
+      list `postId`), deleting, editing, reposting, bookmarking, sharing/
+      copy-link, and post-detail navigation. `currentUser._id` (from
+      `/api/users/me`, which does alias `_id`) compared against
+      `post.authorId` (always undefined) meant `isOwnPost` could also
+      never be true — the edit/delete menu never appeared on your own
+      posts anywhere in the app.
+      Root cause: nobody ever fixed the component itself. Instead, 2 of
+      6 call sites (`UserPostList.tsx`, `UserActivityFeed.tsx`) patched
+      just `_id`/`authorId` onto the spread post (masking the crash but
+      not the broken like/comment/share counts), one route
+      (`api/posts/single`) built a parallel partial camelCase adapter
+      (also incomplete — missed `media_urls`/`link_preview`/`poll_id`),
+      and `VirtualizedFeed.tsx` (which powers the **actual live main
+      feed** via `FeedContainer`) force-cast real data through
+      `as unknown as Post` using an exported `Post`/`PostAuthor` type in
+      `src/types/index.ts` that had the exact same wrong shape — meaning
+      this bug affected the main feed too, not just secondary pages.
+      **Fixed at the source**: rewrote `PostCard.tsx`'s `Post`/`User`
+      interfaces and all ~20 internal references to the real snake_case
+      fields; fixed the same bug in `RepostModal.tsx` (which `PostCard`
+      feeds directly — `post._id`, `post.author.profilePicture`,
+      `post.createdAt`); fixed `src/types/index.ts`'s `Post`/`PostAuthor`
+      to match; simplified `api/posts/single`'s response to pass the real
+      `DbPost` through instead of half-converting it; removed the now-
+      unnecessary manual `_id`/`authorId` patches in the two call sites
+      that had them; fixed the two post-detail pages' fallback-author
+      construction (`_id`→`id`). Updated `PostCard.test.tsx` and
+      `RepostModal.test.tsx`, which had been asserting against the wrong
+      (Convex-style) fixture shape the whole time — passing tests that
+      validated the bug, not caught it, the same failure mode as the
+      notification bug found earlier this session.
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
+      `jest --ci` (649/649 passing). **Not visually verified in a
+      browser** — Chrome automation is still blocked in this environment
+      (navigation reports success but the tab reverts to
+      `chrome://newtab/`); this fix is verified by tracing every mutation
+      call site against the real DB schema and by the updated unit tests,
+      not by seeing it render.
+- [x] **Global search was completely broken.** `search/page.tsx` sent
+      `{ query }`, but `GET /api/search` reads `q` — every search 400'd.
+      Fixed the param name. Also found `universalSearch` (misc.ts) never
+      returned `hashtags` at all (the search page's hashtags tab was
+      always empty by design, not by bug) and selected posts with only
+      `id, content, author_id` — no author join, so `PostCard` couldn't
+      render results even once reachable. Added a hashtag search branch
+      and a full post+author select. Fixed `HashtagCard.postCount` →
+      `post_count` and the search-only `UserCard.profilePicture` →
+      `profile_picture` (both real-column mismatches hiding avatars/counts),
+      plus 3 React keys (`post._id`/`user._id`/`hashtag._id`) that don't
+      exist on real rows, now `id`.
+- [x] **Hashtag pages 404'd on every visit.** The page called
+      `api.hashtags.getPostsByHashtag` → `/api/hashtags/posts`, a route
+      that didn't exist (a *different*, unused mapping —
+      `api.posts.getPostsByHashtag` → `/api/posts/hashtag` — was the only
+      working one, with zero callers). Added the missing route, returning
+      `{ posts, hashtag }` as the page expects — and deliberately
+      returns **200** with `hashtag: null` for an unknown tag rather than
+      404, since `useQuery` throws away the body on a non-2xx response;
+      a 404 here would have made "hashtag not found" indistinguishable
+      from "still loading" forever (the same trap
+      `api/communities/slug`'s existing 404 likely already falls into,
+      not fixed here — out of scope for this pass, flagged for later).
+      Also fixed `hashtag.postCount` → `post_count` and the
+      `PostCard`-wrapper key/id fields.
+- [x] **Explore feed's infinite scroll never advanced past page 1.**
+      `ExplorePostGrid.tsx` sent a `cursor` param and expected a
+      `nextCursor` back; `/api/posts/explore` only ever supported
+      `limit`/`offset` and never read `cursor`. Every scroll re-fetched
+      offset 0, appending duplicate posts with colliding React keys.
+      Switched the frontend to real offset-based pagination matching the
+      route's actual contract.
+- [x] Bookmarks list used `bookmark.post._id`/`.createdAt`/`bookmark.author`
+      — none of which exist (`getBookmarks` nests the real post as
+      `bookmark.post` with `id`/`created_at`, and `author` is nested
+      *inside* `post.author`, not top-level). Fixed; simplified since
+      `bookmark.post` already carries its own author.
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
+      `jest --ci` (649/649 passing).

@@ -37,38 +37,44 @@ import { AvatarWithStatus } from "@/components/ui/OnlineStatusDot"
 import { createLogger } from "@/lib/logger"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
-import type { ReactionCounts } from "@/types"
 
 const log = createLogger("PostCard")
 
+// Real Supabase row shapes (see DbPost in src/server/db/posts.ts) — this
+// component used to be typed against Convex-style camelCase fields
+// (_id/authorId/likeCount/createdAt as a number) that never existed on the
+// actual API response, so every mutation here (like, comment, delete,
+// repost, bookmark) and every post/profile link was silently passed
+// `undefined` for the id. Never caught because every caller either passed
+// data straight through (untyped `any`) or patched just enough fields
+// (_id, authorId) to stop a crash without fixing the rest.
 interface User {
-  _id: Id<"users">
+  id: Id<"users">
   name: string
-  profilePicture?: string
+  profile_picture?: string
   role: "Student" | "Research Scholar" | "Faculty"
 }
 
 interface Post {
-  _id: Id<"posts">
-  authorId: Id<"users">
+  id: Id<"posts">
+  author_id: Id<"users">
   content: string
-  likeCount: number
-  commentCount: number
-  shareCount: number
-  createdAt: number
-  updatedAt: number
-  reactionCounts?: ReactionCounts
-  mediaUrls?: string[]
-  mediaType?: "image" | "video" | "file" | "link"
-  mediaFileNames?: string[]
-  linkPreview?: {
+  like_count?: number
+  comment_count?: number
+  share_count?: number
+  created_at?: string
+  updated_at?: string
+  media_urls?: string[]
+  media_type?: "image" | "video" | "file" | "link"
+  media_file_names?: string[]
+  link_preview?: {
     url: string
     title?: string
     description?: string
     image?: string
     favicon?: string
   }
-  pollId?: Id<"polls">
+  poll_id?: Id<"polls">
 }
 
 interface PostCardProps {
@@ -90,7 +96,7 @@ export const PostCard = memo(function PostCard({
   const [isSavingEdit, setIsSavingEdit] = useState(false)
   const [updatedAtTimestamp, setUpdatedAtTimestamp] = useState<
     number | string | undefined
-  >((post as any).updatedAt || (post as any).updated_at)
+  >(post.updated_at)
 
   const currentUser = useQuery(
     api.users.getCurrentUser,
@@ -103,9 +109,8 @@ export const PostCard = memo(function PostCard({
 
   const isOwnPost = Boolean(
     currentUser?._id &&
-      (currentUser._id === post.authorId ||
-        String(currentUser._id) === String(post.authorId) ||
-        (author?._id && String(currentUser._id) === String(author._id)))
+      (String(currentUser._id) === String(post.author_id) ||
+        (author?.id && String(currentUser._id) === String(author.id)))
   )
 
   const [isDeleting, setIsDeleting] = useState(false)
@@ -126,14 +131,14 @@ export const PostCard = memo(function PostCard({
   // Only fetch comments when expanded â€” paginated
   const commentsData = useQuery(
     api.comments.getPostComments,
-    showComments ? { postId: post._id, sortBy: commentSort, limit: 20 } : "skip"
+    showComments ? { postId: post.id, sortBy: commentSort, limit: 20 } : "skip"
   )
 
   const moreCommentsData = useQuery(
     api.comments.getPostComments,
     showComments && isLoadingMoreComments && commentCursor
       ? {
-          postId: post._id,
+          postId: post.id,
           sortBy: commentSort,
           limit: 20,
           cursor: commentCursor,
@@ -203,7 +208,7 @@ export const PostCard = memo(function PostCard({
     setIsSavingEdit(true)
     try {
       await updatePostMutation({
-        postId: post._id,
+        postId: post.id,
         content: editContent.trim(),
       })
       setCurrentContent(editContent.trim())
@@ -223,10 +228,10 @@ export const PostCard = memo(function PostCard({
     setShowDeleteConfirm(false)
     setShowMenu(false)
     try {
-      await deletePost({ postId: post._id })
+      await deletePost({ postId: post.id })
       toast.success("Post deleted")
     } catch (error) {
-      log.error("Failed to delete post", error, { postId: post._id })
+      log.error("Failed to delete post", error, { postId: post.id })
       toast.error("Failed to delete post. Please try again.")
     } finally {
       setIsDeleting(false)
@@ -275,7 +280,7 @@ export const PostCard = memo(function PostCard({
     }
 
     try {
-      await createRepost({ originalPostId: post._id })
+      await createRepost({ originalPostId: post.id })
       toast.success("Post reposted!")
       setShowShareDropdown(false)
       setTimeout(() => setShareSuccess(null), 3000)
@@ -295,7 +300,7 @@ export const PostCard = memo(function PostCard({
 
   const handleCopyLink = async () => {
     try {
-      const url = `${window.location.origin}/feed#post-${post._id}`
+      const url = `${window.location.origin}/feed#post-${post.id}`
       await navigator.clipboard.writeText(url)
       setShareSuccess("Link copied!")
       setShowShareDropdown(false)
@@ -313,7 +318,7 @@ export const PostCard = memo(function PostCard({
           text:
             post.content.substring(0, 100) +
             (post.content.length > 100 ? "..." : ""),
-          url: `${window.location.origin}/feed#post-${post._id}`,
+          url: `${window.location.origin}/feed#post-${post.id}`,
         })
         setShowShareDropdown(false)
       } catch (err) {
@@ -368,7 +373,7 @@ export const PostCard = memo(function PostCard({
     ) {
       return
     }
-    router.push(`/post/${post._id}`)
+    router.push(`/post/${post.id}`)
   }
 
   const role = roleConfig[author.role] ?? roleConfig.Student
@@ -385,13 +390,13 @@ export const PostCard = memo(function PostCard({
       <div className="w-full px-4 flex gap-3 pb-2">
         {/* Left Column: Avatar */}
         <div className="shrink-0 mt-1">
-          {author?._id ? (
-            <Link href={`/profile/${author._id}`} className="no-nav">
-              <AvatarWithStatus userId={author._id} size="sm">
+          {author?.id ? (
+            <Link href={`/profile/${author.id}`} className="no-nav">
+              <AvatarWithStatus userId={author.id} size="sm">
                 <div className="relative h-10 w-10 flex-shrink-0">
-                  {author.profilePicture ? (
+                  {author.profile_picture ? (
                     <OptimizedImage
-                      src={author.profilePicture}
+                      src={author.profile_picture}
                       alt={author.name}
                       fill
                       isAvatar
@@ -407,11 +412,11 @@ export const PostCard = memo(function PostCard({
               </AvatarWithStatus>
             </Link>
           ) : (
-            <AvatarWithStatus userId={author._id} size="sm">
+            <AvatarWithStatus userId={author?.id} size="sm">
               <div className="relative h-10 w-10 flex-shrink-0">
-                {author.profilePicture ? (
+                {author.profile_picture ? (
                   <OptimizedImage
-                    src={author.profilePicture}
+                    src={author.profile_picture}
                     alt={author.name}
                     fill
                     isAvatar
@@ -435,9 +440,9 @@ export const PostCard = memo(function PostCard({
           <div className="flex items-start justify-between">
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 flex-wrap text-xs text-muted-foreground">
-                {author?._id ? (
+                {author?.id ? (
                   <Link
-                    href={`/profile/${author._id}`}
+                    href={`/profile/${author.id}`}
                     className="font-semibold text-foreground text-sm truncate hover:underline cursor-pointer no-nav"
                   >
                     {author.name}
@@ -449,22 +454,15 @@ export const PostCard = memo(function PostCard({
                 )}
                 <span>·</span>
                 <Link
-                  href={`/post/${post._id}`}
+                  href={`/post/${post.id}`}
                   className="hover:underline text-muted-foreground"
                 >
                   <span suppressHydrationWarning>
-                    {formatTimestamp(
-                      post.createdAt ||
-                        (post as any).created_at ||
-                        (post as any)._creationTime
-                    )}
+                    {formatTimestamp(post.created_at)}
                   </span>
                 </Link>
                 {(() => {
-                  const rawCreated =
-                    post.createdAt ||
-                    (post as any).created_at ||
-                    (post as any)._creationTime
+                  const rawCreated = post.created_at
                   if (!updatedAtTimestamp || !rawCreated) return false
                   const updated =
                     typeof updatedAtTimestamp === "number"
@@ -596,41 +594,41 @@ export const PostCard = memo(function PostCard({
             </div>
           )}
           {/* Media Gallery */}
-          {post.mediaUrls &&
-            post.mediaUrls.length > 0 &&
-            post.mediaType &&
-            post.mediaType !== "link" && (
+          {post.media_urls &&
+            post.media_urls.length > 0 &&
+            post.media_type &&
+            post.media_type !== "link" && (
               <div className="mt-3 rounded-lg overflow-hidden border border-border bg-card">
                 <MediaGallery
-                  mediaUrls={post.mediaUrls}
-                  mediaType={post.mediaType as "image" | "video" | "file"}
-                  mediaFileNames={post.mediaFileNames}
+                  mediaUrls={post.media_urls}
+                  mediaType={post.media_type as "image" | "video" | "file"}
+                  mediaFileNames={post.media_file_names}
                   altPrefix={`${author.name}'s post media`}
                 />
               </div>
             )}
           {/* Link Preview */}
-          {post.linkPreview && (
+          {post.link_preview && (
             <div className="mt-3 rounded-lg overflow-hidden border border-border hover:bg-card transition-colors">
               <LinkPreviewCard
-                url={post.linkPreview.url}
-                title={post.linkPreview.title}
-                description={post.linkPreview.description}
-                image={post.linkPreview.image}
-                favicon={post.linkPreview.favicon}
+                url={post.link_preview.url}
+                title={post.link_preview.title}
+                description={post.link_preview.description}
+                image={post.link_preview.image}
+                favicon={post.link_preview.favicon}
               />
             </div>
           )}
           {/* Poll */}
-          {post.pollId && (
+          {post.poll_id && (
             <div className="mt-3 rounded-lg border border-border p-md bg-card">
-              <PollCard pollId={post.pollId} />
+              <PollCard pollId={post.poll_id} />
             </div>
           )}
           {/* Engagement Stats and Actions */}
           <div className="mt-3 flex items-center justify-between gap-2 max-w-md">
             {/* Like Button */}
-            <ReactionPicker targetId={post._id} targetType="post" />
+            <ReactionPicker targetId={post.id} targetType="post" />
 
             {/* Comment Toggle Button */}
             <motion.button
@@ -645,7 +643,7 @@ export const PostCard = memo(function PostCard({
             >
               <MessageCircle className="h-[18px] w-[18px]" />
               <span className="text-xs text-muted-foreground font-semibold">
-                {post.commentCount}
+                {post.comment_count ?? 0}
               </span>
             </motion.button>
 
@@ -659,9 +657,9 @@ export const PostCard = memo(function PostCard({
                 aria-label="Share post"
               >
                 <Share2 className="h-[18px] w-[18px]" />
-                {post.shareCount > 0 && (
+                {(post.share_count ?? 0) > 0 && (
                   <span className="text-xs text-muted-foreground font-semibold">
-                    {post.shareCount}
+                    {post.share_count}
                   </span>
                 )}
               </motion.button>
@@ -708,13 +706,13 @@ export const PostCard = memo(function PostCard({
             </div>
 
             {/* Bookmark Button */}
-            <BookmarkButton postId={post._id} />
+            <BookmarkButton postId={post.id} />
           </div>
           {/* Inline Comments Section */}
           {showComments && (
             <div className="mt-md border-t border-border pt-md animate-in no-nav" onClick={(e) => e.stopPropagation()}>
               <CommentList
-                postId={post._id}
+                postId={post.id}
                 comments={
                   Array.isArray(allComments) && allComments.length > 0
                     ? allComments
@@ -730,7 +728,7 @@ export const PostCard = memo(function PostCard({
                 onLoadMore={handleLoadMoreComments}
               />
               <div className="mt-sm">
-                <CommentComposer postId={post._id} />
+                <CommentComposer postId={post.id} />
               </div>
             </div>
           )}
@@ -739,7 +737,7 @@ export const PostCard = memo(function PostCard({
 
       {/* Reaction Modal */}
       <ReactionModal
-        targetId={post._id}
+        targetId={post.id}
         targetType="post"
         open={showReactionModal}
         onOpenChange={setShowReactionModal}

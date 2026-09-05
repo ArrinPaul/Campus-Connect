@@ -17,9 +17,9 @@ export default function PostPage({ params }: { params: { id: string } }) {
     );
   }
 
-  const post = result?.post ?? (result?._id || result?.id ? result : null);
+  const post = result?.post ?? (result?.id ? result : null);
   const author = result?.author ?? post?.author ?? {
-    _id: post?.authorId || post?.author_id,
+    id: post?.author_id,
     name: 'User',
     role: 'Student',
   };

@@ -20,21 +20,20 @@ const mockCreateRepost = Object.assign(jest.fn(), {
 })
 
 const mockPost = {
-  _id: "post123" as any,
+  id: "post123" as any,
   content: "This is a test post",
-  authorId: "author123" as any,
-  createdAt: Date.now(),
-  likeCount: 5,
-  commentCount: 2,
-  shareCount: 1,
+  author_id: "author123" as any,
+  created_at: new Date().toISOString(),
+  like_count: 5,
+  comment_count: 2,
+  share_count: 1,
   author: {
-    _id: "author123" as any,
+    id: "author123" as any,
     name: "Test Author",
     username: "testauthor",
-    authId: "auth123",
-    imageUrl: "https://example.com/image.jpg",
+    profile_picture: "https://example.com/image.jpg",
     bio: "Test bio",
-    createdAt: Date.now(),
+    created_at: new Date().toISOString(),
   },
 }
 

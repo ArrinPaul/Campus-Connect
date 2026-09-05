@@ -14,7 +14,8 @@ type Props = {
 };
 
 export function UserCard({ user }: Props) {
-    const userId = user._id || (user as any).id || (user as any).userId;
+    const userId = (user as any).id || user._id || (user as any).userId;
+    const profilePicture = (user as any).profile_picture || user.profilePicture;
     return (
         <Link 
             href={`/profile/${userId}`} 
@@ -23,9 +24,9 @@ export function UserCard({ user }: Props) {
             <div className="flex items-center gap-4">
                 {/* Avatar */}
                 <div className="h-14 w-14 rounded-full overflow-hidden border border-border bg-muted shadow-sm flex-shrink-0">
-                    {user.profilePicture ? (
-                        <Image 
-                            src={user.profilePicture} 
+                    {profilePicture ? (
+                        <Image
+                            src={profilePicture}
                             alt={user.name} 
                             width={56} 
                             height={56} 

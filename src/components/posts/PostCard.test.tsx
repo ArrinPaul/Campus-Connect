@@ -117,20 +117,20 @@ global.confirm = jest.fn()
 
 describe("PostCard", () => {
   const mockAuthor = {
-    _id: "user123" as Id<"users">,
+    id: "user123" as Id<"users">,
     name: "John Doe",
     role: "Student" as const,
   }
 
   const mockPost = {
-    _id: "post123" as Id<"posts">,
-    authorId: "user123" as Id<"users">,
+    id: "post123" as Id<"posts">,
+    author_id: "user123" as Id<"users">,
     content: "This is a test post content",
-    likeCount: 5,
-    commentCount: 3,
-    shareCount: 0,
-    createdAt: Date.now() - 3600000, // 1 hour ago
-    updatedAt: Date.now() - 3600000,
+    like_count: 5,
+    comment_count: 3,
+    share_count: 0,
+    created_at: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+    updated_at: new Date(Date.now() - 3600000).toISOString(),
   }
 
   beforeEach(() => {
@@ -149,7 +149,7 @@ describe("PostCard", () => {
   it("should display post author info with profile picture", () => {
     const authorWithPicture = {
       ...mockAuthor,
-      profilePicture: "https://example.com/avatar.jpg",
+      profile_picture: "https://example.com/avatar.jpg",
     }
 
     render(<PostCard post={mockPost} author={authorWithPicture} />)
@@ -270,7 +270,7 @@ describe("PostCard", () => {
   it("should format timestamp as 'just now' for recent posts", () => {
     const recentPost = {
       ...mockPost,
-      createdAt: Date.now() - 30000, // 30 seconds ago
+      created_at: new Date(Date.now() - 30000).toISOString(), // 30 seconds ago
     }
 
     render(<PostCard post={recentPost} author={mockAuthor} />)
@@ -281,7 +281,7 @@ describe("PostCard", () => {
   it("should format timestamp as minutes for posts under 1 hour", () => {
     const recentPost = {
       ...mockPost,
-      createdAt: Date.now() - 1800000, // 30 minutes ago
+      created_at: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
     }
 
     render(<PostCard post={recentPost} author={mockAuthor} />)
@@ -292,7 +292,7 @@ describe("PostCard", () => {
   it("should format timestamp as days for posts under 1 week", () => {
     const oldPost = {
       ...mockPost,
-      createdAt: Date.now() - 172800000, // 2 days ago
+      created_at: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
     }
 
     render(<PostCard post={oldPost} author={mockAuthor} />)
@@ -303,7 +303,7 @@ describe("PostCard", () => {
   it("should format timestamp as date for posts over 1 week", () => {
     const oldPost = {
       ...mockPost,
-      createdAt: Date.now() - 604800000 - 1000, // Over 1 week ago
+      created_at: new Date(Date.now() - 604800000 - 1000).toISOString(), // Over 1 week ago
     }
 
     render(<PostCard post={oldPost} author={mockAuthor} />)

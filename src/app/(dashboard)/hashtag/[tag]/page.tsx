@@ -24,16 +24,18 @@ const HashtagPostsSkeleton = () => (
 );
 
 function HashtagPageContent({ tag }: { tag: string }) {
- const { posts, hashtag } = useQuery(api.hashtags.getPostsByHashtag, { tag }) || { posts: [], hashtag: null };
+ const result = useQuery(api.hashtags.getPostsByHashtag, { tag });
 
- if (posts === undefined && hashtag === undefined) {
+ if (result === undefined) {
  return <HashtagPostsSkeleton />;
  }
 
- if (hashtag === null && posts === null) {
+ const { posts, hashtag } = result;
+
+ if (hashtag === null) {
  notFound();
  }
- 
+
  return (
  <div className="max-w-xl mx-auto py-8 px-4">
  <Link href="/explore" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4">
@@ -46,14 +48,14 @@ function HashtagPageContent({ tag }: { tag: string }) {
  <Hash className="h-10 w-10 text-primary" />
  <div>
  <h1 className="text-3xl font-bold text-foreground">#{hashtag?.tag}</h1>
- <p className="text-sm text-muted-foreground">{hashtag?.postCount} posts</p>
+ <p className="text-sm text-muted-foreground">{hashtag?.post_count ?? 0} posts</p>
  </div>
  </div>
  </div>
 
  <div className="space-y-4">
  {posts.map((post: any) => (
- <PostCard key={post._id} item={{ type: 'post', post: post as any, _id: post._id, createdAt: post.createdAt }} />
+ <PostCard key={post.id} item={{ type: 'post', post: post as any, _id: post.id, createdAt: post.created_at }} />
  ))}
  </div>
 

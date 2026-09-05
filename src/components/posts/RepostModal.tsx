@@ -9,14 +9,14 @@ import { X } from"lucide-react"
 import { ButtonLoadingSpinner } from"@/components/ui/loading-skeleton"
 
 interface Post {
- _id: Id<"posts">
+ id: Id<"posts">
  content: string
- authorId: Id<"users">
- createdAt: number
+ author_id: Id<"users">
+ created_at?: string
  author?: {
- _id: Id<"users">
+ id: Id<"users">
  name: string
- profilePicture?: string
+ profile_picture?: string
  }
 }
 
@@ -52,7 +52,7 @@ export function RepostModal({ post, isOpen, onClose, onSuccess }: RepostModalPro
 
  try {
  await createRepost({
- originalPostId: post._id,
+ originalPostId: post.id,
  })
  
  onClose()
@@ -85,7 +85,7 @@ export function RepostModal({ post, isOpen, onClose, onSuccess }: RepostModalPro
 
  try {
  await createRepost({
- originalPostId: post._id,
+ originalPostId: post.id,
  quoteContent: quoteContent.trim(),
  })
  
@@ -164,9 +164,9 @@ export function RepostModal({ post, isOpen, onClose, onSuccess }: RepostModalPro
  {/* Original post preview */}
  <div className="border border-border rounded-lg p-4 bg-card">
  <div className="flex items-center gap-3 mb-3">
- {post.author?.profilePicture ? (
+ {post.author?.profile_picture ? (
  <Image
- src={post.author.profilePicture}
+ src={post.author.profile_picture}
  alt={post.author.name}
  width={40}
  height={40}
@@ -182,7 +182,7 @@ export function RepostModal({ post, isOpen, onClose, onSuccess }: RepostModalPro
  {post.author?.name ||"Unknown User"}
  </p>
  <p className="text-sm text-muted-foreground">
- {new Date(post.createdAt).toLocaleDateString()}
+ {new Date(post.created_at ?? 0).toLocaleDateString()}
  </p>
  </div>
  </div>

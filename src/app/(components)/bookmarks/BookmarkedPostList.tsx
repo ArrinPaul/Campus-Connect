@@ -65,12 +65,9 @@ export function BookmarkedPostList() {
     .filter((bookmark: any) => bookmark && bookmark.post)
     .map((bookmark: any) => ({
       type: 'post' as const,
-      _id: bookmark.post._id,
-      createdAt: bookmark.post.createdAt,
-      post: {
-        ...bookmark.post,
-        author: bookmark.author,
-      },
+      _id: bookmark.post.id,
+      createdAt: bookmark.post.created_at,
+      post: bookmark.post,
     }));
 
   return (

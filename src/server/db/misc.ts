@@ -228,15 +228,22 @@ export async function universalSearch(query: string) {
   const supabase = await getSupabase()
   // Escape ILIKE special characters to prevent pattern injection
   const escaped = query.replace(/[%_]/g, (m) => `\\${m}`)
-  const [users, posts, communities] = await Promise.all([
+  const [users, posts, communities, hashtags] = await Promise.all([
     supabase.from("users").select("id, name, username, profile_picture").or(`name.ilike.%${escaped}%,username.ilike.%${escaped}%`).limit(5),
-    supabase.from("posts").select("id, content, author_id").ilike("content", `%${escaped}%`).limit(5),
+    supabase
+      .from("posts")
+      .select("*, author:users!posts_author_id_fkey(id, name, username, profile_picture, role)")
+      .ilike("content", `%${escaped}%`)
+      .order("created_at", { ascending: false })
+      .limit(5),
     supabase.from("communities").select("id, name, slug, cover_image").or(`name.ilike.%${escaped}%,description.ilike.%${escaped}%`).limit(5),
+    supabase.from("hashtags").select("*").ilike("tag", `%${escaped}%`).order("post_count", { ascending: false }).limit(5),
   ])
   return {
     users: users.data ?? [],
     posts: posts.data ?? [],
     communities: communities.data ?? [],
+    hashtags: hashtags.data ?? [],
   }
 }
 
