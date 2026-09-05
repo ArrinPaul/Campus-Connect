@@ -280,11 +280,22 @@ audit.
 - [x] Composer: confirmed Tiptap mention autocomplete is real and wired —
       `PostComposer.tsx` uses `MentionAutocomplete` with live `@`-trigger
       state, not just an unused import.
-- [ ] **Not yet swept:** 61 files in `src/` use `animate-pulse` for loading
-      states; only the feed and suggested-users widgets were checked
-      component-by-component for the bg-card-on-bg-card bug above. Worth a
-      dedicated pass to confirm the rest don't have the same contrast bug —
-      tracked here rather than assumed clean.
+- [x] **Swept every `animate-pulse` call site (27 files with a `bg-card` +
+      `animate-pulse` combination) for the same bg-card-on-bg-card contrast
+      bug found earlier in `FeedContainer`/`SuggestedUsers`.** Most are a
+      single whole-card skeleton block (`bg-card` pulsing against a
+      different-colored page background) — correct, not a bug. Found and
+      fixed 4 more real instances of the actual bug (a `bg-card` *bar*
+      rendered inside a `bg-card` *panel*, so the bar was invisible against
+      its own immediate parent): `UserActivityFeed.tsx`, `PollCard.tsx`,
+      `UserPostList.tsx`, `CreatePost.tsx` — all fixed by switching the
+      inner bars to `bg-muted`, matching the fix pattern and the working
+      examples already in `BookmarkedPostList.tsx`/`find-partners`/
+      `find-experts`/`feed/loading.tsx` (which all correctly used
+      `bg-muted`/`bg-canvas` for inner bars from the start).
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
+      `jest --ci` (601/601 passing). **Not visually verified in a
+      browser** — same standing Chrome-permission blocker.
 - [x] **Media lightbox** — checked `MediaGallery.tsx` / `ImageLightbox`:
       already fully built to a high standard (grid layout, double-tap-to-like
       heart burst, zoom, keyboard nav, dot indicators, file/video/image

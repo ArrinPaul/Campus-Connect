@@ -42,11 +42,11 @@ export function PollCard({ pollId }: PollCardProps) {
  // Loading skeleton
  return (
  <div className="rounded-lg border border-border bg-card p-4 space-y-2 animate-pulse">
- <div className="h-4 w-1/3 rounded bg-card" />
+ <div className="h-4 w-1/3 rounded bg-muted" />
  {[1, 2, 3].map((n) => (
- <div key={n} className="h-9 rounded-lg bg-card" />
+ <div key={n} className="h-9 rounded-lg bg-muted" />
  ))}
- <div className="h-3 w-1/4 rounded bg-card" />
+ <div className="h-3 w-1/4 rounded bg-muted" />
  </div>
  )
  }

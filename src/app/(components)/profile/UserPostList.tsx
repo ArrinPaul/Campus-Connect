@@ -13,8 +13,8 @@ export function UserPostList({ userId }: { userId: Id<'users'> }) {
              <div className="space-y-4 max-w-xl mx-auto">
                 <div className="rounded-lg border border-border bg-card p-4 animate-pulse">
                     <div className="space-y-2">
-                        <div className="h-4 w-full bg-card rounded" />
-                        <div className="h-4 w-5/6 bg-card rounded" />
+                        <div className="h-4 w-full bg-muted rounded" />
+                        <div className="h-4 w-5/6 bg-muted rounded" />
                     </div>
                 </div>
             </div>

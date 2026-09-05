@@ -66,10 +66,10 @@ export function CreatePost({ communityId }: Props) {
     return (
       <div className="rounded-lg border border-border bg-card p-4 mb-4 animate-pulse">
         <div className="flex items-start gap-3">
-          <div className="h-10 w-10 rounded-full bg-card flex-shrink-0" />
+          <div className="h-10 w-10 rounded-full bg-muted flex-shrink-0" />
           <div className="w-full space-y-2">
-            <div className="h-12 bg-card rounded" />
-            <div className="h-8 bg-card rounded w-1/4" />
+            <div className="h-12 bg-muted rounded" />
+            <div className="h-8 bg-muted rounded w-1/4" />
           </div>
         </div>
       </div>
