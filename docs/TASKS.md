@@ -128,9 +128,54 @@ audit.
 - [ ] Add a `course` column to `questions` (or remove the field from
       `AskQuestionModal.tsx`) to resolve the frontend/schema mismatch found
       above.
-- [ ] Extend Zod validation to the remaining write routes (marketplace
-      update, resources upload, research upload, events/jobs create) —
-      `api/marketplace` create is now covered; the rest are not yet.
+- [x] **Extended Zod validation to the remaining write routes — and found
+      that 3 of the 5 were completely broken against the live schema, not
+      just unvalidated.** Same frontend/schema drift pattern as the
+      `questions.course` bug found earlier (a form was built against field
+      names / value shapes the DB doesn't have), but worse: these would
+      currently fail outright on submit, not just silently drop a field.
+      - `api/research` (paper upload) — frontend sends `pdfUrl`, `doi`,
+        `lookingForCollaborators`; table only has `file_url` (no `doi`/
+        `lookingForCollaborators` column at all). Fixed: map `pdfUrl` →
+        `file_url`, drop the other two.
+      - `api/events` (create) — frontend sends camelCase
+        `eventType`/`startDate`/`endDate` (epoch numbers) plus
+        `virtualLink`/`maxAttendees`; table columns are snake_case
+        `event_type`/`start_time`/`end_time` and have no virtual-link or
+        attendee-cap column at all. **This route would 400 on every single
+        submission** (Postgrest rejects unknown columns) — event creation
+        was fully broken, not just unvalidated. Fixed: map fields and
+        convert timestamps to ISO strings; drop the two unsupported fields.
+      - `api/jobs` (create) — frontend's `type` field is `'job' |
+        'internship'`, but the `jobs.type` CHECK constraint only allows
+        `full_time`/`part_time`/`internship`/`contract` — **`'job'` would
+        violate the constraint and fail the insert on every full-time
+        posting**, the most common case. Also `skillsRequired` needed
+        mapping to the `skills` column; `remote`/`duration` have no column.
+        Fixed: map `'job'` → `'full_time'`, `skillsRequired` → `skills`,
+        drop `remote`/`duration`.
+      - `api/marketplace/update` — frontend sends a `condition` field with
+        no matching column. Fixed: accept and drop it.
+      - `api/resources` (upload) — this one only needed validation added
+        (no drift found), now has a proper schema.
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
+      `jest --ci` (567/567, including the existing
+      `marketplace-mutations.test.ts` still passing).
+- [ ] **This session found the same "frontend built against different
+      field names/shapes than the live schema" bug four separate times**
+      (questions.course, research paper upload, event creation, job
+      posting) — strong signal this app was scaffolded against a different
+      backend convention (the codebase's pervasive `Id<'...'>`/`_id`-style
+      types read like a Convex holdover) and several forms were never
+      updated when it moved to Supabase's snake_case schema. Worth a
+      dedicated sweep of every remaining create/update form against its
+      actual table columns rather than assuming the ones not yet touched
+      are fine — this pattern has had a 100% hit rate everywhere checked
+      so far.
+- [ ] Decide whether `virtualLink`/`maxAttendees` (events) and
+      `remote`/`duration` (jobs) get real columns via a migration, or get
+      removed from their forms — currently silently dropped, same open
+      decision as `questions.course`.
 - [ ] Confirm no client-side code can call `notifications` insert directly
       (RLS policy is currently `WITH CHECK (true)`); tighten policy if any
       client path exists.
