@@ -13,6 +13,7 @@ import { formatDistanceToNow } from"date-fns"
 import { useLiveRegion } from"@/components/accessibility/LiveRegion"
 import { useRealtimeNotifications } from"@/hooks/useRealtimeNotifications"
 import { getNotificationUrl } from"@/lib/notifications/url"
+import { groupNotifications } from"@/lib/notifications/group"
 
 /**
  * NotificationBell component
@@ -76,15 +77,21 @@ export function NotificationBell() {
  }
  };
 
+ const groupedNotifications = recentNotifications ? groupNotifications(recentNotifications) : undefined
+
  const handleNotificationClick = (notification: {
  id: string
  type?: string
  reference_type?: string
  reference_id?: string
  from_user_id?: string
+ ids?: string[]
  }) => {
  setIsOpen(false)
- markNotificationAsRead({ notificationId: notification.id as Id<"notifications"> }).catch(() => {});
+ const idsToMark = notification.ids?.length ? notification.ids : [notification.id]
+ for (const id of idsToMark) {
+ markNotificationAsRead({ notificationId: id as Id<"notifications"> }).catch(() => {});
+ }
  router.push(getNotificationUrl(notification))
  }
 
@@ -152,16 +159,16 @@ export function NotificationBell() {
 
  {/* Notifications List */}
  <div className="max-h-96 overflow-y-auto">
- {!recentNotifications || recentNotifications.length === 0 ? (
+ {!groupedNotifications || groupedNotifications.length === 0 ? (
  <div className="px-4 py-8 text-center text-muted-foreground">
  <Bell className="w-12 h-12 mx-auto mb-2 opacity-50" />
  <p>No notifications yet</p>
  </div>
  ) : (
  <div className="divide-y divide-gray-200 dark:divide-gray-700">
- {recentNotifications.map((notification: any) => (
+ {groupedNotifications.map((notification) => (
  <button
- key={notification.id}
+ key={notification.ids.join('-')}
  onClick={() => handleNotificationClick(notification)}
  className={`w-full px-4 py-3 text-left hover:bg-card transition-colors ${
  !notification.read ?"bg-primary/10" :"bg-card"

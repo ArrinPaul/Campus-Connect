@@ -5,6 +5,7 @@ import { useQuery, useMutation } from '@/lib/api';
 import { useUser } from '@/lib/auth/client';
 import { api } from '@/lib/api';
 import { NotificationItem } from '@/components/notifications/NotificationItem';
+import { groupNotifications } from '@/lib/notifications/group';
 import { Bell, CheckCheck, Inbox, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -22,7 +23,8 @@ export default function NotificationsPage() {
   const notifications = data;
   const unreadCount = notifications?.filter((n: any) => !n.read).length ?? 0;
 
-  const filteredNotifications = notifications?.filter((n: any) => {
+  const groupedNotifications = notifications ? groupNotifications(notifications) : undefined;
+  const filteredNotifications = groupedNotifications?.filter((n) => {
     if (filter === 'unread') return !n.read;
     return true;
   });
@@ -136,8 +138,8 @@ export default function NotificationsPage() {
           </div>
         ) : (
           <div className="rounded-lg border border-border bg-card overflow-hidden divide-y divide-hairline">
-            {filteredNotifications?.map((notification: any) => (
-              <NotificationItem key={notification.id} notification={notification} />
+            {filteredNotifications?.map((notification) => (
+              <NotificationItem key={notification.ids.join('-')} notification={notification} />
             ))}
           </div>
         )}

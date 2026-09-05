@@ -326,10 +326,29 @@ audit.
       Added `src/tests/notification-triggers.test.ts` to lock this in — it
       exists specifically so this can't silently regress back to "fully
       built, never called" again. 560/560 tests passing after this change.
-- [ ] Notifications: grouped notifications ("X and N others..."). Now that
-      notifications are actually created, a popular post will generate one
-      row per like — grouping/collapsing in the UI is a real next step, not
-      just a nice-to-have.
+- [x] Notifications: grouped notifications ("X and N others..."). Added
+      `src/lib/notifications/group.ts` (`groupNotifications`) — collapses
+      repeat notifications that share `type` + `reference_type` +
+      `reference_id` into one row with a composed message ("Alice and 3
+      others liked your post"), keeping the most recent actor/timestamp and
+      marking the group read only once every notification in it is read.
+      Scoped deliberately narrow: only `like` and `event_rsvp` are
+      groupable — types like `answer`/`message`/`comment` carry distinct
+      per-notification content and are never collapsed even if they share a
+      reference_id, so nothing meaningful gets hidden.
+      Wired into both `NotificationBell`'s dropdown and the
+      `/notifications` page; clicking a grouped row marks every id in the
+      group as read (`NotificationItem` and the bell's click handler now
+      accept an optional `ids: string[]` and mark all of them, falling back
+      to the single id when ungrouped).
+      Added `src/lib/notifications/group.test.ts` (6 tests: collapses same-
+      post likes, keeps different posts separate, never groups non-
+      groupable types, read-only-when-all-read, single notification passes
+      through unchanged, empty input).
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
+      `jest --ci` (601/601 passing). **Not visually verified in a
+      browser** — same standing Chrome-permission blocker as the rest of
+      this session's frontend work.
 - [x] **While starting the grouping work above, found the entire
       notification display layer was broken and had never been exercised —
       arguably the second-biggest finding of this session, same root cause

@@ -13,7 +13,7 @@ import { getNotificationUrl } from "@/lib/notifications/url"
 interface NotificationItemProps {
   notification: {
     id: Id<"notifications">
-    user_id: Id<"users">
+    user_id?: Id<"users">
     from_user_id?: Id<"users">
     type: string
     reference_type?: string
@@ -26,6 +26,10 @@ interface NotificationItemProps {
       name: string
       profile_picture?: string
     } | null
+    // Present when this notification represents a collapsed group (e.g.
+    // "Alice and 3 others liked your post") — every id in the group is
+    // marked read on click, not just the displayed one.
+    ids?: string[]
   }
   onRead?: () => void
 }
@@ -37,7 +41,8 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
   const handleClick = async () => {
     if (!notification.read) {
       try {
-        await markAsRead({ notificationId: notification.id })
+        const idsToMark = notification.ids?.length ? notification.ids : [notification.id]
+        await Promise.all(idsToMark.map((id) => markAsRead({ notificationId: id as Id<"notifications"> })))
         onRead?.()
       } catch (error) {
         console.error("Failed to mark notification as read:", error)
