@@ -198,12 +198,28 @@ audit.
       `jest --ci` (567/567) — none of that can verify the migration itself
       runs cleanly against a real database, only that the TypeScript/route
       side is consistent with it.
-- [ ] Confirm no client-side code can call `notifications` insert directly
-      (RLS policy is currently `WITH CHECK (true)`); tighten policy if any
-      client path exists.
-- [ ] Add `ALTER PUBLICATION supabase_realtime ADD TABLE ...` migration for
-      any table currently relying on a dashboard-only Realtime config, so
-      it's reproducible from source.
+- [x] Confirmed no client-side code calls `notifications` insert directly —
+      grepped every `.from("notifications").insert` in `src/`, found exactly
+      one, `createNotification` (notifications.ts), which uses
+      `createAdminClient()` (service-role, bypasses RLS entirely). RLS on
+      this table was never actually gating the app's own writes, only
+      failing to gate a hypothetical malicious direct client. Tightened via
+      `supabase/migrations/20240106000000_tighten_notifications_insert_policy.sql`
+      (`WITH CHECK (true)` → `WITH CHECK (false)`) — zero effect on real
+      traffic, closes the gap for anyone calling the client directly with
+      their own session.
+- [x] Added `supabase/migrations/20240107000000_realtime_publication.sql` —
+      idempotent `ALTER PUBLICATION supabase_realtime ADD TABLE` for the
+      three tables client code actually subscribes to via `postgres_changes`
+      (found by grepping every `table:` in a `postgres_changes` subscription):
+      `notifications`, `posts`, `messages`. If Realtime has been working for
+      these, it's because someone enabled it by hand in the dashboard,
+      which wasn't reproducible from source — now it is.
+      **Same caveat as the other new migration this session: neither of
+      these two SQL files has been applied to any live database** — this
+      session has no Supabase access to run them. Both are additive/
+      idempotent and safe to apply whenever someone with access runs
+      `supabase db push` (or the dashboard SQL editor).
 
 ## §3 — Realtime & calls hardening
 
