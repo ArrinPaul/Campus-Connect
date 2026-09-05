@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
-import { addProject, getPortfolio, deleteProject } from "@/server/db/misc"
+import { addProject, getPortfolio, updateProject, deleteProject } from "@/server/db/misc"
 
 // GET /api/portfolio/projects — Fetch portfolio projects
 export async function GET(req: Request) {
@@ -48,6 +48,37 @@ export async function POST(req: Request) {
     })
 
     return NextResponse.json(project, { status: 201 })
+  } catch (err) {
+    return internalError(err)
+  }
+}
+
+// PATCH /api/portfolio/projects — Update a portfolio project
+export async function PATCH(req: Request) {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const body = await req.json().catch(() => ({}))
+    const { id: projectId, ...updates } = body
+    if (!projectId) {
+      return NextResponse.json({ error: "Project ID is required" }, { status: 400 })
+    }
+
+    const project = await updateProject(projectId, user.id, {
+      title: updates.title,
+      description: updates.description,
+      url: updates.url,
+      image_url: updates.image_url,
+    })
+    if (!project) {
+      return NextResponse.json({ error: "Project not found or not owned by you" }, { status: 404 })
+    }
+
+    return NextResponse.json(project, { status: 200 })
   } catch (err) {
     return internalError(err)
   }

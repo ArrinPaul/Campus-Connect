@@ -16,7 +16,12 @@ export async function POST(req: Request) {
       bio: typeof body?.bio === "string" ? body.bio : "",
       university: typeof body?.university === "string" ? body.university : "",
       role: typeof body?.role === "string" ? body.role : "Student",
-      experienceLevel: typeof body?.experienceLevel === "string" ? body.experienceLevel : "Beginner",
+      // No onboarding step actually collects this yet (OnboardingData has
+      // no experience-level field) — completeOnboarding reads
+      // experience_level (snake_case), so this was silently never forwarded
+      // even on the day a step is added, if it sent the same camelCase name
+      // every other frontend form in this app uses.
+      experience_level: typeof body?.experienceLevel === "string" ? body.experienceLevel : "Beginner",
       skills: Array.isArray(body?.skills)
         ? body.skills.filter((skill: any): skill is string => typeof skill === "string")
         : [],

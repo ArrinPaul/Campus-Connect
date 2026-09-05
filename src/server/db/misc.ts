@@ -419,6 +419,23 @@ export async function addProject(userId: string, data: { title: string; descript
   return project
 }
 
+export async function updateProject(
+  projectId: string,
+  userId: string,
+  data: { title?: string; description?: string; url?: string; image_url?: string }
+) {
+  const supabase = await getSupabase()
+  const { data: project, error } = await supabase
+    .from("portfolio_projects")
+    .update(data)
+    .eq("id", projectId)
+    .eq("user_id", userId)
+    .select()
+    .single()
+  if (error) return null
+  return project
+}
+
 export async function deleteProject(projectId: string, userId: string) {
   const supabase = await getSupabase()
   const { error } = await supabase

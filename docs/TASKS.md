@@ -933,3 +933,55 @@ feed) with a fresh set of eyes on each, then fixed the confirmed bugs.
       `bookmark.post` already carries its own author.
       Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
       `jest --ci` (649/649 passing).
+- [x] **Portfolio/settings sweep — 5 more broken features found and fixed.**
+      - Portfolio page (`profile/[id]/portfolio`) queried
+        `api.portfolio.getTimeline` → `/api/portfolio/timeline`, a route
+        that was never built (no `portfolio_timeline`-equivalent table
+        exists at all — this is a real missing feature, not a route typo).
+        Since `useQuery` never resolves on a 404, the **entire page**
+        (including the Projects section, which *is* real) was stuck on
+        its skeleton forever for every visitor. Removed the Timeline
+        section and its query rather than build a whole new schema+
+        feature in this pass; deleted the now-orphaned `TimelineEntry.tsx`
+        (had no other caller). Projects now render correctly. Also fixed
+        `ProjectCard.tsx`, which displayed `project.startDate`/`endDate`/
+        `techStack`/`links` — none of which exist on `portfolio_projects`
+        (real columns: `title`, `description`, `url`, `image_url`,
+        `created_at`) — to show the real fields instead of "Present -
+        Present" garbage, and fixed its `key={project._id}` (undefined)
+        to `project.id`.
+      - Added the missing `PATCH /api/portfolio/projects` handler and an
+        `updateProject` db function — `api.portfolio.updateProject` mapped
+        to it with zero handler, so any future edit-project UI would have
+        405'd. No frontend caller exists yet (no edit-project UI built),
+        so this just removes the trap for whoever adds one next. Added
+        `src/tests/portfolio-projects-patch.test.ts` (4 tests).
+      - Account deletion always failed: `AccountSettings.tsx` called
+        `deleteAccount()` with no body after its own `window.confirm()`,
+        but `DELETE /api/users/me` requires `{ confirm: true }`. Now sends
+        it.
+      - Billing page never loaded: `BillingSettings.tsx` called
+        `api.subscriptions.getMySubscription` → a `POST /api/subscriptions/my`
+        mapping with no matching route at all (the real, working route is
+        `GET /api/subscriptions`, already mapped as
+        `getSubscriptionStatus` but unused). Removed the dead mapping,
+        switched the page to the real one, and fixed 3 more field-name
+        mismatches on the response it reads (`isPro` doesn't exist —
+        derived from `plan !== 'free' && status === 'active'` instead;
+        `currentPeriodEnd`/`cancelAtPeriodEnd` → real
+        `current_period_end`/`cancel_at_period_end`).
+      - Notification settings silently discarded saved preferences on
+        reload: `NotificationSettings.tsx` read
+        `currentUser.notificationPreferences` (camelCase); the real
+        column and API response field is `notification_preferences`.
+        Saving worked (blind JSONB pass-through), the toggles just always
+        reset to hardcoded defaults on refresh. Fixed.
+      - Onboarding's experience-level field was already effectively dead
+        (no onboarding step collects it — `OnboardingData` has no such
+        field), but the route built the `completeOnboarding` payload as
+        `experienceLevel` while the db function reads `experience_level`
+        — fixed the naming now, before a future onboarding step reusing
+        this app's established camelCase-frontend convention silently hits
+        the same trap.
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
+      `jest --ci` (653/653 passing).

@@ -9,7 +9,6 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Plus } from 'lucide-react';
 import { ProjectCard } from '../../../../(components)/profile/ProjectCard';
-import { TimelineEntry } from '../../../../(components)/profile/TimelineEntry';
 
 type PageProps = {
  params: {
@@ -41,11 +40,10 @@ function PortfolioPageContent({ userId }: { userId: Id<'users'> }) {
  isLoaded && isSignedIn ? {} : 'skip'
  );
  const projects = useQuery(api.portfolio.getProjects, { userId });
- const timeline = useQuery(api.portfolio.getTimeline, { userId });
- 
+
  const isOwner = currentUser?._id === userId;
 
- if (user === undefined || projects === undefined || timeline === undefined) {
+ if (user === undefined || projects === undefined) {
  return <PortfolioPageSkeleton />;
  }
 
@@ -75,25 +73,7 @@ function PortfolioPageContent({ userId }: { userId: Id<'users'> }) {
  {projects.length === 0 ? (
  <p className="col-span-full text-muted-foreground">No projects added yet.</p>
  ) : (
- projects.map((project: any) => <ProjectCard key={project._id} project={project as any} />)
- )}
- </div>
- </section>
-
- <section>
- <div className="flex justify-between items-center mb-4">
- <h2 className="text-2xl font-bold">Timeline</h2>
- {isOwner && (
- <button className="h-9 px-3 active:scale-[0.98] bg-primary text-on-primary hover:bg-primary/90 rounded-md text-sm font-semibold flex items-center gap-2">
- <Plus className="h-4 w-4" /> Add Event
- </button>
- )}
- </div>
- <div className="space-y-4">
- {timeline.length === 0 ? (
- <p className="text-muted-foreground">No timeline entries yet.</p>
- ) : (
- timeline.map((item: any) => <TimelineEntry key={item._id} item={item as any} />)
+ projects.map((project: any) => <ProjectCard key={project.id} project={project as any} />)
  )}
  </div>
  </section>

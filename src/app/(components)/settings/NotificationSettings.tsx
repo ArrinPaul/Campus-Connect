@@ -107,8 +107,8 @@ export function NotificationSettings() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        if (currentUser?.notificationPreferences) {
-            setPrefs(currentUser.notificationPreferences);
+        if (currentUser?.notification_preferences && Object.keys(currentUser.notification_preferences).length > 0) {
+            setPrefs((prev) => ({ ...prev, ...currentUser.notification_preferences }));
         }
     }, [currentUser]);
 

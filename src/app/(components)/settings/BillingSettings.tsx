@@ -32,7 +32,7 @@ const PRO_FEATURES = [
 export function BillingSettings() {
   const { isSignedIn } = useUser();
   const isAuthenticated = isSignedIn ?? false;
-  const subscription = useQuery(api.subscriptions.getMySubscription, isAuthenticated ? undefined : 'skip');
+  const subscription = useQuery(api.subscriptions.getSubscriptionStatus, isAuthenticated ? {} : 'skip');
 
   if (subscription === undefined) {
     return (
@@ -42,11 +42,13 @@ export function BillingSettings() {
     );
   }
 
-  const isPro = subscription?.isPro ?? false;
+  // Real subscription row: plan/status/current_period_end/cancel_at_period_end
+  // (no isPro/currentPeriodEnd/cancelAtPeriodEnd columns exist).
   const plan = subscription?.plan ?? 'free';
   const status = subscription?.status;
-  const periodEnd = subscription?.currentPeriodEnd;
-  const cancelAtPeriodEnd = subscription?.cancelAtPeriodEnd ?? false;
+  const isPro = plan !== 'free' && status === 'active';
+  const periodEnd = subscription?.current_period_end;
+  const cancelAtPeriodEnd = subscription?.cancel_at_period_end ?? false;
 
   return (
     <div className="space-y-6">

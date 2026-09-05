@@ -18,7 +18,7 @@ export function AccountSettings() {
         setIsSubmitting(true);
         toast.loading("Deleting your account...");
         try {
-            await deleteAccount();
+            await deleteAccount({ confirm: true });
             toast.success("Your account deletion has started. You will be logged out shortly.");
         } catch (error) {
             toast.error("Failed to delete account.", { description: (error as Error).message });

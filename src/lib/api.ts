@@ -486,7 +486,6 @@ export const api = {
     addCertification: ep("/api/portfolio/certifications", "POST"),
     removeCertification: ep("/api/portfolio/certifications", "DELETE"),
     getProjects: ep("/api/portfolio/projects"),
-    getTimeline: ep("/api/portfolio/timeline"),
   },
 
   // ── skill endorsements ─────────────────────────────────────────────────────
@@ -536,7 +535,6 @@ export const api = {
     getSubscriptionStatus: ep("/api/subscriptions"),
     createCheckoutSession: ep("/api/subscriptions/checkout", "POST"),
     cancelSubscription: ep("/api/subscriptions", "DELETE"),
-    getMySubscription: ep("/api/subscriptions/my", "POST"),
   },
 
   // ── push notifications ─────────────────────────────────────────────────────
