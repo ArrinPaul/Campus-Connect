@@ -985,3 +985,44 @@ feed) with a fresh set of eyes on each, then fixed the confirmed bugs.
         the same trap.
       Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
       `jest --ci` (653/653 passing).
+- [x] **Admin moderation queue and user-management actions were both
+      non-functional.**
+      - `admin/moderation`: the page rendered `item.reportReason`/
+        `item.reportCount`/`item.author`/`item.content` — none of which
+        exist on the real `content_reports` row (`reason`, `description`,
+        joined as `reporter` not `author`; there's no precomputed report
+        count, each row is one report). Worse, `handleAction` sent the
+        **report's own id** as `targetId` (should be `target_id`, the
+        actual reported post/comment/etc.) and never sent `type` at all
+        (should be `target_type`) — so `POST /api/admin/moderation`'s
+        `if (type === "post")` branch never matched and **Delete Content
+        never deleted anything**, silently leaving reported content live
+        while marking the report resolved. Fixed the page to read/send
+        the real fields, and extended the route to actually delete
+        comments and messages too (previously posts only), refusing
+        `type: "user"` with a clear error instead of a silent no-op
+        (suspending a reported user is a distinct action on the Users
+        page). Also started actually using the schema's `dismissed`
+        status value on dismiss instead of always writing `reviewed`.
+      - `admin/users`: `make_admin`/`suspend` wrote `role: "admin"` /
+        `role: "suspended"` — but `users.role` is CHECK-constrained to
+        `('Student', 'Research Scholar', 'Faculty')`, so **every such
+        write violated the constraint and failed**, with the error never
+        checked or surfaced. Even a schema fix wouldn't have been enough:
+        neither action touched `is_admin`, the boolean every admin guard
+        in the codebase (including this same route) actually checks — so
+        "Make Admin" could never have granted access either way. Added
+        `supabase/migrations/20240110000000_users_is_suspended.sql`
+        (`is_suspended boolean default false` — `is_admin` already
+        existed) and rewired both actions to the real flags, splitting
+        the previously-overloaded `"restore"` action (used for both
+        "un-suspend" and "remove admin" with no way to tell them apart
+        server-side) into `unsuspend`/`remove_admin`. Added a
+        server-side guard against an admin removing their own admin
+        access (the UI already hid the button, this closes the API-level
+        gap). Updated the page's badge/action rendering to use
+        `is_admin`/`is_suspended` instead of the `role` comparisons that
+        could never match.
+      Added `src/tests/admin-moderation-users.test.ts` (11 tests).
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
+      `jest --ci` (664/664 passing).

@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server"
 import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
+import { deleteComment } from "@/server/db/comments"
+import { deleteMessage } from "@/server/db/messages"
 
 export async function GET() {
   try {
@@ -45,17 +47,27 @@ export async function POST(req: Request) {
     const { targetId, action, type, reportId } = await req.json()
     if (!targetId || !action) return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
 
-    if (type === "post") {
-      if (action === "delete") {
+    if (action === "delete") {
+      if (type === "post") {
         await supabase.from("posts").delete().eq("id", targetId)
+      } else if (type === "comment") {
+        await deleteComment(targetId)
+      } else if (type === "message") {
+        await deleteMessage(targetId)
+      } else if (type === "user") {
+        return NextResponse.json(
+          { error: "Reported users are suspended from the Users admin page, not deleted here" },
+          { status: 400 }
+        )
       }
     }
 
     // Update report status
     if (reportId) {
+      const status = action === "delete" ? "resolved" : action === "dismiss" ? "dismissed" : "reviewed"
       await supabase
         .from("content_reports")
-        .update({ status: action === "delete" ? "resolved" : "reviewed", reviewed_by: userId })
+        .update({ status, reviewed_by: userId })
         .eq("id", reportId)
     }
 

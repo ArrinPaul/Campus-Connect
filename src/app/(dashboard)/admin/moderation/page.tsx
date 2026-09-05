@@ -25,12 +25,12 @@ export default function AdminModerationPage() {
  );
  }
 
- const handleAction = async (targetId: string, type: string, action: string) => {
+ const handleAction = async (report: any, action: string) => {
  if (action ==="delete" && !confirm("Are you sure you want to permanently delete this content?")) {
  return;
  }
- 
- await moderateContent({ targetId, type, action });
+
+ await moderateContent({ targetId: report.target_id, type: report.target_type, action, reportId: report.id });
  // Invalidate cache or reload
  window.location.reload();
  };
@@ -53,39 +53,36 @@ export default function AdminModerationPage() {
  <div key={item.id} className="bg-card border border-border rounded-lg overflow-hidden flex flex-col md:flex-row">
  <div className="bg-critical/10 p-4 md:w-48 border-b md:border-b-0 md:border-r border-critical/20 flex flex-col justify-center items-center text-center">
  <span className="text-xs uppercase font-bold tracking-wider text-critical mb-1">
- {item.reportReason}
+ {item.reason?.replace(/_/g, ' ')}
  </span>
- <span className="text-2xl font-bold text-critical">
- {item.reportCount}
- </span>
- <span className="text-xs text-critical/70">Reports</span>
+ <span className="text-xs text-critical/70">Reported {item.target_type}</span>
  </div>
- 
+
  <div className="p-4 flex-1">
  <div className="flex items-center gap-2 mb-3">
- {item.author?.profile_picture ? (
- <Image src={item.author.profile_picture} alt={item.author.name} width={24} height={24} className="rounded-full object-cover" />
+ {item.reporter?.profile_picture ? (
+ <Image src={item.reporter.profile_picture} alt={item.reporter.name} width={24} height={24} className="rounded-full object-cover" />
  ) : (
  <div className="w-6 h-6 rounded-full bg-canvas flex items-center justify-center text-[10px]">
- {item.author?.name?.charAt(0) || '?'}
+ {item.reporter?.name?.charAt(0) || '?'}
  </div>
  )}
- <span className="text-sm font-medium">{item.author?.name ||"Unknown"}</span>
+ <span className="text-sm font-medium">Reported by {item.reporter?.name ||"Unknown"}</span>
  <span className="text-xs text-muted-foreground">
  {item.created_at ? formatDistanceToNow(new Date(item.created_at), { addSuffix: true }) :""}
  </span>
  </div>
- <p className="text-sm mb-4 line-clamp-3">{item.content}</p>
- 
+ {item.description && <p className="text-sm mb-4 line-clamp-3">{item.description}</p>}
+
  <div className="flex gap-3 justify-end pt-3 border-t">
- <button 
- onClick={() => handleAction(item.id, item.type,"ignore")}
+ <button
+ onClick={() => handleAction(item,"dismiss")}
  className="px-3 py-1.5 text-sm font-medium rounded-md hover:bg-canvas text-muted-foreground transition-colors"
  >
- Dismiss Reports
+ Dismiss Report
  </button>
- <button 
- onClick={() => handleAction(item.id, item.type,"delete")}
+ <button
+ onClick={() => handleAction(item,"delete")}
  className="px-3 py-1.5 text-sm font-medium rounded-md bg-critical text-white hover:opacity-90 flex items-center gap-2 transition-colors"
  >
  <Trash2 className="w-4 h-4" />

@@ -96,11 +96,11 @@ export default function AdminUsersPage() {
  </td>
  <td className="p-4">
  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
- user.role === 'admin' ? 'bg-primary/10 text-primary' : 
- user.role === 'suspended' ? 'bg-critical/20 text-critical' :
+ user.is_admin ? 'bg-primary/10 text-primary' :
+ user.is_suspended ? 'bg-critical/20 text-critical' :
  'bg-canvas text-muted-foreground'
  }`}>
- {user.role || 'student'}
+ {user.is_admin ? 'Admin' : user.is_suspended ? 'Suspended' : (user.role || 'Student')}
  </span>
  </td>
  <td className="p-4 text-sm text-muted-foreground">{user.university ||"Not specified"}</td>
@@ -109,13 +109,13 @@ export default function AdminUsersPage() {
  </td>
  <td className="p-4 text-right">
  <div className="flex items-center justify-end gap-2">
- {user.role !== 'admin' && (
+ {!user.is_admin && (
  <>
  <button onClick={() => handleAction(user.id,"make_admin")} className="p-2 hover:bg-canvas rounded-full text-primary" title="Make Admin">
  <Shield className="w-4 h-4" />
  </button>
- {user.role === 'suspended' ? (
- <button onClick={() => handleAction(user.id,"restore")} className="p-2 hover:bg-canvas rounded-full text-success" title="Restore User">
+ {user.is_suspended ? (
+ <button onClick={() => handleAction(user.id,"unsuspend")} className="p-2 hover:bg-canvas rounded-full text-success" title="Restore User">
  <CheckCircle className="w-4 h-4" />
  </button>
  ) : (
@@ -125,8 +125,8 @@ export default function AdminUsersPage() {
  )}
  </>
  )}
- {user.role === 'admin' && user.id !== currentUser._id && (
- <button onClick={() => handleAction(user.id,"restore")} className="p-2 hover:bg-canvas rounded-full text-critical" title="Remove Admin">
+ {user.is_admin && user.id !== currentUser._id && (
+ <button onClick={() => handleAction(user.id,"remove_admin")} className="p-2 hover:bg-canvas rounded-full text-critical" title="Remove Admin">
  <Ban className="w-4 h-4" />
  </button>
  )}

@@ -14,8 +14,8 @@ export async function GET() {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    const { data } = await supabase.from("users").select("id, name, username, profile_picture, role, university, created_at").order("created_at", { ascending: false }).limit(50)
-    
+    const { data } = await supabase.from("users").select("id, name, username, profile_picture, role, is_admin, is_suspended, university, created_at").order("created_at", { ascending: false }).limit(50)
+
     return NextResponse.json(data ?? [])
   } catch (err) {
     return internalError(err)
@@ -36,13 +36,23 @@ export async function POST(req: Request) {
 
     const { targetUserId, action } = await req.json()
     if (!targetUserId || !action) return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    if (action === "remove_admin" && targetUserId === userId) {
+      return NextResponse.json({ error: "You cannot remove your own admin access" }, { status: 400 })
+    }
 
+    // is_admin/is_suspended are dedicated flags — users.role is a CHECK-
+    // constrained enum ('Student' | 'Research Scholar' | 'Faculty') that
+    // was never meant to carry moderation state.
     if (action === "make_admin") {
-      await supabase.from("users").update({ role: "admin" }).eq("id", targetUserId)
+      await supabase.from("users").update({ is_admin: true }).eq("id", targetUserId)
+    } else if (action === "remove_admin") {
+      await supabase.from("users").update({ is_admin: false }).eq("id", targetUserId)
     } else if (action === "suspend") {
-      await supabase.from("users").update({ role: "suspended" }).eq("id", targetUserId)
-    } else if (action === "restore") {
-      await supabase.from("users").update({ role: "Student" }).eq("id", targetUserId)
+      await supabase.from("users").update({ is_suspended: true }).eq("id", targetUserId)
+    } else if (action === "unsuspend") {
+      await supabase.from("users").update({ is_suspended: false }).eq("id", targetUserId)
+    } else {
+      return NextResponse.json({ error: "Unknown action" }, { status: 400 })
     }
 
     return NextResponse.json({ success: true })
