@@ -201,6 +201,21 @@ export async function answerQuestion(questionId: string, authorId: string, conte
     row_id: questionId,
     increment_by: 1,
   })
+
+  const { data: question } = await supabase.from("questions").select("author_id").eq("id", questionId).single()
+  if (question && question.author_id !== authorId) {
+    const { data: actor } = await supabase.from("users").select("name").eq("id", authorId).single()
+    const { createNotification } = await import("@/server/db/notifications")
+    await createNotification({
+      user_id: question.author_id,
+      type: "answer",
+      message: `${actor?.name ?? "Someone"} answered your question`,
+      reference_id: questionId,
+      reference_type: "question",
+      from_user_id: authorId,
+    })
+  }
+
   return answer
 }
 
@@ -241,8 +256,17 @@ export async function acceptAnswer(answerId: string) {
       sourceId: answerId,
       points: 15,
     })
+
+    const { createNotification } = await import("@/server/db/notifications")
+    await createNotification({
+      user_id: answer.author_id,
+      type: "answer_accepted",
+      message: "Your answer was accepted",
+      reference_id: answer.question_id,
+      reference_type: "question",
+    })
   }
-    
+
   return true
 }
 

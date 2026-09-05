@@ -227,12 +227,27 @@ audit.
       notifications are actually created, a popular post will generate one
       row per like — grouping/collapsing in the UI is a real next step, not
       just a nice-to-have.
-- [ ] Extend notification triggers to the remaining domains that don't have
-      them yet: question answers/votes (gamification.ts already awards
-      reputation on `accepted_answer` but doesn't notify), event RSVPs,
-      community invites/approvals, marketplace contact (the DM it opens
-      won't itself notify unless `api/messages` triggers a notification too
-      — check that path specifically).
+- [x] Extended notification triggers to three more real domains:
+      - `answerQuestion` (content.ts) — notifies the question author when
+        someone answers, skips self-answers.
+      - `acceptAnswer` (content.ts) — notifies the answer author their
+        answer was accepted (alongside the reputation award that already
+        existed there).
+      - `attendEvent` (events-jobs.ts) — notifies the event creator on an
+        RSVP, skips self-RSVPs.
+      Added 3 more tests to `src/tests/notification-triggers.test.ts` (7
+      total in that file now). Intentionally did **not** add a notification
+      for question upvotes (`voteQuestion`) — matches how Stack Overflow and
+      similar sites treat votes as a lighter signal that doesn't warrant a
+      notification per vote, avoiding spam on a popular question, unlike
+      likes/comments which do notify.
+      `marketplace/contact` doesn't need its own trigger — it opens a DM via
+      `sendMessage`, which already notifies (see the messages fix above).
+      **Not yet done:** community invites/approvals still have no
+      notification trigger — tracked below.
+- [ ] Add notification triggers for community invites (`inviteMember`) and
+      membership approval (`approveMember`) in `server/db/communities.ts` —
+      same pattern as the rest of this list, not yet done.
 - [x] Checked whether `api/messages` (send) notifies the recipient — it
       didn't, same root cause as everything else above. Fixed: `sendMessage`
       (messages.ts) now notifies every other conversation participant (not

@@ -35,6 +35,20 @@ export async function attendEvent(eventId: string, userId: string) {
   await supabase.from("event_attendees").insert({ event_id: eventId, user_id: userId })
   const { data } = await supabase.from("events").select("attendee_count").eq("id", eventId).single()
   if (data) await supabase.from("events").update({ attendee_count: (data.attendee_count ?? 0) + 1 }).eq("id", eventId)
+
+  const { data: event } = await supabase.from("events").select("created_by, title").eq("id", eventId).single()
+  if (event && event.created_by && event.created_by !== userId) {
+    const { data: actor } = await supabase.from("users").select("name").eq("id", userId).single()
+    const { createNotification } = await import("@/server/db/notifications")
+    await createNotification({
+      user_id: event.created_by,
+      type: "event_rsvp",
+      message: `${actor?.name ?? "Someone"} is going to ${event.title ?? "your event"}`,
+      reference_id: eventId,
+      reference_type: "event",
+      from_user_id: userId,
+    })
+  }
 }
 
 export async function unattendEvent(eventId: string, userId: string) {

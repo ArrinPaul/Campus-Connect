@@ -15,10 +15,18 @@ import { createComment } from "@/server/db/comments"
 import { followUser } from "@/server/db/follows"
 import { createPost } from "@/server/db/posts"
 import { sendMessage } from "@/server/db/messages"
+import { answerQuestion, acceptAnswer } from "@/server/db/content"
+import { attendEvent } from "@/server/db/events-jobs"
 
 const mockCreateNotification = jest.fn().mockResolvedValue(undefined)
 jest.mock("@/server/db/notifications", () => ({
   createNotification: (...args: unknown[]) => mockCreateNotification(...args),
+}))
+
+const mockAwardReputation = jest.fn().mockResolvedValue(undefined)
+jest.mock("@/server/db/gamification", () => ({
+  awardReputation: (...args: unknown[]) => mockAwardReputation(...args),
+  revokeReputation: jest.fn().mockResolvedValue(undefined),
 }))
 
 const mockRpc = jest.fn().mockResolvedValue({ error: null })
@@ -139,6 +147,92 @@ describe("Notification triggers", () => {
     )
     expect(mockCreateNotification).toHaveBeenCalledWith(
       expect.objectContaining({ user_id: "recipient-2", type: "message", from_user_id: "sender-1" })
+    )
+  })
+
+  it("answerQuestion notifies the question author, skipping self-answers", async () => {
+    const supabase = makeSupabaseMock({
+      questions: { author_id: "question-author" },
+      users: { name: "Answerer" },
+    })
+    // answerQuestion's initial insert().select().single() needs its own shape
+    supabase.from = jest.fn((table: string) => {
+      if (table === "question_answers") {
+        return { insert: jest.fn(() => ({ select: jest.fn(() => ({ single: jest.fn().mockResolvedValue({ data: { id: "answer-1" }, error: null }) })) })) }
+      }
+      return makeSupabaseMock({ questions: { author_id: "question-author" }, users: { name: "Answerer" } }).from(table)
+    }) as any
+    jest.doMock("@/lib/supabase/server", () => ({ createClient: jest.fn(() => Promise.resolve(supabase)) }))
+    jest.resetModules()
+    const { answerQuestion: answerQuestionFresh } = await import("@/server/db/content")
+
+    await answerQuestionFresh("question-1", "answerer-1", "Here's my answer")
+
+    expect(mockCreateNotification).toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: "question-author", type: "answer", from_user_id: "answerer-1" })
+    )
+  })
+
+  it("acceptAnswer notifies the answer author their answer was accepted", async () => {
+    const supabase = {
+      from: jest.fn((table: string) => {
+        if (table === "question_answers") {
+          return {
+            select: jest.fn(() => ({ eq: jest.fn(() => ({ single: jest.fn().mockResolvedValue({ data: { question_id: "question-1", author_id: "answer-author" }, error: null }) })) })),
+            update: jest.fn(() => ({ eq: jest.fn().mockResolvedValue({ error: null }) })),
+          }
+        }
+        if (table === "questions") {
+          return { update: jest.fn(() => ({ eq: jest.fn().mockResolvedValue({ error: null }) })) }
+        }
+        throw new Error(`Unexpected table: ${table}`)
+      }),
+    }
+    jest.doMock("@/lib/supabase/server", () => ({ createClient: jest.fn(() => Promise.resolve(supabase)) }))
+    jest.resetModules()
+    const { acceptAnswer: acceptAnswerFresh } = await import("@/server/db/content")
+
+    await acceptAnswerFresh("answer-1")
+
+    expect(mockCreateNotification).toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: "answer-author", type: "answer_accepted", reference_id: "question-1" })
+    )
+  })
+
+  it("attendEvent notifies the event creator, skipping self-RSVPs", async () => {
+    const supabase = {
+      from: jest.fn((table: string) => {
+        if (table === "event_attendees") {
+          return { insert: jest.fn().mockResolvedValue({ error: null }) }
+        }
+        if (table === "events") {
+          return {
+            select: jest.fn((cols: string) => ({
+              eq: jest.fn(() => ({
+                single: jest.fn().mockResolvedValue(
+                  cols.includes("attendee_count")
+                    ? { data: { attendee_count: 3 } }
+                    : { data: { created_by: "organizer-1", title: "Career Fair" } }
+                ),
+              })),
+            })),
+            update: jest.fn(() => ({ eq: jest.fn().mockResolvedValue({ error: null }) })),
+          }
+        }
+        if (table === "users") {
+          return { select: jest.fn(() => ({ eq: jest.fn(() => ({ single: jest.fn().mockResolvedValue({ data: { name: "Attendee" } }) })) })) }
+        }
+        throw new Error(`Unexpected table: ${table}`)
+      }),
+    }
+    jest.doMock("@/lib/supabase/server", () => ({ createClient: jest.fn(() => Promise.resolve(supabase)) }))
+    jest.resetModules()
+    const { attendEvent: attendEventFresh } = await import("@/server/db/events-jobs")
+
+    await attendEventFresh("event-1", "attendee-1")
+
+    expect(mockCreateNotification).toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: "organizer-1", type: "event_rsvp", from_user_id: "attendee-1" })
     )
   })
 })
