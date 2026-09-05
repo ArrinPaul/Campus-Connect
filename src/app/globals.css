@@ -107,7 +107,12 @@
     --disabled-text: 82 82 91;
 
     /* Dark Compat Aliases */
-    --muted: 18 18 18;
+    /* --muted was 18 18 18, identical to --card below — anything using
+       bg-muted as a visible surface on top of bg-card (skeleton loaders,
+       avatar fallbacks, badges) was invisible in dark mode specifically,
+       while working fine in light mode where the two differ. Matched to
+       --surface-hover, the palette's existing "next elevation up" gray. */
+    --muted: 28 28 30;
     --muted-foreground: 168 168 168;
     --card: 18 18 18;
     --card-foreground: 245 245 245;

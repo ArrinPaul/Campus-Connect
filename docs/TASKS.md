@@ -299,7 +299,39 @@ audit.
       feed, profile, communities, marketplace, and modals in particular,
       since modals/dialogs are a common place for mobile overflow bugs that
       grep can't catch.
-- [ ] Dark mode: verify every page (not just shell/nav) respects theme.
+- [x] **Dark mode: found and fixed a token collision that made the entire
+      shared skeleton library (and anything else using `bg-muted` as a
+      visible surface) invisible specifically in dark mode.** `next-themes`
+      + Tailwind's `class` strategy is wired correctly, and `globals.css`
+      defines a full, matching set of light/dark CSS variables — this isn't
+      a half-done dark mode. But `.dark { --muted: 18 18 18; ... --card: 18
+      18 18; }` — the exact same RGB value. Light mode correctly gives
+      `--muted`/`--accent`/`--secondary` a "next tier up" value distinct
+      from `--card` (245,245,247 vs 255,255,255); dark mode has that same
+      two-tier system for `accent`/`secondary` (28,28,30 vs `--card`'s
+      18,18,18) but `--muted` was left equal to `--card` instead of getting
+      the same treatment. This is exactly why the skeleton fix from §4
+      earlier this session (switching `FeedContainer`'s bars to `bg-muted`)
+      still wouldn't have been visible in dark mode specifically — the
+      earlier fix was correct for light mode, this closes the gap for dark.
+      Fixed by setting dark `--muted` to `28 28 30`, matching
+      `--surface-hover`/`--accent`/`--secondary`'s existing "next elevation"
+      value, restoring the same two-tier system light mode already has.
+      Also swept for the other classic dark-mode bug (hardcoded
+      `bg-white`/`bg-black`/`text-white`/`text-black` bypassing the token
+      system) across 46 files — all legitimate: theme-adaptive colored
+      buttons with white text, or intentionally theme-independent full-bleed
+      surfaces (Stories viewer, image lightbox, video backgrounds). No
+      further action needed there.
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
+      `jest --ci` (562/562). **Not visually verified in a browser** — same
+      Chrome-permission blocker as the mobile pass; this fix is derived
+      directly from the CSS variable values themselves (not a guess), but a
+      real look in dark mode is still worth doing once that's unblocked.
+- [ ] Dark mode: full page-by-page visual check once the Chrome permission
+      blocker is resolved — the token-level fix above should cascade
+      correctly everywhere `bg-muted` is used, but hasn't been seen
+      rendered.
 
 ## §4b — Messaging (Phase D of the UI pass, 2026-09-05)
 
