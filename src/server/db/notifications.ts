@@ -1,5 +1,6 @@
 import "server-only"
 import { createClient, createAdminClient } from "@/lib/supabase/server"
+import { getNotificationUrl } from "@/lib/notifications/url"
 
 async function getSupabase() {
   return await createClient()
@@ -58,13 +59,7 @@ export async function createNotification(data: {
 
     // Dispatch Web Push notification asynchronously (Authoritative Server Trigger)
     import("@/server/push/web-push").then(({ sendPushNotification }) => {
-      let targetUrl = "/notifications"
-      if (data.reference_type === "post" && data.reference_id) targetUrl = `/post/${data.reference_id}`
-      else if (data.reference_type === "question" && data.reference_id) targetUrl = `/q-and-a/${data.reference_id}`
-      else if (data.reference_type === "research_paper" && data.reference_id) targetUrl = `/research/${data.reference_id}`
-      else if (data.reference_type === "conversation" || data.type === "message") targetUrl = `/messages`
-      else if (data.reference_type === "marketplace" && data.reference_id) targetUrl = `/marketplace/${data.reference_id}`
-      else if (data.reference_type === "event" && data.reference_id) targetUrl = `/events/${data.reference_id}`
+      const targetUrl = getNotificationUrl(data)
 
       sendPushNotification({
         userId: data.user_id,

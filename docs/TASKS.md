@@ -330,6 +330,52 @@ audit.
       notifications are actually created, a popular post will generate one
       row per like — grouping/collapsing in the UI is a real next step, not
       just a nice-to-have.
+- [x] **While starting the grouping work above, found the entire
+      notification display layer was broken and had never been exercised —
+      arguably the second-biggest finding of this session, same root cause
+      as the original "notifications never fire" bug: it was built before
+      the table could ever have a row in it, so nothing ever caught it.**
+      `NotificationBell.tsx`, `NotificationItem.tsx`, and
+      `(dashboard)/notifications/page.tsx` all read camelCase fields
+      (`notification.actor`, `.isRead`, `.createdAt`, `.actorId`,
+      `.referenceId`, `._id`) that don't exist on the real API response
+      (`from_user`, `read`, `created_at`, `from_user_id`, `reference_id`,
+      `id`). `formatDistanceToNow(undefined)` — date-fns given an undefined
+      date — throws `RangeError: Invalid time value`, so **opening the bell
+      dropdown or the notifications page with any real notification present
+      would have crashed that render tree.** The page also independently
+      read `data?.notifications` when `GET /api/notifications` returns a
+      bare array, so the full notifications page showed zero notifications
+      unconditionally, on top of the crash risk.
+      The URL-routing logic was also duplicated three times (push-notification
+      sender in `notifications.ts`, plus both components), each an
+      incomplete, drifted mapping keyed off `type` instead of
+      `reference_type` — e.g. nothing routed `answer`/`answer_accepted` to
+      Q&A or `community_invite`/`community_approved` to a community; both
+      fell through to a `/feed?post=` link.
+      Fixed by adding `src/lib/notifications/url.ts` (`getNotificationUrl`)
+      as the single source of truth for routing, used by all three
+      call sites now, and correcting every field reference to match the
+      real API response. Also wrapped `created_at` (an ISO string) in
+      `new Date(...)` before handing it to `formatDistanceToNow` — even
+      with the right field name, date-fns doesn't accept a raw string.
+      **Why the existing tests never caught this:** `NotificationBell.test.tsx`
+      mocked `formatDistanceToNow` entirely and always passed an empty
+      notification array; `notifications/page.test.tsx` asserted the old,
+      wrong shape (`{ notifications: [...] }`, `isRead`, `_id`) as if it
+      were correct — it was validating the bug, not catching it. Rewrote
+      both to use realistic data against the real `date-fns` implementation,
+      and added `src/components/notifications/NotificationItem.test.tsx`
+      (previously had zero dedicated coverage, only exercised indirectly
+      via a mock in the page test) and `src/lib/notifications/url.test.ts`.
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
+      `jest --ci` (594/594 passing).
+      **Known remaining gap, not fixed in this pass:** community
+      notifications (`inviteMember`, `approveMember`) store the
+      community's UUID in `reference_id`, but the live community route is
+      `/c/[slug]` — `getNotificationUrl` currently builds `/c/${reference_id}`,
+      which won't resolve. Needs either storing the slug in `reference_id`
+      for those two triggers, or changing the route to accept an ID lookup.
 - [x] Extended notification triggers to three more real domains:
       - `answerQuestion` (content.ts) — notifies the question author when
         someone answers, skips self-answers.

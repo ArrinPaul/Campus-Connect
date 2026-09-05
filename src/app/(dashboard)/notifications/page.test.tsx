@@ -37,7 +37,8 @@ describe("NotificationsPage", () => {
   })
 
   it("should render page title", () => {
-    mockUseQuery.mockReturnValue({ notifications: [], cursor: null })
+    // GET /api/notifications returns a bare array, not { notifications: [...] }
+    mockUseQuery.mockReturnValue([])
 
     render(<NotificationsPage />)
 
@@ -46,10 +47,10 @@ describe("NotificationsPage", () => {
 
   it("should show unread count badge when there are unread notifications", () => {
     const mockNotifications = [
-      { _id: "n1" as any, type: "reaction" as const, message: "Test", isRead: false, createdAt: Date.now(), recipientId: "u1" as any, actorId: "u2" as any, referenceId: "p1", actor: { _id: "u2" as any, name: "Alice", profilePicture: undefined } },
-      { _id: "n2" as any, type: "reaction" as const, message: "Test2", isRead: false, createdAt: Date.now(), recipientId: "u1" as any, actorId: "u3" as any, referenceId: "p1", actor: { _id: "u3" as any, name: "Bob", profilePicture: undefined } },
+      { id: "n1", type: "like", message: "Test", read: false, created_at: new Date().toISOString(), from_user_id: "u2", reference_id: "p1", from_user: { id: "u2", name: "Alice", profile_picture: undefined } },
+      { id: "n2", type: "like", message: "Test2", read: false, created_at: new Date().toISOString(), from_user_id: "u3", reference_id: "p1", from_user: { id: "u3", name: "Bob", profile_picture: undefined } },
     ]
-    mockUseQuery.mockReturnValue({ notifications: mockNotifications, cursor: null })
+    mockUseQuery.mockReturnValue(mockNotifications)
 
     render(<NotificationsPage />)
 
@@ -59,9 +60,9 @@ describe("NotificationsPage", () => {
 
   it("should show Mark all as read button when there are unread notifications", () => {
     const mockNotifications = [
-      { _id: "n1" as any, type: "reaction" as const, message: "Test", isRead: false, createdAt: Date.now(), recipientId: "u1" as any, actorId: "u2" as any, referenceId: "p1", actor: { _id: "u2" as any, name: "Alice", profilePicture: undefined } },
+      { id: "n1", type: "like", message: "Test", read: false, created_at: new Date().toISOString(), from_user_id: "u2", reference_id: "p1", from_user: { id: "u2", name: "Alice", profile_picture: undefined } },
     ]
-    mockUseQuery.mockReturnValue({ notifications: mockNotifications, cursor: null })
+    mockUseQuery.mockReturnValue(mockNotifications)
 
     render(<NotificationsPage />)
 
@@ -70,9 +71,9 @@ describe("NotificationsPage", () => {
 
   it("should not show Mark all as read button when no unread notifications", () => {
     const mockNotifications = [
-      { _id: "n1" as any, type: "reaction" as const, message: "Test", isRead: true, createdAt: Date.now(), recipientId: "u1" as any, actorId: "u2" as any, referenceId: "p1", actor: { _id: "u2" as any, name: "Alice", profilePicture: undefined } },
+      { id: "n1", type: "like", message: "Test", read: true, created_at: new Date().toISOString(), from_user_id: "u2", reference_id: "p1", from_user: { id: "u2", name: "Alice", profile_picture: undefined } },
     ]
-    mockUseQuery.mockReturnValue({ notifications: mockNotifications, cursor: null })
+    mockUseQuery.mockReturnValue(mockNotifications)
 
     render(<NotificationsPage />)
 
@@ -80,7 +81,7 @@ describe("NotificationsPage", () => {
   })
 
   it("should show empty state when no notifications", () => {
-    mockUseQuery.mockReturnValue({ notifications: [], cursor: null })
+    mockUseQuery.mockReturnValue([])
 
     render(<NotificationsPage />)
 
@@ -89,10 +90,10 @@ describe("NotificationsPage", () => {
 
   it("should render notification items when notifications exist", () => {
     const mockNotifications = [
-      { _id: "notif1" as any, recipientId: "user1" as any, actorId: "user2" as any, type: "reaction" as const, referenceId: "post1", message: "John reacted to your post", isRead: false, createdAt: Date.now(), actor: { _id: "user2" as any, name: "John", profilePicture: undefined } },
-      { _id: "notif2" as any, recipientId: "user1" as any, actorId: "user3" as any, type: "comment" as const, referenceId: "post2", message: "Jane commented on your post", isRead: true, createdAt: Date.now() - 10000, actor: { _id: "user3" as any, name: "Jane", profilePicture: undefined } },
+      { id: "notif1", from_user_id: "user2", type: "like", reference_id: "post1", message: "John reacted to your post", read: false, created_at: new Date().toISOString(), from_user: { id: "user2", name: "John", profile_picture: undefined } },
+      { id: "notif2", from_user_id: "user3", type: "comment", reference_id: "post2", message: "Jane commented on your post", read: true, created_at: new Date(Date.now() - 10000).toISOString(), from_user: { id: "user3", name: "Jane", profile_picture: undefined } },
     ]
-    mockUseQuery.mockReturnValue({ notifications: mockNotifications, cursor: null })
+    mockUseQuery.mockReturnValue(mockNotifications)
 
     render(<NotificationsPage />)
 
@@ -126,9 +127,9 @@ describe("NotificationsPage", () => {
 
   it("should call markAllAsRead when clicking Mark all as read button", () => {
     const mockNotifications = [
-      { _id: "n1" as any, type: "reaction" as const, message: "Test", isRead: false, createdAt: Date.now(), recipientId: "u1" as any, actorId: "u2" as any, referenceId: "p1", actor: { _id: "u2" as any, name: "Alice", profilePicture: undefined } },
+      { id: "n1", type: "like", message: "Test", read: false, created_at: new Date().toISOString(), from_user_id: "u2", reference_id: "p1", from_user: { id: "u2", name: "Alice", profile_picture: undefined } },
     ]
-    mockUseQuery.mockReturnValue({ notifications: mockNotifications, cursor: null })
+    mockUseQuery.mockReturnValue(mockNotifications)
 
     render(<NotificationsPage />)
 

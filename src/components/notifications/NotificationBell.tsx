@@ -12,6 +12,7 @@ import Link from"next/link"
 import { formatDistanceToNow } from"date-fns"
 import { useLiveRegion } from"@/components/accessibility/LiveRegion"
 import { useRealtimeNotifications } from"@/hooks/useRealtimeNotifications"
+import { getNotificationUrl } from"@/lib/notifications/url"
 
 /**
  * NotificationBell component
@@ -75,27 +76,16 @@ export function NotificationBell() {
  }
  };
 
- const handleNotificationClick = (notification: { _id: string; type?: string; actorId?: string; referenceId?: string }) => {
+ const handleNotificationClick = (notification: {
+ id: string
+ type?: string
+ reference_type?: string
+ reference_id?: string
+ from_user_id?: string
+ }) => {
  setIsOpen(false)
- markNotificationAsRead({ notificationId: notification._id as Id<"notifications"> }).catch(() => {});
- switch (notification.type) {
- case 'message':
- router.push('/messages');
- break;
- case 'follow':
- router.push(`/profile/${notification.actorId}`);
- break;
- case 'event':
- router.push(`/events/${notification.referenceId}`);
- break;
- case 'achievement':
- router.push(`/profile/${notification.actorId}`);
- break;
- default:
- if (notification.referenceId) {
- router.push(`/feed?post=${notification.referenceId}`);
- }
- }
+ markNotificationAsRead({ notificationId: notification.id as Id<"notifications"> }).catch(() => {});
+ router.push(getNotificationUrl(notification))
  }
 
  return (
@@ -171,27 +161,27 @@ export function NotificationBell() {
  <div className="divide-y divide-gray-200 dark:divide-gray-700">
  {recentNotifications.map((notification: any) => (
  <button
- key={notification._id}
+ key={notification.id}
  onClick={() => handleNotificationClick(notification)}
  className={`w-full px-4 py-3 text-left hover:bg-card transition-colors ${
- !notification.isRead ?"bg-primary/10" :"bg-card"
+ !notification.read ?"bg-primary/10" :"bg-card"
  }`}
  >
  <div className="flex items-start space-x-3">
  {/* Actor Avatar */}
- {notification.actor && (
+ {notification.from_user && (
  <div className="flex-shrink-0">
- {notification.actor.profilePicture ? (
+ {notification.from_user.profile_picture ? (
  <Image
- src={notification.actor.profilePicture}
- alt={notification.actor.name}
+ src={notification.from_user.profile_picture}
+ alt={notification.from_user.name}
  width={40}
  height={40}
  className="w-10 h-10 rounded-full"
  />
  ) : (
  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
- {notification.actor.name.charAt(0)}
+ {notification.from_user.name?.charAt(0) ??"?"}
  </div>
  )}
  </div>
@@ -203,12 +193,14 @@ export function NotificationBell() {
  {notification.message}
  </p>
  <p className="text-xs text-muted-foreground mt-1" suppressHydrationWarning>
- {formatDistanceToNow(notification.createdAt, { addSuffix: true })}
+ {notification.created_at
+ ? formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })
+ :""}
  </p>
  </div>
 
  {/* Unread Indicator */}
- {!notification.isRead && (
+ {!notification.read && (
  <div className="flex-shrink-0">
  <div className="w-2 h-2 bg-primary rounded-full" />
  </div>

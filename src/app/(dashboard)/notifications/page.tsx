@@ -18,11 +18,12 @@ export default function NotificationsPage() {
 
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
 
-  const notifications = data?.notifications;
-  const unreadCount = notifications?.filter((n: any) => !n.isRead).length ?? 0;
+  // GET /api/notifications returns a bare array, not { notifications: [...] }
+  const notifications = data;
+  const unreadCount = notifications?.filter((n: any) => !n.read).length ?? 0;
 
   const filteredNotifications = notifications?.filter((n: any) => {
-    if (filter === 'unread') return !n.isRead;
+    if (filter === 'unread') return !n.read;
     return true;
   });
 
@@ -136,7 +137,7 @@ export default function NotificationsPage() {
         ) : (
           <div className="rounded-lg border border-border bg-card overflow-hidden divide-y divide-hairline">
             {filteredNotifications?.map((notification: any) => (
-              <NotificationItem key={notification._id} notification={notification} />
+              <NotificationItem key={notification.id} notification={notification} />
             ))}
           </div>
         )}
