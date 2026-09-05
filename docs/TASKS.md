@@ -218,17 +218,18 @@ audit.
       gap for a future pass, not a field-shape bug.
       Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
       `jest --ci` (649/649 passing).
-- [ ] **This session found the same "frontend built against different
-      field names/shapes than the live schema" bug four separate times**
+- [x] **This session found the same "frontend built against different
+      field names/shapes than the live schema" bug six separate times now**
       (questions.course, research paper upload, event creation, job
-      posting) — strong signal this app was scaffolded against a different
-      backend convention (the codebase's pervasive `Id<'...'>`/`_id`-style
-      types read like a Convex holdover) and several forms were never
-      updated when it moved to Supabase's snake_case schema. Worth a
-      dedicated sweep of every remaining create/update form against its
-      actual table columns rather than assuming the ones not yet touched
-      are fine — this pattern has had a 100% hit rate everywhere checked
-      so far.
+      posting, poll creation, event RSVP status) — strong signal this app
+      was scaffolded against a different backend convention (the
+      codebase's pervasive `Id<'...'>`/`_id`-style types read like a Convex
+      holdover) and several forms were never updated when it moved to
+      Supabase's snake_case schema. The dedicated sweep this note asked for
+      is done (see the poll/RSVP entry above) — it found 2 more instances
+      and confirmed `jobs/apply` and `communities/update` are clean, plus
+      surfaced 2 non-drift gaps (dead UI with no caller yet, one missing
+      route handler) worth a look in a future pass but not schema drift.
 - [x] **Resolved all 5 pending schema-drift decisions with one additive
       migration** rather than leaving them open or deleting working form
       fields: `supabase/migrations/20240105000000_frontend_schema_drift_fixes.sql`
@@ -823,7 +824,15 @@ communities/slug (400 missing slug, 404 not found).
       correction banner (§10 of the earlier audit, commit `069050f`).
 - [x] Reconcile `docs/PROJECT_AUDIT.md` QA tracker with actual state — same
       commit, added a note pointing to ROADMAP.md/TASKS.md as current truth.
-- [ ] Re-run full audit checklist (build/lint/tsc/jest/security) before any
-      real launch.
+- [x] Re-ran the full checklist as a closing pass on this session's work:
+      clean `tsc --noEmit`, `next lint` (zero warnings), `npm run build`
+      (all routes compile), `jest --ci` (649/649 passing), and a `git diff`
+      scan of every commit since the session start for accidentally-
+      committed secrets/keys (none found). **This is not the pre-launch
+      re-audit** — that one still needs a live/seeded environment and the
+      still-pending items above (credential rotation, production env var
+      confirmation, live-DB schema/migration verification, Chrome-permission-
+      gated visual passes) done first; this pass only confirms nothing in
+      this session's own changes is broken or leaking a secret.
 - [x] Delete `patch.js`, `refactor_ui.js`, `refactor_ui.py`,
       `skills_output*.txt` — confirmed unused by any tooling/CI, removed.
