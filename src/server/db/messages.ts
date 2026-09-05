@@ -368,12 +368,12 @@ export async function getConversations(userId: string) {
   return formatted
 }
 
-export async function getConversationById(conversationId: string) {
+export async function getConversationById(conversationId: string, viewerId?: string) {
   const supabase = await getSupabase()
 
   const [convRes, partsRes, msgsRes] = await Promise.all([
     supabase.from("conversations").select("*").eq("id", conversationId).single(),
-    supabase.from("conversation_participants").select("conversation_id, user_id, last_read_at, muted").eq("conversation_id", conversationId),
+    supabase.from("conversation_participants").select("conversation_id, user_id, last_read_at, muted, role").eq("conversation_id", conversationId),
     supabase.from("messages").select("content, created_at, sender_id").eq("conversation_id", conversationId).is("deleted_at", null).order("created_at", { ascending: false }).limit(1)
   ])
 
@@ -403,8 +403,11 @@ export async function getConversationById(conversationId: string) {
       profile_picture: u?.profile_picture,
       last_read_at: p.last_read_at,
       muted: p.muted,
+      role: p.role ?? "member",
     }
   })
+
+  const myRole = viewerId ? (parts.find((p: any) => p.user_id === viewerId)?.role ?? "member") : undefined
 
   const otherPartRaw = parts.find((p: any) => p.user_id !== conv.created_by) || parts[0]
   const ou = otherPartRaw ? usersMap.get(otherPartRaw.user_id) : null
@@ -432,6 +435,7 @@ export async function getConversationById(conversationId: string) {
     last_message: lastMsg || undefined,
     participants: mappedParts,
     otherUser,
+    myRole,
   }
 }
 
@@ -536,6 +540,72 @@ export async function toggleMute(conversationId: string, userId: string, muted: 
     .update({ muted })
     .eq("conversation_id", conversationId)
     .eq("user_id", userId)
+}
+
+async function getParticipantRole(
+  supabase: Awaited<ReturnType<typeof getSupabase>>,
+  conversationId: string,
+  userId: string
+): Promise<string | null> {
+  const { data } = await supabase
+    .from("conversation_participants")
+    .select("role")
+    .eq("conversation_id", conversationId)
+    .eq("user_id", userId)
+    .single()
+  return data?.role ?? null
+}
+
+// Only the group owner may promote/demote — matches GroupInfoPanel, which
+// only ever renders these controls for isOwner.
+export async function promoteToAdmin(conversationId: string, targetUserId: string, actingUserId: string) {
+  const supabase = await getSupabase()
+  const actingRole = await getParticipantRole(supabase, conversationId, actingUserId)
+  if (actingRole !== "owner") {
+    return { error: "Forbidden: only the group owner can promote members", status: 403 }
+  }
+  const { error } = await supabase
+    .from("conversation_participants")
+    .update({ role: "admin" })
+    .eq("conversation_id", conversationId)
+    .eq("user_id", targetUserId)
+  if (error) return { error: error.message, status: 500 }
+  return { success: true }
+}
+
+export async function demoteFromAdmin(conversationId: string, targetUserId: string, actingUserId: string) {
+  const supabase = await getSupabase()
+  const actingRole = await getParticipantRole(supabase, conversationId, actingUserId)
+  if (actingRole !== "owner") {
+    return { error: "Forbidden: only the group owner can demote admins", status: 403 }
+  }
+  const { error } = await supabase
+    .from("conversation_participants")
+    .update({ role: "member" })
+    .eq("conversation_id", conversationId)
+    .eq("user_id", targetUserId)
+  if (error) return { error: error.message, status: 500 }
+  return { success: true }
+}
+
+export async function getPinnedMessages(conversationId: string) {
+  const supabase = await getSupabase()
+  const { data, error } = await supabase
+    .from("messages")
+    .select("*, sender:users!messages_sender_id_fkey(id, name)")
+    .eq("conversation_id", conversationId)
+    .eq("pinned", true)
+    .is("deleted_at", null)
+    .order("pinned_at", { ascending: false })
+  if (error) return []
+  return (data ?? []).map((m: any) => ({
+    _id: m.id,
+    id: m.id,
+    content: m.content,
+    senderName: m.sender?.name ?? "User",
+    created_at: m.created_at,
+    pinned_at: m.pinned_at,
+  }))
 }
 
 export async function getUnreadCount(conversationId: string, userId: string): Promise<number> {

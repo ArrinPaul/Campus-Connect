@@ -16,7 +16,7 @@ export async function GET(req: Request) {
     const id = searchParams.get("id") || searchParams.get("conversationId")
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 })
 
-    let conversation = await getConversationById(id)
+    let conversation = await getConversationById(id, userId)
 
     if (!conversation && id.startsWith("dm_")) {
       const parts = id.replace("dm_", "").split("_")

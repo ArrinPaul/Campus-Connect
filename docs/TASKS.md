@@ -673,11 +673,32 @@ audit.
         actual route files and their response shapes — not on seeing it
         render. Recommend an actual click-through before considering this
         fully done.
-- [ ] Add an admin/role column to `conversation_participants` and a
-      `pinned`/`pinned_at` column to `messages` (migration), then implement
-      `api/conversations/admin` (promote/demote) and
-      `api/conversations/pinned` (GET) so `GroupInfoPanel`'s admin controls
-      and pinned-messages tab actually work instead of hitting a 404.
+- [x] Added `supabase/migrations/20240108000000_conversation_roles_and_pinned_messages.sql`
+      — `conversation_participants.role` (`owner`/`admin`/`member`, default
+      `member`, CHECK-constrained) with a backfill that sets the
+      conversation creator's row to `owner`, and `messages.pinned` +
+      `messages.pinned_at`. Both additive/nullable-or-defaulted, safe against
+      existing rows. **Same caveat as the other pending migrations: not
+      applied to any live database yet** — no Supabase access this session.
+      Implemented the two routes `GroupInfoPanel` needs against it:
+      - `api/conversations/admin` (POST promote / DELETE demote) — added
+        `promoteToAdmin`/`demoteFromAdmin` in `server/db/messages.ts`,
+        which check the *acting* user is the group `owner` before allowing
+        either (matches the UI, which only ever renders these controls for
+        `isOwner`), not just that they're authenticated.
+      - `api/conversations/pinned` (GET) — added `getPinnedMessages`,
+        shaped to exactly what `GroupInfoPanel` reads off each row
+        (`_id`, `senderName`, `content`).
+      - `getConversationById` (used by `api/conversations/single`) now
+        selects each participant's `role` and returns a `myRole` field for
+        the requesting user — previously always `undefined`, which meant
+        `isOwner`/`isAdmin` in `GroupInfoPanel` could never be true even
+        with the schema in place.
+      Added `src/tests/conversation-admin-pinned.test.ts` (8 tests): 401/400
+      on both routes, 403 when a non-owner tries to promote or demote, 200
+      + correct shape on success, and pinned-messages response shape.
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
+      `jest --ci` (613/613 passing).
 - [x] `src/components/messages/ConversationList.tsx` was also dead code
       (same orphaning pattern as `ChatWindow` — the live conversation list
       is `(components)/messages/ConversationListItem.tsx`). Deleted.
