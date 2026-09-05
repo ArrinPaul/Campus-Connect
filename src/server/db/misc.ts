@@ -7,9 +7,25 @@ async function getSupabase() {
 
 // ─── Polls ──────────────────────────────────────────────────────────────────
 
-export async function createPoll(data: { question: string; options: string[]; created_by: string }) {
+export async function createPoll(data: {
+  question: string
+  options: string[]
+  created_by: string
+  expires_at?: string | null
+  is_anonymous?: boolean
+}) {
   const supabase = await getSupabase()
-  const { data: poll, error } = await supabase.from("polls").insert({ question: data.question, options: data.options.map((o, i) => ({ index: i, text: o, votes: 0 })), created_by: data.created_by }).select().single()
+  const { data: poll, error } = await supabase
+    .from("polls")
+    .insert({
+      question: data.question,
+      options: data.options.map((o, i) => ({ index: i, text: o, votes: 0 })),
+      created_by: data.created_by,
+      expires_at: data.expires_at ?? null,
+      is_anonymous: data.is_anonymous ?? false,
+    })
+    .select()
+    .single()
   if (error) return null
   return poll
 }

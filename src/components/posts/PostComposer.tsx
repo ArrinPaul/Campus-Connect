@@ -291,7 +291,11 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
     }
 
     if (!content || content.trim().length === 0) {
-      if (attachedFiles.length === 0 && !showPollUI) {
+      if (showPollUI) {
+        setError("A poll needs a question")
+        return
+      }
+      if (attachedFiles.length === 0) {
         setError("Post content cannot be empty")
         return
       }
@@ -312,11 +316,14 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
           setIsSubmitting(false)
           return
         }
-        pollId = (await createPollMutation({
+        // The route returns the created poll row, not a bare id.
+        const createdPoll = await createPollMutation({
+          question: content.trim(),
           options: validOptions,
           durationHours: pollDuration,
           isAnonymous: pollIsAnonymous,
-        })) as string
+        })
+        pollId = (createdPoll as any)?.id ?? (createdPoll as any)?._id
       }
 
       if (attachedFiles.length > 0 && attachedType) {
@@ -559,8 +566,8 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
           <textarea
             value={content}
             onChange={(e) => handleContentChange(e.target.value)}
-            placeholder="What's on your mind?"
-            aria-label="What's on your mind?"
+            placeholder={showPollUI ? "Ask a question..." : "What's on your mind?"}
+            aria-label={showPollUI ? "Ask a question..." : "What's on your mind?"}
             disabled={isSubmitting}
             className="w-full min-h-[80px] bg-transparent border-none focus:outline-none focus:ring-0 resize-none text-[16px] text-foreground placeholder:text-muted-foreground py-2"
           />

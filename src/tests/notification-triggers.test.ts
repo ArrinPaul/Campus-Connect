@@ -257,7 +257,7 @@ describe("Notification triggers", () => {
     const supabase = {
       from: jest.fn((table: string) => {
         if (table === "event_attendees") {
-          return { insert: jest.fn().mockResolvedValue({ error: null }) }
+          return { upsert: jest.fn().mockResolvedValue({ error: null }) }
         }
         if (table === "events") {
           return {
@@ -288,6 +288,43 @@ describe("Notification triggers", () => {
     expect(mockCreateNotification).toHaveBeenCalledWith(
       expect.objectContaining({ user_id: "organizer-1", type: "event_rsvp", from_user_id: "attendee-1" })
     )
+  })
+
+  it("attendEvent does not notify for a 'maybe' or 'not_going' RSVP", async () => {
+    const mockUpsert = jest.fn().mockResolvedValue({ error: null })
+    const supabase = {
+      from: jest.fn((table: string) => {
+        if (table === "event_attendees") {
+          return { upsert: mockUpsert }
+        }
+        if (table === "events") {
+          return {
+            select: jest.fn((cols: string) => ({
+              eq: jest.fn(() => ({
+                single: jest.fn().mockResolvedValue(
+                  cols.includes("attendee_count")
+                    ? { data: { attendee_count: 3 } }
+                    : { data: { created_by: "organizer-1", title: "Career Fair" } }
+                ),
+              })),
+            })),
+            update: jest.fn(() => ({ eq: jest.fn().mockResolvedValue({ error: null }) })),
+          }
+        }
+        throw new Error(`Unexpected table: ${table}`)
+      }),
+    }
+    jest.doMock("@/lib/supabase/server", () => ({ createClient: jest.fn(() => Promise.resolve(supabase)) }))
+    jest.resetModules()
+    const { attendEvent: attendEventFresh } = await import("@/server/db/events-jobs")
+
+    await attendEventFresh("event-1", "attendee-1", "maybe")
+
+    expect(mockUpsert).toHaveBeenCalledWith(
+      { event_id: "event-1", user_id: "attendee-1", status: "maybe" },
+      { onConflict: "event_id,user_id" }
+    )
+    expect(mockCreateNotification).not.toHaveBeenCalled()
   })
 
   it("inviteMember notifies the invitee", async () => {

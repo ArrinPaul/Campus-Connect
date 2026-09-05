@@ -19,7 +19,7 @@ export async function GET(req: Request) {
   }
 }
 
-// POST /api/polls  body: { question, options }
+// POST /api/polls  body: { question, options, durationHours?, isAnonymous? }
 export async function POST(req: Request) {
   try {
     const supabase = await createClient()
@@ -32,10 +32,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "question and options required" }, { status: 400 })
     }
 
+    const durationHours = typeof body.durationHours === "number" && body.durationHours > 0 ? body.durationHours : undefined
+    const expiresAt = durationHours ? new Date(Date.now() + durationHours * 60 * 60 * 1000).toISOString() : null
+
     const poll = await createPoll({
       question: body.question,
       options: body.options,
       created_by: userId,
+      expires_at: expiresAt,
+      is_anonymous: Boolean(body.isAnonymous),
     })
     
     if (!poll) {

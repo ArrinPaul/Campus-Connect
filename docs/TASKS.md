@@ -173,6 +173,51 @@ audit.
       Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
       `jest --ci` (567/567, including the existing
       `marketplace-mutations.test.ts` still passing).
+- [x] **Dedicated sweep of remaining create/update forms found the same
+      drift pattern two more times — one of them the worst yet (poll
+      creation was completely non-functional, not just missing a field).**
+      - `api/polls` (create): `PostComposer.tsx`'s poll UI has no question
+        input at all — the design intent is the composer's main textarea
+        doubles as the poll question — but the submit handler never sent
+        `content` as `question`, so `createPollMutation` always omitted the
+        NOT NULL `question` column. **Every poll creation 400'd.** Also
+        found while fixing it: `pollId` was being assigned the *entire*
+        created-poll object (the route returns the full row, not a bare
+        id) and then passed as a UUID string to `linkPollToPost` and the
+        post's `poll_id` field — would have sent malformed data to both
+        even after the question bug was fixed. Fixed both, plus added
+        validation requiring non-empty content when `showPollUI` is on,
+        updated the placeholder to "Ask a question..." in poll mode, and
+        forwarded `durationHours`→`expires_at` (computed server-side) and
+        `isAnonymous`→`is_anonymous` (new column, see migration below) —
+        both were previously silently dropped.
+      - `api/events/attend`: the RSVP UI (`events/[id]/page.tsx`) sends
+        `status: 'going'|'maybe'|'not_going'`, but the route only ever read
+        `eventId` — every RSVP landed as the `status` column's default
+        (`'going'`) regardless of what the user picked; "maybe" and "not
+        going" had zero effect. Fixed by forwarding and validating
+        `status`. Also switched `attendEvent`'s insert to an `upsert`
+        (`event_attendees` is keyed on `(event_id, user_id)`, so changing
+        your RSVP would otherwise violate the primary key instead of
+        updating it — a crash this bug had been masking, since nothing
+        ever sent a value that would prompt re-RSVPing with intent). Scoped
+        the "X is going to your event" notification to `status === "going"`
+        only — the message doesn't make sense for the other two, matches
+        the existing precedent of not notifying on lighter-weight signals
+        (question upvotes).
+      Added `supabase/migrations/20240109000000_polls_is_anonymous.sql`
+      (additive, defaulted). Added
+      `src/tests/rsvp-and-poll-schema-drift.test.ts` (7 tests) and a new
+      test in `notification-triggers.test.ts` (RSVP status `maybe` doesn't
+      notify). **Checked and confirmed clean:** `jobs/apply`,
+      `communities/update`. **Not a drift, just noted:** `portfolio.addProject`/
+      `addCertification`/`research/review`'s `submitPaperReview` have no
+      frontend caller anywhere yet (dead/unbuilt UI, nothing to drift
+      against); `portfolio.updateProject` maps to `PATCH /api/portfolio/projects`
+      but that route only has GET/POST/DELETE handlers — a missing-route
+      gap for a future pass, not a field-shape bug.
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
+      `jest --ci` (649/649 passing).
 - [ ] **This session found the same "frontend built against different
       field names/shapes than the live schema" bug four separate times**
       (questions.course, research paper upload, event creation, job

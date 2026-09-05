@@ -30,14 +30,23 @@ export async function createEvent(data: any) {
   return event
 }
 
-export async function attendEvent(eventId: string, userId: string) {
+export async function attendEvent(eventId: string, userId: string, status: "going" | "maybe" | "not_going" = "going") {
   const supabase = await getSupabase()
-  await supabase.from("event_attendees").insert({ event_id: eventId, user_id: userId })
+  // Upsert, not insert: event_attendees is keyed on (event_id, user_id), so
+  // re-RSVPing (changing your status) would otherwise violate the primary
+  // key instead of updating it.
+  await supabase.from("event_attendees").upsert(
+    { event_id: eventId, user_id: userId, status },
+    { onConflict: "event_id,user_id" }
+  )
   const { data } = await supabase.from("events").select("attendee_count").eq("id", eventId).single()
   if (data) await supabase.from("events").update({ attendee_count: (data.attendee_count ?? 0) + 1 }).eq("id", eventId)
 
   const { data: event } = await supabase.from("events").select("created_by, title").eq("id", eventId).single()
-  if (event && event.created_by && event.created_by !== userId) {
+  // Only "going" is worth notifying the organizer about — "maybe"/"not
+  // going" are lighter signals, same reasoning as not notifying on
+  // question upvotes elsewhere in this file's sibling triggers.
+  if (event && event.created_by && event.created_by !== userId && status === "going") {
     const { data: actor } = await supabase.from("users").select("name").eq("id", userId).single()
     const { createNotification } = await import("@/server/db/notifications")
     await createNotification({
