@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
 import { createLogger } from '@/lib/logger'
+import { withReconnect } from '@/lib/realtime-backoff'
 
 const log = createLogger('useRealtime')
 
@@ -47,11 +48,14 @@ export function useRealtimeMessages(conversationId: string) {
           })
         }
       )
-      .subscribe((status) => {
-        log.info(`Realtime messages subscription status: ${status}`)
-      })
+
+    const reconnect = withReconnect(channel, (status) => {
+      log.info(`Realtime messages subscription status: ${status}`)
+    })
+    channel.subscribe(reconnect.handleStatus)
 
     return () => {
+      reconnect.cancel()
       supabase.removeChannel(channel)
     }
   }, [conversationId, queryClient])

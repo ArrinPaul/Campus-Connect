@@ -226,9 +226,29 @@ audit.
 - [ ] Add a TURN server (Twilio Network Traversal Service, or self-hosted
       coturn) and wire its credentials into `useWebRTC.ts` alongside the
       existing STUN config.
-- [ ] Add reconnect/backoff to realtime hooks (`useRealtimeNotifications`,
-      `useRealtimeFeed`, `useRealtime`) — currently only log subscription
-      status changes.
+- [x] Added reconnect/backoff to all three realtime hooks
+      (`useRealtimeNotifications`, `useRealtimeFeed`, `useRealtime` /
+      `useRealtimeMessages`) — they previously only logged
+      `CHANNEL_ERROR`/`TIMED_OUT` without retrying. Added
+      `src/lib/realtime-backoff.ts` (`withReconnect`), a shared helper that
+      wraps the `.subscribe()` status callback: exponential backoff (1s →
+      2s → 4s ... capped at 30s, max 6 attempts), resets the attempt count
+      on a successful `SUBSCRIBED`, and resubscribes the same channel
+      instance after a delay rather than tearing down and re-registering
+      every `.on()` handler (the pattern Supabase's realtime-js docs
+      recommend for this). Each hook's cleanup calls the helper's `cancel()`
+      to stop any pending retry timer on unmount, avoiding a leak.
+      Added `src/lib/realtime-backoff.test.ts` (6 tests, using fake timers)
+      covering the backoff math, the reset-after-success behavior, and
+      cancellation — this is exactly the kind of timing logic that's easy
+      to get subtly wrong and hard to catch without a fake-timer test.
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
+      `jest --ci` (581/581 passing). Not visually/live verified against an
+      actual dropped connection — same Chrome-permission and no-live-app
+      constraints as the rest of this session's frontend work; the fix is
+      reasoned from Supabase's documented reconnect pattern and covered by
+      unit tests of the backoff logic itself, not observed against a real
+      network drop.
 
 ## §4 — UI pass ("feels like Facebook")
 

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
 import { useUser } from '@/lib/auth/client'
 import { createLogger } from '@/lib/logger'
+import { withReconnect } from '@/lib/realtime-backoff'
 import { toast } from 'sonner'
 
 const log = createLogger('useRealtimeNotifications')
@@ -67,11 +68,14 @@ export function useRealtimeNotifications() {
           }
         }
       )
-      .subscribe((status) => {
-        log.info(`Realtime notifications subscription status: ${status}`)
-      })
+
+    const reconnect = withReconnect(channel, (status) => {
+      log.info(`Realtime notifications subscription status: ${status}`)
+    })
+    channel.subscribe(reconnect.handleStatus)
 
     return () => {
+      reconnect.cancel()
       supabase.removeChannel(channel)
     }
   }, [user?.id, queryClient])
