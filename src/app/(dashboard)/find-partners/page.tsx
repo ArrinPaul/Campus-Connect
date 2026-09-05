@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, api } from '@/lib/api';
 import { useUser } from '@/lib/auth/client';
 import { Search, UserSearch, Handshake, Users, BookOpen, Sparkles, MessageSquare, UserPlus, UserCheck, ArrowRight, X, MapPin, Briefcase } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { AvatarWithStatus } from '@/components/ui/OnlineStatusDot';
 import { toast } from 'sonner';
@@ -162,13 +163,11 @@ export default function FindPartnersPage() {
             ))}
           </div>
         ) : users.length === 0 ? (
-          <div className="text-center py-12 bg-card border border-border rounded-lg p-6">
-            <Users className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
-            <h3 className="text-sm font-semibold text-foreground">No partners found</h3>
-            <p className="text-xs text-muted-foreground mt-1">
-              Try typing a skill like &ldquo;Python&rdquo;, &ldquo;Design&rdquo;, or &ldquo;Biology&rdquo; in the search box.
-            </p>
-          </div>
+          <EmptyState
+            icon={Users}
+            title="No partners found"
+            description={'Try typing a skill like "Python", "Design", or "Biology" in the search box.'}
+          />
         ) : (
           <div className="space-y-4">
             {users.map((user: any) => {

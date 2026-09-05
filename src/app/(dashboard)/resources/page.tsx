@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import { ResourceCard } from '../../(components)/resources/ResourceCard';
 import Link from 'next/link';
 import { Search, Plus, Book, FileText } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useState } from 'react';
 import { UploadResourceModal } from '@/components/resources/UploadResourceModal';
 
@@ -93,13 +94,11 @@ export default function ResourcesPage() {
  </div>
  
  {resources?.length === 0 && (
- <div className="text-center py-section bg-card rounded-lg border border-border/50">
- <Book className="w-16 h-16 text-muted-foreground/50 mx-auto mb-md" />
- <h3 className="text-heading-lg text-foreground mb-sm">No resources found</h3>
- <p className="text-body-md text-muted-foreground max-w-sm mx-auto mb-6">
- Try adjusting your search or be the first to upload a new resource!
- </p>
- </div>
+ <EmptyState
+ icon={Book}
+ title="No resources found"
+ description="Try adjusting your search or be the first to upload a new resource!"
+ />
  )}
  </div>
  </div>

@@ -8,6 +8,7 @@ import { useUser } from '@/lib/auth/client';
 import { Search, UserSearch, Award, MessageSquare, UserPlus, UserCheck, ArrowRight, ShieldCheck, X, MapPin } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { AvatarWithStatus } from '@/components/ui/OnlineStatusDot';
+import { EmptyState } from '@/components/ui/empty-state';
 import { toast } from 'sonner';
 
 export default function FindExpertsPage() {
@@ -129,13 +130,11 @@ export default function FindExpertsPage() {
             ))}
           </div>
         ) : users.length === 0 ? (
-          <div className="text-center py-12 bg-card border border-border rounded-lg p-6">
-            <Award className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
-            <h3 className="text-sm font-semibold text-foreground">No experts found</h3>
-            <p className="text-xs text-muted-foreground mt-1">
-              Try searching by a specific academic field or domain topic.
-            </p>
-          </div>
+          <EmptyState
+            icon={Award}
+            title="No experts found"
+            description="Try searching by a specific academic field or domain topic."
+          />
         ) : (
           <div className="space-y-4">
             {users.map((user: any) => {

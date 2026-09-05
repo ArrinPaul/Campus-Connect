@@ -6,6 +6,7 @@ import { QuestionCard } from '../../(components)/q-and-a/QuestionCard';
 import { AskQuestionModal } from '@/components/q-and-a/AskQuestionModal';
 import Link from 'next/link';
 import { Search, Plus, HelpCircle, Filter, Hash } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useState } from 'react';
 
 const QuestionCardSkeleton = () => <div className="p-4 border border-border/50 rounded-lg bg-card h-[192px] animate-pulse" />;
@@ -110,13 +111,11 @@ export default function QuestionsPage() {
  </div>
  
  {questions?.length === 0 && (
- <div className="text-center py-section bg-card rounded-lg border border-border/50">
- <HelpCircle className="w-16 h-16 text-muted-foreground/50 mx-auto mb-md" />
- <h3 className="text-heading-lg text-foreground mb-sm">No questions found</h3>
- <p className="text-body-md text-muted-foreground max-w-sm mx-auto mb-6">
- Try adjusting your search filters or be the first to ask!
- </p>
- </div>
+ <EmptyState
+ icon={HelpCircle}
+ title="No questions found"
+ description="Try adjusting your search filters or be the first to ask!"
+ />
  )}
  </div>
  </div>

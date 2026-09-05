@@ -7,6 +7,7 @@ import { PostJobModal } from '@/components/jobs/PostJobModal';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Search, Filter, Briefcase, Plus, Sparkles, X } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 import { cn } from '@/lib/utils';
 
 const JOB_TYPES = ['All', 'Full-time', 'Part-time', 'Internship', 'Contract'];
@@ -140,23 +141,20 @@ export default function JobsPage() {
                 {[...Array(6)].map((_, i) => <JobCardSkeleton key={i} />)}
               </div>
             ) : jobs.length === 0 ? (
-              <div className="text-center py-16 bg-card rounded-lg border border-border max-w-lg mx-auto">
-                <Briefcase className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-40" />
-                <h3 className="text-base font-semibold text-foreground">No opportunities found</h3>
-                <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
-                  {hasActiveFilters
+              <EmptyState
+                icon={Briefcase}
+                title="No opportunities found"
+                description={
+                  hasActiveFilters
                     ? 'Try adjusting your search terms or job type filter.'
-                    : 'Check back later for new job postings.'}
-                </p>
-                {hasActiveFilters && (
-                  <button
-                    onClick={() => { setSearchTerm(''); setJobType('All'); }}
-                    className="mt-4 rounded-full border border-border px-4 py-1.5 text-xs font-semibold text-foreground hover:bg-canvas transition-colors"
-                  >
-                    Clear Filters
-                  </button>
-                )}
-              </div>
+                    : 'Check back later for new job postings.'
+                }
+                action={
+                  hasActiveFilters
+                    ? { label: 'Clear Filters', onClick: () => { setSearchTerm(''); setJobType('All'); } }
+                    : undefined
+                }
+              />
             ) : (
               <>
                 <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">

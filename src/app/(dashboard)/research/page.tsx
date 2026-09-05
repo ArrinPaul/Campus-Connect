@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import { ResearchPaperCard } from '../../(components)/research/ResearchPaperCard';
 import Link from 'next/link';
 import { Search, Plus, BookOpen, Microscope } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useState } from 'react';
 import { UploadPaperModal } from '@/components/research/UploadPaperModal';
 
@@ -78,13 +79,11 @@ export default function ResearchPage() {
  </div>
  
  {papers?.length === 0 && (
- <div className="text-center py-section bg-card rounded-lg border border-border/50">
- <BookOpen className="w-16 h-16 text-muted-foreground/50 mx-auto mb-md" />
- <h3 className="text-heading-lg text-foreground mb-sm">No research papers found</h3>
- <p className="text-body-md text-muted-foreground max-w-sm mx-auto mb-6">
- Try adjusting your search or be the first to upload a new paper!
- </p>
- </div>
+ <EmptyState
+ icon={BookOpen}
+ title="No research papers found"
+ description="Try adjusting your search or be the first to upload a new paper!"
+ />
  )}
  </div>
  </div>

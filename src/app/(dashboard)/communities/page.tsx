@@ -8,6 +8,7 @@ import { MyInvitesBanner } from '@/components/communities/MyInvitesBanner';
 import Link from 'next/link';
 import { Search, Users, SlidersHorizontal, X, Plus, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { EmptyState } from '@/components/ui/empty-state';
 
 const CATEGORIES = ['All', 'Academic', 'Research', 'Social', 'Sports', 'Clubs', 'Technology', 'Arts', 'Professional'];
 
@@ -158,23 +159,20 @@ export default function CommunitiesPage() {
                 {[...Array(8)].map((_, i) => <CommunityCardSkeleton key={i} />)}
               </div>
             ) : sortedCommunities.length === 0 ? (
-              <div className="text-center py-16 bg-card rounded-lg border border-border max-w-lg mx-auto">
-                <Users className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-40" />
-                <h3 className="text-base font-semibold text-foreground">No communities found</h3>
-                <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
-                  {hasActiveFilters 
-                    ? 'Try adjusting your search query or category filters.' 
-                    : 'Be the first to create a community and invite peers!'}
-                </p>
-                {hasActiveFilters && (
-                  <button
-                    className="mt-4 rounded-full border border-border px-4 py-1.5 text-xs font-semibold text-foreground hover:bg-canvas transition-colors"
-                    onClick={() => { setSelectedCategory('All'); setSearchInput(''); }}
-                  >
-                    Clear Filters
-                  </button>
-                )}
-              </div>
+              <EmptyState
+                icon={Users}
+                title="No communities found"
+                description={
+                  hasActiveFilters
+                    ? 'Try adjusting your search query or category filters.'
+                    : 'Be the first to create a community and invite peers!'
+                }
+                action={
+                  hasActiveFilters
+                    ? { label: 'Clear Filters', onClick: () => { setSelectedCategory('All'); setSearchInput(''); } }
+                    : undefined
+                }
+              />
             ) : (
               <div className="space-y-4">
                 <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">

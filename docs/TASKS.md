@@ -371,8 +371,38 @@ audit.
 - [x] Messaging: read receipts + unread-per-conversation badge — both done
       via §4b (unread count fixed; read receipts now live after the
       ChatArea swap). Kept here as a pointer rather than duplicating detail.
-- [ ] Build one shared `<EmptyState>` / `<ErrorState>` / `<LoadingState>`
-      component set and replace ad hoc per-page versions.
+- [x] Built shared `<EmptyState>`/`<ErrorState>`/`<LoadingState>` components
+      (`src/components/ui/empty-state.tsx`) matching the visual pattern
+      already established on most list pages (centered card, icon at
+      reduced opacity, title, optional description, optional single action
+      button) — a consolidation, not a redesign, so this carries near-zero
+      visual risk. Migrated 8 pages that had a hand-rolled version of the
+      same pattern with small inconsistencies (icon size, text scale,
+      padding): `communities`, `find-experts`, `find-partners`, `jobs`,
+      `events`, `q-and-a`, `resources`, `research`.
+      Deliberately **not** migrated: `BookmarkedPostList.tsx`'s empty state
+      uses a distinct branded icon-badge treatment (colored rounded square
+      behind the icon) — that's a real design choice, not an inconsistency
+      to mechanically flatten, so it was left as-is. `marketplace/page.tsx`
+      has no empty-state handling to find in the first place (not checked
+      further — out of scope for this pass, worth a look separately).
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`
+      (whole-app, since 8 pages changed), `jest --ci` (581/581 passing).
+      **Not visually verified in a browser** — same Chrome-permission
+      blocker as the rest of this session's frontend work; low risk here
+      specifically because the new component's markup/classes were copied
+      directly from the existing per-page versions rather than invented.
+- [ ] `ErrorState`/`LoadingState` (built alongside `EmptyState` above) have
+      no call sites yet — `EmptyState` was the one with duplicated ad hoc
+      versions to consolidate; error/loading states weren't audited for the
+      same pattern in this pass. Worth checking whether pages have a
+      similarly inconsistent error-state pattern worth consolidating, or
+      whether they're better left page-specific.
+- [ ] Migrate remaining pages with an ad hoc empty-state block to the new
+      shared component: `marketplace` (once its actual pattern is found),
+      `stories`, `notifications`, `leaderboard`, `admin/*`, and any others
+      not covered above — the 8 done are the highest-traffic list pages,
+      not an exhaustive sweep.
 - [x] **Mobile pass, part 1 — found and fixed a real layout bug in the
       highest-traffic mobile flow (opening a chat).** Swept `src/app` and
       `src/components` for the two most common mobile anti-patterns

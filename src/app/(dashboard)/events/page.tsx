@@ -6,6 +6,7 @@ import { EventCard } from '../../(components)/events/EventCard';
 import { CreateEventModal } from '@/components/events/CreateEventModal';
 import Link from 'next/link';
 import { Plus, Filter, Calendar } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useState } from 'react';
 
 const EventCardSkeleton = () => <div className="p-4 border border-border/50 rounded-lg bg-card h-[192px] animate-pulse" />;
@@ -83,13 +84,11 @@ export default function EventsPage() {
  </div>
  
  {events?.length === 0 && (
- <div className="text-center py-section bg-card rounded-lg border border-border/50">
- <Calendar className="w-16 h-16 text-muted-foreground/50 mx-auto mb-md" />
- <h3 className="text-heading-lg text-foreground mb-sm">No upcoming events</h3>
- <p className="text-body-md text-muted-foreground max-w-sm mx-auto mb-6">
- Check back later or be the first to create a new event!
- </p>
- </div>
+ <EmptyState
+ icon={Calendar}
+ title="No upcoming events"
+ description="Check back later or be the first to create a new event!"
+ />
  )}
  </div>
  </div>
