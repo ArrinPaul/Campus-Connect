@@ -94,11 +94,23 @@ audit.
 - [x] **Partner/study-buddy matching** (`matching-engine.ts`) — confirmed
       real: cosine + Jaccard similarity across skills/university/department/
       bio. Not hardcoded.
-- [ ] **Semantic research search degrades silently without `OPENAI_API_KEY`**
-      — falls back to `MockEmbeddingProvider`, a deterministic hash, not a
-      real embedding. Confirmed `OPENAI_API_KEY` is unset in `.env.local`
-      right now. Either set a real key (production too, if also unset there)
-      or make the degraded mode visible to users/logs instead of silent.
+- [x] **Semantic research search degraded silently without
+      `OPENAI_API_KEY`** — `.env.local` still doesn't have a real key set
+      (this session can't set production secrets either), so made the
+      degraded mode visible instead of fixing the missing key itself:
+      `getEmbeddingProvider()` now logs a `warn` the first time it falls
+      back to `MockEmbeddingProvider` (once per process, not per request —
+      semantic search can run on every keystroke). `GET /api/research/search`
+      also sets an `X-Semantic-Search-Degraded: true` response header when
+      running degraded and the query is non-empty, without changing the
+      response body shape (stays the established bare-array contract, so no
+      frontend changes needed). Added
+      `src/server/recommendations/embedding-provider.test.ts` (4 tests:
+      warns once when unset, doesn't warn twice, warns on a `mock_`
+      placeholder key, doesn't warn and returns the real provider with a
+      real key).
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
+      `jest --ci` (605/605 passing).
 - [ ] **Confirm production env vars**, not just local `.env.local`: Stripe,
       VAPID, Upstash, OpenAI, Sentry, PostHog are all unset locally — billing,
       push notifications, rate limiting (fails open, not closed), semantic

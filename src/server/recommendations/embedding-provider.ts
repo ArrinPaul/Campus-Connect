@@ -103,10 +103,21 @@ export class OpenAIEmbeddingProvider implements EmbeddingProvider {
 
 // ─── Provider Factory ─────────────────────────────────────────────────────────
 
+// Logged once per process, not once per request — semantic search can be
+// called on every keystroke, and a warning on every call would drown the
+// logs without adding information after the first one.
+let warnedAboutMockFallback = false
+
 export function getEmbeddingProvider(): EmbeddingProvider {
   const apiKey = process.env.OPENAI_API_KEY
   if (apiKey && !apiKey.startsWith("mock_")) {
     return new OpenAIEmbeddingProvider(apiKey)
+  }
+  if (!warnedAboutMockFallback) {
+    warnedAboutMockFallback = true
+    log.warn(
+      "OPENAI_API_KEY is unset (or a mock_ placeholder) — semantic search is running on MockEmbeddingProvider, a deterministic hash with no real semantic understanding. Set a real key to restore actual similarity search."
+    )
   }
   return new MockEmbeddingProvider()
 }
