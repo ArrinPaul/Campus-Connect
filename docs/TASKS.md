@@ -726,11 +726,20 @@ communities/slug (400 missing slug, 404 not found).
       `polls/single` (400 missing id, 404 not found), and
       `communities/members/remove` (403 non-moderator, 403 refuses to
       remove an admin). 575/575 tests passing repo-wide.
-      **Not yet covered:** `communities/members/approve`, `invite/respond`,
-      `stories/{user,delete}`, `marketplace/contact`, `events/my-events`,
-      `reactions/counts`, `comments/replies`, `posts/activity` — lower risk
-      (mostly simple reads or already covered indirectly via
-      `notification-triggers.test.ts` for the ones that also notify).
+- [x] Added `src/tests/fixed-routes-coverage-3.test.ts` (23 tests) covering
+      the remaining routes noted above: `communities/members/approve` (400
+      missing fields, 403 propagated from a non-moderator, 200 success),
+      `communities/invite/respond` (400 invalid status, 403 someone
+      responding to another user's invite, 200 for the real invitee),
+      `stories/user` (400 missing userId, 200 with data),
+      `stories/delete` (401, 400, 403 non-owner), `marketplace/contact`
+      (400 missing listingId, 404 unknown listing, 400 self-contact, 201 +
+      conversation opened on success), `events/my-events` (401, 200),
+      `reactions/counts` (400 missing targetId, default targetType),
+      `comments/replies` (400 missing commentId, `hasMore` computed
+      correctly), `posts/activity` (400 when signed out with no userId,
+      defaults to the signed-in user's id otherwise).
+      636/636 tests passing repo-wide.
 - [ ] Real Playwright e2e (login → act → assert) for at least the highest-
       value flows once there's a way to run against a live/seeded
       environment — search, Q&A, resource download, community moderation,
