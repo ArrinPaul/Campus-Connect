@@ -524,11 +524,17 @@ communities/slug (400 missing slug, 404 not found).
 - [x] Jest regression coverage for the previously-stubbed routes above
       (`src/tests/stub-routes-regression.test.ts`) — 557/557 tests passing
       repo-wide after adding it.
-- [ ] Extend the same file (or add siblings) for the remaining fixed routes
-      not yet covered: communities/members/{approve,remove}, invite/respond,
-      stories/{user,delete}, marketplace/contact, events/my-events,
-      reactions/counts, polls/single, hashtags/search, comments/replies,
-      posts/activity.
+- [x] Added `src/tests/fixed-routes-coverage-2.test.ts` (8 tests) covering
+      `hashtags/search` (empty-query short-circuit + real match),
+      `reposts/check` (401 unauthenticated, 400 missing postId),
+      `polls/single` (400 missing id, 404 not found), and
+      `communities/members/remove` (403 non-moderator, 403 refuses to
+      remove an admin). 575/575 tests passing repo-wide.
+      **Not yet covered:** `communities/members/approve`, `invite/respond`,
+      `stories/{user,delete}`, `marketplace/contact`, `events/my-events`,
+      `reactions/counts`, `comments/replies`, `posts/activity` — lower risk
+      (mostly simple reads or already covered indirectly via
+      `notification-triggers.test.ts` for the ones that also notify).
 - [ ] Real Playwright e2e (login → act → assert) for at least the highest-
       value flows once there's a way to run against a live/seeded
       environment — search, Q&A, resource download, community moderation,
