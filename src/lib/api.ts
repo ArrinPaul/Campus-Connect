@@ -77,6 +77,55 @@ export function useQuery<T = any>(
   return data
 }
 
+// ─── useQueryError ───────────────────────────────────────────────────────────
+/**
+ * Companion to useQuery for pages that want to distinguish "still loading"
+ * from "the fetch actually failed" — useQuery only ever returns `data`, so a
+ * genuine error looks identical to a slow load (data stays undefined
+ * forever) and pages fall back to an empty/loading state instead of a real
+ * error message. Opt-in and additive: shares the same query cache entry as
+ * a useQuery call for the same endpoint+args (same queryKey), so it doesn't
+ * trigger an extra fetch — call both for the same endpoint to get data and
+ * error state together.
+ */
+export function useQueryError(
+  endpoint: Endpoint | null | undefined,
+  args?: Record<string, unknown> | "skip"
+): Error | null {
+  const enabled = endpoint != null && args !== "skip"
+
+  const params = new URLSearchParams()
+  if (args && args !== "skip") {
+    Object.entries(args).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) params.set(k, String(v))
+    })
+  }
+
+  const baseUrl = getBaseUrl(endpoint?._path || "")
+  const url = enabled
+    ? params.toString()
+      ? `${baseUrl}${endpoint!._path}?${params.toString()}`
+      : `${baseUrl}${endpoint!._path}`
+    : ""
+
+  const { error } = useTanstackQuery({
+    queryKey: [endpoint?._path, args],
+    queryFn: async () => {
+      const res = await fetch(url, { credentials: "include" })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: res.statusText }))
+        throw new Error(err.error || "Query failed")
+      }
+      return res.json()
+    },
+    enabled,
+    staleTime: 30_000,
+    refetchInterval: 30_000,
+  })
+
+  return (error as Error) ?? null
+}
+
 // ─── useMutation ─────────────────────────────────────────────────────────────
 /**
  * Legacy-compatible useMutation: returns an async function that sends the request.

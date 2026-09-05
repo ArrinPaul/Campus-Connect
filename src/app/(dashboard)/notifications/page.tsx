@@ -1,12 +1,13 @@
 ﻿'use client';
 
 import { useState } from 'react';
-import { useQuery, useMutation } from '@/lib/api';
+import { useQuery, useQueryError, useMutation } from '@/lib/api';
+import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '@/lib/auth/client';
 import { api } from '@/lib/api';
 import { NotificationItem } from '@/components/notifications/NotificationItem';
 import { groupNotifications } from '@/lib/notifications/group';
-import { EmptyState } from '@/components/ui/empty-state';
+import { EmptyState, ErrorState } from '@/components/ui/empty-state';
 import { Bell, CheckCheck, Inbox, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -16,6 +17,8 @@ export default function NotificationsPage() {
   const isLoading = !isLoaded;
   const isAuthenticated = isSignedIn ?? false;
   const data = useQuery(api.notifications.getNotifications, isAuthenticated ? {} : 'skip');
+  const fetchError = useQueryError(api.notifications.getNotifications, isAuthenticated ? {} : 'skip');
+  const queryClient = useQueryClient();
   const markAllAsRead = useMutation(api.notifications.markAllAsRead);
 
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
@@ -119,7 +122,12 @@ export default function NotificationsPage() {
         </div>
 
         {/* Notifications List */}
-        {notifications === undefined ? (
+        {fetchError ? (
+          <ErrorState
+            description="We couldn't load your notifications."
+            action={{ label: 'Try Again', onClick: () => queryClient.invalidateQueries() }}
+          />
+        ) : notifications === undefined ? (
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="h-20 w-full bg-card animate-pulse rounded-lg border border-border" />

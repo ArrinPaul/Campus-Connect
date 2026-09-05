@@ -489,12 +489,38 @@ audit.
       blocker as the rest of this session's frontend work; low risk here
       specifically because the new component's markup/classes were copied
       directly from the existing per-page versions rather than invented.
-- [ ] `ErrorState`/`LoadingState` (built alongside `EmptyState` above) have
-      no call sites yet — `EmptyState` was the one with duplicated ad hoc
-      versions to consolidate; error/loading states weren't audited for the
-      same pattern in this pass. Worth checking whether pages have a
-      similarly inconsistent error-state pattern worth consolidating, or
-      whether they're better left page-specific.
+- [x] **Root-caused why `ErrorState` had zero call sites: it's not that
+      pages didn't need one, it's that the data-fetching hook made it
+      unreachable.** `useQuery` (`src/lib/api.ts`) only ever returns
+      `data` from React Query, discarding `error`/`isError` — so a page
+      that fetches successfully-but-slowly and a page whose fetch actually
+      500'd are indistinguishable (`data` stays `undefined` in both cases).
+      Every list page's "loading forever" skeleton was quietly also its
+      error state, with no way to tell the two apart or show a real error
+      message.
+      Rather than changing `useQuery`'s return shape (would touch every one
+      of its 60+ call sites), added an additive companion hook,
+      `useQueryError(endpoint, args)`, that shares the exact same React
+      Query cache entry (same `queryKey`) as a `useQuery` call for the same
+      endpoint+args — so calling both costs zero extra fetches. A page opts
+      in by calling it alongside its existing `useQuery` call.
+      Wired it into `/notifications` (the page already touched most this
+      session) as the reference implementation: shows `ErrorState` with a
+      "Try Again" button (`queryClient.invalidateQueries()`) instead of an
+      infinite skeleton when the fetch genuinely fails.
+      Added `src/lib/api-query-error.test.tsx` (4 tests via `renderHook`:
+      null while pending/succeeded, surfaces the real error message on
+      failure, stays null and fetch-free when `skip`ped, and — the point of
+      the whole design — confirmed zero extra fetches when paired with a
+      `useQuery` call for the same endpoint) and 2 new tests in
+      `notifications/page.test.tsx` (renders the error state, Try Again
+      invalidates queries).
+      **Not yet done:** rolling `useQueryError` out to other list pages —
+      this lands the capability and proves it on one page; broader adoption
+      is a separate, larger sweep (60+ call sites) better done as its own
+      pass rather than folded into this one.
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
+      `jest --ci` (642/642 passing).
 - [x] Migrated 4 more pages to the shared `EmptyState`: `marketplace`
       ("No listings found", with the conditional Clear Filters action),
       `stories` ("No stories available"), `notifications` (both the

@@ -1,12 +1,14 @@
 import { render, screen, fireEvent } from "@testing-library/react"
 import NotificationsPage from "./page"
-import { useQuery, useMutation } from "@/lib/api"
+import { useQuery, useQueryError, useMutation } from "@/lib/api"
+import { useQueryClient } from "@tanstack/react-query"
 import { useUser } from "@/lib/auth/client"
 
 const useConvexAuth = jest.fn(() => ({ isAuthenticated: true, isLoading: false }))
 
 jest.mock("@/lib/api", () => ({
   useQuery: jest.fn(),
+  useQueryError: jest.fn(() => null),
   useMutation: jest.fn(() => jest.fn()),
   api: {
     notifications: {
@@ -16,6 +18,9 @@ jest.mock("@/lib/api", () => ({
     },
   },
 }))
+jest.mock("@tanstack/react-query", () => ({
+  useQueryClient: jest.fn(() => ({ invalidateQueries: jest.fn() })),
+}))
 jest.mock("@/components/notifications/NotificationItem", () => ({
   NotificationItem: ({ notification }: any) => (
     <div data-testid="notification-item">{notification.message}</div>
@@ -23,6 +28,7 @@ jest.mock("@/components/notifications/NotificationItem", () => ({
 }))
 
 const mockUseQuery = useQuery as jest.MockedFunction<typeof useQuery>
+const mockUseQueryError = useQueryError as jest.MockedFunction<typeof useQueryError>
 const mockUseMutation = useMutation as jest.MockedFunction<typeof useMutation>
 const mockUseConvexAuth = useConvexAuth as jest.MockedFunction<typeof useConvexAuth>
 const mockUseUser = useUser as jest.MockedFunction<typeof useUser>
@@ -31,6 +37,7 @@ const mockMarkAllAsRead = jest.fn()
 describe("NotificationsPage", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockUseQueryError.mockReturnValue(null)
     mockUseMutation.mockReturnValue(mockMarkAllAsRead as any)
     mockUseConvexAuth.mockReturnValue({ isAuthenticated: true, isLoading: false })
     mockUseUser.mockReturnValue({ isLoaded: true, isSignedIn: true, user: { id: "test-user-id", fullName: "Test User", imageUrl: "/test.jpg" } } as any)
@@ -137,6 +144,31 @@ describe("NotificationsPage", () => {
     fireEvent.click(markAllButton)
 
     expect(mockMarkAllAsRead).toHaveBeenCalled()
+  })
+
+  // Regression: useQuery only ever returns data, so a genuine fetch error
+  // used to be indistinguishable from "still loading" — the page would
+  // show a skeleton forever instead of a real error message.
+  it("shows an error state instead of an infinite skeleton when the fetch fails", () => {
+    mockUseQuery.mockReturnValue(undefined)
+    mockUseQueryError.mockReturnValue(new Error("Internal Server Error"))
+
+    render(<NotificationsPage />)
+
+    expect(screen.getByText(/couldn't load your notifications/i)).toBeInTheDocument()
+    expect(screen.getByText(/Try Again/i)).toBeInTheDocument()
+  })
+
+  it("retries by invalidating queries when Try Again is clicked", () => {
+    const mockInvalidate = jest.fn()
+    ;(useQueryClient as jest.Mock).mockReturnValue({ invalidateQueries: mockInvalidate })
+    mockUseQuery.mockReturnValue(undefined)
+    mockUseQueryError.mockReturnValue(new Error("Internal Server Error"))
+
+    render(<NotificationsPage />)
+    fireEvent.click(screen.getByText(/Try Again/i))
+
+    expect(mockInvalidate).toHaveBeenCalled()
   })
 })
 
