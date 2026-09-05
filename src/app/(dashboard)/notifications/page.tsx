@@ -6,6 +6,7 @@ import { useUser } from '@/lib/auth/client';
 import { api } from '@/lib/api';
 import { NotificationItem } from '@/components/notifications/NotificationItem';
 import { groupNotifications } from '@/lib/notifications/group';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Bell, CheckCheck, Inbox, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -125,17 +126,15 @@ export default function NotificationsPage() {
             ))}
           </div>
         ) : filteredNotifications?.length === 0 ? (
-          <div className="text-center py-20 bg-card rounded-lg border border-border">
-            <Inbox className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-40" />
-            <h3 className="text-base font-semibold text-foreground">
-              {filter === 'unread' ? 'No unread notifications' : 'All caught up'}
-            </h3>
-            <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
-              {filter === 'unread'
+          <EmptyState
+            icon={Inbox}
+            title={filter === 'unread' ? 'No unread notifications' : 'All caught up'}
+            description={
+              filter === 'unread'
                 ? 'You have read all your notifications.'
-                : 'When new activity happens, it will appear here.'}
-            </p>
-          </div>
+                : 'When new activity happens, it will appear here.'
+            }
+          />
         ) : (
           <div className="rounded-lg border border-border bg-card overflow-hidden divide-y divide-hairline">
             {filteredNotifications?.map((notification) => (

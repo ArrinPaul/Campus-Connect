@@ -4,6 +4,7 @@ import { useQuery, useAction, api } from"@/lib/api";
 import { ShieldAlert, AlertTriangle, Check, Trash2 } from"lucide-react";
 import Image from"next/image";
 import { formatDistanceToNow } from"date-fns";
+import { EmptyState } from"@/components/ui/empty-state";
 
 export default function AdminModerationPage() {
  const currentUser = useQuery(api.users.getCurrentUser);
@@ -46,10 +47,7 @@ export default function AdminModerationPage() {
 
  <div className="space-y-6">
  {(!reportedContent || reportedContent.length === 0) ? (
- <div className="text-center py-12 bg-card border border-border rounded-lg text-muted-foreground">
- <Check className="w-12 h-12 mx-auto text-green-500 mb-4 opacity-50" />
- <p>The moderation queue is empty. Great job!</p>
- </div>
+ <EmptyState icon={Check} title="The moderation queue is empty" description="Great job!" />
  ) : (
  reportedContent.map((item: any) => (
  <div key={item.id} className="bg-card border border-border rounded-lg overflow-hidden flex flex-col md:flex-row">

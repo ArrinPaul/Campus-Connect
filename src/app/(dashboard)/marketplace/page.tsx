@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { Search, Store, ShoppingBag, Plus, Sparkles, X } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { EmptyState } from '@/components/ui/empty-state';
 
 const CATEGORIES = [
   { key: 'all', label: 'All' },
@@ -149,23 +150,20 @@ export default function MarketplacePage() {
                 </div>
               </>
             ) : (
-              <div className="text-center py-16 bg-card rounded-lg border border-border max-w-lg mx-auto">
-                <ShoppingBag className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-40" />
-                <h3 className="text-base font-semibold text-foreground">No listings found</h3>
-                <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
-                  {hasActiveFilters
+              <EmptyState
+                icon={ShoppingBag}
+                title="No listings found"
+                description={
+                  hasActiveFilters
                     ? 'Try adjusting your search query or category filters.'
-                    : 'Be the first to list an item for sale!'}
-                </p>
-                {hasActiveFilters && (
-                  <button
-                    onClick={() => { setSearchQuery(''); setCategoryFilter('all'); }}
-                    className="mt-4 rounded-full border border-border px-4 py-1.5 text-xs font-semibold text-foreground hover:bg-canvas transition-colors"
-                  >
-                    Clear Filters
-                  </button>
-                )}
-              </div>
+                    : 'Be the first to list an item for sale!'
+                }
+                action={
+                  hasActiveFilters
+                    ? { label: 'Clear Filters', onClick: () => { setSearchQuery(''); setCategoryFilter('all'); } }
+                    : undefined
+                }
+              />
             )}
           </div>
         </div>

@@ -483,11 +483,23 @@ audit.
       same pattern in this pass. Worth checking whether pages have a
       similarly inconsistent error-state pattern worth consolidating, or
       whether they're better left page-specific.
-- [ ] Migrate remaining pages with an ad hoc empty-state block to the new
-      shared component: `marketplace` (once its actual pattern is found),
-      `stories`, `notifications`, `leaderboard`, `admin/*`, and any others
-      not covered above — the 8 done are the highest-traffic list pages,
-      not an exhaustive sweep.
+- [x] Migrated 4 more pages to the shared `EmptyState`: `marketplace`
+      ("No listings found", with the conditional Clear Filters action),
+      `stories` ("No stories available"), `notifications` (both the
+      "All caught up" and "No unread notifications" variants), and
+      `admin/moderation` ("The moderation queue is empty").
+      Deliberately **not** migrated: `leaderboard`'s empty state uses the
+      same distinct branded icon-badge treatment as `BookmarkedPostList`
+      (a colored circle behind the icon) plus a `Link`-based action —
+      that's a real design choice already noted as intentional, not an
+      inconsistency. `admin/users`' "No users found" lives inside a
+      `<table>` row (`<td colSpan>`), not a card layout — `EmptyState`'s
+      markup doesn't fit there. The three admin pages' "Access Denied"
+      guards are a distinct concept (an auth guard, not an empty list) and
+      were left as their own pattern rather than force-fit into
+      `EmptyState`.
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
+      `jest --ci` (601/601 passing).
 - [x] **Mobile pass, part 1 — found and fixed a real layout bug in the
       highest-traffic mobile flow (opening a chat).** Swept `src/app` and
       `src/components` for the two most common mobile anti-patterns

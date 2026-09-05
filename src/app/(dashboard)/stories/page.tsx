@@ -5,7 +5,8 @@ import { useQuery } from '@/lib/api';
 import { api } from '@/lib/api';
 import { StoryPreviewCard } from '../../(components)/stories/StoryPreviewCard';
 import { StoryComposer } from '@/components/stories/StoryComposer';
-import { Loader2, Plus } from 'lucide-react';
+import { Camera, Loader2, Plus } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 
 const StoriesPageSkeleton = () => (
  <div className="max-w-4xl mx-auto py-8 px-4">
@@ -38,10 +39,11 @@ function StoriesPageContent() {
  <Plus className="h-4 w-4" /> Create Story
  </button>
  </div>
- <div className="text-center py-16 text-muted-foreground">
- <h3 className="text-lg font-semibold">No stories available</h3>
- <p className="text-sm mt-2">Follow more users or create your own story!</p>
- </div>
+ <EmptyState
+ icon={Camera}
+ title="No stories available"
+ description="Follow more users or create your own story!"
+ />
  <StoryComposer isOpen={composerOpen} onClose={() => setComposerOpen(false)} />
  </div>
  );
