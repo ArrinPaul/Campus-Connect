@@ -125,7 +125,9 @@ describe("Notification triggers", () => {
           return {
             select: jest.fn(() => ({
               eq: jest.fn(() => ({
-                neq: jest.fn().mockResolvedValue({ data: [{ user_id: "recipient-1" }, { user_id: "recipient-2" }] }),
+                neq: jest.fn(() => ({
+                  or: jest.fn().mockResolvedValue({ data: [{ user_id: "recipient-1" }, { user_id: "recipient-2" }] }),
+                })),
               })),
             })),
           }
@@ -148,6 +150,57 @@ describe("Notification triggers", () => {
     )
     expect(mockCreateNotification).toHaveBeenCalledWith(
       expect.objectContaining({ user_id: "recipient-2", type: "message", from_user_id: "sender-1" })
+    )
+  })
+
+  it("sendMessage does not notify a participant who muted the conversation", async () => {
+    const supabase = {
+      from: jest.fn((table: string) => {
+        if (table === "conversations") {
+          return {
+            select: jest.fn(() => ({ eq: jest.fn(() => ({ limit: jest.fn().mockResolvedValue({ data: [{ id: "conv-1" }] }) })) })),
+            update: jest.fn(() => ({ eq: jest.fn(() => ({ then: (res: any) => res(null, null) })) })),
+          }
+        }
+        if (table === "messages") {
+          return {
+            insert: jest.fn(() => ({
+              select: jest.fn().mockResolvedValue({ data: [{ id: "msg-1", conversation_id: "conv-1", sender_id: "sender-1", content: "hi" }], error: null }),
+            })),
+          }
+        }
+        if (table === "conversation_participants") {
+          return {
+            select: jest.fn(() => ({
+              eq: jest.fn(() => ({
+                neq: jest.fn(() => ({
+                  // The .or() filter is applied server-side in real Supabase;
+                  // the mock emulates its effect by only returning the
+                  // unmuted participant.
+                  or: jest.fn().mockResolvedValue({ data: [{ user_id: "recipient-1" }] }),
+                })),
+              })),
+            })),
+          }
+        }
+        if (table === "users") {
+          return { select: jest.fn(() => ({ eq: jest.fn(() => ({ single: jest.fn().mockResolvedValue({ data: { name: "Sender" } }) })) })) }
+        }
+        throw new Error(`Unexpected table: ${table}`)
+      }),
+    }
+    jest.doMock("@/lib/supabase/server", () => ({ createClient: jest.fn(() => Promise.resolve(supabase)) }))
+    jest.resetModules()
+    const { sendMessage: sendMessageFresh } = await import("@/server/db/messages")
+
+    await sendMessageFresh({ conversation_id: "conv-1", sender_id: "sender-1", content: "hi" })
+
+    expect(mockCreateNotification).toHaveBeenCalledTimes(1)
+    expect(mockCreateNotification).toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: "recipient-1", type: "message" })
+    )
+    expect(mockCreateNotification).not.toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: "recipient-2" })
     )
   })
 

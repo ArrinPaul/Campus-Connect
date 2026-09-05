@@ -412,9 +412,17 @@ audit.
       never block message delivery itself. Not yet respecting per-conversation
       mute (`toggleMute` exists in messages.ts but isn't checked before
       notifying) — tracked as a follow-up, not blocking.
-- [ ] Respect conversation mute state before sending a message notification
-      (`toggleMute` in messages.ts sets it but `notifyOtherParticipants`
-      doesn't check it yet).
+- [x] Respect conversation mute state before sending a message notification
+      — `notifyOtherParticipants` (messages.ts) now filters participants with
+      `.or("muted.is.null,muted.eq.false")` alongside the existing
+      `neq(sender)` filter, so a muted participant no longer gets a
+      notification for new messages in that conversation (still receives the
+      message itself via realtime/fetch — only the notification is
+      suppressed). Added a regression test in
+      `notification-triggers.test.ts` asserting a muted participant is
+      skipped while an unmuted one still gets notified.
+      Verified with a clean `tsc --noEmit`, `next lint`, `jest --ci`
+      (595/595 passing).
 - [x] Messaging: read receipts + unread-per-conversation badge — both done
       via §4b (unread count fixed; read receipts now live after the
       ChatArea swap). Kept here as a pointer rather than duplicating detail.

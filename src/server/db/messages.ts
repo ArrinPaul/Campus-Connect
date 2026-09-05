@@ -112,9 +112,10 @@ async function notifyOtherParticipants(
   try {
     const { data: participants } = await supabase
       .from("conversation_participants")
-      .select("user_id")
+      .select("user_id, muted")
       .eq("conversation_id", conversationId)
       .neq("user_id", senderId)
+      .or("muted.is.null,muted.eq.false")
     if (!participants || participants.length === 0) return
 
     const { data: sender } = await supabase.from("users").select("name").eq("id", senderId).single()
