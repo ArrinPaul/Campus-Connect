@@ -82,6 +82,18 @@ export async function getUserCommunities(userId: string) {
 export async function inviteMember(communityId: string, inviterId: string, inviteeId: string) {
   const supabase = await getSupabase()
   await supabase.from("community_invites").insert({ community_id: communityId, inviter_id: inviterId, invitee_id: inviteeId })
+
+  const { data: community } = await supabase.from("communities").select("name").eq("id", communityId).single()
+  const { data: inviter } = await supabase.from("users").select("name").eq("id", inviterId).single()
+  const { createNotification } = await import("@/server/db/notifications")
+  await createNotification({
+    user_id: inviteeId,
+    type: "community_invite",
+    message: `${inviter?.name ?? "Someone"} invited you to join ${community?.name ?? "a community"}`,
+    reference_id: communityId,
+    reference_type: "community",
+    from_user_id: inviterId,
+  })
 }
 
 export async function respondToInvite(inviteId: string, status: "accepted" | "declined") {
@@ -142,6 +154,17 @@ export async function approveMember(communityId: string, requestId: string, appr
   if (!request) return { error: "Join request not found", status: 404 }
 
   await respondToInvite(requestId, "accepted")
+
+  const { data: community } = await supabase.from("communities").select("name").eq("id", communityId).single()
+  const { createNotification } = await import("@/server/db/notifications")
+  await createNotification({
+    user_id: request.invitee_id,
+    type: "community_approved",
+    message: `Your request to join ${community?.name ?? "the community"} was approved`,
+    reference_id: communityId,
+    reference_type: "community",
+  })
+
   return { success: true }
 }
 

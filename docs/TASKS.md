@@ -245,9 +245,14 @@ audit.
       `sendMessage`, which already notifies (see the messages fix above).
       **Not yet done:** community invites/approvals still have no
       notification trigger — tracked below.
-- [ ] Add notification triggers for community invites (`inviteMember`) and
-      membership approval (`approveMember`) in `server/db/communities.ts` —
-      same pattern as the rest of this list, not yet done.
+- [x] Added notification triggers for community invites (`inviteMember` —
+      notifies the invitee) and membership approval (`approveMember` —
+      notifies the requester once approved) in `server/db/communities.ts`.
+      2 more tests in `notification-triggers.test.ts` (9 total in that
+      file). This closes out the notification-trigger gaps identified in
+      this session — every core social action now notifies: likes,
+      comments, replies, follows, mentions, messages, Q&A answers/accepted
+      answers, event RSVPs, community invites/approvals.
 - [x] Checked whether `api/messages` (send) notifies the recipient — it
       didn't, same root cause as everything else above. Fixed: `sendMessage`
       (messages.ts) now notifies every other conversation participant (not

@@ -17,6 +17,7 @@ import { createPost } from "@/server/db/posts"
 import { sendMessage } from "@/server/db/messages"
 import { answerQuestion, acceptAnswer } from "@/server/db/content"
 import { attendEvent } from "@/server/db/events-jobs"
+import { inviteMember, approveMember } from "@/server/db/communities"
 
 const mockCreateNotification = jest.fn().mockResolvedValue(undefined)
 jest.mock("@/server/db/notifications", () => ({
@@ -233,6 +234,58 @@ describe("Notification triggers", () => {
 
     expect(mockCreateNotification).toHaveBeenCalledWith(
       expect.objectContaining({ user_id: "organizer-1", type: "event_rsvp", from_user_id: "attendee-1" })
+    )
+  })
+
+  it("inviteMember notifies the invitee", async () => {
+    const supabase = {
+      from: jest.fn((table: string) => {
+        if (table === "community_invites") return { insert: jest.fn().mockResolvedValue({ error: null }) }
+        if (table === "communities") return { select: jest.fn(() => ({ eq: jest.fn(() => ({ single: jest.fn().mockResolvedValue({ data: { name: "Robotics Club" } }) })) })) }
+        if (table === "users") return { select: jest.fn(() => ({ eq: jest.fn(() => ({ single: jest.fn().mockResolvedValue({ data: { name: "Inviter" } }) })) })) }
+        throw new Error(`Unexpected table: ${table}`)
+      }),
+    }
+    jest.doMock("@/lib/supabase/server", () => ({ createClient: jest.fn(() => Promise.resolve(supabase)) }))
+    jest.resetModules()
+    const { inviteMember: inviteMemberFresh } = await import("@/server/db/communities")
+
+    await inviteMemberFresh("community-1", "inviter-1", "invitee-1")
+
+    expect(mockCreateNotification).toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: "invitee-1", type: "community_invite", from_user_id: "inviter-1" })
+    )
+  })
+
+  it("approveMember notifies the requester once approved", async () => {
+    const supabase = {
+      from: jest.fn((table: string) => {
+        if (table === "community_members") {
+          return {
+            select: jest.fn(() => ({ eq: jest.fn(() => ({ eq: jest.fn(() => ({ single: jest.fn().mockResolvedValue({ data: { role: "admin" } }) })) })) })),
+            insert: jest.fn().mockResolvedValue({ error: null }),
+          }
+        }
+        if (table === "community_invites") {
+          return {
+            select: jest.fn(() => ({ eq: jest.fn(() => ({ eq: jest.fn(() => ({ single: jest.fn().mockResolvedValue({ data: { id: "req-1", invitee_id: "requester-1", community_id: "community-1" }, error: null }) })) })) })),
+            update: jest.fn(() => ({ eq: jest.fn(() => ({ select: jest.fn(() => ({ single: jest.fn().mockResolvedValue({ data: { community_id: "community-1", invitee_id: "requester-1" } }) })) })) })),
+          }
+        }
+        if (table === "communities") return { select: jest.fn(() => ({ eq: jest.fn(() => ({ single: jest.fn().mockResolvedValue({ data: { name: "Robotics Club" } }) })) })) }
+        throw new Error(`Unexpected table: ${table}`)
+      }),
+      rpc: jest.fn().mockResolvedValue({ error: null }),
+    }
+    jest.doMock("@/lib/supabase/server", () => ({ createClient: jest.fn(() => Promise.resolve(supabase)) }))
+    jest.resetModules()
+    const { approveMember: approveMemberFresh } = await import("@/server/db/communities")
+
+    const result = await approveMemberFresh("community-1", "req-1", "admin-1")
+
+    expect(result).toEqual({ success: true })
+    expect(mockCreateNotification).toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: "requester-1", type: "community_approved", reference_id: "community-1" })
     )
   })
 })
