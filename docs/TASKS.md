@@ -176,6 +176,16 @@ audit.
       `remote`/`duration` (jobs) get real columns via a migration, or get
       removed from their forms — currently silently dropped, same open
       decision as `questions.course`.
+- [x] Checked the marketplace **create** form (`CreateListingModal.tsx`)
+      against this same pattern — 5th hit: it sends `condition` and
+      `university`, neither of which exist on `marketplace_listings`. Not
+      currently broken like the other three, though: the Zod schema added
+      earlier this session for `api/marketplace` POST doesn't declare those
+      fields, and Zod's default `.parse()` silently strips unrecognized
+      keys rather than erroring — so the listing still saves, it just
+      quietly loses the condition/university the user typed. Same "needs a
+      migration or form change" decision as the other fields above, just
+      non-crashing.
 - [ ] Confirm no client-side code can call `notifications` insert directly
       (RLS policy is currently `WITH CHECK (true)`); tighten policy if any
       client path exists.
