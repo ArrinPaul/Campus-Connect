@@ -83,14 +83,16 @@ export async function inviteMember(communityId: string, inviterId: string, invit
   const supabase = await getSupabase()
   await supabase.from("community_invites").insert({ community_id: communityId, inviter_id: inviterId, invitee_id: inviteeId })
 
-  const { data: community } = await supabase.from("communities").select("name").eq("id", communityId).single()
+  const { data: community } = await supabase.from("communities").select("name, slug").eq("id", communityId).single()
   const { data: inviter } = await supabase.from("users").select("name").eq("id", inviterId).single()
   const { createNotification } = await import("@/server/db/notifications")
   await createNotification({
     user_id: inviteeId,
     type: "community_invite",
     message: `${inviter?.name ?? "Someone"} invited you to join ${community?.name ?? "a community"}`,
-    reference_id: communityId,
+    // The live community route is /c/[slug], not /c/[id] — store the slug
+    // so getNotificationUrl's link actually resolves.
+    reference_id: community?.slug ?? communityId,
     reference_type: "community",
     from_user_id: inviterId,
   })
@@ -155,13 +157,14 @@ export async function approveMember(communityId: string, requestId: string, appr
 
   await respondToInvite(requestId, "accepted")
 
-  const { data: community } = await supabase.from("communities").select("name").eq("id", communityId).single()
+  const { data: community } = await supabase.from("communities").select("name, slug").eq("id", communityId).single()
   const { createNotification } = await import("@/server/db/notifications")
   await createNotification({
     user_id: request.invitee_id,
     type: "community_approved",
     message: `Your request to join ${community?.name ?? "the community"} was approved`,
-    reference_id: communityId,
+    // See inviteMember above — /c/[slug] needs the slug, not the id.
+    reference_id: community?.slug ?? communityId,
     reference_type: "community",
   })
 

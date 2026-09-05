@@ -241,7 +241,7 @@ describe("Notification triggers", () => {
     const supabase = {
       from: jest.fn((table: string) => {
         if (table === "community_invites") return { insert: jest.fn().mockResolvedValue({ error: null }) }
-        if (table === "communities") return { select: jest.fn(() => ({ eq: jest.fn(() => ({ single: jest.fn().mockResolvedValue({ data: { name: "Robotics Club" } }) })) })) }
+        if (table === "communities") return { select: jest.fn(() => ({ eq: jest.fn(() => ({ single: jest.fn().mockResolvedValue({ data: { name: "Robotics Club", slug: "robotics-club" } }) })) })) }
         if (table === "users") return { select: jest.fn(() => ({ eq: jest.fn(() => ({ single: jest.fn().mockResolvedValue({ data: { name: "Inviter" } }) })) })) }
         throw new Error(`Unexpected table: ${table}`)
       }),
@@ -253,7 +253,9 @@ describe("Notification triggers", () => {
     await inviteMemberFresh("community-1", "inviter-1", "invitee-1")
 
     expect(mockCreateNotification).toHaveBeenCalledWith(
-      expect.objectContaining({ user_id: "invitee-1", type: "community_invite", from_user_id: "inviter-1" })
+      // reference_id must be the slug ("robotics-club"), not the community's
+      // id ("community-1") — the live community route is /c/[slug].
+      expect.objectContaining({ user_id: "invitee-1", type: "community_invite", from_user_id: "inviter-1", reference_id: "robotics-club" })
     )
   })
 
@@ -272,7 +274,7 @@ describe("Notification triggers", () => {
             update: jest.fn(() => ({ eq: jest.fn(() => ({ select: jest.fn(() => ({ single: jest.fn().mockResolvedValue({ data: { community_id: "community-1", invitee_id: "requester-1" } }) })) })) })),
           }
         }
-        if (table === "communities") return { select: jest.fn(() => ({ eq: jest.fn(() => ({ single: jest.fn().mockResolvedValue({ data: { name: "Robotics Club" } }) })) })) }
+        if (table === "communities") return { select: jest.fn(() => ({ eq: jest.fn(() => ({ single: jest.fn().mockResolvedValue({ data: { name: "Robotics Club", slug: "robotics-club" } }) })) })) }
         throw new Error(`Unexpected table: ${table}`)
       }),
       rpc: jest.fn().mockResolvedValue({ error: null }),
@@ -285,7 +287,8 @@ describe("Notification triggers", () => {
 
     expect(result).toEqual({ success: true })
     expect(mockCreateNotification).toHaveBeenCalledWith(
-      expect.objectContaining({ user_id: "requester-1", type: "community_approved", reference_id: "community-1" })
+      // Same slug-vs-id note as the inviteMember test above.
+      expect.objectContaining({ user_id: "requester-1", type: "community_approved", reference_id: "robotics-club" })
     )
   })
 })

@@ -370,12 +370,13 @@ audit.
       via a mock in the page test) and `src/lib/notifications/url.test.ts`.
       Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
       `jest --ci` (594/594 passing).
-      **Known remaining gap, not fixed in this pass:** community
-      notifications (`inviteMember`, `approveMember`) store the
-      community's UUID in `reference_id`, but the live community route is
-      `/c/[slug]` — `getNotificationUrl` currently builds `/c/${reference_id}`,
-      which won't resolve. Needs either storing the slug in `reference_id`
-      for those two triggers, or changing the route to accept an ID lookup.
+      **Resolved as a same-day follow-up:** `inviteMember` and
+      `approveMember` now select the community's `slug` (alongside `name`,
+      already fetched) and store that in `reference_id` instead of the raw
+      UUID, so `getNotificationUrl`'s `/c/${reference_id}` actually
+      resolves against the live `/c/[slug]` route. Updated the two
+      existing tests in `notification-triggers.test.ts` to assert on the
+      slug rather than the id.
 - [x] Extended notification triggers to three more real domains:
       - `answerQuestion` (content.ts) — notifies the question author when
         someone answers, skips self-answers.
