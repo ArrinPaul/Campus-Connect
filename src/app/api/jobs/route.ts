@@ -5,13 +5,13 @@ import { NextResponse } from "next/server"
 import { getJobs, createJob } from "@/server/db/events-jobs"
 import { z } from "zod"
 
-// PostJobModal.tsx sends type: 'job' | 'internship', skillsRequired, remote,
-// duration — but the jobs table's `type` CHECK constraint only allows
-// full_time/part_time/internship/contract ('job' would violate it and fail
-// the insert), the column is `skills` not `skillsRequired`, and remote/
-// duration have no matching column (same frontend/schema drift pattern as
-// research paper upload, questions.course, and event creation found
-// earlier this session — see docs/TASKS.md §2).
+// PostJobModal.tsx sends type: 'job' | 'internship' and skillsRequired --
+// the jobs table's `type` CHECK constraint only allows full_time/part_time/
+// internship/contract ('job' would violate it and fail the insert), and the
+// column is `skills` not `skillsRequired`. remote/duration columns were
+// added in migration 20240105000000 (see docs/TASKS.md §2 for the full
+// history -- this route used to fail on every full-time posting before
+// the type mapping was added).
 const createJobSchema = z.object({
   title: z.string().trim().min(2, "Title must be at least 2 characters").max(200),
   company: z.string().trim().min(1, "Company is required").max(200),
@@ -50,16 +50,17 @@ export async function POST(req: Request) {
 
     const parsed = await parseBody(req, createJobSchema)
     if ("response" in parsed) return parsed.response
-    const { title, company, description, location, type, salary, skillsRequired } = parsed.data
-    // remote and duration intentionally dropped — no matching column on
-    // jobs (see schema note above). 'job' maps to 'full_time' since that's
-    // the DB's valid default for a non-internship posting.
+    const { title, company, description, location, type, remote, duration, salary, skillsRequired } = parsed.data
+    // 'job' maps to 'full_time' since that's the DB's valid default for a
+    // non-internship posting (see schema note above).
     const job = await createJob({
       title,
       company,
       description,
       location,
       type: type === "internship" ? "internship" : "full_time",
+      remote,
+      duration,
       salary,
       skills: skillsRequired,
       posted_by: userId,

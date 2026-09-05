@@ -122,12 +122,10 @@ audit.
       **Found in the process:** `api/questions` POST was forwarding a
       `course` field from the frontend into an insert against a `questions`
       table that has no `course` column — would have errored in production
-      the first time a real client sent one. Fixed by dropping the field at
-      the API boundary; a real fix is either adding the column or removing
-      it from the frontend form (tracked below).
-- [ ] Add a `course` column to `questions` (or remove the field from
-      `AskQuestionModal.tsx`) to resolve the frontend/schema mismatch found
-      above.
+      the first time a real client sent one. Fixed at the time by dropping
+      the field at the API boundary; properly resolved later in the session
+      by adding the column via migration (see below) and forwarding it for
+      real.
 - [x] **Extended Zod validation to the remaining write routes — and found
       that 3 of the 5 were completely broken against the live schema, not
       just unvalidated.** Same frontend/schema drift pattern as the
@@ -144,18 +142,20 @@ audit.
         `event_type`/`start_time`/`end_time` and have no virtual-link or
         attendee-cap column at all. **This route would 400 on every single
         submission** (Postgrest rejects unknown columns) — event creation
-        was fully broken, not just unvalidated. Fixed: map fields and
-        convert timestamps to ISO strings; drop the two unsupported fields.
+        was fully broken, not just unvalidated. Fixed: map fields, convert
+        timestamps to ISO strings, and (once the migration below landed)
+        forward `virtualLink`/`maxAttendees` to real columns.
       - `api/jobs` (create) — frontend's `type` field is `'job' |
         'internship'`, but the `jobs.type` CHECK constraint only allows
         `full_time`/`part_time`/`internship`/`contract` — **`'job'` would
         violate the constraint and fail the insert on every full-time
         posting**, the most common case. Also `skillsRequired` needed
-        mapping to the `skills` column; `remote`/`duration` have no column.
-        Fixed: map `'job'` → `'full_time'`, `skillsRequired` → `skills`,
-        drop `remote`/`duration`.
-      - `api/marketplace/update` — frontend sends a `condition` field with
-        no matching column. Fixed: accept and drop it.
+        mapping to the `skills` column. Fixed: map `'job'` → `'full_time'`,
+        `skillsRequired` → `skills`, and (once the migration below landed)
+        forward `remote`/`duration` to real columns.
+      - `api/marketplace/update` — frontend sends a `condition` field.
+        Fixed: validated, and (once the migration below landed) forwarded
+        to a real column.
       - `api/resources` (upload) — this one only needed validation added
         (no drift found), now has a proper schema.
       Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
@@ -172,20 +172,32 @@ audit.
       actual table columns rather than assuming the ones not yet touched
       are fine — this pattern has had a 100% hit rate everywhere checked
       so far.
-- [ ] Decide whether `virtualLink`/`maxAttendees` (events) and
-      `remote`/`duration` (jobs) get real columns via a migration, or get
-      removed from their forms — currently silently dropped, same open
-      decision as `questions.course`.
-- [x] Checked the marketplace **create** form (`CreateListingModal.tsx`)
-      against this same pattern — 5th hit: it sends `condition` and
-      `university`, neither of which exist on `marketplace_listings`. Not
-      currently broken like the other three, though: the Zod schema added
-      earlier this session for `api/marketplace` POST doesn't declare those
-      fields, and Zod's default `.parse()` silently strips unrecognized
-      keys rather than erroring — so the listing still saves, it just
-      quietly loses the condition/university the user typed. Same "needs a
-      migration or form change" decision as the other fields above, just
-      non-crashing.
+- [x] **Resolved all 5 pending schema-drift decisions with one additive
+      migration** rather than leaving them open or deleting working form
+      fields: `supabase/migrations/20240105000000_frontend_schema_drift_fixes.sql`
+      adds `questions.course`, `events.virtual_link` + `events.max_attendees`,
+      `jobs.remote` + `jobs.duration`, and
+      `marketplace_listings.condition` (CHECK-constrained to the same 5
+      values `CreateListingModal.tsx` uses) + `marketplace_listings.university`.
+      All columns are nullable with no default required — safe against
+      existing rows. Updated all 5 routes (`api/questions`, `api/events`,
+      `api/jobs`, `api/marketplace`, `api/marketplace/update`) to actually
+      forward these fields instead of dropping them.
+      **Important caveat: this migration exists in the repo but has NOT
+      been applied to any live database** — this session has no Supabase
+      access to run it. Someone needs to run
+      `supabase db push` (or apply it via the SQL editor in the Supabase
+      dashboard) against the real project before these fields will
+      actually persist; until then the routes will fail on these new
+      fields exactly the way the old ones did before this fix (unknown
+      column), for `course`/`virtual_link`/`max_attendees`/`remote`/
+      `duration` specifically — `condition`/`university` will just be
+      silently dropped again by Zod, same as before, since those aren't
+      new failure points.
+      Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
+      `jest --ci` (567/567) — none of that can verify the migration itself
+      runs cleanly against a real database, only that the TypeScript/route
+      side is consistent with it.
 - [ ] Confirm no client-side code can call `notifications` insert directly
       (RLS policy is currently `WITH CHECK (true)`); tighten policy if any
       client path exists.

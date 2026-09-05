@@ -5,6 +5,8 @@ import { NextResponse } from "next/server"
 import { getListings, createListing } from "@/server/db/misc"
 import { z } from "zod"
 
+// CreateListingModal.tsx also sends `condition` and `university` — both
+// columns added in migration 20240105000000 (see docs/TASKS.md §2).
 const createListingSchema = z.object({
   title: z.string().trim().min(2, "Title must be at least 2 characters").max(200),
   description: z.string().trim().max(5000).default(""),
@@ -12,6 +14,8 @@ const createListingSchema = z.object({
   category: z.enum(["books", "electronics", "furniture", "services", "other"]).default("other"),
   images: z.array(z.string().url()).max(10).default([]),
   contact_info: z.string().trim().max(500).optional(),
+  condition: z.enum(["new", "like_new", "good", "fair", "poor"]).optional(),
+  university: z.string().trim().max(200).optional(),
 })
 
 // GET /api/marketplace?limit=...&offset=...&category=...

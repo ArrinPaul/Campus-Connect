@@ -5,11 +5,10 @@ import { NextResponse } from "next/server"
 import { updateListing } from "@/server/db/misc"
 import { z } from "zod"
 
-// EditListingModal.tsx sends a `condition` field the marketplace_listings
-// table has no column for (same frontend/schema drift pattern found
-// repeatedly this session — see docs/TASKS.md §2). Accepting and
-// intentionally dropping it here rather than forwarding it to an update
-// that would 400 on an unknown column.
+// EditListingModal.tsx sends a `condition` field -- the `condition` and
+// `university` columns were added in migration 20240105000000 to match
+// what CreateListingModal.tsx/EditListingModal.tsx actually send (see
+// docs/TASKS.md §2 for the full history).
 const updateListingSchema = z.object({
   title: z.string().trim().min(2, "Title must be at least 2 characters").max(200).optional(),
   description: z.string().trim().max(5000).optional(),
@@ -18,7 +17,8 @@ const updateListingSchema = z.object({
   images: z.array(z.string().url()).max(10).optional(),
   contact_info: z.string().trim().max(500).optional(),
   status: z.enum(["active", "sold", "removed"]).optional(),
-  condition: z.string().optional(),
+  condition: z.enum(["new", "like_new", "good", "fair", "poor"]).optional(),
+  university: z.string().trim().max(200).optional(),
 })
 
 // POST or PATCH /api/marketplace/update
@@ -48,9 +48,7 @@ async function handleUpdate(req: Request) {
     if (!parsed.success) {
       return NextResponse.json({ error: "Validation failed", issues: parsed.error.issues }, { status: 400 })
     }
-    const { condition: _condition, ...updates } = parsed.data
-
-    const result = await updateListing(listingId, userId, updates)
+    const result = await updateListing(listingId, userId, parsed.data)
 
     if ("error" in result) {
       return NextResponse.json({ error: result.error }, { status: result.status })

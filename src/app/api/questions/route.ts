@@ -39,11 +39,8 @@ export async function POST(req: Request) {
 
     const parsed = await parseBody(req, createQuestionSchema)
     if ("response" in parsed) return parsed.response
-    const { title, content, tags } = parsed.data
-    // Note: the `questions` table has no `course` column (frontend sends one,
-    // schema doesn't have it — see docs/TASKS.md §2) — intentionally dropped
-    // here rather than forwarded to the insert, which would error.
-    const question = await createQuestion({ title, content, tags, author_id: userId })
+    const { title, content, course, tags } = parsed.data
+    const question = await createQuestion({ title, content, course, tags, author_id: userId })
     return NextResponse.json(question)
   } catch (err) {
     return internalError(err)

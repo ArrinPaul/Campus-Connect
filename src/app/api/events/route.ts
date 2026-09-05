@@ -6,13 +6,11 @@ import { getEvents, createEvent } from "@/server/db/events-jobs"
 import { z } from "zod"
 
 // The frontend (CreateEventModal.tsx) sends camelCase fields that don't
-// match the events table's snake_case columns at all: eventType/startDate/
-// endDate need mapping to event_type/start_time/end_time, and
-// virtualLink/maxAttendees have no matching column (same kind of
-// frontend/schema drift as research paper upload and questions.course
-// found earlier this session — see docs/TASKS.md §2). Without this route
-// mapping the fields, creating an event 400s against the live table
-// (unknown column) every time.
+// match the events table's snake_case columns: eventType/startDate/endDate
+// need mapping to event_type/start_time/end_time. virtual_link/
+// max_attendees columns were added in migration 20240105000000 to match
+// virtualLink/maxAttendees (see docs/TASKS.md §2 for the full history —
+// this route used to 400 on every submission before that migration).
 const createEventSchema = z.object({
   title: z.string().trim().min(2, "Title must be at least 2 characters").max(200),
   description: z.string().trim().max(5000).default(""),
@@ -49,9 +47,7 @@ export async function POST(req: Request) {
 
     const parsed = await parseBody(req, createEventSchema)
     if ("response" in parsed) return parsed.response
-    const { title, description, eventType, startDate, endDate, location, communityId } = parsed.data
-    // virtualLink and maxAttendees intentionally dropped — no matching
-    // column on events (see schema note above).
+    const { title, description, eventType, startDate, endDate, location, virtualLink, maxAttendees, communityId } = parsed.data
     const event = await createEvent({
       title,
       description,
@@ -59,6 +55,8 @@ export async function POST(req: Request) {
       start_time: new Date(startDate).toISOString(),
       end_time: endDate ? new Date(endDate).toISOString() : null,
       location,
+      virtual_link: virtualLink,
+      max_attendees: maxAttendees,
       community_id: communityId,
       created_by: userId,
     })
