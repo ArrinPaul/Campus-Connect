@@ -1026,3 +1026,59 @@ feed) with a fresh set of eyes on each, then fixed the confirmed bugs.
       Added `src/tests/admin-moderation-users.test.ts` (11 tests).
       Verified with a clean `tsc --noEmit`, `next lint`, `npm run build`,
       `jest --ci` (664/664 passing).
+
+## §8 — Code-side blockers cleared (2026-09-19)
+
+Everything from the §7 sweep that could be fixed in code without DB access,
+credentials or a browser. Verified with `tsc`, `next lint`, `jest --ci`
+(694/694). None of it has been exercised against a live database or in a
+browser.
+
+- [x] **Calls were broken end to end.** `ChatArea` sent `conversationId`
+      but `POST /api/calls` needs `recipientId` (400 every time) and read
+      `result.callId`, which the route never returned. `/api/calls/incoming`
+      returned one object while `IncomingCallNotification` called
+      `.filter` on it (crash the moment a call arrived), read fields the
+      row doesn't have, and unmounted the modal on accept because an
+      accepted call is no longer "ringing". `CallModal` treated "no data
+      yet" as "call ended". Any user could accept/reject/end any call by
+      id — status changes are now participant-scoped (recipient-only for
+      accept/reject). Call polling is 2–3s via a new optional
+      `useQuery` `refetchInterval` (was 30s). `src/tests/calls-routes.test.ts`.
+      **Still needs:** a TURN server (§3) — calls across restrictive NATs
+      will not connect without one.
+- [x] **Job detail page never loaded** (sent `jobId` to a route reading
+      `id`; read `createdAt`/`skillsRequired`/`viewerApplication`, none of
+      which exist). Fixed, and posters now get an Applicants panel with
+      cover letter/resume and reviewed/accepted/rejected controls
+      (poster-only `PATCH /api/jobs/job-applications`).
+- [x] **Marketplace purchase requests** — the buy/accept/decline UI called
+      four routes with no table behind them. Added
+      `marketplace_transactions` (migration `20240111`), db functions,
+      `purchase`/`complete`/`cancel`/`transactions` routes and
+      notifications. It is a request record, not a payment; the "secure
+      escrow" copy was removed. Also fixed `ListingCard`/detail/edit reading
+      `_id`/`createdAt`/`sellerId`/`avatarUrl` (card linked to
+      `/marketplace/undefined`; edit sent an undefined id). Prices were
+      stored in cents by the create form but shown as dollars — now dollars
+      everywhere. **Existing listings created through the modal are 100x
+      too high and need a one-off `UPDATE marketplace_listings SET price =
+      price / 100`** (only if any were created against a live DB).
+- [x] **Resource detail page** — same field drift plus a rating widget with
+      no table or route: added `resource_ratings` (migration `20240112`),
+      `POST /api/resources/rate`, average/viewer rating on the single
+      route, owner edit form. Download was a POST mapping to a GET-only
+      route. `updateResource` spread the raw request body into the update
+      (caller could overwrite `uploaded_by`/`download_count`/`file_url`) —
+      now whitelisted to title/description/course.
+- [x] **`useQuery` now resolves a 404 to `null`** instead of throwing and
+      staying `undefined` forever. Eleven pages already did
+      `if (x === null) notFound()` (communities, events, jobs, marketplace,
+      q-and-a, research, resources, stories, …) but that branch was
+      unreachable, so an unknown id showed a permanent skeleton. Risk to
+      watch: a page that calls `.map`/`.length` on a query whose route can
+      404 will now get `null` instead of hanging.
+- [ ] Rolling `useQueryError` out to the remaining list pages (only
+      `/notifications` uses it).
+- [ ] Apply migrations `20240105`–`20240112` to the live database (8 files,
+      none applied), then re-verify the features above against it.

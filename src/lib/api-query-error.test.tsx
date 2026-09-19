@@ -70,3 +70,22 @@ describe("useQueryError", () => {
     expect(global.fetch).toHaveBeenCalledTimes(1)
   })
 })
+
+describe("useQuery on a 404", () => {
+  const originalFetch = global.fetch
+  afterEach(() => { global.fetch = originalFetch })
+
+  it("resolves null (not-found) instead of staying undefined forever", async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 404, json: async () => ({ error: "nope" }) }) as any
+    const { result } = renderHook(() => ({ data: useQuery(endpoint, {}), error: useQueryError(endpoint, {}) }), { wrapper })
+    await waitFor(() => expect(result.current.data).toBeNull())
+    expect(result.current.error).toBeNull()
+  })
+
+  it("still surfaces other failures as errors, with data left undefined", async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 500, json: async () => ({ error: "boom" }) }) as any
+    const { result } = renderHook(() => ({ data: useQuery(endpoint, {}), error: useQueryError(endpoint, {}) }), { wrapper })
+    await waitFor(() => expect(result.current.error).not.toBeNull())
+    expect(result.current.data).toBeUndefined()
+  })
+})

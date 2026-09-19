@@ -64,6 +64,9 @@ export function useQuery<T = any>(
     queryKey: [endpoint?._path, args],
     queryFn: async () => {
       const res = await fetch(url, { credentials: "include" })
+      // A 404 means "no such record": resolve null so pages can render not-found
+      // instead of sitting on their loading state forever.
+      if (res.status === 404) return null as T
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: res.statusText }))
         throw new Error(err.error || "Query failed")
@@ -113,6 +116,7 @@ export function useQueryError(
     queryKey: [endpoint?._path, args],
     queryFn: async () => {
       const res = await fetch(url, { credentials: "include" })
+      if (res.status === 404) return null
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: res.statusText }))
         throw new Error(err.error || "Query failed")
