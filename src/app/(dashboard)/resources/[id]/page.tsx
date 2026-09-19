@@ -18,10 +18,12 @@ import {
  User as UserIcon,
  Calendar,
  Trash2,
+ Pencil,
  Loader2,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 type PageProps = {
  params: { id: string };
@@ -86,7 +88,14 @@ function ResourceDetailContent({ id }: { id: string }) {
  const rateResource = useMutation(api.resources.rateResource);
  const downloadResource = useMutation(api.resources.downloadResource);
  const deleteResource = useMutation(api.resources.deleteResource);
+ const updateResource = useMutation(api.resources.updateResource);
+ const queryClient = useQueryClient();
 
+ const [isEditing, setIsEditing] = useState(false);
+ const [isSavingEdit, setIsSavingEdit] = useState(false);
+ const [editTitle, setEditTitle] = useState('');
+ const [editDescription, setEditDescription] = useState('');
+ const [editCourse, setEditCourse] = useState('');
  const [userRating, setUserRating] = useState(0);
  const [isRating, setIsRating] = useState(false);
  const [isDownloading, setIsDownloading] = useState(false);
@@ -100,13 +109,13 @@ function ResourceDetailContent({ id }: { id: string }) {
  notFound();
  }
 
- const isOwner = currentUser && resource.uploadedBy === currentUser._id;
+ const isOwner = Boolean(currentUser && resource.uploaded_by === currentUser._id);
 
  const handleRate = async (rating: number) => {
  setUserRating(rating);
  setIsRating(true);
  try {
- await rateResource({ resourceId: resource._id, rating });
+ await rateResource({ resourceId: resource.id, rating });
  toast.success(`Rated ${rating} star${rating !== 1 ? 's' : ''}`);
  } catch (err: any) {
  toast.error(err.message || 'Failed to rate');
@@ -117,11 +126,11 @@ function ResourceDetailContent({ id }: { id: string }) {
  };
 
  const handleDownload = async () => {
- if (!resource.fileUrl) return;
+ if (!resource.file_url) return;
  setIsDownloading(true);
  try {
- await downloadResource({ resourceId: resource._id });
- window.open(resource.fileUrl, '_blank');
+ const result = await downloadResource({ resourceId: resource.id });
+ window.open(result?.url ?? resource.file_url, '_blank', 'noopener,noreferrer');
  } catch (err: any) {
  toast.error(err.message || 'Failed to download');
  } finally {
@@ -129,11 +138,38 @@ function ResourceDetailContent({ id }: { id: string }) {
  }
  };
 
+ const startEdit = () => {
+ setEditTitle(resource.title ?? '');
+ setEditDescription(resource.description ?? '');
+ setEditCourse(resource.course ?? '');
+ setIsEditing(true);
+ };
+
+ const handleSaveEdit = async () => {
+ if (!editTitle.trim()) return toast.error('Title is required');
+ setIsSavingEdit(true);
+ try {
+ await updateResource({
+ resourceId: resource.id,
+ title: editTitle.trim(),
+ description: editDescription.trim(),
+ course: editCourse.trim(),
+ });
+ toast.success('Resource updated');
+ setIsEditing(false);
+ queryClient.invalidateQueries();
+ } catch (err: any) {
+ toast.error(err.message || 'Failed to update');
+ } finally {
+ setIsSavingEdit(false);
+ }
+ };
+
  const handleDelete = async () => {
  if (!confirm('Are you sure you want to delete this resource? This cannot be undone.')) return;
  setIsDeleting(true);
  try {
- await deleteResource({ resourceId: resource._id });
+ await deleteResource({ resourceId: resource.id });
  toast.success('Resource deleted');
  window.location.href = '/resources';
  } catch (err: any) {
@@ -158,6 +194,15 @@ function ResourceDetailContent({ id }: { id: string }) {
  <h1 className="text-3xl font-bold">{resource.title}</h1>
  {isOwner && (
  <button
+ onClick={startEdit}
+ className="flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-md hover:bg-muted flex-shrink-0"
+ >
+ <Pencil className="h-4 w-4" />
+ Edit
+ </button>
+ )}
+ {isOwner && (
+ <button
  onClick={handleDelete}
  disabled={isDeleting}
  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 border border-red-200 dark:border-red-900/50 rounded-md hover:bg-red-500/10 disabled:opacity-50 transition-colors flex-shrink-0"
@@ -172,18 +217,46 @@ function ResourceDetailContent({ id }: { id: string }) {
  )}
  </div>
 
+ {isEditing && (
+ <div className="rounded-lg border bg-card p-4 mb-6 space-y-3">
+ <input
+ value={editTitle}
+ onChange={(e) => setEditTitle(e.target.value)}
+ placeholder="Title"
+ maxLength={200}
+ className="w-full rounded-md border bg-canvas px-3 py-2 text-sm"
+ />
+ <input
+ value={editCourse}
+ onChange={(e) => setEditCourse(e.target.value)}
+ placeholder="Course"
+ maxLength={100}
+ className="w-full rounded-md border bg-canvas px-3 py-2 text-sm"
+ />
+ <textarea
+ value={editDescription}
+ onChange={(e) => setEditDescription(e.target.value)}
+ placeholder="Description"
+ rows={4}
+ className="w-full rounded-md border bg-canvas px-3 py-2 text-sm resize-none"
+ />
+ <div className="flex gap-2 justify-end">
+ <button onClick={() => setIsEditing(false)} disabled={isSavingEdit} className="px-3 py-1.5 text-sm border rounded-md hover:bg-muted">
+ Cancel
+ </button>
+ <button onClick={handleSaveEdit} disabled={isSavingEdit} className="px-4 py-1.5 text-sm rounded-md bg-primary text-on-primary hover:bg-primary/90 disabled:opacity-50">
+ {isSavingEdit ? 'Saving...' : 'Save changes'}
+ </button>
+ </div>
+ </div>
+ )}
+
  {/* Tags */}
  <div className="flex flex-wrap gap-2 mb-6">
  {resource.course && (
  <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
  <BookOpen className="h-3.5 w-3.5" />
  {resource.course}
- </span>
- )}
- {resource.subject && (
- <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-xs font-medium">
- <FileText className="h-3.5 w-3.5" />
- {resource.subject}
  </span>
  )}
  </div>
@@ -205,13 +278,13 @@ function ResourceDetailContent({ id }: { id: string }) {
  <span className="text-xl font-bold">{resource.rating.toFixed(1)}</span>
  </div>
  <p className="text-xs text-muted-foreground">
- {resource.ratingCount} rating{resource.ratingCount !== 1 ? 's' : ''}
+ {resource.rating_count} rating{resource.rating_count !== 1 ? 's' : ''}
  </p>
  </div>
  <div>
  <div className="flex items-center justify-center gap-1 text-primary mb-1">
  <Download className="h-5 w-5" />
- <span className="text-xl font-bold">{resource.downloadCount}</span>
+ <span className="text-xl font-bold">{resource.download_count}</span>
  </div>
  <p className="text-xs text-muted-foreground">downloads</p>
  </div>
@@ -220,17 +293,17 @@ function ResourceDetailContent({ id }: { id: string }) {
  <Calendar className="h-5 w-5" />
  </div>
  <p className="text-xs text-muted-foreground" suppressHydrationWarning>
- {formatDistanceToNow(new Date(resource.createdAt), { addSuffix: true })}
+ {formatDistanceToNow(new Date(resource.created_at), { addSuffix: true })}
  </p>
  </div>
  <div>
  <Link
- href={`/profile/${resource.uploadedBy}`}
+ href={`/profile/${resource.uploaded_by}`}
  className="flex flex-col items-center gap-1 hover:text-primary transition-colors"
  >
- {resource.uploader?.profilePicture ? (
+ {resource.uploader?.profile_picture ? (
  <Image
- src={resource.uploader.profilePicture}
+ src={resource.uploader.profile_picture}
  alt={resource.uploader.name || ''}
  width={28}
  height={28}
@@ -250,7 +323,7 @@ function ResourceDetailContent({ id }: { id: string }) {
  {/* Actions */}
  <div className="rounded-lg border bg-card p-6 space-y-5">
  {/* Download */}
- {resource.fileUrl ? (
+ {resource.file_url ? (
  <div>
  <h3 className="text-sm font-semibold mb-2">Download Resource</h3>
  <button
@@ -276,10 +349,10 @@ function ResourceDetailContent({ id }: { id: string }) {
  {/* Rating */}
  <div className="border-t pt-5">
  <h3 className="text-sm font-semibold mb-2">Rate this Resource</h3>
- <StarRating value={userRating} onChange={handleRate} disabled={isRating} />
- {userRating > 0 && (
+ <StarRating value={userRating || resource.viewer_rating || 0} onChange={handleRate} disabled={isRating || isOwner} />
+ {(userRating > 0 || resource.viewer_rating) && (
  <p className="text-xs text-muted-foreground mt-1">
- You rated this {userRating}/5
+ You rated this {userRating || resource.viewer_rating}/5
  </p>
  )}
  </div>

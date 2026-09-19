@@ -80,7 +80,7 @@ export async function uploadResource(data: any) {
   return resource
 }
 
-export async function getResourceById(resourceId: string) {
+export async function getResourceById(resourceId: string, viewerId?: string) {
   const supabase = await getSupabase()
   const { data: resource, error } = await supabase
     .from("resources")
@@ -88,7 +88,27 @@ export async function getResourceById(resourceId: string) {
     .eq("id", resourceId)
     .single()
   if (error || !resource) return null
-  return resource
+
+  const { data: ratings } = await supabase.from("resource_ratings").select("user_id, rating").eq("resource_id", resourceId)
+  const list = ratings ?? []
+  return {
+    ...resource,
+    rating: list.length ? list.reduce((sum, r) => sum + r.rating, 0) / list.length : 0,
+    rating_count: list.length,
+    viewer_rating: viewerId ? (list.find((r) => r.user_id === viewerId)?.rating ?? null) : null,
+  }
+}
+
+export async function rateResource(resourceId: string, userId: string, rating: number) {
+  const supabase = await getSupabase()
+  const { data: resource } = await supabase.from("resources").select("uploaded_by").eq("id", resourceId).single()
+  if (!resource) return { error: "Resource not found", status: 404 }
+  if (resource.uploaded_by === userId) return { error: "You cannot rate your own resource", status: 400 }
+  const { error } = await supabase
+    .from("resource_ratings")
+    .upsert({ resource_id: resourceId, user_id: userId, rating }, { onConflict: "resource_id,user_id" })
+  if (error) return { error: error.message, status: 500 }
+  return { success: true }
 }
 
 export async function updateResource(resourceId: string, userId: string, updates: Partial<{ title: string; description: string; course: string }>) {
@@ -102,9 +122,17 @@ export async function updateResource(resourceId: string, userId: string, updates
     return { error: "Forbidden: Only the uploader or admin can update this resource", status: 403 }
   }
 
+  // Whitelist: the route spreads the raw request body here, which would
+  // otherwise let a caller overwrite uploaded_by, download_count, file_url...
+  const safeUpdates: Record<string, string> = {}
+  for (const key of ["title", "description", "course"] as const) {
+    if (typeof updates[key] === "string") safeUpdates[key] = updates[key] as string
+  }
+  if (Object.keys(safeUpdates).length === 0) return { error: "No valid fields to update", status: 400 }
+
   const { data: updated, error } = await supabase
     .from("resources")
-    .update(updates)
+    .update(safeUpdates)
     .eq("id", resourceId)
     .select()
     .single()
