@@ -506,3 +506,116 @@ export async function trackAdClick(adId: string) {
     if (data) await supabase.from("ads").update({ clicks: (data.clicks ?? 0) + 1 }).eq("id", adId)
   }
 }
+
+// ─── Marketplace purchase requests ──────────────────────────────────────────
+// A request/offer record between a buyer and the seller — no payment is
+// processed by the app.
+
+type TxResult<T> = { data: T } | { error: string; status: number }
+
+export async function purchaseListing(listingId: string, buyerId: string, message?: string): Promise<TxResult<any>> {
+  const supabase = await getSupabase()
+  const { data: listing } = await supabase
+    .from("marketplace_listings")
+    .select("id, title, price, status, posted_by")
+    .eq("id", listingId)
+    .single()
+  if (!listing) return { error: "Listing not found", status: 404 }
+  if (listing.status !== "active") return { error: "This listing is no longer available", status: 400 }
+  if (listing.posted_by === buyerId) return { error: "You cannot buy your own listing", status: 400 }
+
+  const { data, error } = await supabase
+    .from("marketplace_transactions")
+    .insert({
+      listing_id: listingId,
+      buyer_id: buyerId,
+      seller_id: listing.posted_by,
+      amount: listing.price ?? 0,
+      message: message ?? null,
+    })
+    .select()
+    .single()
+  if (error) {
+    // unique partial index: one pending request per buyer per listing
+    if (error.code === "23505") return { error: "You already have a pending request for this listing", status: 409 }
+    return { error: error.message, status: 500 }
+  }
+
+  const { data: buyer } = await supabase.from("users").select("name").eq("id", buyerId).single()
+  const { createNotification } = await import("@/server/db/notifications")
+  await createNotification({
+    user_id: listing.posted_by,
+    type: "marketplace_request",
+    message: `${buyer?.name ?? "Someone"} wants to buy "${listing.title}"`,
+    reference_id: listingId,
+    reference_type: "marketplace",
+    from_user_id: buyerId,
+  }).catch(() => undefined)
+  return { data }
+}
+
+// Seller only. Buyer names/avatars are joined for the requests panel.
+export async function getListingTransactions(listingId: string, userId: string) {
+  const supabase = await getSupabase()
+  const { data, error } = await supabase
+    .from("marketplace_transactions")
+    .select("*, buyer:users!marketplace_transactions_buyer_id_fkey(id, name, username, profile_picture)")
+    .eq("listing_id", listingId)
+    .eq("seller_id", userId)
+    .order("created_at", { ascending: false })
+  if (error) return []
+  return data ?? []
+}
+
+// Seller accepts: the transaction completes, the listing is marked sold, and
+// every other pending request on it is cancelled.
+export async function completeTransaction(transactionId: string, sellerId: string): Promise<TxResult<any>> {
+  const supabase = await getSupabase()
+  const { data: tx } = await supabase.from("marketplace_transactions").select("*").eq("id", transactionId).single()
+  if (!tx || tx.seller_id !== sellerId) return { error: "Transaction not found", status: 404 }
+  if (tx.status !== "pending") return { error: "Only pending requests can be accepted", status: 400 }
+
+  const { data, error } = await supabase
+    .from("marketplace_transactions")
+    .update({ status: "completed" })
+    .eq("id", transactionId)
+    .select()
+    .single()
+  if (error) return { error: error.message, status: 500 }
+
+  await supabase.from("marketplace_listings").update({ status: "sold" }).eq("id", tx.listing_id).eq("posted_by", sellerId)
+  await supabase
+    .from("marketplace_transactions")
+    .update({ status: "cancelled" })
+    .eq("listing_id", tx.listing_id)
+    .eq("status", "pending")
+    .neq("id", transactionId)
+
+  const { createNotification } = await import("@/server/db/notifications")
+  await createNotification({
+    user_id: tx.buyer_id,
+    type: "marketplace_accepted",
+    message: "Your purchase request was accepted",
+    reference_id: tx.listing_id,
+    reference_type: "marketplace",
+    from_user_id: sellerId,
+  }).catch(() => undefined)
+  return { data }
+}
+
+// Either participant may cancel (seller = decline, buyer = withdraw).
+export async function cancelTransaction(transactionId: string, userId: string): Promise<TxResult<any>> {
+  const supabase = await getSupabase()
+  const { data: tx } = await supabase.from("marketplace_transactions").select("*").eq("id", transactionId).single()
+  if (!tx || (tx.seller_id !== userId && tx.buyer_id !== userId)) return { error: "Transaction not found", status: 404 }
+  if (tx.status !== "pending") return { error: "Only pending requests can be cancelled", status: 400 }
+
+  const { data, error } = await supabase
+    .from("marketplace_transactions")
+    .update({ status: "cancelled" })
+    .eq("id", transactionId)
+    .select()
+    .single()
+  if (error) return { error: error.message, status: 500 }
+  return { data }
+}

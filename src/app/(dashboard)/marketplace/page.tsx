@@ -143,7 +143,7 @@ export default function MarketplacePage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {filteredListings.map((listing: any) => (
-                    <div key={listing._id} className="transition-transform duration-200 hover:-translate-y-1">
+                    <div key={listing.id} className="transition-transform duration-200 hover:-translate-y-1">
                       <ListingCard listing={listing as any} />
                     </div>
                   ))}

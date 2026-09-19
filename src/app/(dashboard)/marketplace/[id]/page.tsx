@@ -35,10 +35,10 @@ export default function ListingDetailPage({ params }: PageProps) {
  const deleteListing = useMutation(api.marketplace.deleteListing);
 
  // Get transactions for seller view
- const isSeller = currentUser?._id === listing?.sellerId;
+ const isSeller = currentUser?._id === listing?.posted_by;
  const transactions = useQuery(
  api.marketplace.getListingTransactions,
- listing && isSeller ? { listingId: listing._id } : 'skip'
+ listing && isSeller ? { listingId: listing.id } : 'skip'
  );
 
  const handleMarkAsSold = async () => {
@@ -103,7 +103,7 @@ export default function ListingDetailPage({ params }: PageProps) {
  }
 
  const sellerName = listing.seller?.name || 'Anonymous';
- const sellerAvatar = listing.seller?.avatarUrl;
+ const sellerAvatar = listing.seller?.profile_picture;
 
  return (
  <div className="max-w-4xl mx-auto py-8 px-4">
@@ -127,7 +127,7 @@ export default function ListingDetailPage({ params }: PageProps) {
  </div>
 
  <h1 className="text-3xl font-bold text-primary mb-2">{listing.title}</h1>
- <p className="text-2xl font-semibold text-foreground mb-4">${listing.price.toFixed(2)}</p>
+ <p className="text-2xl font-semibold text-foreground mb-4">${Number(listing.price ?? 0).toFixed(2)}</p>
  
  <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground my-4 border-y py-4">
  <div className="flex items-center gap-1.5"><Tag className="h-4 w-4" /> {listing.category}</div>
@@ -135,7 +135,7 @@ export default function ListingDetailPage({ params }: PageProps) {
  {listing.university && (
  <div className="flex items-center gap-1.5"><MapPin className="h-4 w-4" /> {listing.university}</div>
  )}
- <div className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> Listed {formatDistanceToNow(new Date(listing.createdAt), { addSuffix: true })}</div>
+ <div className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> Listed {formatDistanceToNow(new Date(listing.created_at), { addSuffix: true })}</div>
  </div>
 
  <div>
@@ -153,7 +153,7 @@ export default function ListingDetailPage({ params }: PageProps) {
  </div>
  <div>
  <p className="text-sm text-muted-foreground">Seller</p>
- <Link href={`/profile/${listing.sellerId}`} className="font-bold hover:underline">{sellerName}</Link>
+ <Link href={`/profile/${listing.posted_by}`} className="font-bold hover:underline">{sellerName}</Link>
  </div>
  </div>
 
@@ -166,13 +166,13 @@ export default function ListingDetailPage({ params }: PageProps) {
  onClick={() => setShowPurchaseForm(true)}
  className="h-10 px-4 active:scale-[0.98] bg-primary text-on-primary hover:bg-primary/90 rounded-md text-sm font-semibold flex items-center gap-2 w-fit"
  >
- <ShoppingCart className="h-4 w-4" /> Buy with Secure Escrow
+ <ShoppingCart className="h-4 w-4" /> Request to Buy
  </button>
  ) : (
  <div className="border rounded-lg p-4 bg-muted/30 border-primary/20">
- <h3 className="font-semibold text-sm mb-3 text-primary flex items-center gap-2"><CheckCircle className="w-4 h-4" /> Secure Escrow Request</h3>
+ <h3 className="font-semibold text-sm mb-3 text-primary flex items-center gap-2"><CheckCircle className="w-4 h-4" /> Purchase Request</h3>
  <p className="text-xs text-muted-foreground mb-3">
- Funds will be held securely in escrow until you receive the item. The seller will be notified of your request. Include a message to coordinate pickup/delivery.
+ No payment is taken in the app — the seller is notified of your request and you arrange payment and handover directly. Include a message to coordinate pickup/delivery.
  </p>
  <textarea
  value={purchaseMessage}
@@ -193,7 +193,7 @@ export default function ListingDetailPage({ params }: PageProps) {
  ) : (
  <ShoppingCart className="h-4 w-4" />
  )}
- Fund Escrow & Request
+ Send Request
  </button>
  <button
  onClick={() => { setShowPurchaseForm(false); setPurchaseMessage(''); }}
@@ -232,7 +232,7 @@ export default function ListingDetailPage({ params }: PageProps) {
  if (!confirm('Delete this listing? This cannot be undone.')) return;
  setIsDeleting(true);
  try {
- await deleteListing({ listingId: listing._id });
+ await deleteListing({ listingId: listing.id });
  toast.success('Listing deleted');
  window.location.href = '/marketplace';
  } catch (err: any) {
@@ -257,13 +257,13 @@ export default function ListingDetailPage({ params }: PageProps) {
  {/* Seller: Purchase Requests */}
  {isSeller && transactions && transactions.length > 0 && (
  <div className="mt-8 border-t pt-6">
- <h3 className="font-bold text-lg mb-4 flex items-center gap-2"><CheckCircle className="w-5 h-5 text-primary" /> Escrow Offers ({transactions.length})</h3>
+ <h3 className="font-bold text-lg mb-4 flex items-center gap-2"><CheckCircle className="w-5 h-5 text-primary" /> Purchase Requests ({transactions.length})</h3>
  <div className="space-y-3">
  {transactions.map((tx: any) => (
- <div key={tx._id} className="flex items-start gap-3 p-4 border rounded-lg bg-canvas">
- {tx.buyer?.profilePicture ? (
+ <div key={tx.id} className="flex items-start gap-3 p-4 border rounded-lg bg-canvas">
+ {tx.buyer?.profile_picture ? (
  <Image
- src={tx.buyer.profilePicture}
+ src={tx.buyer.profile_picture}
  alt={tx.buyer.name || ''}
  width={36}
  height={36}
@@ -276,7 +276,7 @@ export default function ListingDetailPage({ params }: PageProps) {
  )}
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-2">
- <Link href={`/profile/${tx.buyerId}`} className="text-sm font-medium hover:underline">
+ <Link href={`/profile/${tx.buyer_id}`} className="text-sm font-medium hover:underline">
  {tx.buyer?.name || 'Unknown'}
  </Link>
  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
@@ -293,17 +293,17 @@ export default function ListingDetailPage({ params }: PageProps) {
  <p className="text-sm text-muted-foreground mt-1">{tx.message}</p>
  )}
  <p className="text-xs text-muted-foreground mt-1">
- ${tx.amount.toFixed(2)} · {formatDistanceToNow(new Date(tx.createdAt), { addSuffix: true })}
+ ${Number(tx.amount).toFixed(2)} · {formatDistanceToNow(new Date(tx.created_at), { addSuffix: true })}
  </p>
  </div>
  {tx.status === 'pending' && (
  <div className="flex items-center gap-1.5 flex-shrink-0">
  <button
- onClick={() => handleCompleteTransaction(tx._id)}
- disabled={processingTx === tx._id}
+ onClick={() => handleCompleteTransaction(tx.id)}
+ disabled={processingTx === tx.id}
  className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
  >
- {processingTx === tx._id ? (
+ {processingTx === tx.id ? (
  <Loader2 className="h-3.5 w-3.5 animate-spin" />
  ) : (
  <Check className="h-3.5 w-3.5" />
@@ -311,8 +311,8 @@ export default function ListingDetailPage({ params }: PageProps) {
  Accept
  </button>
  <button
- onClick={() => handleCancelTransaction(tx._id)}
- disabled={processingTx === tx._id}
+ onClick={() => handleCancelTransaction(tx.id)}
+ disabled={processingTx === tx.id}
  className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-md border hover:bg-muted disabled:opacity-50"
  >
  <X className="h-3.5 w-3.5" />

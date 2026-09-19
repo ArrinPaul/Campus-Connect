@@ -10,7 +10,7 @@ type Listing = Doc<'listings'> & {
     seller: {
         name: string | null;
         username: string | null;
-        avatarUrl: string | null;
+        profile_picture: string | null;
     } | null;
 };
 
@@ -20,10 +20,10 @@ type Props = {
 
 export function ListingCard({ listing }: Props) {
     const sellerName = listing.seller?.name || 'Anonymous';
-    const sellerAvatar = listing.seller?.avatarUrl;
+    const sellerAvatar = listing.seller?.profile_picture;
 
     return (
-        <Link href={`/marketplace/${listing._id}`} className="block p-4 border border-border rounded-lg bg-card hover:bg-surface-hover transition-colors shadow-sm">
+        <Link href={`/marketplace/${listing.id}`} className="block p-4 border border-border rounded-lg bg-card hover:bg-surface-hover transition-colors shadow-sm">
             <div className="relative h-48 w-full rounded-lg bg-muted overflow-hidden border border-border">
                 {listing.images && listing.images.length > 0 ? (
                     <OptimizedImage src={listing.images[0]} alt={listing.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 400px" />
@@ -42,7 +42,7 @@ export function ListingCard({ listing }: Props) {
                 
                 <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mt-3 font-semibold">
                     <div className="flex items-center gap-1">
-                        <DollarSign className="h-3.5 w-3.5" /> {(listing.price / 100).toFixed(2)}
+                        <DollarSign className="h-3.5 w-3.5" /> {Number(listing.price ?? 0).toFixed(2)}
                     </div>
                     <div className="flex items-center gap-1">
                         <Tag className="h-3.5 w-3.5" /> {listing.category}
@@ -65,7 +65,7 @@ export function ListingCard({ listing }: Props) {
                     )}
                     <p>{sellerName}</p>
                     <span className="mx-1">â€¢</span>
-                    <p suppressHydrationWarning>Listed {formatDistanceToNow(new Date(listing.createdAt), { addSuffix: true })}</p>
+                    <p suppressHydrationWarning>Listed {formatDistanceToNow(new Date(listing.created_at), { addSuffix: true })}</p>
                 </div>
             </div>
         </Link>

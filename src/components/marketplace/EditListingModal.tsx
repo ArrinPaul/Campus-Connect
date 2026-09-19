@@ -20,7 +20,7 @@ const conditionLabels: Record<string, string> = {
 
 interface EditListingModalProps {
  listing: {
- _id: Id<'listings'>;
+ id: Id<'listings'>;
  title: string;
  description: string;
  category: string;
@@ -35,8 +35,8 @@ interface EditListingModalProps {
 export function EditListingModal({ listing, onClose }: EditListingModalProps) {
  const updateListing = useMutation(api.marketplace.updateListing);
  const [title, setTitle] = useState(listing.title);
- const [description, setDescription] = useState(listing.description);
- const [price, setPrice] = useState(listing.price.toString());
+ const [description, setDescription] = useState(listing.description ?? '');
+ const [price, setPrice] = useState(String(listing.price ?? ''));
  const [condition, setCondition] = useState(listing.condition);
  const [isSaving, setIsSaving] = useState(false);
 
@@ -49,7 +49,7 @@ export function EditListingModal({ listing, onClose }: EditListingModalProps) {
  setIsSaving(true);
  try {
  await updateListing({
- listingId: listing._id,
+ listingId: listing.id,
  title: title.trim(),
  description: description.trim(),
  price: priceNum,

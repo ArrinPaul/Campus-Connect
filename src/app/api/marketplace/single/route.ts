@@ -13,7 +13,9 @@ export async function GET(req: Request) {
 
     const listing = await getListingById(id)
     if (!listing) {
-      return NextResponse.json({ error: "Listing not found" }, { status: 404 })
+      // 200 null, not 404: useQuery drops non-2xx bodies, so the page could
+      // never tell "no such listing" from "still loading".
+      return NextResponse.json(null)
     }
 
     return NextResponse.json(listing)

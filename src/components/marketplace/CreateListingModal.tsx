@@ -40,7 +40,7 @@ export function CreateListingModal({ onClose }: CreateListingModalProps) {
  setLoading(true)
  setError(null)
  try {
- const price = form.price ==="" ? 0 : Math.round(parseFloat(form.price) * 100)
+ const price = form.price ==="" ? 0 : Math.round(parseFloat(form.price) * 100) / 100
  await createListing({
  title: form.title,
  description: form.description,
