@@ -189,13 +189,31 @@ export async function initiateCall(callerId: string, recipientId: string, type: 
   return call
 }
 
-export async function updateCallStatus(callId: string, status: string) {
+// Only call participants may change a call's status; only the recipient may
+// accept or reject it. Returns false when the call isn't found / not allowed.
+export async function updateCallStatus(callId: string, status: string, userId: string) {
   const supabase = await getSupabase()
-  const update: Record<string, unknown> = { status }
+  const update: Record<string, unknown> = { status, updated_at: new Date().toISOString() }
   if (status === "ended" || status === "rejected") {
     update.ended_at = new Date().toISOString()
   }
-  await supabase.from("calls").update(update).eq("id", callId)
+  let q = supabase.from("calls").update(update).eq("id", callId)
+  q = status === "active" || status === "rejected"
+    ? q.eq("recipient_id", userId)
+    : q.or(`caller_id.eq.${userId},recipient_id.eq.${userId}`)
+  const { data } = await q.select("id")
+  return (data?.length ?? 0) > 0
+}
+
+// Flattens a calls row (with joined caller) into the shape the call UI reads.
+export function toCallView(call: any) {
+  if (!call) return call
+  return {
+    ...call,
+    _id: call.id,
+    callerName: call.caller?.name ?? "Unknown",
+    callerProfilePicture: call.caller?.profile_picture ?? undefined,
+  }
 }
 
 export async function getIncomingCall(userId: string) {

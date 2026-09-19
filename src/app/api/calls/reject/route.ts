@@ -14,7 +14,8 @@ export async function POST(req: Request) {
     const { callId } = await req.json()
     if (!callId) return NextResponse.json({ error: "callId required" }, { status: 400 })
 
-    await updateCallStatus(callId, "rejected")
+    const ok = await updateCallStatus(callId, "rejected", userId)
+    if (!ok) return NextResponse.json({ error: "Call not found" }, { status: 404 })
     return NextResponse.json({ success: true })
   } catch (err) {
     return internalError(err)

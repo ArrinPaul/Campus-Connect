@@ -20,7 +20,7 @@ import {
 
 interface CallModalProps {
  callId: Id<"calls">
- conversationId: Id<"conversations">
+ conversationId?: Id<"conversations">
  isIncoming?: boolean
  callType:"audio" |"video"
  callerName: string
@@ -82,15 +82,17 @@ export function CallModal({
  const endCall = useMutation(api.calls.endCall)
 
  // Watch call state via reactive query
- const activeCalls = useQuery(api.calls.getActiveCall, { conversationId })
+ const activeCalls = useQuery(api.calls.getActiveCall, {}, { refetchInterval: 2000 })
  
  // getActiveCall returns an array of calls, so we need to find the one for this conversation
  const activeCall = Array.isArray(activeCalls) 
- ? activeCalls.find((c: any) => c.conversationId === conversationId || c.id === callId)
+ ? activeCalls.find((c: any) => c.id === callId)
  : activeCalls;
 
  // Sync call state with backend
  useEffect(() => {
+ // Still loading the first response — don't treat "no data yet" as "call ended"
+ if (activeCalls === undefined) return
  if (!activeCall) {
  if (callState !=="ended") {
  setCallState("ended")

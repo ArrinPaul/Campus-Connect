@@ -13,7 +13,8 @@ import { CallModal } from"./CallModal"
  * Should be mounted in the dashboard layout so it's always active.
  */
 export function IncomingCallNotification() {
- const incomingCalls = useQuery(api.calls.getIncomingCalls)
+ const incomingCalls = useQuery(api.calls.getIncomingCalls, {}, { refetchInterval: 3000 }) as any[] | undefined
+ const [acceptedCall, setAcceptedCall] = useState<any>(null)
  const [activeCallId, setActiveCallId] = useState<Id<"calls"> | null>(null)
  const [dismissedCallIds, setDismissedCallIds] = useState<Set<string>>(new Set())
 
@@ -26,17 +27,20 @@ export function IncomingCallNotification() {
  )
 
  // If there's an active call modal, show it
- const activeCallData = activeCallId
- ? (incomingCalls || []).find((c: any) => c._id === activeCallId)
- : null
+ // Kept in state: once accepted the call is no longer "ringing", so it
+ // drops out of the incoming list and would otherwise unmount the modal.
+ const activeCallData = acceptedCall
 
  const handleAccept = useCallback(
- async (callId: Id<"calls">) => {
+ async (call: any) => {
  try {
- setActiveCallId(callId)
- await acceptCall({ callId })
+ setActiveCallId(call._id)
+ setAcceptedCall(call)
+ await acceptCall({ callId: call._id })
  } catch {
  setActiveCallId(null)
+ setAcceptedCall(null)
+ setAcceptedCall(null)
  }
  },
  [acceptCall]
@@ -67,6 +71,7 @@ export function IncomingCallNotification() {
  })
  }
  setActiveCallId(null)
+ setAcceptedCall(null)
  }, [activeCallId])
 
  // Clean up dismissed calls that are no longer in the list
@@ -87,7 +92,7 @@ export function IncomingCallNotification() {
  return (
  <CallModal
  callId={activeCallId}
- conversationId={activeCallData.conversationId}
+ 
  isIncoming
  callType={activeCallData.type}
  callerName={activeCallData.callerName}
@@ -136,9 +141,7 @@ export function IncomingCallNotification() {
  {call.callerName}
  </p>
  <p className="text-xs text-muted-foreground truncate">
- {call.conversationName !== call.callerName
- ? call.conversationName
- : call.type ==="video" ?"Video call" :"Audio call"}
+ {call.type ==="video" ?"Video call" :"Audio call"}
  </p>
  </div>
 
@@ -163,7 +166,7 @@ export function IncomingCallNotification() {
  </button>
  <div className="w-px bg-card" />
  <button
- onClick={() => handleAccept(call._id)}
+ onClick={() => handleAccept(call)}
  className="flex flex-1 items-center justify-center gap-2 py-3 text-sm font-medium text-accent-emerald hover:bg-accent-emerald/10 transition-colors"
  >
  <Phone className="h-4 w-4" />

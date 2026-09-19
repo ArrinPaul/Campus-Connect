@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { internalError } from "@/lib/api-error"
 import { NextResponse } from "next/server"
-import { getIncomingCall } from "@/server/db/misc"
+import { getIncomingCall, toCallView } from "@/server/db/misc"
 
 // GET /api/calls/incoming
 export async function GET() {
@@ -12,7 +12,7 @@ export async function GET() {
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const call = await getIncomingCall(userId)
-    return NextResponse.json(call)
+    return NextResponse.json(call ? [toCallView(call)] : [])
   } catch (err) {
     return internalError(err)
   }

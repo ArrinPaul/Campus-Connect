@@ -252,7 +252,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
  <button
  onClick={async () => {
  try {
- const result = await initiateCall({ conversationId, type:"audio" })
+ const result = await initiateCall({ recipientId: otherParticipant?._id, type:"audio" })
  setActiveCallType("audio")
  setActiveCallId(result.callId)
  } catch (e) {
@@ -272,7 +272,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
  <button
  onClick={async () => {
  try {
- const result = await initiateCall({ conversationId, type:"video" })
+ const result = await initiateCall({ recipientId: otherParticipant?._id, type:"video" })
  setActiveCallType("video")
  setActiveCallId(result.callId)
  } catch (e) {

@@ -108,12 +108,15 @@ describe("Phase 2 Foundation Verification Suite", () => {
     it("updateCallStatus updates status and ends timestamp on termination", async () => {
       const { updateCallStatus } = await import("@/server/db/misc");
 
-      const mockEq = jest.fn().mockResolvedValue({ data: null, error: null });
+      const mockSelect = jest.fn().mockResolvedValue({ data: [{ id: "call-123" }], error: null });
+      const mockOr = jest.fn().mockReturnValue({ select: mockSelect });
+      const mockEq = jest.fn().mockReturnValue({ or: mockOr });
       const mockUpdate = jest.fn().mockReturnValue({ eq: mockEq });
 
       mockFrom.mockReturnValue({ update: mockUpdate });
 
-      await updateCallStatus("call-123", "ended");
+      const ok = await updateCallStatus("call-123", "ended", "user-1");
+      expect(ok).toBe(true);
 
       expect(mockFrom).toHaveBeenCalledWith("calls");
       expect(mockUpdate).toHaveBeenCalledWith(

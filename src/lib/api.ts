@@ -41,7 +41,8 @@ function ep(
  */
 export function useQuery<T = any>(
   endpoint: Endpoint | null | undefined,
-  args?: Record<string, unknown> | "skip"
+  args?: Record<string, unknown> | "skip",
+  options?: { refetchInterval?: number }
 ): T | undefined {
   const enabled = endpoint != null && args !== "skip"
 
@@ -70,8 +71,8 @@ export function useQuery<T = any>(
       return res.json() as T
     },
     enabled,
-    staleTime: 30_000,
-    refetchInterval: 30_000,
+    staleTime: options?.refetchInterval ? 0 : 30_000,
+    refetchInterval: options?.refetchInterval ?? 30_000,
   })
 
   return data
