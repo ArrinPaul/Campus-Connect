@@ -1,13 +1,13 @@
 ﻿'use client';
 
-import { useQuery } from '@/lib/api';
+import { useQueryWithError } from '@/lib/api';
 import { api } from '@/lib/api';
 import { JobCard } from '../../(components)/jobs/JobCard';
 import { PostJobModal } from '@/components/jobs/PostJobModal';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Search, Filter, Briefcase, Plus, Sparkles, X } from 'lucide-react';
-import { EmptyState } from '@/components/ui/empty-state';
+import { EmptyState, RetryErrorState } from '@/components/ui/empty-state';
 import { cn } from '@/lib/utils';
 
 const JOB_TYPES = ['All', 'Full-time', 'Part-time', 'Internship', 'Contract'];
@@ -34,7 +34,7 @@ export default function JobsPage() {
   if (debouncedQuery) queryParams.q = debouncedQuery;
   if (jobType !== 'All') queryParams.type = jobType;
 
-  const jobs = useQuery(api.jobs.getJobs, queryParams);
+  const { data: jobs, error: loadError } = useQueryWithError(api.jobs.getJobs, queryParams);
 
   const hasActiveFilters = searchTerm.length > 0 || jobType !== 'All';
 
@@ -136,7 +136,7 @@ export default function JobsPage() {
 
           {/* Job Listings Grid */}
           <div className="space-y-4">
-            {jobs === undefined ? (
+            {loadError ? (<RetryErrorState what="jobs" />) : jobs === undefined ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {[...Array(6)].map((_, i) => <JobCardSkeleton key={i} />)}
               </div>

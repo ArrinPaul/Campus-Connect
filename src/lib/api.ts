@@ -579,3 +579,14 @@ export const api = {
     getLeaderboard: ep("/api/leaderboard"),
   },
 } as const
+
+/** useQuery + useQueryError in one call: { data, error } for the same endpoint/args. */
+export function useQueryWithError<T = any>(
+  endpoint: Endpoint | null | undefined,
+  args?: Record<string, unknown> | "skip",
+  options?: { refetchInterval?: number }
+): { data: T | undefined; error: Error | null } {
+  const data = useQuery<T>(endpoint, args, options)
+  const error = useQueryError(endpoint, args)
+  return { data, error }
+}

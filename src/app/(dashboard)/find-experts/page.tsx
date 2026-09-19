@@ -3,12 +3,12 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useQuery, useMutation, api } from '@/lib/api';
+import { useQueryWithError, useMutation, api } from '@/lib/api';
 import { useUser } from '@/lib/auth/client';
 import { Search, UserSearch, Award, MessageSquare, UserPlus, UserCheck, ArrowRight, ShieldCheck, X, MapPin } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { AvatarWithStatus } from '@/components/ui/OnlineStatusDot';
-import { EmptyState } from '@/components/ui/empty-state';
+import { EmptyState, RetryErrorState } from '@/components/ui/empty-state';
 import { toast } from 'sonner';
 
 export default function FindExpertsPage() {
@@ -22,7 +22,7 @@ export default function FindExpertsPage() {
   const followUser = useMutation(api.follows.followUser);
   const unfollowUser = useMutation(api.follows.unfollowUser);
 
-  const searchResults = useQuery(
+  const { data: searchResults, error: loadError } = useQueryWithError(
     api.users.searchUsers,
     { query: searchQuery, limit: 30 }
   );
@@ -113,7 +113,7 @@ export default function FindExpertsPage() {
 
       {/* Experts List */}
       <div className="space-y-4">
-        {searchResults === undefined ? (
+        {loadError ? (<RetryErrorState what="results" />) : searchResults === undefined ? (
           <div className="space-y-4">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="animate-pulse rounded-lg bg-card p-5 border border-border space-y-3">

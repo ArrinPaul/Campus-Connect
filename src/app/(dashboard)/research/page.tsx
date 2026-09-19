@@ -1,11 +1,11 @@
 ﻿'use client';
 
-import { useQuery } from '@/lib/api';
+import { useQueryWithError } from '@/lib/api';
 import { api } from '@/lib/api';
 import { ResearchPaperCard } from '../../(components)/research/ResearchPaperCard';
 import Link from 'next/link';
 import { Search, Plus, BookOpen, Microscope } from 'lucide-react';
-import { EmptyState } from '@/components/ui/empty-state';
+import { EmptyState, RetryErrorState } from '@/components/ui/empty-state';
 import { useState } from 'react';
 import { UploadPaperModal } from '@/components/research/UploadPaperModal';
 
@@ -15,7 +15,7 @@ export default function ResearchPage() {
  const [searchQuery, setSearchQuery] = useState('');
  const [showUploadModal, setShowUploadModal] = useState(false);
  // TODO: Add state for search and filters
- const papers = useQuery(api.papers.searchPapers, { query: searchQuery || undefined });
+ const { data: papers, error: loadError } = useQueryWithError(api.papers.searchPapers, { query: searchQuery || undefined });
 
  return (
  <div className="w-full bg-canvas min-h-screen">
@@ -60,7 +60,8 @@ export default function ResearchPage() {
  </div>
 
  <div className="space-y-md">
- {papers === undefined && (
+ {loadError && <RetryErrorState what="papers" />}
+ {papers === undefined && !loadError && (
  <div className="space-y-md">
  {[...Array(4)].map((_, i) => <ResearchPaperCardSkeleton key={i} />)}
  </div>

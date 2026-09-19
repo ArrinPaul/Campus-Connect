@@ -1,12 +1,12 @@
 'use client';
 
-import { useQuery } from '@/lib/api';
+import { useQueryWithError } from '@/lib/api';
 import { api } from '@/lib/api';
 import { EventCard } from '../../(components)/events/EventCard';
 import { CreateEventModal } from '@/components/events/CreateEventModal';
 import Link from 'next/link';
 import { Plus, Filter, Calendar } from 'lucide-react';
-import { EmptyState } from '@/components/ui/empty-state';
+import { EmptyState, RetryErrorState } from '@/components/ui/empty-state';
 import { useState } from 'react';
 
 const EventCardSkeleton = () => <div className="p-4 border border-border/50 rounded-lg bg-card h-[192px] animate-pulse" />;
@@ -15,7 +15,7 @@ export default function EventsPage() {
  const [eventTypeFilter, setEventTypeFilter] = useState('all'); // 'in_person', 'virtual', 'hybrid'
  const [showCreateModal, setShowCreateModal] = useState(false);
 
- const events = useQuery(api.events.getUpcomingEvents, { 
+ const { data: events, error: loadError } = useQueryWithError(api.events.getUpcomingEvents, { 
  eventType: eventTypeFilter === 'all' ? undefined : (eventTypeFilter as any),
  });
 
@@ -65,7 +65,8 @@ export default function EventsPage() {
  </div>
 
  <div className="space-y-md">
- {events === undefined && (
+ {loadError && <RetryErrorState what="events" />}
+ {events === undefined && !loadError && (
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg">
  {[...Array(6)].map((_, i) => <EventCardSkeleton key={i} />)}
  </div>

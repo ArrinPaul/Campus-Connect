@@ -1,12 +1,12 @@
 ﻿'use client';
 
-import { useQuery } from '@/lib/api';
+import { useQueryWithError } from '@/lib/api';
 import { api } from '@/lib/api';
 import { QuestionCard } from '../../(components)/q-and-a/QuestionCard';
 import { AskQuestionModal } from '@/components/q-and-a/AskQuestionModal';
 import Link from 'next/link';
 import { Search, Plus, HelpCircle, Filter, Hash } from 'lucide-react';
-import { EmptyState } from '@/components/ui/empty-state';
+import { EmptyState, RetryErrorState } from '@/components/ui/empty-state';
 import { useState } from 'react';
 
 const QuestionCardSkeleton = () => <div className="p-4 border border-border/50 rounded-lg bg-card h-[192px] animate-pulse" />;
@@ -17,7 +17,7 @@ export default function QuestionsPage() {
  const [tagFilter, setTagFilter] = useState('');
  const [showAskModal, setShowAskModal] = useState(false);
 
- const questions = useQuery(api.questions.getQuestions, { 
+ const { data: questions, error: loadError } = useQueryWithError(api.questions.getQuestions, { 
  query: searchQuery || undefined, 
  sort: sortOption as any,
  tag: tagFilter || undefined,
@@ -92,7 +92,8 @@ export default function QuestionsPage() {
  </div>
 
  <div className="space-y-md">
- {questions === undefined && (
+ {loadError && <RetryErrorState what="questions" />}
+ {questions === undefined && !loadError && (
  <div className="space-y-md">
  {[...Array(4)].map((_, i) => <QuestionCardSkeleton key={i} />)}
  </div>

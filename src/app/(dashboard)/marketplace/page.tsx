@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useQuery } from '@/lib/api';
+import { useQueryWithError } from '@/lib/api';
 import { api } from '@/lib/api';
 import { ListingCard } from '../../(components)/marketplace/ListingCard';
 import { CreateListingModal } from '@/components/marketplace/CreateListingModal';
@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { Search, Store, ShoppingBag, Plus, Sparkles, X } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { EmptyState } from '@/components/ui/empty-state';
+import { EmptyState, RetryErrorState } from '@/components/ui/empty-state';
 
 const CATEGORIES = [
   { key: 'all', label: 'All' },
@@ -28,7 +28,7 @@ export default function MarketplacePage() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const listings = useQuery(api.marketplace.getListings, { 
+  const { data: listings, error: loadError } = useQueryWithError(api.marketplace.getListings, { 
     category: categoryFilter === 'all' ? undefined : categoryFilter,
   });
 
@@ -132,7 +132,7 @@ export default function MarketplacePage() {
 
           {/* Listings Grid */}
           <div className="space-y-4">
-            {listings === undefined ? (
+            {loadError ? (<RetryErrorState what="listings" />) : listings === undefined ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {[...Array(8)].map((_, i) => <ListingCardSkeleton key={i} />)}
               </div>

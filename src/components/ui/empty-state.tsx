@@ -1,7 +1,10 @@
+"use client"
+
 import type { LucideIcon } from "lucide-react"
 import { AlertTriangle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LoadingSpinner } from "@/components/ui/loading-skeleton"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface StateAction {
   label: string
@@ -94,5 +97,20 @@ export function LoadingState({ label = "Loading...", className }: LoadingStatePr
       <LoadingSpinner size="md" />
       <p className="text-xs text-muted-foreground">{label}</p>
     </div>
+  )
+}
+
+/**
+ * ErrorState with a built-in retry: refetches every active query. Pair it
+ * with useQueryError so a failed fetch shows this instead of an endless
+ * skeleton.
+ */
+export function RetryErrorState({ what }: { what: string }) {
+  const queryClient = useQueryClient()
+  return (
+    <ErrorState
+      description={`We couldn't load ${what}.`}
+      action={{ label: "Try Again", onClick: () => queryClient.invalidateQueries() }}
+    />
   )
 }

@@ -3,10 +3,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useQuery, useMutation, api } from '@/lib/api';
+import { useQueryWithError, useMutation, api } from '@/lib/api';
 import { useUser } from '@/lib/auth/client';
 import { Search, UserSearch, Handshake, Users, BookOpen, Sparkles, MessageSquare, UserPlus, UserCheck, ArrowRight, X, MapPin, Briefcase } from 'lucide-react';
-import { EmptyState } from '@/components/ui/empty-state';
+import { EmptyState, RetryErrorState } from '@/components/ui/empty-state';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { AvatarWithStatus } from '@/components/ui/OnlineStatusDot';
 import { toast } from 'sonner';
@@ -33,7 +33,7 @@ export default function FindPartnersPage() {
   const followUser = useMutation(api.follows.followUser);
   const unfollowUser = useMutation(api.follows.unfollowUser);
 
-  const searchResults = useQuery(
+  const { data: searchResults, error: loadError } = useQueryWithError(
     api.users.searchUsers,
     { query: searchQuery, limit: 30 }
   );
@@ -146,7 +146,7 @@ export default function FindPartnersPage() {
 
       {/* Main List Grid - Single Column or Clean Dual Grid */}
       <div className="space-y-4">
-        {searchResults === undefined ? (
+        {loadError ? (<RetryErrorState what="results" />) : searchResults === undefined ? (
           <div className="space-y-4">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="animate-pulse rounded-lg bg-card p-5 border border-border space-y-3">

@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useQuery } from '@/lib/api';
+import { useQueryWithError } from '@/lib/api';
 import { api } from '@/lib/api';
 import { CommunityCard } from '../../(components)/communities/CommunityCard';
 import { MyInvitesBanner } from '@/components/communities/MyInvitesBanner';
 import Link from 'next/link';
 import { Search, Users, SlidersHorizontal, X, Plus, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { EmptyState } from '@/components/ui/empty-state';
+import { EmptyState, RetryErrorState } from '@/components/ui/empty-state';
 
 const CATEGORIES = ['All', 'Academic', 'Research', 'Social', 'Sports', 'Clubs', 'Technology', 'Arts', 'Professional'];
 
@@ -33,7 +33,7 @@ export default function CommunitiesPage() {
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   }), [selectedCategory, debouncedSearch]);
 
-  const communities = useQuery(api.communities.getCommunities, queryArgs);
+  const { data: communities, error: loadError } = useQueryWithError(api.communities.getCommunities, queryArgs);
 
   const sortedCommunities = useMemo(() => {
     if (!communities) return undefined;
@@ -154,7 +154,7 @@ export default function CommunitiesPage() {
 
           {/* Community Grid */}
           <div className="w-full">
-            {sortedCommunities === undefined ? (
+            {loadError ? (<RetryErrorState what="communities" />) : sortedCommunities === undefined ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {[...Array(8)].map((_, i) => <CommunityCardSkeleton key={i} />)}
               </div>

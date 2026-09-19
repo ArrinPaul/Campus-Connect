@@ -1,11 +1,11 @@
 ﻿'use client';
 
-import { useQuery } from '@/lib/api';
+import { useQueryWithError } from '@/lib/api';
 import { api } from '@/lib/api';
 import { ResourceCard } from '../../(components)/resources/ResourceCard';
 import Link from 'next/link';
 import { Search, Plus, Book, FileText } from 'lucide-react';
-import { EmptyState } from '@/components/ui/empty-state';
+import { EmptyState, RetryErrorState } from '@/components/ui/empty-state';
 import { useState } from 'react';
 import { UploadResourceModal } from '@/components/resources/UploadResourceModal';
 
@@ -16,7 +16,7 @@ export default function ResourcesPage() {
  const [courseFilter, setCourseFilter] = useState('');
  const [showUploadModal, setShowUploadModal] = useState(false);
 
- const resources = useQuery(api.resources.getResources, { 
+ const { data: resources, error: loadError } = useQueryWithError(api.resources.getResources, { 
  query: searchQuery || undefined, 
  course: courseFilter || undefined,
  });
@@ -75,7 +75,8 @@ export default function ResourcesPage() {
  </div>
 
  <div className="space-y-md">
- {resources === undefined && (
+ {loadError && <RetryErrorState what="resources" />}
+ {resources === undefined && !loadError && (
  <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
  {[...Array(6)].map((_, i) => <ResourceCardSkeleton key={i} />)}
  </div>
