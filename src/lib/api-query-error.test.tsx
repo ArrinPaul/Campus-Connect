@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from "@testing-library/react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { useQuery, useQueryError } from "./api"
+import { useQuery, useQueryError, useQueryWithError } from "./api"
 
 // Regression: useQuery only ever returns `data`, so a genuine fetch failure
 // looked identical to "still loading" (both leave data undefined forever).
@@ -86,6 +86,26 @@ describe("useQuery on a 404", () => {
     global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 500, json: async () => ({ error: "boom" }) }) as any
     const { result } = renderHook(() => ({ data: useQuery(endpoint, {}), error: useQueryError(endpoint, {}) }), { wrapper })
     await waitFor(() => expect(result.current.error).not.toBeNull())
+    expect(result.current.data).toBeUndefined()
+  })
+})
+
+describe("useQueryWithError", () => {
+  const originalFetch = global.fetch
+  afterEach(() => { global.fetch = originalFetch })
+
+  it("returns data and error together with a single fetch", async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: true, status: 200, json: async () => [1, 2] }) as any
+    const { result } = renderHook(() => useQueryWithError(endpoint, {}), { wrapper })
+    await waitFor(() => expect(result.current.data).toEqual([1, 2]))
+    expect(result.current.error).toBeNull()
+    expect(global.fetch).toHaveBeenCalledTimes(1)
+  })
+
+  it("exposes the error when the request fails, so pages can show a retry state", async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 500, json: async () => ({ error: "boom" }) }) as any
+    const { result } = renderHook(() => useQueryWithError(endpoint, {}), { wrapper })
+    await waitFor(() => expect(result.current.error?.message).toBe("boom"))
     expect(result.current.data).toBeUndefined()
   })
 })

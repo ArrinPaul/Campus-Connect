@@ -1078,7 +1078,6 @@ browser.
       unreachable, so an unknown id showed a permanent skeleton. Risk to
       watch: a page that calls `.map`/`.length` on a query whose route can
       404 will now get `null` instead of hanging.
-- [ ] Rolling `useQueryError` out to the remaining list pages (only
-      `/notifications` uses it).
+- [x] Rolled the error state out to communities, events, jobs, Q&A, research, resources, marketplace, find-experts and find-partners via new `useQueryWithError` + `RetryErrorState` (failed fetch shows a Try Again card instead of an endless skeleton). Remaining pages (feed, leaderboard, detail pages) still use the plain hook.
 - [ ] Apply migrations `20240105`–`20240112` to the live database (8 files,
       none applied), then re-verify the features above against it.
