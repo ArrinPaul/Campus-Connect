@@ -361,6 +361,7 @@ export const api = {
     applyToJob: ep("/api/jobs/apply", "POST"),
     getMyApplications: ep("/api/jobs/applications"),
     getJobApplications: ep("/api/jobs/job-applications"),
+    updateApplicationStatus: ep("/api/jobs/job-applications", "PATCH"),
   },
 
   // ── stories ────────────────────────────────────────────────────────────────

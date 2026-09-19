@@ -208,3 +208,39 @@ export async function getMyApplications(userId: string) {
   const { data } = await supabase.from("job_applications").select("*, job:jobs(title, company, location)").eq("user_id", userId).order("created_at", { ascending: false })
   return data ?? []
 }
+
+// The applicant's own application to a job, if any (drives the "Applied" state).
+export async function getViewerApplication(jobId: string, userId: string) {
+  const supabase = await getSupabase()
+  const { data } = await supabase
+    .from("job_applications")
+    .select("id, status, created_at")
+    .eq("job_id", jobId)
+    .eq("user_id", userId)
+    .maybeSingle()
+  return data ?? null
+}
+
+// Only the job's poster (or an admin) may change an application's status.
+export async function updateApplicationStatus(
+  applicationId: string,
+  status: "pending" | "reviewed" | "accepted" | "rejected",
+  userId: string,
+  isAdmin = false
+) {
+  const supabase = await getSupabase()
+  const { data: application } = await supabase
+    .from("job_applications")
+    .select("id, job:jobs(posted_by)")
+    .eq("id", applicationId)
+    .single()
+  const postedBy = (application as any)?.job?.posted_by
+  if (!application || (postedBy !== userId && !isAdmin)) return null
+  const { data, error } = await supabase
+    .from("job_applications")
+    .update({ status })
+    .eq("id", applicationId)
+    .select()
+    .single()
+  return error ? null : data
+}
