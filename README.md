@@ -17,7 +17,7 @@ _Feed, chat, communities, events, jobs, Q&A and research in one place._
 ![Playwright](https://img.shields.io/badge/Playwright-E2E-2EAD33?logo=playwright&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-deploy-000000?logo=vercel&logoColor=white)
 
-[Quickstart](#quickstart) · [Features](#features) · [Architecture](#architecture) · [Project status](#project-status) · [Documentation](#documentation) · [Report an issue](https://github.com/ArrinPaul/Campus-Connect/issues)
+[Quickstart](#quickstart) · [Features](#features) · [Architecture](#architecture) · [Methodology](./METHODOLOGY.md) · [Project status](#project-status) · [Documentation](#documentation) · [Report an issue](https://github.com/ArrinPaul/Campus-Connect/issues)
 
 </div>
 
@@ -67,7 +67,7 @@ The project is under active development and **not yet production-ready**. See [P
 | **Academic** | Q&A with answers, shared resource library with ratings, research papers and collaboration, course data |
 | **Career** | Job and internship board, applications with poster-side review, project and portfolio sections on profiles |
 | **Campus life** | Events, a marketplace with purchase requests, a leaderboard with reputation and gamification |
-| **Discovery** | Find project partners and experts, graph-based suggestions, optional semantic matching with OpenAI embeddings |
+| **Discovery** | Find project partners and experts, people suggestions and weighted study-partner matching, and research search (keyword search today, embedding code present but not yet wired up) |
 | **Platform** | Onboarding wizard, notifications center with Web Push, settings (profile, privacy, notifications, billing), subscriptions through Stripe, campus ads, an admin dashboard with user and moderation tools, installable PWA with an offline page |
 
 ## Tech stack
@@ -78,7 +78,7 @@ The project is under active development and **not yet production-ready**. See [P
 | Language | TypeScript 5 (strict) |
 | Styling and UI | Tailwind CSS 3, Radix UI primitives, Framer Motion, Lucide icons |
 | Rich content | TipTap editor, KaTeX, react-markdown, highlight.js |
-| Data and auth | Supabase: PostgreSQL with RLS, SSR Auth, Storage, Realtime; pgvector for embeddings |
+| Data and auth | Supabase: PostgreSQL with RLS, SSR Auth, Storage, Realtime |
 | Client state | TanStack Query 5, TanStack Virtual, Zustand, React Hook Form |
 | Validation | Zod 4 |
 | Rate limiting | Upstash Redis, with an in-memory fallback |
@@ -133,7 +133,7 @@ Copy `.env.example` to `.env.local` and never commit it.
 | `NEXT_PUBLIC_API_URL` | Frontend API base URL (default `http://localhost:3000`) | default |
 | `CRON_SECRET` | Authorizes the `/api/cron/*` endpoints. It is **not** in `.env.example`. | Cron endpoints return `500` |
 | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Edge rate limiting (120 requests per minute per IP on `/api/*`) | No rate limiting (the middleware logs a warning) |
-| `OPENAI_API_KEY` | Embeddings for semantic matching | Mock embeddings |
+| `OPENAI_API_KEY` | Query embeddings for research search. **Has no visible effect today**, because no paper embeddings are ever stored. | Mock embeddings |
 | `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` | Paid subscriptions | Mock provider |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Web Push notifications | Push disabled |
 | `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` | Error monitoring | Disabled |
@@ -179,7 +179,7 @@ The schema lives in `supabase/migrations/` (12 files). It defines 45 tables, and
 | Engagement | `notifications`, `push_subscriptions`, `user_reputation`, `reputation_events` |
 | Moderation | `content_reports` |
 | Monetization | `subscriptions`, `subscription_events`, `ads` |
-| Matching | `research_embeddings`, `user_interest_embeddings` (pgvector) |
+| Matching | `research_embeddings`, `user_interest_embeddings` (JSON arrays, not yet populated by any code) |
 
 Migrations in order:
 
@@ -188,7 +188,7 @@ Migrations in order:
 | `20240101` init | Core schema |
 | `20240102` gamification | Reputation events |
 | `20240103` push and subscriptions | Web Push subscriptions, Stripe subscriptions |
-| `20240104` vector and recommendations | pgvector embeddings |
+| `20240104` vector and recommendations | Embedding tables (JSON arrays, no pgvector column) |
 | `20240105` frontend schema drift fixes | Columns the UI expected |
 | `20240106` notifications policy | Tighter `notifications` insert policy |
 | `20240107` realtime publication | Tables published to Supabase Realtime |
@@ -304,6 +304,7 @@ Campus-Connect/
 ├── supabase/
 │   ├── config.toml          Local Supabase configuration
 │   └── migrations/          12 SQL migrations (about 45 tables, RLS policies)
+├── METHODOLOGY.md           Ranking, matching, search and reputation algorithms
 ├── docs/                    Architecture, development, operations, roadmap, task list
 ├── scripts/                 Icon generation and migration helpers
 └── public/                  Static assets and PWA icons
@@ -315,6 +316,7 @@ Campus Connect is a **work in progress**. The code builds, type-checks and passe
 
 - **Never run against a live database.** According to `docs/TASKS.md`, migrations `20240105` to `20240112` had not been applied to the live database when last updated, and recent fixes have not been exercised in a browser or against live data.
 - **Five API routes are still `501 Not Implemented` stubs:** `ads/update`, `media/confirm`, `messages/typing`, `monitoring/error` and `presence/status`.
+- **Research search is keyword-only in practice.** The embedding code exists, but nothing stores paper embeddings, so semantic search always falls back to keywords. Details in [METHODOLOGY.md](METHODOLOGY.md#6-research-search).
 - **Calls need a TURN server.** WebRTC calls across restrictive networks will not connect without one.
 - **Payments are not real escrow.** The marketplace records purchase requests only. Stripe subscriptions fall back to a mock provider without keys.
 - **No CI workflow is committed.** The repo has Dependabot configuration but no GitHub Actions workflow, so run lint, type-check and tests locally before merging.
@@ -352,6 +354,7 @@ Operational guidance is in [`docs/OPERATIONS.md`](docs/OPERATIONS.md).
 
 | Document | Purpose |
 | :--- | :--- |
+| [`METHODOLOGY.md`](METHODOLOGY.md) | How feed ranking, suggestions, matching, search and reputation work |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Where the project stands and where it's going |
 | [`docs/TASKS.md`](docs/TASKS.md) | Detailed checklist of fixes and remaining work |
 | [`docs/SYSTEM_ARCHITECTURE.md`](docs/SYSTEM_ARCHITECTURE.md) | Architecture and database design |
