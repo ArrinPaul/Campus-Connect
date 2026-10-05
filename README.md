@@ -44,13 +44,18 @@ The project is under active development and **not yet production-ready**. See [P
 4. [Quickstart](#quickstart)
 5. [Configuration](#configuration)
 6. [Architecture](#architecture)
-7. [Scripts](#scripts)
-8. [Project structure](#project-structure)
-9. [Project status](#project-status)
-10. [Deployment](#deployment)
-11. [Documentation](#documentation)
-12. [Contributing](#contributing)
-13. [License](#license)
+7. [Database](#database)
+8. [API overview](#api-overview)
+9. [Security](#security)
+10. [Testing](#testing)
+11. [Scripts](#scripts)
+12. [Project structure](#project-structure)
+13. [Project status](#project-status)
+14. [Troubleshooting](#troubleshooting)
+15. [Deployment](#deployment)
+16. [Documentation](#documentation)
+17. [Contributing](#contributing)
+18. [License](#license)
 
 ## Features
 
@@ -126,7 +131,8 @@ Copy `.env.example` to `.env.local` and never commit it.
 | Variable | Enables | Fallback when unset |
 | :--- | :--- | :--- |
 | `NEXT_PUBLIC_API_URL` | Frontend API base URL (default `http://localhost:3000`) | default |
-| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Distributed rate limiting | In-memory limiter |
+| `CRON_SECRET` | Authorizes the `/api/cron/*` endpoints. It is **not** in `.env.example`. | Cron endpoints return `500` |
+| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Edge rate limiting (120 requests per minute per IP on `/api/*`) | No rate limiting (the middleware logs a warning) |
 | `OPENAI_API_KEY` | Embeddings for semantic matching | Mock embeddings |
 | `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` | Paid subscriptions | Mock provider |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Web Push notifications | Push disabled |
@@ -151,9 +157,116 @@ flowchart LR
 
 - **Pages** use the App Router. Route groups split the app into `(auth)`, `(onboarding)` and `(dashboard)`, and the dashboard has an `@modal` slot for intercepted post views.
 - **API** routes under `src/app/api` call server-only modules in `src/server/db`, which talk to Supabase. The frontend uses a typed client in `src/lib/api.ts` built on TanStack Query.
-- **Security** relies on Row Level Security in Postgres for tenant isolation. Public write endpoints are rate-limited and request bodies are validated with Zod.
+- **Security** relies on Row Level Security in Postgres for data isolation, plus per-route auth checks and edge rate limiting. See [Security](#security).
 - **Realtime** uses Supabase Realtime for the feed, notifications, chat and typing indicators, with reconnect backoff. Calls use WebRTC with Supabase Realtime for signalling.
 - **Background work** runs through cron route handlers (`src/app/api/cron`: daily digest and suggestions sync).
+
+## Database
+
+The schema lives in `supabase/migrations/` (12 files). It defines 45 tables, and Row Level Security is enabled on every one of them.
+
+| Domain | Tables |
+| :--- | :--- |
+| Profiles | `users`, `portfolio_projects`, `portfolio_certifications`, `skill_endorsements` |
+| Social graph | `follows` |
+| Content | `posts`, `comments`, `reactions`, `reposts`, `polls`, `poll_votes`, `bookmarks`, `hashtags`, `post_hashtags`, `stories`, `story_views` |
+| Messaging | `conversations`, `conversation_participants`, `messages`, `presence`, `calls` |
+| Communities | `communities`, `community_members`, `community_invites` |
+| Events | `events`, `event_attendees` |
+| Careers | `jobs`, `job_applications` |
+| Marketplace | `marketplace_listings`, `marketplace_transactions` |
+| Academic | `questions`, `question_answers`, `resources`, `resource_ratings`, `research_papers` |
+| Engagement | `notifications`, `push_subscriptions`, `user_reputation`, `reputation_events` |
+| Moderation | `content_reports` |
+| Monetization | `subscriptions`, `subscription_events`, `ads` |
+| Matching | `research_embeddings`, `user_interest_embeddings` (pgvector) |
+
+Migrations in order:
+
+| Migration | Adds |
+| :--- | :--- |
+| `20240101` init | Core schema |
+| `20240102` gamification | Reputation events |
+| `20240103` push and subscriptions | Web Push subscriptions, Stripe subscriptions |
+| `20240104` vector and recommendations | pgvector embeddings |
+| `20240105` frontend schema drift fixes | Columns the UI expected |
+| `20240106` notifications policy | Tighter `notifications` insert policy |
+| `20240107` realtime publication | Tables published to Supabase Realtime |
+| `20240108` conversation roles, pinned messages | Roles and pinned messages |
+| `20240109` polls | `is_anonymous` on polls |
+| `20240110` users | `is_suspended` on users |
+| `20240111` marketplace transactions | Purchase requests |
+| `20240112` resource ratings | Ratings for resources |
+
+> Per `docs/TASKS.md`, the fixes from `20240105` onward were written without database access and had not been applied to the live database when that file was last updated. Apply all migrations before testing features that depend on them.
+
+## API overview
+
+All endpoints are Next.js Route Handlers under `src/app/api`, about 184 route files in total. Most return JSON and require a signed-in user. The numbers below count route files per group.
+
+| Group | Routes | Covers |
+| :--- | :---: | :--- |
+| `auth` | 4 | Sign-in, sign-up, sign-out |
+| `users`, `skills`, `portfolio` | 9, 2, 3 | Profiles, skills, portfolio projects and certifications |
+| `follows`, `graph`, `matching` | 6, 2, 2 | Follow graph, suggestions, partner and expert matching |
+| `posts`, `comments`, `reactions`, `reposts`, `polls`, `bookmarks`, `hashtags`, `stories` | 10, 3, 4, 3, 3, 4, 4, 4 | Content and engagement |
+| `conversations`, `messages`, `calls`, `presence` | 11, 5, 6, 2 | Chat, typing, WebRTC call signalling, online status |
+| `communities` | 12 | Communities, members, invites, moderation |
+| `events` | 6 | Events and attendance |
+| `jobs` | 7 | Jobs and applications |
+| `marketplace` | 11 | Listings and purchase requests |
+| `questions`, `resources`, `research`, `courses` | 9, 6, 7, 1 | Q&A, shared resources, research papers |
+| `leaderboard`, `reputation` | 1, 1 | Gamification |
+| `notifications`, `push` | 4, 6 | In-app notifications and Web Push |
+| `search` | 4 | Search across posts, people and hashtags |
+| `subscriptions`, `ads` | 4, 7 | Stripe subscriptions, campus ads |
+| `admin`, `reports` | 3, 1 | Stats, user management, moderation |
+| `media` | 2 | Upload URLs and confirmation |
+| `cron` | 2 | Daily digest and suggestions sync |
+| `health`, `monitoring` | 2, 1 | Liveness and readiness, client error reports |
+
+Five routes are still stubs that return `501`. See [Project status](#project-status).
+
+## Security
+
+What the code does today:
+
+- **Row Level Security** is enabled on all 45 tables, and policies are bound to `auth.uid()`. There are about 138 `CREATE POLICY` statements across the migrations.
+- **Authentication** uses Supabase Auth with SSR cookies. The Edge middleware refreshes the session and redirects unauthenticated visitors to `/sign-in`. About 143 route files check the signed-in user themselves.
+- **Admin access.** Admin routes check `users.is_admin` and return an error for everyone else. Call accept, reject and end actions are limited to the call's participants.
+- **Rate limiting.** When Upstash Redis is configured, the middleware limits every `/api/*` request to 120 per minute per IP and returns `429`. If Redis is unreachable it fails open.
+- **Security headers** are set in `next.config.js`: a Content Security Policy, `X-Frame-Options: DENY`, HSTS with preload, `X-Content-Type-Options`, a referrer policy and a restrictive Permissions Policy.
+- **Input handling.** Zod validation exists for a subset of write routes, and the post-creation route sanitizes content with `isomorphic-dompurify`.
+- **Secrets.** `SUPABASE_SERVICE_ROLE_KEY` is used server-side only. Cron routes require `CRON_SECRET`, and the Stripe webhook checks a signature header.
+
+Known gaps:
+
+- **Rate limiting is off by default.** Without Upstash credentials the middleware does not limit requests at all.
+- **Validation is uneven.** Zod covers only about 10 of the 184 route files, so many write routes rely on hand-written checks and RLS.
+- **Credentials in git history.** `docs/ROADMAP.md` records that a Supabase service-role key and database password were once committed. They are no longer in the tree, but they remain in history. If they have not been rotated, rotate them.
+
+Please report vulnerabilities privately to the maintainer, not in a public issue.
+
+## Testing
+
+```bash
+npm test                 # Jest: unit, component and route tests
+npm run type-check       # tsc --noEmit
+npm run lint             # ESLint
+npm run test:e2e         # Playwright end-to-end
+```
+
+**Jest** (jsdom, via `next/jest`) runs 82 suites and 696 tests. Tests sit next to the code (`*.test.ts(x)`) and in `src/tests/`, which holds route and feature tests for calls, marketplace, jobs, messaging, reputation, subscriptions, push, rate limiting, security and recommendations. Tests mock Supabase, so the suite does not need a database or network. Jest may print a "worker process has failed to exit gracefully" warning after the run, which comes from timers that tests leave open.
+
+**Playwright** (`src/e2e/`) has specs for auth, feed, leaderboard, marketplace, messaging, notifications, profile and research, and runs in Chromium. Unlike Jest, it needs a running app wired to a real Supabase project, and the repo does not start one for you outside CI. Locally:
+
+```bash
+npx playwright install chromium
+npm run dev              # in one terminal
+npm run test:e2e         # in another
+```
+
+Set `PLAYWRIGHT_TEST_BASE_URL` to test a deployed URL. The e2e suite has not been run as part of this documentation pass.
 
 ## Scripts
 
@@ -206,6 +319,23 @@ Campus Connect is a **work in progress**. The code builds, type-checks and passe
 - **Payments are not real escrow.** The marketplace records purchase requests only. Stripe subscriptions fall back to a mock provider without keys.
 - **No CI workflow is committed.** The repo has Dependabot configuration but no GitHub Actions workflow, so run lint, type-check and tests locally before merging.
 - **Some documents are outdated.** `docs/PHASE_8_FINAL_REPORT.md` claims the app is "production certified". A later audit showed that is not true. Treat [`docs/ROADMAP.md`](docs/ROADMAP.md) and [`docs/TASKS.md`](docs/TASKS.md) as the source of truth.
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+| :--- | :--- | :--- |
+| App crashes on start with a Supabase URL or key error | `.env.local` missing or the three required Supabase variables are empty | Copy `.env.example` to `.env.local`, fill in the values and restart `npm run dev`. |
+| Pages show errors or empty data, or queries fail with "column does not exist" | Migrations not applied, especially `20240105` onward | Apply every file in `supabase/migrations/` (`supabase db reset` locally). |
+| Feed, notifications or chat don't update live | Realtime publication not set up | Make sure migration `20240107` is applied and Realtime is enabled for your project. |
+| `/api/cron/*` returns `500 CRON_SECRET is not configured` | `CRON_SECRET` is not set, and it is missing from `.env.example` | Set `CRON_SECRET` and send it as `Authorization: Bearer <secret>` or an `x-cron-secret` header. |
+| An endpoint returns `501 Not Implemented` | One of the five unfinished stub routes | See [Project status](#project-status). `ads/update`, `media/confirm`, `messages/typing`, `monitoring/error` and `presence/status` are not implemented. |
+| `429 Too many requests` | The Upstash edge limiter (120 requests per minute per IP) | Slow down, or unset the Upstash variables for local development. |
+| No rate limiting in production | Upstash variables not set, so the middleware skips limiting | Set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`. |
+| Admin pages refuse access | Your user's `is_admin` flag is false | Set `is_admin = true` for your row in the `users` table. |
+| Calls don't connect across different networks | No TURN server is configured for WebRTC | Add a TURN server. See `docs/TASKS.md` §3. |
+| Marketplace prices look 100 times too high | Older listings were stored in cents, and the app now uses dollars | Run `UPDATE marketplace_listings SET price = price / 100` once, only for listings created before the fix. |
+| Jest fails with an ESM syntax error on a new markdown package | The package needs transforming | Add it to `transformIgnorePatterns` in `jest.config.js`. |
+| `npm run test:e2e` fails to connect | The app isn't running | Start `npm run dev` first, or set `PLAYWRIGHT_TEST_BASE_URL`. |
 
 ## Deployment
 
