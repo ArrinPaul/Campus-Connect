@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { StoryRow } from "@/components/stories/StoryRow";
@@ -40,13 +40,16 @@ export function Feed() {
 
       {/* Feed Filters */}
       <div className="w-full mb-4 flex items-center justify-between border-b border-border pb-2">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1" role="tablist" aria-label="Feed type">
           {TABS.map((tab) => (
             <button
               key={tab.key}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={cn(
-                "px-4 py-2 rounded-lg text-[15px] font-semibold transition-colors",
+                "px-4 py-2 rounded-lg text-[15px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 activeTab === tab.key 
                   ? "bg-primary/10 text-primary" 
                   : "text-muted-foreground hover:bg-accent hover:text-foreground"

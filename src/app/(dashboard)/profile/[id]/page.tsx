@@ -52,7 +52,7 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
                 {courses.map(course => (
                   <Link 
                     key={course.id} 
-                    href={`/communities/${course.slug}`}
+                    href={`/c/${course.slug}`}
                     className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border rounded-full hover:border-primary transition-colors"
                   >
                     <BookOpen className="w-4 h-4 text-primary" />
