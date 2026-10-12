@@ -105,18 +105,18 @@ export function LikeButton({
             onClick={handleToggleLike}
             className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-all ${
               isLiked
-                ? "bg-rose-500/10 text-rose-500"
-                : "text-muted-foreground hover:bg-rose-500/10 hover:text-rose-500"
+                ? "bg-critical/10 text-critical"
+                : "text-muted-foreground hover:bg-critical/10 hover:text-critical"
             } ${compact ? "px-2 py-1 text-sm" : ""}`}
             aria-label={isLiked ? "Unlike" : "Like"}
           >
             <Heart
               className={`h-[18px] w-[18px] transition-transform ${
-                isLiked ? "fill-rose-500 text-rose-500 scale-110" : ""
+                isLiked ? "fill-critical text-critical scale-110" : ""
               }`}
             />
             {totalReactions > 0 && (
-              <span className={`text-xs font-semibold ${isLiked ? "text-rose-500" : "text-muted-foreground"}`}>
+              <span className={`text-xs font-semibold ${isLiked ? "text-critical" : "text-muted-foreground"}`}>
                 {totalReactions}
               </span>
             )}
@@ -157,7 +157,7 @@ export function ReactionSummary({ targetId, targetType, onClick }: ReactionSumma
       onClick={onClick}
       className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
     >
-      <Heart className="h-3.5 w-3.5 fill-rose-500 text-rose-500 inline" />
+      <Heart className="h-3.5 w-3.5 fill-critical text-critical inline" />
       <span>{total}</span>
     </button>
   )

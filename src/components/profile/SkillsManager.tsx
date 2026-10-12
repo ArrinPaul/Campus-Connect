@@ -85,7 +85,7 @@ export function SkillsManager({ skills, onUpdate }: SkillsManagerProps) {
  placeholder="Add a skill (e.g., React, Python, Machine Learning)"
  className="w-full rounded-md border border-border bg-card px-3 py-2 text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-primary"
  />
- {error && <p className="mt-1 text-sm text-critical dark:text-red-400">{error}</p>}
+ {error && <p className="mt-1 text-sm text-critical">{error}</p>}
  </div>
  <button
  type="submit"
@@ -108,7 +108,7 @@ export function SkillsManager({ skills, onUpdate }: SkillsManagerProps) {
  <span>{skill}</span>
  <button
  onClick={() => handleRemoveSkill(skill)}
- className="text-primary hover:text-primary dark:hover:text-blue-300 focus:outline-none"
+ className="text-primary hover:text-primary-deep focus:outline-none"
  aria-label={`Remove ${skill}`}
  >
  <svg

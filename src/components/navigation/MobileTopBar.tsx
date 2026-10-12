@@ -69,7 +69,7 @@ export function MobileTopBar() {
             >
               <Send className="h-[20px] w-[20px] stroke-[1.8] -rotate-12 translate-y-[-1px]" />
               {typeof totalUnreadMessages === 'number' && totalUnreadMessages > 0 && (
-                <span className="absolute top-1 right-1 flex h-4 min-w-[15px] items-center justify-center rounded-full bg-critical px-1 text-[9px] font-bold text-white shadow-xs ring-1.5 ring-background">
+                <span className="absolute top-1 right-1 flex h-4 min-w-[15px] items-center justify-center rounded-full bg-critical px-1 text-[9px] font-bold text-white shadow-subtle ring-1.5 ring-background">
                   {totalUnreadMessages > 99 ? '99+' : totalUnreadMessages}
                 </span>
               )}

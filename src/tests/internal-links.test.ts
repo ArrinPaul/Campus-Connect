@@ -25,13 +25,20 @@ function routePatterns(): RegExp[] {
   for (const file of walk(APP_DIR)) {
     if (path.basename(file) !== "page.tsx") continue;
     const rel = path.relative(APP_DIR, path.dirname(file)).split(path.sep);
+    // Parallel slots (@modal) and intercepting routes ((.)post) are not
+    // standalone URLs; dropping their segment would create a bogus /[id] route.
+    if (rel.some((s) => s.startsWith("@") || s.startsWith("(."))) continue;
     const segs = rel.filter((s) => s && !s.startsWith("(") && !s.startsWith("@"));
     const body = segs
       .map((s) =>
-        s.startsWith("[[") ? "(?:[^/]+)?" : s.startsWith("[") ? "[^/]+" : s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+        s.startsWith("[[")
+          ? "(?:/[^/]+)*"
+          : s.startsWith("[")
+          ? "/[^/]+"
+          : "/" + s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
       )
-      .join("/");
-    patterns.push(new RegExp(`^/${body}/?$`));
+      .join("");
+    patterns.push(new RegExp(`^${body}/?$`));
   }
   return patterns;
 }

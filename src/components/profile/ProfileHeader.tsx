@@ -2,18 +2,20 @@
 
 import Image from"next/image"
 import { useState } from"react"
-import { useRouter } from"next/navigation"
+import Link from"next/link"
+import { useRouter, usePathname } from"next/navigation"
 import { useUser } from"@/lib/auth/client"
 import { useMutation, useQuery } from"@/lib/api"
 import { api } from"@/lib/api"
 import { Id } from"@/lib/api"
 import { ButtonLoadingSpinner } from"@/components/ui/loading-skeleton"
 import { OnlineStatusDot } from"@/components/ui/OnlineStatusDot"
-import { MessageSquare, Pencil, X, Share2, Globe, Github, Linkedin, Twitter, BookOpen, Trophy, Award, CheckCircle, Sparkles } from"lucide-react"
+import { MessageSquare, Pencil, Share2, Globe, Github, Linkedin, Twitter, BookOpen, Trophy, Award, CheckCircle, Sparkles } from"lucide-react"
 import { createLogger } from"@/lib/logger"
 import { toast } from"sonner"
 import { ProfileForm } from"@/components/profile/ProfileForm"
 import { Button } from"@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from"@/components/ui/dialog"
 import { cn } from"@/lib/utils"
 
 const log = createLogger("ProfileHeader")
@@ -43,12 +45,18 @@ interface ProfileHeaderProps {
 
 export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileHeaderProps) {
   const router = useRouter()
+  const pathname = usePathname()
   const { isLoaded, isSignedIn } = useUser()
   const followUser = useMutation(api.follows.followUser)
   const unfollowUser = useMutation(api.follows.unfollowUser)
   const getOrCreateConversation = useMutation(api.conversations.getOrCreateConversation)
 
   const targetUserId = user._id || (user as any).id || (user as any).userId
+  const profileTabs = [
+    { label: "Posts", href: `/profile/${targetUserId}` },
+    { label: "Activity", href: `/profile/${targetUserId}/activity` },
+    { label: "Portfolio", href: `/profile/${targetUserId}/portfolio` },
+  ]
   const profilePicture = user.profilePicture || (user as any).profile_picture || (user as any).avatar_url
   const followerCount = user.followerCount ?? (user as any).follower_count ?? (user as any).followersCount ?? 0
   const followingCount = user.followingCount ?? (user as any).following_count ?? 0
@@ -209,7 +217,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
                     <p className="text-micro text-muted-foreground uppercase font-semibold">Reputation (Lvl {reputation?.level ?? 1})</p>
                   </div>
                   <div className="text-center md:text-left border-l border-border pl-4">
-                    <p className="text-subtitle-md font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                    <p className="text-subtitle-md font-bold text-warning flex items-center gap-1">
                       <Trophy className="w-3.5 h-3.5" />
                       <span>{reputation?.rank ? `#${reputation.rank}` : "â€”"}</span>
                     </p>
@@ -241,7 +249,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
                     <div
                       key={b.id}
                       title={`${b.name}: ${b.description}`}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-semibold"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-warning/10 border border-warning/20 text-warning text-xs font-semibold"
                     >
                       {b.id === "top_researcher" && <BookOpen className="w-3.5 h-3.5" />}
                       {b.id === "helpful_peer" && <CheckCircle className="w-3.5 h-3.5" />}
@@ -321,35 +329,35 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
  </div>
  </div>
 
- {/* Tabs - Apple Style */}
-          <div className="w-full flex items-center justify-center md:justify-start gap-8 h-12 border-t border-border mt-4 overflow-x-auto scrollbar-none">
-            <a href={`/profile/${targetUserId}`} className="relative h-full flex items-center text-[15px] font-semibold text-primary whitespace-nowrap">
-              Posts
-              <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-primary rounded-t-full" />
-            </a>
-            <a href={`/profile/${targetUserId}/activity`} className="h-full flex items-center text-[15px] text-muted-foreground font-semibold hover:bg-muted px-4 rounded-md my-1 transition-colors whitespace-nowrap">
-              Activity
-            </a>
-            <a href={`/profile/${targetUserId}/portfolio`} className="h-full flex items-center text-[15px] text-muted-foreground font-semibold hover:bg-muted px-4 rounded-md my-1 transition-colors whitespace-nowrap">
-              Portfolio
-            </a>
-          </div>
+ {/* Profile sections */}
+          <nav aria-label="Profile sections" className="w-full flex items-center justify-center md:justify-start gap-2 h-12 border-t border-border mt-4 overflow-x-auto scrollbar-none">
+            {profileTabs.map((tab) => {
+              const active = pathname === tab.href
+              return (
+                <Link
+                  key={tab.href}
+                  href={tab.href}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "relative h-full flex items-center px-4 text-[15px] font-semibold whitespace-nowrap transition-colors rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                    active ? "text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  )}
+                >
+                  {tab.label}
+                  {active && <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-primary rounded-t-full" />}
+                </Link>
+              )
+            })}
+          </nav>
         </div>
 
  {/* Edit Profile Modal */}
- {showEditModal && (
- <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowEditModal(false)}>
- <div
- className="bg-card border border-border rounded-lg shadow-sm w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto"
- onClick={(e) => e.stopPropagation()}
- >
- <div className="flex items-center justify-between p-lg border-b border-border">
- <h2 className="text-heading-sm text-foreground">Edit Profile</h2>
- <button onClick={() => setShowEditModal(false)} className="p-2 rounded-full hover:bg-card text-muted-foreground transition-colors">
- <X className="h-5 w-5" />
- </button>
- </div>
- <div className="p-lg">
+ <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+ <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+ <DialogHeader>
+ <DialogTitle>Edit Profile</DialogTitle>
+ <DialogDescription className="sr-only">Update your profile details.</DialogDescription>
+ </DialogHeader>
  <ProfileForm
  initialData={{
  bio: user.bio,
@@ -361,47 +369,44 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
  }}
  onSave={() => setShowEditModal(false)}
  />
- </div>
- </div>
- </div>
- )}
+ </DialogContent>
+ </Dialog>
 
   {/* Add Course Modal */}
-  {showAddCourseModal && (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowAddCourseModal(false)}>
-      <div
-        className="bg-card border border-border rounded-lg shadow-sm w-full max-w-sm mx-4 p-6"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-heading-sm text-foreground">Add Course</h2>
-          <button onClick={() => setShowAddCourseModal(false)} className="p-2 rounded-full hover:bg-card text-muted-foreground transition-colors">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        <p className="text-body-sm text-muted-foreground mb-4">
+  <Dialog open={showAddCourseModal} onOpenChange={setShowAddCourseModal}>
+    <DialogContent className="max-w-sm">
+      <DialogHeader>
+        <DialogTitle>Add Course</DialogTitle>
+        <DialogDescription>
           Enter your course code (e.g., CS101, BIO205) to automatically join its community and connect with classmates.
-        </p>
-        <div className="space-y-4">
-          <input
-            type="text"
-            placeholder="Course Code"
-            value={courseCode}
-            onChange={(e) => setCourseCode(e.target.value.toUpperCase())}
-            className="w-full px-4 h-12 bg-card border border-border rounded-lg text-foreground focus:outline-none focus:border-primary transition-colors"
-          />
-          <Button
-            onClick={handleAddCourse}
-            disabled={isAddingCourse || !courseCode.trim()}
-            variant="primary"
-            className="w-full h-12 flex justify-center items-center"
-          >
-            {isAddingCourse ? "Adding..." : "Add Course"}
-          </Button>
-        </div>
-      </div>
-    </div>
-  )}
+        </DialogDescription>
+      </DialogHeader>
+      <form
+        className="space-y-4"
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (!isAddingCourse && courseCode.trim()) handleAddCourse()
+        }}
+      >
+        <input
+          type="text"
+          aria-label="Course code"
+          placeholder="Course Code"
+          value={courseCode}
+          onChange={(e) => setCourseCode(e.target.value.toUpperCase())}
+          className="w-full px-4 h-12 bg-card border border-border rounded-lg text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors"
+        />
+        <Button
+          type="submit"
+          disabled={isAddingCourse || !courseCode.trim()}
+          variant="primary"
+          className="w-full h-12 flex justify-center items-center"
+        >
+          {isAddingCourse ? "Adding..." : "Add Course"}
+        </Button>
+      </form>
+    </DialogContent>
+  </Dialog>
  </div>
  )
 }

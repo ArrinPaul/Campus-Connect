@@ -89,7 +89,7 @@ export function UserActivityFeed({ userId }: { userId: Id<'users'> }) {
                         onClick={() => setFilter(value)}
                         className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-colors ${
                             filter === value
-                                ? 'bg-primary text-white'
+                                ? 'bg-primary text-on-primary'
                                 : 'bg-card text-muted-foreground border border-border hover:bg-card hover:text-foreground'
                         }`}
                     >

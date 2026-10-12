@@ -186,7 +186,7 @@ export function FeedContainer({ feedType ="following" }: FeedContainerProps) {
  // Handle not authenticated
  if (!isSignedIn) {
    return (
-     <div className="rounded-lg bg-card p-8 text-center shadow-elevation-1">
+     <div className="rounded-lg bg-card p-8 text-center shadow-subtle">
        <p className="text-muted-foreground">Please sign in to view the feed.</p>
      </div>
    )
@@ -218,15 +218,15 @@ export function FeedContainer({ feedType ="following" }: FeedContainerProps) {
 
  return (
  <div className="space-y-4">
- <div className="rounded-lg border border-border/60 bg-card p-6 text-center shadow-elevation-1 sm:p-8">
- <div className="mx-auto h-12 w-12 rounded-lg brand-gradient flex items-center justify-center shadow-glow-sm">
- <Repeat2 className="h-5 w-5 text-white" />
+ <div className="rounded-lg border border-border/60 bg-card p-6 text-center shadow-subtle sm:p-8">
+ <div className="mx-auto h-12 w-12 rounded-lg bg-gradient-to-br from-primary to-primary-deep flex items-center justify-center shadow-sm shadow-primary/20">
+ <Repeat2 className="h-5 w-5 text-on-primary" />
  </div>
  <h3 className="mt-4 text-lg font-semibold text-foreground sm:text-xl font-display">{title}</h3>
  <p className="mt-2 text-sm text-muted-foreground">{description}</p>
  <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
  <Link
- href="/discover"
+ href="/communities"
  className="inline-flex items-center rounded-full bg-primary/10 px-4 py-2 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors"
  >
  Explore communities
@@ -241,12 +241,12 @@ export function FeedContainer({ feedType ="following" }: FeedContainerProps) {
  </div>
 
  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
- <div className="rounded-lg border border-border/60 bg-card shadow-elevation-1 overflow-hidden">
- <div className="h-[3px] w-full gradient-warm" />
+ <div className="rounded-lg border border-border/60 bg-card shadow-subtle overflow-hidden">
+ <div className="h-[3px] w-full bg-gradient-to-r from-warning to-critical" />
  <SuggestedUsers limit={4} showSeeAll />
  </div>
- <div className="rounded-lg border border-border/60 bg-card shadow-elevation-1 overflow-hidden">
- <div className="h-[3px] w-full brand-gradient" />
+ <div className="rounded-lg border border-border/60 bg-card shadow-subtle overflow-hidden">
+ <div className="h-[3px] w-full bg-gradient-to-br from-primary to-primary-deep" />
  <TrendingHashtags limit={8} />
  </div>
  </div>

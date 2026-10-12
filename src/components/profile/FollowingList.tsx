@@ -19,7 +19,7 @@ export function FollowingList({ userId }: FollowingListProps) {
 
  if (followingData === undefined) {
  return (
- <div className="rounded-lg bg-card p-6 shadow-elevation-1">
+ <div className="rounded-lg bg-card p-6 shadow-subtle">
  <h2 className="text-xl font-bold text-foreground mb-4">Following</h2>
  <div className="space-y-3">
  {[1, 2, 3].map((i) => (
@@ -34,7 +34,7 @@ export function FollowingList({ userId }: FollowingListProps) {
 
  if (!Array.isArray(following) || following.length === 0) {
  return (
- <div className="rounded-lg bg-card p-6 shadow-elevation-1">
+ <div className="rounded-lg bg-card p-6 shadow-subtle">
  <h2 className="text-xl font-bold text-foreground mb-4">Following</h2>
  <p className="text-muted-foreground text-center py-8">Not following anyone yet</p>
  </div>
@@ -42,7 +42,7 @@ export function FollowingList({ userId }: FollowingListProps) {
  }
 
  return (
- <div className="rounded-lg bg-card p-6 shadow-elevation-1">
+ <div className="rounded-lg bg-card p-6 shadow-subtle">
  <h2 className="text-xl font-bold text-foreground mb-4">
  Following ({following.length})
  </h2>

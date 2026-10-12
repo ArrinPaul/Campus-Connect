@@ -92,7 +92,7 @@ export function SkillEndorsements({
  : undefined
  }
  >
- <Award className="h-3.5 w-3.5 text-amber-500" />
+ <Award className="h-3.5 w-3.5 text-warning" />
  {skill.count}
  {skill.topEndorsers.length > 0 && (
  <span className="hidden sm:inline text-muted-foreground truncate max-w-[120px]">

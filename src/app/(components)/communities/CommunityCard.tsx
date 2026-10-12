@@ -66,7 +66,7 @@ export function CommunityCard({ community }: Props) {
                 {/* Action CTA */}
                 <div className="mt-lg">
                     <div className={cn(
-                        "w-full h-10 flex items-center justify-center rounded-pill text-caption-bold transition-colors",
+                        "w-full h-10 flex items-center justify-center rounded-full text-caption-bold transition-colors",
                         community.viewerRole 
                             ? "bg-muted text-foreground" 
                             : "bg-primary text-white"

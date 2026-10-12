@@ -86,7 +86,7 @@ export function CreatePost({ communityId }: Props) {
           Join the conversation by signing in to your account.
         </p>
         <Link href="/sign-in">
-          <button className="bg-primary text-white hover:bg-primary/90 font-semibold rounded-md px-4 py-2 shadow-sm transition-colors flex items-center justify-center">
+          <button className="bg-primary text-on-primary hover:bg-primary/90 font-semibold rounded-md px-4 py-2 shadow-sm transition-colors flex items-center justify-center">
             Sign In
           </button>
         </Link>
@@ -128,7 +128,7 @@ export function CreatePost({ communityId }: Props) {
                 <button 
                     onClick={handleSubmit}
                     disabled={isSubmitting || content.trim().length === 0}
-                    className="bg-primary text-white hover:bg-primary/90 font-semibold rounded-md px-4 py-2 shadow-sm transition-colors flex items-center justify-center py-[8px] px-[20px] disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-disabled-text"
+                    className="bg-primary text-on-primary hover:bg-primary/90 font-semibold rounded-md px-4 py-2 shadow-sm transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-disabled-text"
                 >
                     {isSubmitting ? (
                         <Loader2 className="h-4 w-4 animate-spin" />

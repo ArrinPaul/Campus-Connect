@@ -1,6 +1,6 @@
 export function PostSkeleton() {
  return (
- <div className="rounded-lg border border-border/50 bg-card p-5 shadow-elevation-1 sm:p-6 animate-pulse">
+ <div className="rounded-lg border border-border/50 bg-card p-5 shadow-subtle sm:p-6 animate-pulse">
  <div className="flex items-start gap-3">
  <div className="h-10 w-10 rounded-full bg-muted animate-shimmer flex-shrink-0" />
  <div className="flex-1 space-y-3">
@@ -25,7 +25,7 @@ export function PostSkeleton() {
 
 export function UserCardSkeleton() {
  return (
- <div className="rounded-lg border border-border/50 bg-card p-4 shadow-elevation-1 animate-pulse">
+ <div className="rounded-lg border border-border/50 bg-card p-4 shadow-subtle animate-pulse">
  <div className="flex items-center gap-3">
  <div className="h-11 w-11 rounded-full bg-muted animate-shimmer flex-shrink-0" />
  <div className="flex-1 space-y-2">
@@ -43,7 +43,7 @@ export function UserCardSkeleton() {
 
 export function ProfileHeaderSkeleton() {
  return (
- <div className="rounded-lg border border-border/50 bg-card p-6 shadow-elevation-1 animate-pulse">
+ <div className="rounded-lg border border-border/50 bg-card p-6 shadow-subtle animate-pulse">
  <div className="flex flex-col items-center gap-4 sm:flex-row">
  <div className="h-24 w-24 rounded-full bg-muted animate-shimmer" />
  <div className="flex-1 space-y-3">
@@ -161,7 +161,7 @@ export function MessageListSkeleton() {
 // Community Card Skeleton
 export function CommunityCardSkeleton() {
  return (
- <div className="rounded-lg border border-border/50 bg-card p-5 shadow-elevation-1">
+ <div className="rounded-lg border border-border/50 bg-card p-5 shadow-subtle">
  <div className="space-y-3">
  <div className="h-5 w-3/4 rounded-md bg-muted animate-shimmer" />
  <div className="h-3.5 w-full rounded-md bg-muted animate-shimmer" />
@@ -181,7 +181,7 @@ export function CommunityCardSkeleton() {
 // Event Card Skeleton
 export function EventCardSkeleton() {
  return (
- <div className="rounded-lg border border-border/50 bg-card p-5 shadow-elevation-1">
+ <div className="rounded-lg border border-border/50 bg-card p-5 shadow-subtle">
  <div className="space-y-3">
  <div className="flex items-start gap-3">
  <div className="h-12 w-12 rounded-lg bg-muted animate-shimmer flex-shrink-0" />

@@ -154,8 +154,8 @@ export function RepostModal({ post, isOpen, onClose, onSuccess }: RepostModalPro
  disabled={isSubmitting}
  />
  <div className="mt-1 flex justify-between text-xs">
- <span className="text-critical dark:text-red-400">{error}</span>
- <span className={`${quoteContent.length > maxLength ?"text-critical dark:text-red-400" :"text-muted-foreground"}`}>
+ <span className="text-critical">{error}</span>
+ <span className={`${quoteContent.length > maxLength ?"text-critical" :"text-muted-foreground"}`}>
  {quoteContent.length}/{maxLength}
  </span>
  </div>

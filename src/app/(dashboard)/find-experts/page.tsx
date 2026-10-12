@@ -75,7 +75,7 @@ export default function FindExpertsPage() {
   return (
     <div className="w-full bg-canvas min-h-screen pb-16 space-y-6">
       {/* Header Banner */}
-      <div className="bg-card border-b border-border p-6 rounded-lg shadow-elevation-1 space-y-4">
+      <div className="bg-card border-b border-border p-6 rounded-lg shadow-subtle space-y-4">
         <div className="flex items-center gap-3.5">
           <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
             <UserSearch className="w-6 h-6" />
@@ -147,7 +147,7 @@ export default function FindExpertsPage() {
               return (
                 <div
                   key={targetUserId}
-                  className="group rounded-lg border border-border bg-card p-5 hover:border-primary/40 hover:shadow-elevation-1 transition-all duration-200"
+                  className="group rounded-lg border border-border bg-card p-5 hover:border-primary/40 hover:shadow-subtle transition-all duration-200"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <Link href={`/profile/${targetUserId}`} className="flex items-center gap-3 min-w-0 flex-1">
@@ -196,7 +196,7 @@ export default function FindExpertsPage() {
                       className={`px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all shrink-0 flex items-center gap-1.5 ${
                         isFollowing
                           ? 'bg-canvas border-border text-muted-foreground hover:text-critical'
-                          : 'bg-primary text-white hover:bg-primary/90 shadow-glow-sm'
+                          : 'bg-primary text-white hover:bg-primary/90 shadow-sm shadow-primary/20'
                       }`}
                     >
                       {isFollowing ? (

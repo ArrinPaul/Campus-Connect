@@ -2,7 +2,7 @@ export default function FeedLoading() {
  return (
  <div className="space-y-3 sm:space-y-4">
  {[...Array(3)].map((_, i) => (
- <div key={i} className="animate-pulse rounded-lg bg-card p-4 shadow-elevation-1 sm:p-6">
+ <div key={i} className="animate-pulse rounded-lg bg-card p-4 shadow-subtle sm:p-6">
  <div className="flex items-center gap-2 sm:gap-3">
  <div className="h-8 w-8 rounded-full bg-muted sm:h-10 sm:w-10" />
  <div className="flex-1 space-y-2">

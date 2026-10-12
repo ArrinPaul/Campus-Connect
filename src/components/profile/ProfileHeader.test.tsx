@@ -71,6 +71,7 @@ jest.mock("next/navigation", () => ({
     back: jest.fn(),
     prefetch: jest.fn(),
   })),
+  usePathname: jest.fn(() => "/profile/user123/activity"),
 }))
 
 describe("ProfileHeader", () => {
@@ -278,6 +279,39 @@ describe("ProfileHeader", () => {
       const loadingButton = screen.getAllByRole("button").find(btn => btn.hasAttribute("disabled") && btn.textContent?.includes("..."))
       expect(loadingButton).toBeTruthy()
       expect(loadingButton).toBeDisabled()
+    })
+  })
+
+  describe("profile section tabs", () => {
+    it("renders Posts/Activity/Portfolio as links to this user's pages", () => {
+      render(<ProfileHeader user={mockUser as any} />)
+      const nav = screen.getByRole("navigation", { name: "Profile sections" })
+      expect(nav).toBeInTheDocument()
+      expect(screen.getByRole("link", { name: "Posts" })).toHaveAttribute("href", "/profile/user123")
+      expect(screen.getByRole("link", { name: "Activity" })).toHaveAttribute("href", "/profile/user123/activity")
+      expect(screen.getByRole("link", { name: "Portfolio" })).toHaveAttribute("href", "/profile/user123/portfolio")
+    })
+
+    it("marks only the current section as active", () => {
+      render(<ProfileHeader user={mockUser as any} />)
+      expect(screen.getByRole("link", { name: "Activity" })).toHaveAttribute("aria-current", "page")
+      expect(screen.getByRole("link", { name: "Posts" })).not.toHaveAttribute("aria-current")
+    })
+  })
+
+  describe("own-profile dialogs", () => {
+    it("opens Add Course as an accessible dialog", () => {
+      render(<ProfileHeader user={mockUser as any} isOwnProfile />)
+      fireEvent.click(screen.getByRole("button", { name: /Add course/i }))
+      const dialog = screen.getByRole("dialog", { name: "Add Course" })
+      expect(dialog).toBeInTheDocument()
+      expect(screen.getByLabelText("Course code")).toBeInTheDocument()
+    })
+
+    it("opens Edit Profile as an accessible dialog", () => {
+      render(<ProfileHeader user={mockUser as any} isOwnProfile />)
+      fireEvent.click(screen.getByRole("button", { name: /Edit profile/i }))
+      expect(screen.getByRole("dialog", { name: "Edit Profile" })).toBeInTheDocument()
     })
   })
 })

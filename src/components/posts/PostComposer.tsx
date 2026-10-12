@@ -621,7 +621,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
           className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-primary transition-colors disabled:opacity-30"
           title="Attach photos"
         >
-          <ImageIcon className="h-4 w-4 text-emerald-500" />
+          <ImageIcon className="h-4 w-4 text-success" />
           <span className="hidden sm:inline">Photos</span>
         </button>
 
@@ -632,7 +632,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
           className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-primary transition-colors disabled:opacity-30"
           title="Attach video"
         >
-          <Video className="h-4 w-4 text-sky-500" />
+          <Video className="h-4 w-4 text-primary" />
           <span className="hidden sm:inline">Video</span>
         </button>
 
@@ -643,7 +643,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
           className="active:scale-[0.98] flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-primary transition-colors disabled:opacity-30"
           title="Attach document"
         >
-          <FileText className="h-4 w-4 text-amber-500" />
+          <FileText className="h-4 w-4 text-warning" />
           <span className="hidden sm:inline">Document</span>
         </button>
 
@@ -658,7 +658,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
           )}
           title="Create poll"
         >
-          <BarChart2 className="h-4 w-4 text-purple-500" />
+          <BarChart2 className="h-4 w-4 text-primary-deep" />
           <span className="hidden sm:inline">Poll</span>
         </button>
 
