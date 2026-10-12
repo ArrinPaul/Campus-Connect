@@ -44,3 +44,10 @@ seed.*.js
 test_db.js
 test_db.*.js
 *.debug.js
+
+# agent skills & tool outputs
+.agents/
+.claude/
+skills-lock.json
+brag-output/
+.swc/
