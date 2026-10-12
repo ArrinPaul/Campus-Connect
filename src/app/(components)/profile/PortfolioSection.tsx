@@ -29,7 +29,7 @@ export function PortfolioSection({ userId, projects = [], certifications = [] }:
     return (
         <div className="mt-4 space-y-6">
             {/* Projects */}
-            <div className="bg-card-soft border border-border/50 rounded-lg p-5 shadow-subtle">
+            <div className="bg-muted border border-border/50 rounded-lg p-5 shadow-subtle">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2 text-foreground font-semibold">
                         <Code className="w-5 h-5 text-primary" />
@@ -67,7 +67,7 @@ export function PortfolioSection({ userId, projects = [], certifications = [] }:
             </div>
 
             {/* Certifications */}
-            <div className="bg-card-soft border border-border/50 rounded-lg p-5 shadow-subtle">
+            <div className="bg-muted border border-border/50 rounded-lg p-5 shadow-subtle">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2 text-foreground font-semibold">
                         <Award className="w-5 h-5 text-warning" />

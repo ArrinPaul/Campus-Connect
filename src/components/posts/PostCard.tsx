@@ -385,7 +385,7 @@ export const PostCard = memo(function PostCard({
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.4, ease: "easeOut" }}
       onClick={handlePostClick}
-      className="group/post w-full bg-card border border-border rounded-lg mb-4 pt-4 transition-all hover:bg-surface-hover cursor-pointer shadow-sm"
+      className="group/post w-full bg-card border border-border rounded-lg mb-4 pt-4 transition-all hover:bg-muted cursor-pointer shadow-sm"
     >
       <div className="w-full px-4 flex gap-3 pb-2">
         {/* Left Column: Avatar */}

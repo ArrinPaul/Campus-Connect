@@ -23,7 +23,7 @@ export function ListingCard({ listing }: Props) {
     const sellerAvatar = listing.seller?.profile_picture;
 
     return (
-        <Link href={`/marketplace/${listing.id}`} className="block p-4 border border-border rounded-lg bg-card hover:bg-surface-hover transition-colors shadow-sm">
+        <Link href={`/marketplace/${listing.id}`} className="block p-4 border border-border rounded-lg bg-card hover:bg-muted transition-colors shadow-sm">
             <div className="relative h-48 w-full rounded-lg bg-muted overflow-hidden border border-border">
                 {listing.images && listing.images.length > 0 ? (
                     <OptimizedImage src={listing.images[0]} alt={listing.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 400px" />

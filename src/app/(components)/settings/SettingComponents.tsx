@@ -15,8 +15,8 @@ export const SettingsSection = ({
 }) => (
   <div className="mb-12 animate-in">
     <div className="mb-6">
-      <h3 className="text-display-md text-foreground font-bold tracking-tight">{title}</h3>
-      <p className="text-body text-foreground-muted-48 mt-1">{description}</p>
+      <h3 className="text-heading-sm text-foreground font-bold tracking-tight">{title}</h3>
+      <p className="text-body-md text-muted-foreground mt-1">{description}</p>
     </div>
     <div className="space-y-6 bg-card border border-border rounded-lg p-lg shadow-sm">
       {children}
@@ -44,7 +44,7 @@ export const Input = ({
   <div className="space-y-2">
     <label
       htmlFor={name}
-      className="block text-caption-strong text-foreground uppercase tracking-wider"
+      className="block text-caption-bold text-foreground uppercase tracking-wider"
     >
       {label}
     </label>
@@ -55,9 +55,9 @@ export const Input = ({
       value={value}
       onChange={onChange}
       placeholder={placeholder}
-      className="w-full h-11 px-4 rounded-sm border border-border bg-card text-body focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm"
+      className="w-full h-11 px-4 rounded-sm border border-border bg-card text-body-md focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm"
     />
-    {subtext && <p className="text-tiny text-foreground-muted-48 font-medium italic">{subtext}</p>}
+    {subtext && <p className="text-tiny text-muted-foreground font-medium italic">{subtext}</p>}
   </div>
 )
 
@@ -79,7 +79,7 @@ export const Textarea = ({
   <div className="space-y-2">
     <label
       htmlFor={name}
-      className="block text-caption-strong text-foreground uppercase tracking-wider"
+      className="block text-caption-bold text-foreground uppercase tracking-wider"
     >
       {label}
     </label>
@@ -91,11 +91,11 @@ export const Textarea = ({
         onChange={onChange}
         placeholder={placeholder}
         maxLength={maxLength}
-        className="w-full px-4 py-3 rounded-sm border border-border bg-card text-body focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm resize-none"
+        className="w-full px-4 py-3 rounded-sm border border-border bg-card text-body-md focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm resize-none"
         rows={4}
       />
       {maxLength && (
-        <p className="absolute bottom-2 right-3 text-micro text-foreground-muted-48 font-bold uppercase tracking-widest">
+        <p className="absolute bottom-2 right-3 text-micro text-muted-foreground font-bold uppercase tracking-widest">
           {value?.length || 0} / {maxLength}
         </p>
       )}

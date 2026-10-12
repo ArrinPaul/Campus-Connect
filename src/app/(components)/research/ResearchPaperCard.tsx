@@ -18,7 +18,7 @@ type Props = {
 
 export function ResearchPaperCard({ paper }: Props) {
     return (
-        <Link href={`/research/${paper._id}`} className="block p-4 border border-border rounded-lg bg-card hover:bg-surface-hover transition-colors shadow-sm">
+        <Link href={`/research/${paper._id}`} className="block p-4 border border-border rounded-lg bg-card hover:bg-muted transition-colors shadow-sm">
             <h3 className="font-bold text-[17px] text-primary hover:underline line-clamp-2">{paper.title}</h3>
             <p className="text-[13px] text-muted-foreground mt-1.5 line-clamp-3 leading-relaxed">{paper.abstract}</p>
             

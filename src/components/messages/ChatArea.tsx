@@ -194,7 +194,7 @@ export function ChatArea({ conversationId, onBack }: ChatAreaProps) {
  <div
  className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-medium ${
  isGroup
- ?"bg-accent-violet/10 text-accent-violet"
+ ?"bg-primary/10 text-primary"
  :"bg-primary/10 text-primary"
  }`}
  >

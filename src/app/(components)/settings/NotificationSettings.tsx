@@ -84,7 +84,7 @@ function PushNotificationSection() {
                     className={`px-4 py-2 text-sm font-medium rounded-md transition-colors disabled:opacity-50 ${
                         isSubscribed
                             ? 'bg-muted text-foreground hover:bg-muted/80'
-                            : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                            : 'bg-primary text-on-primary hover:bg-primary/90'
                     }`}
                 >
                     {toggling ? 'Updating...' : isSubscribed ? 'Disable' : 'Enable'}

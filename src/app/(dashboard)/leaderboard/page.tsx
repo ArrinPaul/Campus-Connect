@@ -67,7 +67,7 @@ export default function LeaderboardPage() {
           {/* Current User Quick Rank Pill */}
           {currentUserRank !== null && currentUserRank !== undefined && (
             <div className="flex items-center gap-3 bg-primary/10 border border-primary/20 rounded-lg px-4 py-3 shrink-0">
-              <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-extrabold text-base shadow-sm">
+              <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-extrabold text-base shadow-sm">
                 #{currentUserRank}
               </div>
               <div>
@@ -171,7 +171,7 @@ export default function LeaderboardPage() {
           <div className="pt-2">
             <Link
               href="/q-and-a"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:opacity-90 transition-opacity"
             >
               <span>Explore Questions</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
@@ -186,14 +186,14 @@ export default function LeaderboardPage() {
           {/* Rank 2 (Silver) */}
           {topThree[1] && (
             <div className="bg-card border border-border rounded-lg p-5 flex flex-col items-center text-center relative order-2 md:order-1 hover:border-border transition-colors">
-              <div className="absolute top-3 right-3 text-muted-foreground-400 font-black text-xs flex items-center gap-1">
-                <Medal className="w-4 h-4 text-muted-foreground-400" /> #2
+              <div className="absolute top-3 right-3 text-muted-foreground font-black text-xs flex items-center gap-1">
+                <Medal className="w-4 h-4 text-muted-foreground" /> #2
               </div>
-              <div className="h-16 w-16 rounded-full overflow-hidden border-2 border-slate-300 relative mb-3 bg-muted">
+              <div className="h-16 w-16 rounded-full overflow-hidden border-2 border-border relative mb-3 bg-muted">
                 {topThree[1].profilePicture ? (
                   <Image src={topThree[1].profilePicture} alt={topThree[1].name} fill className="object-cover" />
                 ) : (
-                  <div className="h-full w-full flex items-center justify-center font-bold text-lg text-muted-foreground-500">
+                  <div className="h-full w-full flex items-center justify-center font-bold text-lg text-muted-foreground">
                     {topThree[1].name[0]}
                   </div>
                 )}
@@ -202,7 +202,7 @@ export default function LeaderboardPage() {
                 {topThree[1].name}
               </Link>
               <p className="text-tiny text-muted-foreground truncate max-w-[160px]">{topThree[1].university || "Campus Scholar"}</p>
-              <div className="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/60 text-muted-foreground-700 dark:text-muted-foreground-300 text-xs font-bold">
+              <div className="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted dark:bg-muted/60 text-muted-foreground dark:text-muted-foreground text-xs font-bold">
                 <span>{topThree[1].points} pts</span>
                 <span className="text-micro text-muted-foreground">· Lvl {topThree[1].level}</span>
               </div>

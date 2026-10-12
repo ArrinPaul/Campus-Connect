@@ -19,7 +19,7 @@ type Props = {
 
 export function JobCard({ job }: Props) {
     return (
-        <Link href={`/jobs/${job._id}`} className="block p-4 border border-border rounded-lg bg-card hover:bg-surface-hover transition-colors shadow-sm">
+        <Link href={`/jobs/${job._id}`} className="block p-4 border border-border rounded-lg bg-card hover:bg-muted transition-colors shadow-sm">
             <div className="flex gap-4">
                 <div className="h-12 w-12 rounded-lg bg-muted flex-shrink-0 flex items-center justify-center font-bold text-lg border border-border shadow-sm">
                     {job.company.charAt(0)}

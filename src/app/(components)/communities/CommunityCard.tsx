@@ -22,7 +22,7 @@ export function CommunityCard({ community }: Props) {
             className="group block bg-card border border-border rounded-lg overflow-hidden transition-all shadow-sm hover:shadow-md"
         >
             {/* Banner Area */}
-            <div className="h-24 bg-card-parchment overflow-hidden relative">
+            <div className="h-24 bg-muted overflow-hidden relative">
                 {community.banner && (
                     <Image 
                         src={community.banner} 
@@ -66,9 +66,9 @@ export function CommunityCard({ community }: Props) {
                 {/* Action CTA */}
                 <div className="mt-lg">
                     <div className={cn(
-                        "w-full h-10 flex items-center justify-center rounded-pill text-caption-strong transition-colors",
+                        "w-full h-10 flex items-center justify-center rounded-pill text-caption-bold transition-colors",
                         community.viewerRole 
-                            ? "bg-card-parchment text-foreground" 
+                            ? "bg-muted text-foreground" 
                             : "bg-primary text-white"
                     )}>
                         {community.viewerRole ? 'View' : 'Join'}

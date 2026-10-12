@@ -12,7 +12,7 @@ type Props = {
 
 export function HashtagCard({ hashtag }: Props) {
     return (
-        <Link href={`/hashtag/${hashtag.tag}`} className="block p-4 border border-border rounded-lg bg-card hover:bg-surface-hover transition-colors shadow-sm">
+        <Link href={`/hashtag/${hashtag.tag}`} className="block p-4 border border-border rounded-lg bg-card hover:bg-muted transition-colors shadow-sm">
             <div className="flex items-center gap-3">
                 <Hash className="h-8 w-8 text-primary opacity-80" />
                 <div>

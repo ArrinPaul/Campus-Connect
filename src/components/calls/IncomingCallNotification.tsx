@@ -167,7 +167,7 @@ export function IncomingCallNotification() {
  <div className="w-px bg-card" />
  <button
  onClick={() => handleAccept(call)}
- className="flex flex-1 items-center justify-center gap-2 py-3 text-sm font-medium text-accent-emerald hover:bg-accent-emerald/10 transition-colors"
+ className="flex flex-1 items-center justify-center gap-2 py-3 text-sm font-medium text-success hover:bg-success/10 transition-colors"
  >
  <Phone className="h-4 w-4" />
  Accept

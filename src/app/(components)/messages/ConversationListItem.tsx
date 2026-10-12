@@ -36,7 +36,7 @@ export function ConversationListItem({
       onClick={onClick}
       className={cn(
         "w-full px-4 py-4 text-left transition-all btn-press border-b border-border relative flex items-center gap-4 group",
-        isSelected ? "bg-card-parchment" : "bg-card hover:bg-card-parchment/30"
+        isSelected ? "bg-muted" : "bg-card hover:bg-muted/30"
       )}
     >
       {/* Selected Indicator Bar */}
@@ -46,7 +46,7 @@ export function ConversationListItem({
 
       {/* Avatar */}
       <div className="relative flex-shrink-0">
-        <div className="h-12 w-12 rounded-full overflow-hidden border border-border bg-card-parchment shadow-sm">
+        <div className="h-12 w-12 rounded-full overflow-hidden border border-border bg-muted shadow-sm">
           {otherUser.profilePicture ? (
             <OptimizedImage
               src={otherUser.profilePicture}
@@ -73,19 +73,19 @@ export function ConversationListItem({
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-baseline mb-0.5">
           <h3 className={cn(
-            "text-body-strong truncate",
-            isSelected ? "text-foreground" : "text-foreground-muted-80"
+            "text-body-sm-bold truncate",
+            isSelected ? "text-foreground" : "text-muted-foreground"
           )}>
             {otherUser.name}
           </h3>
-          <span className="text-micro text-foreground-muted-48 font-semibold uppercase tracking-wider" suppressHydrationWarning>
+          <span className="text-micro text-muted-foreground font-semibold uppercase tracking-wider" suppressHydrationWarning>
             {formatDistanceToNow(conversation.updatedAt, { addSuffix: false })}
           </span>
         </div>
         <div className="flex justify-between items-center gap-2">
           <p className={cn(
             "text-caption truncate",
-            (conversation.unreadCount ?? 0) > 0 ? "text-foreground font-semibold" : "text-foreground-muted-48"
+            (conversation.unreadCount ?? 0) > 0 ? "text-foreground font-semibold" : "text-muted-foreground"
           )}>
             {conversation.lastMessage || "No messages yet"}
           </p>

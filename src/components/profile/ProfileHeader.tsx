@@ -140,7 +140,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
       {/* Cover Image / Gradient Area */}
       <div className="relative h-48 md:h-80 w-full max-w-[1096px] mx-auto bg-muted overflow-hidden md:rounded-b-lg">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-canvas/20" />
-        <div className="absolute inset-0 bg-tile-black opacity-5" />
+        <div className="absolute inset-0 bg-black opacity-5" />
       </div>
 
       {/* Header Content */}
@@ -185,7 +185,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
               </div>
 
               {user.bio && (
-                <p className="text-body text-muted-foreground max-w-2xl mt-4 leading-relaxed italic">
+                <p className="text-body-md text-muted-foreground max-w-2xl mt-4 leading-relaxed italic">
                   &ldquo;{user.bio}&rdquo;
                 </p>
               )}
@@ -194,22 +194,22 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 mt-4 pt-4 w-full">
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="text-center md:text-left">
-                    <p className="text-tagline font-bold text-foreground">{followerCount}</p>
+                    <p className="text-subtitle-md font-bold text-foreground">{followerCount}</p>
                     <p className="text-micro text-muted-foreground uppercase font-semibold">Followers</p>
                   </div>
                   <div className="text-center md:text-left border-l border-border pl-4">
-                    <p className="text-tagline font-bold text-foreground">{followingCount}</p>
+                    <p className="text-subtitle-md font-bold text-foreground">{followingCount}</p>
                     <p className="text-micro text-muted-foreground uppercase font-semibold">Following</p>
                   </div>
                   <div className="text-center md:text-left border-l border-border pl-4">
-                    <p className="text-tagline font-bold text-primary flex items-center gap-1">
+                    <p className="text-subtitle-md font-bold text-primary flex items-center gap-1">
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>{reputation?.points ?? (user as any).reputation ?? 0}</span>
                     </p>
                     <p className="text-micro text-muted-foreground uppercase font-semibold">Reputation (Lvl {reputation?.level ?? 1})</p>
                   </div>
                   <div className="text-center md:text-left border-l border-border pl-4">
-                    <p className="text-tagline font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                    <p className="text-subtitle-md font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
                       <Trophy className="w-3.5 h-3.5" />
                       <span>{reputation?.rank ? `#${reputation.rank}` : "â€”"}</span>
                     </p>
@@ -344,7 +344,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
  onClick={(e) => e.stopPropagation()}
  >
  <div className="flex items-center justify-between p-lg border-b border-border">
- <h2 className="text-display-md text-foreground">Edit Profile</h2>
+ <h2 className="text-heading-sm text-foreground">Edit Profile</h2>
  <button onClick={() => setShowEditModal(false)} className="p-2 rounded-full hover:bg-card text-muted-foreground transition-colors">
  <X className="h-5 w-5" />
  </button>
@@ -374,7 +374,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-display-md text-foreground">Add Course</h2>
+          <h2 className="text-heading-sm text-foreground">Add Course</h2>
           <button onClick={() => setShowAddCourseModal(false)} className="p-2 rounded-full hover:bg-card text-muted-foreground transition-colors">
             <X className="h-5 w-5" />
           </button>

@@ -77,7 +77,7 @@ export default function FindExpertsPage() {
       {/* Header Banner */}
       <div className="bg-card border-b border-border p-6 rounded-lg shadow-elevation-1 space-y-4">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-lg bg-accent-violet/10 text-accent-violet flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
             <UserSearch className="w-6 h-6" />
           </div>
           <div>
@@ -98,7 +98,7 @@ export default function FindExpertsPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search experts by domain, subject, department, or skill..."
-            className="w-full pl-11 pr-10 h-11 bg-canvas border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-accent-violet transition-colors shadow-sm"
+            className="w-full pl-11 pr-10 h-11 bg-canvas border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors shadow-sm"
           />
           {searchQuery && (
             <button
@@ -147,7 +147,7 @@ export default function FindExpertsPage() {
               return (
                 <div
                   key={targetUserId}
-                  className="group rounded-lg border border-border bg-card p-5 hover:border-accent-violet/40 hover:shadow-elevation-1 transition-all duration-200"
+                  className="group rounded-lg border border-border bg-card p-5 hover:border-primary/40 hover:shadow-elevation-1 transition-all duration-200"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <Link href={`/profile/${targetUserId}`} className="flex items-center gap-3 min-w-0 flex-1">
@@ -163,7 +163,7 @@ export default function FindExpertsPage() {
                               className="rounded-full object-cover group-hover:opacity-90 transition-opacity"
                             />
                           ) : (
-                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-violet/10 text-accent-violet font-bold text-base border border-border">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-base border border-border">
                               {user.name?.charAt(0).toUpperCase() || 'E'}
                             </div>
                           )}
@@ -177,7 +177,7 @@ export default function FindExpertsPage() {
                           </h3>
                           <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
                         </div>
-                        <span className="text-micro rounded-full bg-accent-violet/10 px-2 py-0.5 font-semibold text-accent-violet inline-block mt-0.5">
+                        <span className="text-micro rounded-full bg-primary/10 px-2 py-0.5 font-semibold text-primary inline-block mt-0.5">
                           {user.role || 'Faculty'}
                         </span>
                         
@@ -196,7 +196,7 @@ export default function FindExpertsPage() {
                       className={`px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all shrink-0 flex items-center gap-1.5 ${
                         isFollowing
                           ? 'bg-canvas border-border text-muted-foreground hover:text-critical'
-                          : 'bg-accent-violet text-white hover:bg-accent-violet/90 shadow-glow-sm'
+                          : 'bg-primary text-white hover:bg-primary/90 shadow-glow-sm'
                       }`}
                     >
                       {isFollowing ? (
@@ -219,7 +219,7 @@ export default function FindExpertsPage() {
                         <span
                           key={skill}
                           onClick={() => setSearchQuery(skill)}
-                          className="text-tiny px-2.5 py-1 rounded-lg bg-canvas border border-border text-foreground hover:border-accent-violet cursor-pointer transition-colors"
+                          className="text-tiny px-2.5 py-1 rounded-lg bg-canvas border border-border text-foreground hover:border-primary cursor-pointer transition-colors"
                         >
                           {skill}
                         </span>
@@ -230,7 +230,7 @@ export default function FindExpertsPage() {
                   <div className="mt-4 flex items-center gap-2">
                     <Link
                       href={`/profile/${targetUserId}`}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg border border-border bg-canvas text-xs font-semibold text-foreground hover:border-accent-violet/50 transition-colors"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg border border-border bg-canvas text-xs font-semibold text-foreground hover:border-primary/50 transition-colors"
                     >
                       <span>View Full Profile</span>
                       <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
@@ -238,7 +238,7 @@ export default function FindExpertsPage() {
 
                     <button
                       onClick={(e) => handleMessage(targetUserId, e)}
-                      className="py-2 px-4 rounded-lg bg-card border border-border text-xs font-semibold text-accent-violet hover:bg-accent-violet/10 hover:border-accent-violet/30 transition-colors flex items-center gap-1.5"
+                      className="py-2 px-4 rounded-lg bg-card border border-border text-xs font-semibold text-primary hover:bg-primary/10 hover:border-primary/30 transition-colors flex items-center gap-1.5"
                     >
                       <MessageSquare className="w-3.5 h-3.5" />
                       <span>Message</span>

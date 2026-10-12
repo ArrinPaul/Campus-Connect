@@ -180,7 +180,7 @@ export function MessageBubble({
  className="h-7 w-7 rounded-full object-cover ring-1 ring-hairline"
  />
  ) : (
- <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/20 to-accent-violet/20 flex items-center justify-center text-micro font-semibold text-foreground">
+ <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/20 to-primary/20 flex items-center justify-center text-micro font-semibold text-foreground">
  {message.senderName[0]?.toUpperCase()}
  </div>
  )}

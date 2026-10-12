@@ -10,10 +10,10 @@ interface SectionProps {
 export function Section({ children, className, variant ="light" }: SectionProps) {
  const variants = {
  light:"bg-card text-foreground",
- dark:"bg-tile-1 text-white",
+ dark:"bg-ink-deep dark:bg-card text-white",
  parchment:"bg-card text-foreground",
- dark2:"bg-tile-2 text-white",
- dark3:"bg-tile-3 text-white",
+ dark2:"bg-ink-deep/90 dark:bg-muted text-white",
+ dark3:"bg-primary-deep text-white",
  };
 
  return (
@@ -38,7 +38,7 @@ export function SectionHeader({ title, tagline, children }: { title: string; tag
  {title}
  </h2>
  {tagline && (
- <p className="text-lead md:text-tagline opacity-90 max-w-2xl">
+ <p className="text-subtitle-md md:text-subtitle-md opacity-90 max-w-2xl">
  {tagline}
  </p>
  )}

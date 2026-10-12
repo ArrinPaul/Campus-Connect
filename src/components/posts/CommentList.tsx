@@ -260,7 +260,7 @@ export function CommentList({
  {isAtMaxDepth && replyCount > 0 && (
  <Link
  href={`#comment-${comment._id}`}
- className="text-xs text-accent-violet hover:text-accent-violet/80 flex items-center gap-1"
+ className="text-xs text-primary hover:text-primary/80 flex items-center gap-1"
  >
  <ArrowRight className="h-3 w-3" />
  Continue this thread

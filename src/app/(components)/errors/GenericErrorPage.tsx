@@ -24,7 +24,7 @@ export default function GenericErrorPage({
             </h1>
             <p className="text-muted-foreground text-lg mb-8 max-w-md">{message}</p>
             {reset && (
-                <button onClick={reset} className="px-6 py-3 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+                <button onClick={reset} className="px-6 py-3 bg-primary text-on-primary rounded-md hover:bg-primary/90 transition-colors">
                     Try again
                 </button>
             )}

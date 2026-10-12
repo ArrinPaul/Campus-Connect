@@ -46,7 +46,7 @@ export function UserCard({ user }: Props) {
                             {user.name}
                         </h3>
                         {user.username && (
-                            <span className="text-caption text-foreground-muted-48 truncate">
+                            <span className="text-caption text-muted-foreground truncate">
                                 @{user.username}
                             </span>
                         )}
@@ -64,7 +64,7 @@ export function UserCard({ user }: Props) {
                 </div>
 
                 {/* Indicator */}
-                <div className="flex-shrink-0 text-foreground-muted-48 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                <div className="flex-shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
                     <ChevronRight size={20} />
                 </div>
             </div>

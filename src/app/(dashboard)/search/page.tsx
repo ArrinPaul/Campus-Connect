@@ -49,8 +49,8 @@ function SearchResultsContent() {
  return (
  <div className="flex flex-col items-center justify-center py-32 text-center opacity-50">
  <Search size={64} className="mb-4 text-muted-foreground" />
- <h3 className="text-display-md text-foreground">Discover Campus Connect.</h3>
- <p className="text-body text-muted-foreground mt-2 max-w-sm">
+ <h3 className="text-heading-sm text-foreground">Discover Campus Connect.</h3>
+ <p className="text-body-md text-muted-foreground mt-2 max-w-sm">
  Search for people, posts, or academic hashtags to expand your community.
  </p>
  </div>
@@ -67,8 +67,8 @@ function SearchResultsContent() {
  return (
  <div className="flex flex-col items-center justify-center py-32 text-center">
  <Inbox size={64} className="mb-4 text-foreground/10" />
- <h3 className="text-display-md text-foreground">No matches found.</h3>
- <p className="text-body text-muted-foreground mt-2 max-w-sm">
+ <h3 className="text-heading-sm text-foreground">No matches found.</h3>
+ <p className="text-body-md text-muted-foreground mt-2 max-w-sm">
  We couldn&apos;t find anything for &ldquo;{currentQuery}&rdquo;. Try checking the spelling or using broader keywords.
  </p>
  </div>
@@ -108,19 +108,19 @@ function SearchResultsContent() {
  <div className="space-y-12">
  {posts.length > 0 && (
  <div className="space-y-4">
- <div className="text-fine-print text-muted-foreground font-bold uppercase tracking-widest border-b border-border pb-2">Top Posts</div>
+ <div className="text-caption text-muted-foreground font-bold uppercase tracking-widest border-b border-border pb-2">Top Posts</div>
  <PostGrid items={posts} />
  </div>
  )}
  {users.length > 0 && (
  <div className="space-y-4">
- <div className="text-fine-print text-muted-foreground font-bold uppercase tracking-widest border-b border-border pb-2">Relevant People</div>
+ <div className="text-caption text-muted-foreground font-bold uppercase tracking-widest border-b border-border pb-2">Relevant People</div>
  <UserGrid items={users} />
  </div>
  )}
  {hashtags.length > 0 && (
  <div className="space-y-4">
- <div className="text-fine-print text-muted-foreground font-bold uppercase tracking-widest border-b border-border pb-2">Academic Hashtags</div>
+ <div className="text-caption text-muted-foreground font-bold uppercase tracking-widest border-b border-border pb-2">Academic Hashtags</div>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  {hashtags.map((hashtag: any) => <HashtagCard key={hashtag.id} hashtag={hashtag as any} />)}
  </div>

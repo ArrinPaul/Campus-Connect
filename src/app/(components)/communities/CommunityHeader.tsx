@@ -65,7 +65,7 @@ export function CommunityHeader({ community }: Props) {
                         className="object-cover opacity-90" 
                     />
                 ) : (
-                    <div className="absolute inset-0 bg-tile-1 opacity-5" />
+                    <div className="absolute inset-0 bg-ink-deep dark:bg-card opacity-5" />
                 )}
             </div>
 
@@ -142,7 +142,7 @@ export function CommunityHeader({ community }: Props) {
                     </Link>
                     <Link 
                         href={`/c/${community.slug}/members`} 
-                        className="h-full flex items-center text-caption font-semibold text-foreground-muted-48 hover:text-foreground transition-colors"
+                        className="h-full flex items-center text-caption font-semibold text-muted-foreground hover:text-foreground transition-colors"
                     >
                         Members
                     </Link>

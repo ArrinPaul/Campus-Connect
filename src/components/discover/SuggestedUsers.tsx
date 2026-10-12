@@ -126,7 +126,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = false, className = "" }
                   className={`ml-2 flex items-center justify-center gap-1 rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
                     isFollowed
                       ? "bg-card text-charcoal border border-border cursor-default"
-                      : "bg-primary text-white hover:bg-primary-hover active:scale-95"
+                      : "bg-primary text-white hover:bg-primary-deep active:scale-95"
                   }`}
                   data-testid={`follow-btn-${user.id}`}
                   aria-label={isFollowed ? `Following ${user.name}` : `Follow ${user.name}`}

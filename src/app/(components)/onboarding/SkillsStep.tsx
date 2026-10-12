@@ -7,7 +7,7 @@ import { X, Check } from 'lucide-react';
 const TempButton = ({ children, onClick, disabled=false, variant='primary' }: { children: React.ReactNode, onClick: () => void, disabled?: boolean, variant?: 'primary' | 'outline' }) => {
     const baseClasses = "w-full inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background h-12 py-2 px-4 btn-press";
     const variantClasses = variant === 'primary' 
-        ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+        ? 'bg-primary text-on-primary hover:bg-primary/90'
         : 'border border-input bg-transparent hover:bg-accent hover:text-accent-foreground';
     return <button onClick={onClick} disabled={disabled} className={`${baseClasses} ${variantClasses}`}>{children}</button>
 }
@@ -56,7 +56,7 @@ export function SkillsStep({ data, updateFormData, prevStep, submit }: Props) {
                         onClick={() => toggleSkill(skill)}
                         className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                             data.skills.includes(skill) 
-                            ? 'bg-primary text-primary-foreground' 
+                            ? 'bg-primary text-on-primary' 
                             : 'bg-muted hover:bg-muted/80'
                         }`}
                     >

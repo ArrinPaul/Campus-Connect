@@ -149,7 +149,7 @@ export default function ResearchDetailPage({ params }: PageProps) {
             onClick={handleVote}
             disabled={isVoting}
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-colors ${
-              hasVoted ? 'bg-primary text-on-primary' : 'bg-card text-muted-foreground hover:text-primary hover:bg-surface'
+              hasVoted ? 'bg-primary text-on-primary' : 'bg-card text-muted-foreground hover:text-primary hover:bg-card'
             }`}
             title="Upvote preprint"
           >
@@ -160,7 +160,7 @@ export default function ResearchDetailPage({ params }: PageProps) {
           <button
             type="button"
             onClick={() => setShowReviewForm((v) => !v)}
-            className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold bg-card text-muted-foreground hover:text-primary hover:bg-surface transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold bg-card text-muted-foreground hover:text-primary hover:bg-card transition-colors"
           >
             <MessageSquarePlus className="h-4 w-4" />
             <span>Peer Review ({currentReviews})</span>
@@ -189,7 +189,7 @@ export default function ResearchDetailPage({ params }: PageProps) {
                     onClick={() => setRating(star)}
                     className="p-1 text-amber-500 hover:scale-110 transition-transform"
                   >
-                    <Star className={`h-5 w-5 ${star <= rating ? 'fill-amber-500' : 'text-muted-foreground-300'}`} />
+                    <Star className={`h-5 w-5 ${star <= rating ? 'fill-amber-500' : 'text-muted-foreground'}`} />
                   </button>
                 ))}
                 <span className="text-xs text-muted-foreground ml-2">{rating} / 5</span>
@@ -248,7 +248,7 @@ export default function ResearchDetailPage({ params }: PageProps) {
 
         <div>
           <h3 className="font-bold text-lg mb-2">Abstract</h3>
-          <p className="whitespace-pre-wrap text-sm text-muted-foreground-700 dark:text-muted-foreground-300 leading-relaxed">{paper.abstract}</p>
+          <p className="whitespace-pre-wrap text-sm text-muted-foreground dark:text-muted-foreground leading-relaxed">{paper.abstract}</p>
         </div>
 
         {paper.tags && paper.tags.length > 0 && (

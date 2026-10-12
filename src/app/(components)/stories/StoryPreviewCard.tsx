@@ -29,7 +29,7 @@ export function StoryPreviewCard({ story }: Props) {
                     {authorAvatar ? (
                         <Image src={authorAvatar} alt={authorName} width={64} height={64} className="h-full w-full object-cover" />
                     ) : (
-                        <span className="text-xl font-bold text-primary-foreground">{authorName.charAt(0)}</span>
+                        <span className="text-xl font-bold text-on-primary">{authorName.charAt(0)}</span>
                     )}
                 </div>
             </div>
