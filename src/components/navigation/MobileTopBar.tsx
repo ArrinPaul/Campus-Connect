@@ -57,7 +57,7 @@ export function MobileTopBar() {
             >
               <Heart className="h-[22px] w-[22px] stroke-[1.8]" />
               {typeof unreadNotifications === 'number' && unreadNotifications > 0 && (
-                <span className="absolute top-1.5 right-1.5 flex h-2 w-2 rounded-full bg-[#ED4956] ring-1.5 ring-background" />
+                <span className="absolute top-1.5 right-1.5 flex h-2 w-2 rounded-full bg-critical ring-1.5 ring-background" />
               )}
             </Link>
 
@@ -69,7 +69,7 @@ export function MobileTopBar() {
             >
               <Send className="h-[20px] w-[20px] stroke-[1.8] -rotate-12 translate-y-[-1px]" />
               {typeof totalUnreadMessages === 'number' && totalUnreadMessages > 0 && (
-                <span className="absolute top-1 right-1 flex h-4 min-w-[15px] items-center justify-center rounded-full bg-[#ED4956] px-1 text-[9px] font-bold text-white shadow-xs ring-1.5 ring-background">
+                <span className="absolute top-1 right-1 flex h-4 min-w-[15px] items-center justify-center rounded-full bg-critical px-1 text-[9px] font-bold text-white shadow-xs ring-1.5 ring-background">
                   {totalUnreadMessages > 99 ? '99+' : totalUnreadMessages}
                 </span>
               )}

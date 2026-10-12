@@ -180,7 +180,7 @@ export function MessageBubble({
  className="h-7 w-7 rounded-full object-cover ring-1 ring-hairline"
  />
  ) : (
- <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/20 to-accent-violet/20 flex items-center justify-center text-[10px] font-semibold text-foreground">
+ <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/20 to-accent-violet/20 flex items-center justify-center text-micro font-semibold text-foreground">
  {message.senderName[0]?.toUpperCase()}
  </div>
  )}
@@ -217,7 +217,7 @@ export function MessageBubble({
  :"border-primary/40 bg-primary/5"
  }`}
  >
- <p className="text-[10px] font-semibold opacity-90">
+ <p className="text-micro font-semibold opacity-90">
  {message.replyToMessage.senderName}
  </p>
  <p className="text-xs truncate opacity-70">
@@ -229,7 +229,7 @@ export function MessageBubble({
  {/* Pinned indicator */}
  {message.isPinned && (
  <div className="flex items-center gap-1 mb-1">
- <span className="text-[10px] opacity-60">📌 Pinned</span>
+ <span className="text-micro opacity-60">📌 Pinned</span>
  </div>
  )}
 
@@ -289,7 +289,7 @@ export function MessageBubble({
  }`}
  >
  <span
- className={`text-[10px] ${
+ className={`text-micro ${
  message.isOwn ?"text-white/80" :"text-muted-foreground"
  }`}
  >
@@ -297,7 +297,7 @@ export function MessageBubble({
  </span>
  {message.updatedAt && (
  <span
- className={`text-[10px] italic ${
+ className={`text-micro italic ${
  message.isOwn ?"text-white/80" :"text-muted-foreground"
  }`}
  >
@@ -305,7 +305,7 @@ export function MessageBubble({
  </span>
  )}
  {message.isOwn && (
- <span className="text-[10px]">
+ <span className="text-micro">
  {message.status ==="read" ? (
  <CheckCheck className="h-3 w-3 text-white/90" />
  ) : message.status ==="delivered" ? (

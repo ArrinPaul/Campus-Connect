@@ -63,7 +63,7 @@ export default function AdminModerationPage() {
  {item.reporter?.profile_picture ? (
  <Image src={item.reporter.profile_picture} alt={item.reporter.name} width={24} height={24} className="rounded-full object-cover" />
  ) : (
- <div className="w-6 h-6 rounded-full bg-canvas flex items-center justify-center text-[10px]">
+ <div className="w-6 h-6 rounded-full bg-canvas flex items-center justify-center text-micro">
  {item.reporter?.name?.charAt(0) || '?'}
  </div>
  )}

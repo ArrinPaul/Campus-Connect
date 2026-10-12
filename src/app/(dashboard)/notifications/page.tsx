@@ -112,7 +112,7 @@ export default function NotificationsPage() {
             Unread
             {unreadCount > 0 && (
               <span className={cn(
-                "px-1.5 py-0.5 rounded-full text-[10px] font-bold",
+                "px-1.5 py-0.5 rounded-full text-micro font-bold",
                 filter === 'unread' ? "bg-white text-primary" : "bg-primary text-white"
               )}>
                 {unreadCount}

@@ -69,7 +69,7 @@ export default function ResourcesPage() {
  value={courseFilter}
  onChange={(e) => setCourseFilter(e.target.value)}
  placeholder="Filter by course..."
- className="w-full pl-9 pr-4 h-[40px] bg-card border border-border rounded-full text-body-sm focus:outline-none focus:border-2 focus:border-fb-blue focus:bg-canvas transition-all text-foreground placeholder:text-muted-foreground sm:w-48"
+ className="w-full pl-9 pr-4 h-[40px] bg-card border border-border rounded-full text-body-sm focus:outline-none focus:border-2 focus:border-primary focus:bg-canvas transition-all text-foreground placeholder:text-muted-foreground sm:w-48"
  />
  </div>
  </div>

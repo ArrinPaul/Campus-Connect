@@ -209,7 +209,7 @@ export default function FindPartnersPage() {
                           <h3 className="text-sm font-bold text-foreground truncate group-hover:underline">
                             {user.name}
                           </h3>
-                          <span className="text-[10px] rounded-full bg-primary/10 px-2 py-0.5 font-semibold text-primary">
+                          <span className="text-micro rounded-full bg-primary/10 px-2 py-0.5 font-semibold text-primary">
                             {user.role || 'Student'}
                           </span>
                         </div>
@@ -254,13 +254,13 @@ export default function FindPartnersPage() {
                         <span
                           key={skill}
                           onClick={() => setSearchQuery(skill)}
-                          className="text-[11px] px-2.5 py-1 rounded-lg bg-canvas border border-border text-foreground hover:border-primary cursor-pointer transition-colors"
+                          className="text-tiny px-2.5 py-1 rounded-lg bg-canvas border border-border text-foreground hover:border-primary cursor-pointer transition-colors"
                         >
                           {skill}
                         </span>
                       ))}
                       {user.skills.length > 5 && (
-                        <span className="text-[11px] text-muted-foreground font-medium self-center pl-1">
+                        <span className="text-tiny text-muted-foreground font-medium self-center pl-1">
                           +{user.skills.length - 5} more
                         </span>
                       )}

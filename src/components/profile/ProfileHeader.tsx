@@ -195,25 +195,25 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="text-center md:text-left">
                     <p className="text-tagline font-bold text-foreground">{followerCount}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase font-semibold">Followers</p>
+                    <p className="text-micro text-muted-foreground uppercase font-semibold">Followers</p>
                   </div>
                   <div className="text-center md:text-left border-l border-border pl-4">
                     <p className="text-tagline font-bold text-foreground">{followingCount}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase font-semibold">Following</p>
+                    <p className="text-micro text-muted-foreground uppercase font-semibold">Following</p>
                   </div>
                   <div className="text-center md:text-left border-l border-border pl-4">
                     <p className="text-tagline font-bold text-primary flex items-center gap-1">
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>{reputation?.points ?? (user as any).reputation ?? 0}</span>
                     </p>
-                    <p className="text-[10px] text-muted-foreground uppercase font-semibold">Reputation (Lvl {reputation?.level ?? 1})</p>
+                    <p className="text-micro text-muted-foreground uppercase font-semibold">Reputation (Lvl {reputation?.level ?? 1})</p>
                   </div>
                   <div className="text-center md:text-left border-l border-border pl-4">
                     <p className="text-tagline font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
                       <Trophy className="w-3.5 h-3.5" />
                       <span>{reputation?.rank ? `#${reputation.rank}` : "â€”"}</span>
                     </p>
-                    <p className="text-[10px] text-muted-foreground uppercase font-semibold">Campus Rank</p>
+                    <p className="text-micro text-muted-foreground uppercase font-semibold">Campus Rank</p>
                   </div>
                 </div>
 
@@ -236,7 +236,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
               {/* Achievement Badges Row */}
               {reputation?.badges && reputation.badges.length > 0 && (
                 <div className="flex flex-wrap items-center gap-2 pt-4 w-full">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mr-1">Badges:</span>
+                  <span className="text-micro font-bold text-muted-foreground uppercase tracking-wider mr-1">Badges:</span>
                   {reputation.badges.map((b: any) => (
                     <div
                       key={b.id}
@@ -388,7 +388,7 @@ export function ProfileHeader({ user, isOwnProfile: isOwnProfileProp }: ProfileH
             placeholder="Course Code"
             value={courseCode}
             onChange={(e) => setCourseCode(e.target.value.toUpperCase())}
-            className="w-full px-4 h-12 bg-card border border-border rounded-lg text-foreground focus:outline-none focus:border-fb-blue transition-colors"
+            className="w-full px-4 h-12 bg-card border border-border rounded-lg text-foreground focus:outline-none focus:border-primary transition-colors"
           />
           <Button
             onClick={handleAddCourse}

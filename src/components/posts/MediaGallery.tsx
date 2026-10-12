@@ -145,7 +145,7 @@ export function MediaGallery({
                 zIndex: 30,
               }}
             >
-              <Heart className="h-20 w-20 fill-[#ED4956] text-[#ED4956] drop-shadow-lg" />
+              <Heart className="h-20 w-20 fill-critical text-critical drop-shadow-lg" />
             </motion.div>
           )}
         </AnimatePresence>

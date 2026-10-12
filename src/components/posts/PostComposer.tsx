@@ -590,7 +590,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
                   >
                     <div className="flex items-center justify-between font-semibold">
                       <span>#{hashtag.tag}</span>
-                      <span className="text-[10px] text-muted-foreground">{hashtag.postCount}</span>
+                      <span className="text-micro text-muted-foreground">{hashtag.postCount}</span>
                     </div>
                   </li>
                 ))}
@@ -747,7 +747,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
               <p className="text-xs font-semibold text-foreground truncate">
                 {attachedFiles[0].name}
               </p>
-              <p className="text-[10px] text-muted-foreground">
+              <p className="text-micro text-muted-foreground">
                 {(attachedFiles[0].size / (1024 * 1024)).toFixed(2)} MB
               </p>
             </div>
@@ -777,7 +777,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs font-semibold text-foreground truncate">{file.name}</p>
-                  <p className="text-[10px] text-muted-foreground">
+                  <p className="text-micro text-muted-foreground">
                     {(file.size / (1024 * 1024)).toFixed(2)} MB
                   </p>
                 </div>
@@ -813,7 +813,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
             {linkPreviewData.title || linkPreviewData.url}
           </p>
           {linkPreviewData.description && (
-            <p className="text-[11px] text-muted-foreground line-clamp-2 mt-0.5">
+            <p className="text-tiny text-muted-foreground line-clamp-2 mt-0.5">
               {linkPreviewData.description}
             </p>
           )}
@@ -823,7 +823,7 @@ export function PostComposer({ onPostCreated, communityId }: PostComposerProps) 
       {/* Uploading Status */}
       {isUploading && (
         <div className="space-y-1 animate-pulse">
-          <div className="flex justify-between text-[10px] text-muted-foreground font-semibold">
+          <div className="flex justify-between text-micro text-muted-foreground font-semibold">
             <span>Uploading Assets</span>
             <span>{uploadProgress}%</span>
           </div>

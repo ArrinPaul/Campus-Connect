@@ -198,7 +198,7 @@ export function SignIn(_props: Record<string, unknown>) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email address"
-              className="w-full pl-11 pr-4 h-11 rounded-lg border border-border bg-card text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
+              className="w-full pl-11 pr-4 h-11 rounded-lg border border-border bg-card text-body-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               required
             />
           </div>
@@ -209,7 +209,7 @@ export function SignIn(_props: Record<string, unknown>) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-              className="w-full pl-11 pr-11 h-11 rounded-lg border border-border bg-card text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
+              className="w-full pl-11 pr-11 h-11 rounded-lg border border-border bg-card text-body-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               required
             />
             <button
@@ -346,7 +346,7 @@ export function SignUp(_props: Record<string, unknown>) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Full name"
-              className="w-full pl-11 pr-4 h-11 rounded-lg border border-border bg-card text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
+              className="w-full pl-11 pr-4 h-11 rounded-lg border border-border bg-card text-body-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               required
             />
           </div>
@@ -357,7 +357,7 @@ export function SignUp(_props: Record<string, unknown>) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email address"
-              className="w-full pl-11 pr-4 h-11 rounded-lg border border-border bg-card text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
+              className="w-full pl-11 pr-4 h-11 rounded-lg border border-border bg-card text-body-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               required
             />
           </div>
@@ -368,7 +368,7 @@ export function SignUp(_props: Record<string, unknown>) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password (min 8 chars)"
-              className="w-full pl-11 pr-11 h-11 rounded-lg border border-border bg-card text-body-md focus:outline-none focus:ring-2 focus:ring-fb-blue focus:border-transparent transition-all"
+              className="w-full pl-11 pr-11 h-11 rounded-lg border border-border bg-card text-body-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               required
             />
             <button

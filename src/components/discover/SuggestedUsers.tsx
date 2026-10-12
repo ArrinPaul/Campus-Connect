@@ -113,7 +113,7 @@ export function SuggestedUsers({ limit = 5, showSeeAll = false, className = "" }
                     <p className="text-xs font-semibold text-foreground truncate group-hover:text-primary transition-colors">
                       {user.name}
                     </p>
-                    <p className="text-[11px] text-charcoal truncate">
+                    <p className="text-tiny text-charcoal truncate">
                       {user.role || (user.username ? `@${user.username}` : "Student")}
                     </p>
                   </div>

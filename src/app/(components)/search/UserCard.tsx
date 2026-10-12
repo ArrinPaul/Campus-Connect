@@ -57,7 +57,7 @@ export function UserCard({ user }: Props) {
                         </p>
                     )}
                     <div className="flex items-center gap-2 mt-2">
-                         <span className="text-[10px] text-primary font-bold uppercase tracking-widest border border-primary/20 bg-primary/5 px-2 py-0.5 rounded-pill">
+                         <span className="text-micro text-primary font-bold uppercase tracking-widest border border-primary/20 bg-primary/5 px-2 py-0.5 rounded-pill">
                             {user.role}
                          </span>
                     </div>

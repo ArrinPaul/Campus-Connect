@@ -72,7 +72,7 @@ export default function QuestionsPage() {
  value={tagFilter}
  onChange={(e) => setTagFilter(e.target.value)}
  placeholder="Filter tag..."
- className="w-full pl-9 pr-4 h-[40px] bg-card border border-border rounded-full text-body-sm focus:outline-none focus:border-2 focus:border-fb-blue focus:bg-canvas transition-all text-foreground placeholder:text-muted-foreground sm:w-32"
+ className="w-full pl-9 pr-4 h-[40px] bg-card border border-border rounded-full text-body-sm focus:outline-none focus:border-2 focus:border-primary focus:bg-canvas transition-all text-foreground placeholder:text-muted-foreground sm:w-32"
  />
  </div>
 

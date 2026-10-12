@@ -55,7 +55,7 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
   const getIcon = () => {
     const iconClass = "w-3.5 h-3.5";
     switch (notification.type) {
-      case "like": return <Heart className={cn(iconClass, "fill-[#ED4956] text-[#ED4956]")} />
+      case "like": return <Heart className={cn(iconClass, "fill-critical text-critical")} />
       case "comment": return <MessageCircle className={cn(iconClass, "text-primary")} />
       case "mention": return <AtSign className={cn(iconClass, "text-amber-500")} />
       case "follow": return <UserPlus className={cn(iconClass, "text-primary")} />
@@ -113,7 +113,7 @@ export function NotificationItem({ notification, onRead }: NotificationItemProps
           )}>
             {notification.message}
           </p>
-          <p className="text-[11px] text-muted-foreground mt-0.5 font-medium" suppressHydrationWarning>
+          <p className="text-tiny text-muted-foreground mt-0.5 font-medium" suppressHydrationWarning>
             {notification.created_at
               ? formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })
               : ""}

@@ -11,11 +11,6 @@
     --on-primary: 255 255 255;
 
     /* Accent & Social */
-    --ink-button: 5 5 5;
-    --on-ink-button: 255 255 255;
-    --fb-blue: 8 102 255;
-    --meta-link: 24 119 242;
-    --oculus-purple: 114 46 209;
 
     /* Semantic */
     --success: 49 162 76;        /* #31A24C */
@@ -23,8 +18,9 @@
     --attention: 245 159 0;      /* #F59F00 */
     --warning: 245 159 0;        
     --warning-bg: 255 250 230;
-    --critical: 237 73 86;       /* #ED4956 Instagram Like Red */
+    --critical: 237 73 86;       /* #ED4956 */
     --critical-strong: 200 30 60;
+    --critical-bg: 254 237 239;
 
     /* Surfaces */
     --canvas: 248 249 250;       /* #F8F9FA Clean Background */
@@ -72,12 +68,6 @@
     --primary-soft: 24 39 64;    /* Subtle dark blue background */
     --on-primary: 255 255 255;
 
-    --ink-button: 255 255 255;
-    --on-ink-button: 0 0 0;
-    --fb-blue: 76 181 249;
-    --meta-link: 76 181 249;
-    --oculus-purple: 168 85 247;
-
     /* Dark Semantic */
     --success: 50 186 94;
     --success-bg: 19 43 28;
@@ -86,6 +76,7 @@
     --warning-bg: 45 35 15;
     --critical: 237 73 86;       /* #ED4956 */
     --critical-strong: 239 68 68;
+    --critical-bg: 52 20 24;
 
     /* Dark Surfaces */
     --canvas: 0 0 0;             /* #000000 Pitch Black OLED */

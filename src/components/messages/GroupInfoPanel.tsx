@@ -134,13 +134,13 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
  switch (role) {
  case"owner":
  return (
- <span className="flex items-center gap-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+ <span className="flex items-center gap-0.5 text-micro font-medium text-amber-600 dark:text-amber-400">
  <Crown className="h-3 w-3" /> Owner
  </span>
  )
  case"admin":
  return (
- <span className="flex items-center gap-0.5 text-[10px] font-medium text-primary">
+ <span className="flex items-center gap-0.5 text-micro font-medium text-primary">
  <ShieldCheck className="h-3 w-3" /> Admin
  </span>
  )
@@ -396,7 +396,7 @@ export function GroupInfoPanel({ conversationId, onClose }: GroupInfoPanelProps)
  {getRoleBadge(member.role)}
  </div>
  {member.username && (
- <p className="text-[10px] text-muted-foreground">
+ <p className="text-micro text-muted-foreground">
  @{member.username}
  </p>
  )}

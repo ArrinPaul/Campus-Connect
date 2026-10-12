@@ -201,10 +201,10 @@ export default function LeaderboardPage() {
               <Link href={`/profile/${topThree[1].userId}`} className="font-bold text-sm text-foreground hover:underline">
                 {topThree[1].name}
               </Link>
-              <p className="text-[11px] text-muted-foreground truncate max-w-[160px]">{topThree[1].university || "Campus Scholar"}</p>
+              <p className="text-tiny text-muted-foreground truncate max-w-[160px]">{topThree[1].university || "Campus Scholar"}</p>
               <div className="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/60 text-muted-foreground-700 dark:text-muted-foreground-300 text-xs font-bold">
                 <span>{topThree[1].points} pts</span>
-                <span className="text-[10px] text-muted-foreground">· Lvl {topThree[1].level}</span>
+                <span className="text-micro text-muted-foreground">· Lvl {topThree[1].level}</span>
               </div>
             </div>
           )}
@@ -212,7 +212,7 @@ export default function LeaderboardPage() {
           {/* Rank 1 (Gold) */}
           {topThree[0] && (
             <div className="bg-card border-2 border-amber-500/30 rounded-lg p-6 flex flex-col items-center text-center relative order-1 md:order-2 bg-gradient-to-b from-amber-500/5 to-transparent shadow-md">
-              <div className="absolute -top-3 px-3 py-0.5 rounded-full bg-amber-500 text-white font-extrabold text-[11px] flex items-center gap-1 shadow-sm">
+              <div className="absolute -top-3 px-3 py-0.5 rounded-full bg-amber-500 text-white font-extrabold text-tiny flex items-center gap-1 shadow-sm">
                 <Trophy className="w-3.5 h-3.5 fill-current" /> #1 Champion
               </div>
               <div className="h-20 w-20 rounded-full overflow-hidden border-4 border-amber-500 relative mb-3 bg-muted shadow-sm">
@@ -231,7 +231,7 @@ export default function LeaderboardPage() {
               <div className="mt-3 flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-400 text-sm font-extrabold">
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>{topThree[0].points} pts</span>
-                <span className="text-[11px] font-semibold opacity-80">· Lvl {topThree[0].level}</span>
+                <span className="text-tiny font-semibold opacity-80">· Lvl {topThree[0].level}</span>
               </div>
             </div>
           )}
@@ -254,10 +254,10 @@ export default function LeaderboardPage() {
               <Link href={`/profile/${topThree[2].userId}`} className="font-bold text-sm text-foreground hover:underline">
                 {topThree[2].name}
               </Link>
-              <p className="text-[11px] text-muted-foreground truncate max-w-[160px]">{topThree[2].university || "Campus Scholar"}</p>
+              <p className="text-tiny text-muted-foreground truncate max-w-[160px]">{topThree[2].university || "Campus Scholar"}</p>
               <div className="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-700/10 text-amber-800 dark:text-amber-400 text-xs font-bold">
                 <span>{topThree[2].points} pts</span>
-                <span className="text-[10px] text-muted-foreground">· Lvl {topThree[2].level}</span>
+                <span className="text-micro text-muted-foreground">· Lvl {topThree[2].level}</span>
               </div>
             </div>
           )}
@@ -267,7 +267,7 @@ export default function LeaderboardPage() {
       {/* Full Leaderboard List */}
       {!isLoading && (searchFilter ? filteredEntries : remainingEntries).length > 0 && (
         <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm divide-y divide-hairline">
-          <div className="px-5 py-3 bg-muted/40 text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+          <div className="px-5 py-3 bg-muted/40 text-tiny font-bold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
             <div className="flex items-center gap-4">
               <span className="w-6 text-center">#</span>
               <span>Scholar</span>
@@ -307,12 +307,12 @@ export default function LeaderboardPage() {
                       {entry.name}
                     </Link>
                     {entry.role && (
-                      <span className="hidden sm:inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                      <span className="hidden sm:inline-block text-micro font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
                         {entry.role}
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-muted-foreground truncate max-w-[200px] sm:max-w-none">
+                  <p className="text-tiny text-muted-foreground truncate max-w-[200px] sm:max-w-none">
                     {entry.university || "Academic Contributor"}
                   </p>
                 </div>
@@ -339,7 +339,7 @@ export default function LeaderboardPage() {
                   <span className="text-xs sm:text-sm font-extrabold text-primary">
                     {entry.points} pts
                   </span>
-                  <p className="text-[10px] text-muted-foreground font-semibold">
+                  <p className="text-micro text-muted-foreground font-semibold">
                     Lvl {entry.level}
                   </p>
                 </div>

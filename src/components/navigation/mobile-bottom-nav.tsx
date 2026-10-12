@@ -95,7 +95,7 @@ export function MobileBottomNav() {
                 )}
               >
                 <AvatarImage src={user?.profilePicture} alt="" />
-                <AvatarFallback className="text-[10px] bg-muted font-bold text-foreground">
+                <AvatarFallback className="text-micro bg-muted font-bold text-foreground">
                   {user?.name?.substring(0, 2).toUpperCase() || "CC"}
                 </AvatarFallback>
               </Avatar>
@@ -103,7 +103,7 @@ export function MobileBottomNav() {
             {badge > 0 && (
               <span
                 aria-hidden="true"
-                className="absolute top-0.5 right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-critical px-1 text-[10px] font-bold text-white ring-1 ring-background"
+                className="absolute top-0.5 right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-critical px-1 text-micro font-bold text-white ring-1 ring-background"
               >
                 {badge > 99 ? "99+" : badge}
               </span>

@@ -217,7 +217,7 @@ export function CommentList({
                 {comment.author?.name || "Unknown User"}
               </p>
             )}
-            <span suppressHydrationWarning className="text-[11px] font-medium text-muted-foreground">
+            <span suppressHydrationWarning className="text-tiny font-medium text-muted-foreground">
               {formatTimestamp(comment.createdAt)}
             </span>
  </div>

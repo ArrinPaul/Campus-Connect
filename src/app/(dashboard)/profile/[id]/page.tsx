@@ -53,9 +53,9 @@ async function ProfilePageContent({ userId }: { userId: Id<'users'> }) {
                   <Link 
                     key={course.id} 
                     href={`/communities/${course.slug}`}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border rounded-full hover:border-fb-blue transition-colors"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border rounded-full hover:border-primary transition-colors"
                   >
-                    <BookOpen className="w-4 h-4 text-fb-blue" />
+                    <BookOpen className="w-4 h-4 text-primary" />
                     <span className="text-body-sm-bold text-foreground">{course.name}</span>
                   </Link>
                 ))}

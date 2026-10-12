@@ -78,7 +78,7 @@ export function ConversationListItem({
           )}>
             {otherUser.name}
           </h3>
-          <span className="text-[10px] text-foreground-muted-48 font-semibold uppercase tracking-wider" suppressHydrationWarning>
+          <span className="text-micro text-foreground-muted-48 font-semibold uppercase tracking-wider" suppressHydrationWarning>
             {formatDistanceToNow(conversation.updatedAt, { addSuffix: false })}
           </span>
         </div>
@@ -90,7 +90,7 @@ export function ConversationListItem({
             {conversation.lastMessage || "No messages yet"}
           </p>
           {(conversation.unreadCount ?? 0) > 0 && (
-            <div className="h-4 min-w-[16px] px-1 rounded-full bg-primary text-[10px] font-bold text-white flex items-center justify-center shadow-sm">
+            <div className="h-4 min-w-[16px] px-1 rounded-full bg-primary text-micro font-bold text-white flex items-center justify-center shadow-sm">
               {conversation.unreadCount}
             </div>
           )}

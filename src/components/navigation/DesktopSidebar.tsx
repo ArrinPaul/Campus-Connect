@@ -166,7 +166,7 @@ export function DesktopSidebar({
           <Icon className={cn("h-5 w-5", active ? "stroke-[2.25px]" : "stroke-[1.8]")} aria-hidden="true" />
           {count > 0 && (
             <span
-              className="absolute -top-1.5 -right-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-critical px-1 text-[10px] font-bold text-white ring-1 ring-background"
+              className="absolute -top-1.5 -right-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-critical px-1 text-micro font-bold text-white ring-1 ring-background"
               aria-hidden="true"
             >
               {count > 99 ? "99+" : count}
@@ -190,7 +190,7 @@ export function DesktopSidebar({
     >
       <Avatar className="h-8 w-8 shrink-0">
         <AvatarImage src={avatarSrc} alt="" />
-        <AvatarFallback className="text-[11px] bg-muted font-bold text-foreground">
+        <AvatarFallback className="text-tiny bg-muted font-bold text-foreground">
           {initials}
         </AvatarFallback>
       </Avatar>
@@ -253,7 +253,7 @@ export function DesktopSidebar({
                   group !== "core" && <div className="mx-3 mb-1 border-t border-border" aria-hidden="true" />
                 ) : (
                   group !== "core" && (
-                    <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    <p className="px-3 pb-1 text-tiny font-semibold uppercase tracking-wider text-muted-foreground">
                       {NAV_GROUP_LABELS[group]}
                     </p>
                   )

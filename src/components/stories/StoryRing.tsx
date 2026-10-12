@@ -68,7 +68,7 @@ export function StoryRing({
           className={cn(
             "flex h-[68px] w-[68px] items-center justify-center rounded-full p-[2.5px] transition-all",
             hasStories && hasUnseen
-              ? "bg-gradient-to-tr from-[#FEDA75] via-[#FA7E1E] via-[#D62976] via-[#962FBF] to-[#4F5BD5]"
+              ? "bg-gradient-to-tr from-warning via-critical to-primary"
               : hasStories
               ? "bg-border dark:bg-zinc-800"
               : isOwn
@@ -106,7 +106,7 @@ export function StoryRing({
       </div>
 
       {/* Label */}
-      <span className="max-w-[70px] truncate text-[11px] font-medium text-foreground tracking-tight text-center">
+      <span className="max-w-[70px] truncate text-tiny font-medium text-foreground tracking-tight text-center">
         {isOwn ? "Your story" : displayName}
       </span>
     </button>
@@ -183,7 +183,7 @@ function AddStoryButton({ onClick }: { onClick: () => void }) {
           <Plus className="h-5 w-5 stroke-[2.5]" />
         </div>
       </div>
-      <span className="max-w-[70px] truncate text-[11px] font-medium text-foreground tracking-tight text-center">
+      <span className="max-w-[70px] truncate text-tiny font-medium text-foreground tracking-tight text-center">
         Your story
       </span>
     </button>

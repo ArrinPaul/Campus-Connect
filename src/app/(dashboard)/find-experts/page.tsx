@@ -177,7 +177,7 @@ export default function FindExpertsPage() {
                           </h3>
                           <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
                         </div>
-                        <span className="text-[10px] rounded-full bg-accent-violet/10 px-2 py-0.5 font-semibold text-accent-violet inline-block mt-0.5">
+                        <span className="text-micro rounded-full bg-accent-violet/10 px-2 py-0.5 font-semibold text-accent-violet inline-block mt-0.5">
                           {user.role || 'Faculty'}
                         </span>
                         
@@ -219,7 +219,7 @@ export default function FindExpertsPage() {
                         <span
                           key={skill}
                           onClick={() => setSearchQuery(skill)}
-                          className="text-[11px] px-2.5 py-1 rounded-lg bg-canvas border border-border text-foreground hover:border-accent-violet cursor-pointer transition-colors"
+                          className="text-tiny px-2.5 py-1 rounded-lg bg-canvas border border-border text-foreground hover:border-accent-violet cursor-pointer transition-colors"
                         >
                           {skill}
                         </span>

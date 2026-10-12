@@ -57,7 +57,7 @@ export const Input = ({
       placeholder={placeholder}
       className="w-full h-11 px-4 rounded-sm border border-border bg-card text-body focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm"
     />
-    {subtext && <p className="text-[11px] text-foreground-muted-48 font-medium italic">{subtext}</p>}
+    {subtext && <p className="text-tiny text-foreground-muted-48 font-medium italic">{subtext}</p>}
   </div>
 )
 
@@ -95,7 +95,7 @@ export const Textarea = ({
         rows={4}
       />
       {maxLength && (
-        <p className="absolute bottom-2 right-3 text-[10px] text-foreground-muted-48 font-bold uppercase tracking-widest">
+        <p className="absolute bottom-2 right-3 text-micro text-foreground-muted-48 font-bold uppercase tracking-widest">
           {value?.length || 0} / {maxLength}
         </p>
       )}

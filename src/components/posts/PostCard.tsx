@@ -478,7 +478,7 @@ export const PostCard = memo(function PostCard({
                     updated > created + 5000
                   )
                 })() && (
-                  <span suppressHydrationWarning className="text-[11px] text-muted-foreground/70 italic cursor-default select-none">
+                  <span suppressHydrationWarning className="text-tiny text-muted-foreground/70 italic cursor-default select-none">
                     · edited {formatTimestamp(updatedAtTimestamp)}
                   </span>
                 )}
@@ -521,7 +521,7 @@ export const PostCard = memo(function PostCard({
                       </>
                     ) : (
                       <div className="p-3 space-y-2">
-                        <p className="text-[10px] text-muted-foreground uppercase font-semibold">
+                        <p className="text-micro text-muted-foreground uppercase font-semibold">
                           Confirm Delete?
                         </p>
                         <div className="flex gap-2">

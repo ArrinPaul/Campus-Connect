@@ -1,9 +1,11 @@
-﻿import type { Config } from "tailwindcss"
+import type { Config } from "tailwindcss"
 
 /**
  * Campus Connect Design System
  *
- * Implements the exact tokens from DESIGN.md (Meta/Facebook design system).
+ * Tokens are CSS variables defined in src/app/globals.css (light + .dark);
+ * add a token there first, then expose it here. Prefer these over arbitrary
+ * values and raw palette classes (bg-red-500, text-[#hex], text-[11px]).
  */
 const config: Config = {
   darkMode: "class",
@@ -14,13 +16,13 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      // â”€â”€â”€ Typography â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      // Typography
       fontFamily: {
         sans: ["-apple-system", "BlinkMacSystemFont", "SF Pro Text", "Inter", "system-ui", "sans-serif"],
         display: ["-apple-system", "BlinkMacSystemFont", "SF Pro Display", "Inter", "system-ui", "sans-serif"],
       },
 
-      // â”€â”€â”€ Colors (from DESIGN.md) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      // 
       colors: {
         // Brand & Accent
         primary: {
@@ -29,13 +31,6 @@ const config: Config = {
           soft: "rgb(var(--primary-soft) / <alpha-value>)",
         },
         "on-primary": "rgb(var(--on-primary) / <alpha-value>)",
-        
-        "ink-button": "rgb(var(--ink-button) / <alpha-value>)",
-        "on-ink-button": "rgb(var(--on-ink-button) / <alpha-value>)",
-        
-        "fb-blue": "rgb(var(--fb-blue) / <alpha-value>)",
-        "meta-link": "rgb(var(--meta-link) / <alpha-value>)",
-        "oculus-purple": "rgb(var(--oculus-purple) / <alpha-value>)",
 
         // Semantic
         success: {
@@ -50,6 +45,7 @@ const config: Config = {
         critical: {
           DEFAULT: "rgb(var(--critical) / <alpha-value>)",
           strong: "rgb(var(--critical-strong) / <alpha-value>)",
+          bg: "rgb(var(--critical-bg) / <alpha-value>)",
         },
 
         // Surface
@@ -75,7 +71,7 @@ const config: Config = {
         },
         "disabled-text": "rgb(var(--disabled-text) / <alpha-value>)", 
 
-        // Legacy Compat â€” maps old/shadcn/stale tokens â†’ Apple Minimal values
+        // Legacy compat: maps old/shadcn/stale tokens -> Apple Minimal values
         border: "rgb(var(--hairline) / <alpha-value>)",
         input: "rgb(var(--hairline) / <alpha-value>)",
         ring: "rgb(var(--primary) / <alpha-value>)",
@@ -97,7 +93,7 @@ const config: Config = {
           foreground: "rgb(var(--card-foreground) / <alpha-value>)",
         },
 
-        // Destructive (shadcn compat â†’ critical)
+        // Destructive (shadcn compat -> critical)
         destructive: {
           DEFAULT: "rgb(var(--critical) / <alpha-value>)",
           foreground: "rgb(var(--on-primary) / <alpha-value>)",
@@ -122,7 +118,7 @@ const config: Config = {
         },
       },
 
-      // â”€â”€â”€ Border Radius (from DESIGN.md) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      // 
       borderRadius: {
         none: "0px",
         xs: "2px",       
@@ -137,7 +133,7 @@ const config: Config = {
         circle: "9999px",
       },
 
-      // â”€â”€â”€ Spacing (from DESIGN.md) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      // 
       spacing: {
         xxs: "4px",      
         xs: "8px",       
@@ -154,8 +150,11 @@ const config: Config = {
         hero: "120px",        
       },
 
-      // â”€â”€â”€ Typography (from DESIGN.md) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      // 
       fontSize: {
+        // Compact sizes for badges / metadata; replace text-[10px] / text-[11px].
+        micro: "10px",
+        tiny: "11px",
         "hero-display": ["64px", { lineHeight: "1.16", fontWeight: "500", letterSpacing: "0px" }],
         "display-lg": ["48px", { lineHeight: "1.17", fontWeight: "500", letterSpacing: "0px" }],
         "heading-lg": ["36px", { lineHeight: "1.28", fontWeight: "500", letterSpacing: "0px" }],
@@ -173,8 +172,8 @@ const config: Config = {
         "link-md": ["16px", { lineHeight: "1.50", letterSpacing: "-0.16px", fontWeight: "700" }],
       },
 
-      // â”€â”€â”€ Shadows â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-      // Motion — `animate-shimmer` is used across
+      // Shadows
+      // Motion  `animate-shimmer` is used across
       // src/components/ui/loading-skeleton.tsx (40+ call sites) but had no
       // matching keyframes/animation defined here; Tailwind silently drops
       // unknown utility classes, so every skeleton bar using it was static.

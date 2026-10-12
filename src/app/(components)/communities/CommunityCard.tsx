@@ -58,7 +58,7 @@ export function CommunityCard({ community }: Props) {
                 </div>
 
                 {/* Stats */}
-                <div className="flex items-center justify-center gap-2 mt-4 text-[11px] text-muted-foreground font-semibold uppercase tracking-wider">
+                <div className="flex items-center justify-center gap-2 mt-4 text-tiny text-muted-foreground font-semibold uppercase tracking-wider">
                     <Users className="h-3 w-3" />
                     <span>{community.memberCount} {community.memberCount === 1 ? 'member' : 'members'}</span>
                 </div>

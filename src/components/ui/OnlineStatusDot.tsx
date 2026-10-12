@@ -22,7 +22,7 @@ interface OnlineStatusDotProps {
 
 const statusColors: Record<string, string> = {
  online:"bg-success",
- away:"bg-yellow-500",
+ away:"bg-warning",
  dnd:"bg-critical",
  invisible:"bg-muted",
  offline:"bg-muted",
