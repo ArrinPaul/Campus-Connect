@@ -22,7 +22,7 @@ const config: Config = {
         display: ["-apple-system", "BlinkMacSystemFont", "SF Pro Display", "Inter", "system-ui", "sans-serif"],
       },
 
-      // 
+      // Colors
       colors: {
         // Brand & Accent
         primary: {
@@ -118,7 +118,7 @@ const config: Config = {
         },
       },
 
-      // 
+      // Border radius
       borderRadius: {
         none: "0px",
         xs: "2px",       
@@ -133,7 +133,7 @@ const config: Config = {
         circle: "9999px",
       },
 
-      // 
+      // Spacing
       spacing: {
         xxs: "4px",      
         xs: "8px",       
@@ -150,7 +150,7 @@ const config: Config = {
         hero: "120px",        
       },
 
-      // 
+      // Font sizes
       fontSize: {
         // Compact sizes for badges / metadata; replace text-[10px] / text-[11px].
         micro: "10px",
@@ -172,8 +172,8 @@ const config: Config = {
         "link-md": ["16px", { lineHeight: "1.50", letterSpacing: "-0.16px", fontWeight: "700" }],
       },
 
-      // Shadows
-      // Motion  `animate-shimmer` is used across
+      // Shadows and motion
+      // `animate-shimmer` is used across
       // src/components/ui/loading-skeleton.tsx (40+ call sites) but had no
       // matching keyframes/animation defined here; Tailwind silently drops
       // unknown utility classes, so every skeleton bar using it was static.
