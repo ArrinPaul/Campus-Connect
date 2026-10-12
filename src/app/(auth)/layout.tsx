@@ -7,7 +7,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
  {/* Left Panel — Decorative (desktop only) */}
  <div className="hidden lg:flex lg:w-[45%] xl:w-[50%] bg-card border-r border-border relative overflow-hidden flex-col justify-between p-12">
 
- {/* Logo — matches GlobalNav/DesktopSidebar CC icon pattern */}
+ {/* Logo — matches the DesktopSidebar CC brand mark */}
  <Link href="/" className="relative z-10 flex items-center gap-3">
  <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center shrink-0 shadow-sm">
  <span className="text-white text-lg font-bold">CC</span>

@@ -92,7 +92,7 @@ export function MainLayout({
           id="main-content"
           className={cn(
             "flex-1 min-w-0 flex flex-col justify-start transition-all duration-300 border-x border-border/40 md:px-8 md:py-6",
-            isMobileConversationView ? "px-0 py-0 pb-0 md:pb-12" : "px-4 sm:px-6 py-4 pb-24 md:pb-12",
+            isMobileConversationView ? "px-0 py-0 pb-0 md:pb-12" : "px-4 sm:px-6 py-4 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] md:pb-12",
             isFullWidthPage ? "w-full" : "items-center"
           )}
         >

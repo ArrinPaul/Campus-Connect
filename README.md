@@ -68,7 +68,7 @@ src/
     messages/         # ChatWindow, ChatInput, MessageBubble, TypingIndicator
     communities/      # CommunityCard, InviteMemberModal
     profile/          # ProfileHeader, SkillsManager, FollowersList
-    navigation/       # DesktopSidebar, MobileBottomNav, MobileNav
+    navigation/       # DesktopSidebar, MobileBottomNav, MobileTopBar, nav-config (shared)
   hooks/              # Custom hooks (useRealtimeMessages, useRealtimeFeed, useHeartbeat, useWebRTC)
   lib/
     supabase/         # Supabase clients (client, server, middleware, admin)

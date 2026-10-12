@@ -5,8 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useUser, useAuthActions } from "@/lib/auth/client";
-import { useQuery } from "@/lib/api";
-import { api } from "@/lib/api";
+import { useQuery, api } from "@/lib/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Tooltip,
@@ -15,32 +14,38 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-  Home,
-  Search,
-  Compass,
-  Send,
-  Heart,
-  PlusSquare,
-  Users,
-  Store,
-  Briefcase,
-  BookOpen,
-  Calendar,
-  Bookmark,
   Menu,
   Moon,
   Sun,
   LogOut,
-  Settings,
-  HelpCircle,
-  Activity,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import {
+  NAV_GROUP_LABELS,
+  PROFILE_HREF,
+  getSidebarItems,
+  isNavItemActive,
+  isProfileActive,
+  type NavGroup,
+  type NavItem,
+} from "./nav-config";
 
 interface DesktopSidebarProps {
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
 }
+
+interface CurrentUserRecord {
+  name?: string | null;
+  username?: string | null;
+  profile_picture?: string | null;
+  is_admin?: boolean | null;
+  role?: string | null;
+}
+
+const GROUP_ORDER: NavGroup[] = ["core", "discover", "academic", "opportunities", "account"];
 
 export function DesktopSidebar({
   isCollapsed: controlledCollapsed,
@@ -63,26 +68,36 @@ export function DesktopSidebar({
       setInternalCollapsed(saved === "true");
     }
 
-    // Outside click listener for More menu
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        moreMenuRef.current &&
-        !moreMenuRef.current.contains(event.target as Node)
-      ) {
+      if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
         setShowMoreMenu(false);
       }
     };
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setShowMoreMenu(false);
+    };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKey);
+    };
   }, []);
 
   const isCollapsed =
-    controlledCollapsed !== undefined
-      ? controlledCollapsed
-      : internalCollapsed;
+    controlledCollapsed !== undefined ? controlledCollapsed : internalCollapsed;
 
-  // Unread notifications & messages
+  const handleToggle = () => {
+    if (onToggleCollapse) {
+      onToggleCollapse();
+    } else {
+      const next = !internalCollapsed;
+      setInternalCollapsed(next);
+      localStorage.setItem("cc_sidebar_collapsed", String(next));
+    }
+  };
+
   const unreadNotifications = useQuery(
     api.notifications.getUnreadCount,
     isSignedIn ? {} : "skip"
@@ -91,307 +106,214 @@ export function DesktopSidebar({
     api.conversations.getTotalUnreadCount,
     isSignedIn ? {} : "skip"
   );
+  const dbUser = useQuery(
+    api.users.getCurrentUser,
+    isSignedIn ? {} : "skip"
+  ) as CurrentUserRecord | null | undefined;
 
-  const navItems = [
-    {
-      id: "home",
-      label: "Home",
-      href: "/feed",
-      icon: Home,
-      isActive: pathname === "/" || pathname === "/feed",
-    },
-    {
-      id: "search",
-      label: "Search",
-      href: "/search",
-      icon: Search,
-      isActive: pathname?.startsWith("/search"),
-    },
-    {
-      id: "explore",
-      label: "Explore",
-      href: "/explore",
-      icon: Compass,
-      isActive: pathname?.startsWith("/explore") || pathname?.startsWith("/hashtag"),
-    },
-    {
-      id: "messages",
-      label: "Messages",
-      href: "/messages",
-      icon: Send,
-      badge: typeof totalUnreadMessages === "number" ? totalUnreadMessages : 0,
-      iconClass: "-rotate-12",
-      isActive: pathname?.startsWith("/messages"),
-    },
-    {
-      id: "notifications",
-      label: "Notifications",
-      href: "/notifications",
-      icon: Heart,
-      badge: typeof unreadNotifications === "number" ? unreadNotifications : 0,
-      isActive: pathname?.startsWith("/notifications"),
-    },
-    {
-      id: "create",
-      label: "Create",
-      href: "/feed#create",
-      icon: PlusSquare,
-      isActive: false,
-    },
-    {
-      id: "marketplace",
-      label: "Marketplace",
-      href: "/marketplace",
-      icon: Store,
-      isActive: pathname?.startsWith("/marketplace"),
-    },
-    {
-      id: "jobs",
-      label: "Jobs",
-      href: "/jobs",
-      icon: Briefcase,
-      isActive: pathname?.startsWith("/jobs"),
-    },
-    {
-      id: "research",
-      label: "Research",
-      href: "/research",
-      icon: BookOpen,
-      isActive: pathname?.startsWith("/research"),
-    },
-    {
-      id: "communities",
-      label: "Communities",
-      href: "/communities",
-      icon: Users,
-      isActive: pathname?.startsWith("/communities"),
-    },
-    {
-      id: "events",
-      label: "Events",
-      href: "/events",
-      icon: Calendar,
-      isActive: pathname?.startsWith("/events"),
-    },
-    {
-      id: "bookmarks",
-      label: "Saved",
-      href: "/bookmarks",
-      icon: Bookmark,
-      isActive: pathname?.startsWith("/bookmarks"),
-    },
-    {
-      id: "profile",
-      label: "Profile",
-      href: "/profile/me",
-      isProfile: true,
-      isActive: pathname?.startsWith("/profile"),
-    },
-  ];
+  const isAdmin = !!dbUser && (dbUser.is_admin === true || dbUser.role === "admin");
+  const items = getSidebarItems({ isAdmin });
+
+  const displayName = dbUser?.name || user?.name || "Your profile";
+  const handle = dbUser?.username ? `@${dbUser.username}` : user?.email ?? "";
+  const avatarSrc = dbUser?.profile_picture || user?.profilePicture || undefined;
+  const initials = displayName.substring(0, 2).toUpperCase();
+  const profileActive = isProfileActive(pathname, user?.id);
+
+  const badgeFor = (item: NavItem): number => {
+    if (item.badge === "messages") return typeof totalUnreadMessages === "number" ? totalUnreadMessages : 0;
+    if (item.badge === "notifications") return typeof unreadNotifications === "number" ? unreadNotifications : 0;
+    return 0;
+  };
+
+  const withTooltip = (key: string, label: string, node: React.ReactElement) =>
+    isCollapsed ? (
+      <Tooltip key={key}>
+        <TooltipTrigger asChild>{node}</TooltipTrigger>
+        <TooltipContent side="right" sideOffset={12}>
+          <p className="font-semibold text-xs">{label}</p>
+        </TooltipContent>
+      </Tooltip>
+    ) : (
+      node
+    );
+
+  const itemClass = (active: boolean) =>
+    cn(
+      "flex items-center gap-3 px-3 py-2 rounded-xl transition-colors motion-reduce:transition-none font-medium relative group",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+      active
+        ? "bg-primary/10 text-primary font-semibold"
+        : "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
+      isCollapsed && "justify-center px-0 w-11 h-11 mx-auto"
+    );
+
+  const renderItem = (item: NavItem) => {
+    const active = isNavItemActive(item, pathname);
+    const count = badgeFor(item);
+    const Icon = item.icon;
+    const accessibleName = count > 0 ? `${item.label}, ${count} unread` : item.label;
+
+    const node = (
+      <Link
+        key={item.id}
+        href={item.href}
+        className={itemClass(active)}
+        aria-current={active ? "page" : undefined}
+        aria-label={isCollapsed ? accessibleName : undefined}
+      >
+        <span className="relative shrink-0 flex items-center justify-center">
+          <Icon className={cn("h-5 w-5", active ? "stroke-[2.25px]" : "stroke-[1.8]")} aria-hidden="true" />
+          {count > 0 && (
+            <span
+              className="absolute -top-1.5 -right-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-critical px-1 text-[10px] font-bold text-white ring-1 ring-background"
+              aria-hidden="true"
+            >
+              {count > 99 ? "99+" : count}
+            </span>
+          )}
+        </span>
+        {!isCollapsed && <span className="text-sm truncate">{item.label}</span>}
+        {!isCollapsed && count > 0 && <span className="sr-only">{count} unread</span>}
+      </Link>
+    );
+
+    return withTooltip(item.id, item.label, node);
+  };
+
+  const profileNode = (
+    <Link
+      href={PROFILE_HREF}
+      className={cn(itemClass(profileActive), "gap-3", !isCollapsed && "py-2.5")}
+      aria-current={profileActive ? "page" : undefined}
+      aria-label={isCollapsed ? `Profile: ${displayName}` : undefined}
+    >
+      <Avatar className="h-8 w-8 shrink-0">
+        <AvatarImage src={avatarSrc} alt="" />
+        <AvatarFallback className="text-[11px] bg-muted font-bold text-foreground">
+          {initials}
+        </AvatarFallback>
+      </Avatar>
+      {!isCollapsed && (
+        <span className="min-w-0 flex flex-col leading-tight">
+          <span className="text-sm font-semibold truncate">{displayName}</span>
+          {handle && <span className="text-xs text-muted-foreground truncate">{handle}</span>}
+        </span>
+      )}
+    </Link>
+  );
 
   return (
     <TooltipProvider delayDuration={150}>
       <aside
         className={cn(
-          "flex flex-col h-full bg-background dark:bg-black border-r border-border transition-all duration-200 select-none z-30 px-3 py-4 justify-between relative",
-          isCollapsed ? "w-[72px]" : "w-[245px] xl:w-[260px]"
+          "flex flex-col h-full bg-background border-r border-border transition-[width] duration-200 motion-reduce:transition-none z-30 px-3 py-4 relative",
+          isCollapsed ? "w-[72px]" : "w-[232px] xl:w-[260px]"
         )}
-        aria-label="Instagram Style Desktop Sidebar"
+        aria-label="Primary"
       >
-        {/* Top Header / Brand Logo */}
-        <div className="flex flex-col gap-4 overflow-hidden">
-          <div className="px-3 pt-1">
-            <Link
-              href="/feed"
-              className="flex items-center gap-3 active:scale-95 transition-transform focus:outline-none"
-            >
-              {isCollapsed ? (
-                <span className="text-[20px] font-black tracking-tight text-foreground font-sans">
-                  CC
-                </span>
-              ) : (
-                <span className="text-[22px] font-bold tracking-tight text-foreground font-sans">
-                  Campus Connect
-                </span>
-              )}
-            </Link>
-          </div>
-
-          {/* Navigation Item Stack (Scrollable if height constrained) */}
-          <nav className="flex flex-col gap-1 overflow-y-auto no-scrollbar max-h-[calc(100vh-140px)] pr-1">
-            {navItems.map((item) => {
-              const active = item.isActive;
-
-              const linkNode = (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center gap-4 px-3 py-2.5 rounded-xl transition-all font-medium text-foreground relative group",
-                    active ? "font-bold" : "hover:bg-muted/60 text-foreground/80 hover:text-foreground",
-                    isCollapsed && "justify-center px-0 w-12 h-11 mx-auto"
-                  )}
-                  aria-current={active ? "page" : undefined}
-                >
-                  {item.isProfile ? (
-                    <div className="relative shrink-0 flex items-center justify-center">
-                      <Avatar
-                        className={cn(
-                          "h-6 w-6 transition-all",
-                          active
-                            ? "ring-2 ring-foreground ring-offset-2 ring-offset-background"
-                            : "border border-border"
-                        )}
-                      >
-                        <AvatarImage src={user?.profilePicture} alt={user?.name || "Profile"} />
-                        <AvatarFallback className="text-[10px] bg-muted font-bold text-foreground">
-                          {user?.name?.substring(0, 2).toUpperCase() || "CC"}
-                        </AvatarFallback>
-                      </Avatar>
-                    </div>
-                  ) : (
-                    <div className="relative shrink-0 flex items-center justify-center">
-                      {item.icon && (
-                        <item.icon
-                          className={cn(
-                            "h-[21px] w-[21px] transition-transform group-hover:scale-105",
-                            active ? "stroke-[2.5px] text-foreground" : "stroke-[1.8] text-foreground",
-                            item.iconClass
-                          )}
-                        />
-                      )}
-                      {item.badge !== undefined && item.badge > 0 && (
-                        <span className="absolute -top-1 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#ED4956] px-1 text-[9px] font-bold text-white ring-1 ring-background">
-                          {item.badge > 99 ? "99+" : item.badge}
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {!isCollapsed && (
-                    <span className={cn("text-[14.5px] tracking-tight", active ? "font-bold text-foreground" : "text-foreground")}>
-                      {item.label}
-                    </span>
-                  )}
-                </Link>
-              );
-
-              if (isCollapsed) {
-                return (
-                  <Tooltip key={item.id}>
-                    <TooltipTrigger asChild>{linkNode}</TooltipTrigger>
-                    <TooltipContent side="right" sideOffset={12}>
-                      <p className="font-semibold text-xs">{item.label}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                );
-              }
-
-              return linkNode;
-            })}
-          </nav>
+        {/* Brand + collapse toggle */}
+        <div
+          className={cn(
+            "flex items-center pb-3 shrink-0",
+            isCollapsed ? "flex-col gap-2" : "justify-between px-2"
+          )}
+        >
+          <Link
+            href="/feed"
+            className="font-bold tracking-tight text-foreground rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            aria-label="Campus Connect home"
+          >
+            {isCollapsed ? <span className="text-xl font-black">CC</span> : <span className="text-xl">Campus Connect</span>}
+          </Link>
+          <button
+            type="button"
+            onClick={handleToggle}
+            className="h-8 w-8 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-pressed={isCollapsed}
+          >
+            {isCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+          </button>
         </div>
 
-        {/* Bottom Menu / More Options */}
-        <div className="relative pt-2" ref={moreMenuRef}>
+        {/* Identity */}
+        {isSignedIn && (
+          <div className="shrink-0 pb-2">{withTooltip("profile", displayName, profileNode)}</div>
+        )}
+
+        {/* Navigation (scrolls when the viewport is short) */}
+        <nav className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col gap-0.5" aria-label="Main navigation">
+          {GROUP_ORDER.map((group) => {
+            const groupItems = items.filter((i) => i.group === group);
+            if (groupItems.length === 0) return null;
+            return (
+              <div key={group} className="flex flex-col gap-0.5 pt-2">
+                {isCollapsed ? (
+                  group !== "core" && <div className="mx-3 mb-1 border-t border-border" aria-hidden="true" />
+                ) : (
+                  group !== "core" && (
+                    <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      {NAV_GROUP_LABELS[group]}
+                    </p>
+                  )
+                )}
+                {groupItems.map(renderItem)}
+              </div>
+            );
+          })}
+        </nav>
+
+        {/* More: appearance and sign out */}
+        <div className="relative pt-2 shrink-0" ref={moreMenuRef}>
           {showMoreMenu && (
             <div
-              className={cn(
-                "absolute bottom-full mb-3 bg-card border border-border rounded-2xl shadow-2xl p-1.5 z-50 animate-in fade-in slide-in-from-bottom-2 duration-150 backdrop-blur-xl",
-                isCollapsed ? "left-0 w-60" : "left-0 w-64"
-              )}
+              className="absolute bottom-full mb-2 left-0 w-60 bg-card border border-border rounded-2xl shadow-lg p-1.5 z-50"
+              role="menu"
             >
-              {/* Settings */}
-              <Link
-                href="/settings"
-                onClick={() => setShowMoreMenu(false)}
-                className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors"
-              >
-                <Settings className="h-4 w-4 text-muted-foreground" />
-                <span>Settings</span>
-              </Link>
-
-              {/* Your Activity */}
-              <Link
-                href="/notifications"
-                onClick={() => setShowMoreMenu(false)}
-                className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors"
-              >
-                <Activity className="h-4 w-4 text-muted-foreground" />
-                <span>Your Activity</span>
-              </Link>
-
-              {/* Saved */}
-              <Link
-                href="/bookmarks"
-                onClick={() => setShowMoreMenu(false)}
-                className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors"
-              >
-                <Bookmark className="h-4 w-4 text-muted-foreground" />
-                <span>Saved</span>
-              </Link>
-
-              {/* Theme Toggle */}
               {mounted && (
                 <button
                   type="button"
-                  onClick={() => {
-                    setTheme(theme === "dark" ? "light" : "dark");
-                  }}
-                  className="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors text-left"
+                  role="menuitem"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors text-left"
                 >
-                  <div className="flex items-center gap-3">
-                    {theme === "dark" ? (
-                      <Moon className="h-4 w-4 text-indigo-400" />
-                    ) : (
-                      <Sun className="h-4 w-4 text-amber-500" />
-                    )}
-                    <span>Switch Appearance</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground capitalize">
-                    {theme === "dark" ? "Dark" : "Light"}
+                  <span className="flex items-center gap-3">
+                    {theme === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                    Switch appearance
                   </span>
+                  <span className="text-xs text-muted-foreground">{theme === "dark" ? "Dark" : "Light"}</span>
                 </button>
               )}
-
-              {/* Help & Support */}
-              <Link
-                href="/q-and-a"
-                onClick={() => setShowMoreMenu(false)}
-                className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors"
-              >
-                <HelpCircle className="h-4 w-4 text-muted-foreground" />
-                <span>Help & Q&A</span>
-              </Link>
-
-              {/* Log Out */}
               {isSignedIn && (
                 <button
                   type="button"
+                  role="menuitem"
                   onClick={() => signOut({ redirectUrl: "/" })}
-                  className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium text-[#ED4956] hover:bg-rose-500/10 transition-colors text-left border-t border-border mt-1 pt-3"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-critical hover:bg-critical/10 transition-colors text-left"
                 >
                   <LogOut className="h-4 w-4" />
-                  <span>Log Out</span>
+                  Log out
                 </button>
               )}
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={() => setShowMoreMenu((prev) => !prev)}
-            className={cn(
-              "flex items-center gap-4 px-3 py-2.5 rounded-xl transition-all font-medium text-foreground hover:bg-muted/60 w-full group focus:outline-none cursor-pointer",
-              showMoreMenu && "bg-muted/70 font-bold",
-              isCollapsed && "justify-center px-0 w-12 h-11 mx-auto"
-            )}
-            aria-label="More options"
-            aria-expanded={showMoreMenu}
-          >
-            <Menu className="h-[22px] w-[22px] stroke-[1.8] text-foreground group-hover:scale-105 transition-transform" />
-            {!isCollapsed && <span className="text-[15px]">More</span>}
-          </button>
+          {withTooltip(
+            "more",
+            "More",
+            <button
+              type="button"
+              onClick={() => setShowMoreMenu((prev) => !prev)}
+              className={cn(itemClass(showMoreMenu), "w-full cursor-pointer")}
+              aria-label="More options"
+              aria-expanded={showMoreMenu}
+              aria-haspopup="menu"
+            >
+              <Menu className="h-5 w-5 stroke-[1.8]" aria-hidden="true" />
+              {!isCollapsed && <span className="text-sm">More</span>}
+            </button>
+          )}
         </div>
       </aside>
     </TooltipProvider>
